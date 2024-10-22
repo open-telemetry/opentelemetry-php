@@ -34,6 +34,16 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
         return new LogsExporter($this->buildTransport($protocol));
     }
 
+    public function type(): string
+    {
+        return 'otlp';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
+
     /**
      * @psalm-suppress UndefinedClass
      */

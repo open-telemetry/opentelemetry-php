@@ -8,6 +8,7 @@ use Http\Discovery\Exception\NotFoundException;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -47,7 +48,7 @@ class AutoRootSpan
             : (int) microtime(true);
         $span = $tracer->spanBuilder($request->getMethod())
             ->setSpanKind(SpanKind::KIND_SERVER)
-            ->setStartTimestamp((int) ($startTime*1_000_000))
+            ->setStartTimestamp((int) ($startTime*ClockInterface::NANOS_PER_SECOND))
             ->setParent($parent)
             ->setAttribute(TraceAttributes::URL_FULL, (string) $request->getUri())
             ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $request->getMethod())

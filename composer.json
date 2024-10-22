@@ -117,84 +117,50 @@
         "ext-yaml": "Allows loading config from yaml files",
         "symfony/yaml": "Allows loading config from yaml files"
     },
-    "scripts": {
-        "pre-autoload-dump": "OpenTelemetry\\SDK\\ComposerRegistry::generate"
-    },
     "extra": {
         "bamarni-bin": {
             "bin-links": false,
             "target-directory": "vendor-bin",
             "forward-command": true
         },
-        "opentelemetry": {
-            "registry": {
-                "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": {
-                    "http": "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory",
-                    "grpc": "OpenTelemetry\\Contrib\\Grpc\\GrpcTransportFactory",
-                    "stream": "OpenTelemetry\\SDK\\Common\\Export\\Stream\\StreamTransportFactory"
-                },
-                "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": {
-                    "console": "OpenTelemetry\\SDK\\Trace\\SpanExporter\\ConsoleSpanExporterFactory",
-                    "memory": "OpenTelemetry\\SDK\\Trace\\SpanExporter\\InMemorySpanExporterFactory",
-                    "stream": "OpenTelemetry\\SDK\\Common\\Export\\Stream\\StreamTransportFactory",
-                    "otlp": "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory",
-                    "zipkin": "OpenTelemetry\\Contrib\\Zipkin\\SpanExporterFactory"
-                },
-                "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": {
-                    "memory": "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\InMemoryExporterFactory",
-                    "console": "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\ConsoleMetricExporterFactory",
-                    "none": "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\NoopMetricExporterFactory",
-                    "otlp": "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory"
-                },
-                "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorInterface": {
-                    "baggage": [
-                        "OpenTelemetry\\API\\Baggage\\Propagation\\BaggagePropagator",
-                        "getInstance"
-                    ],
-                    "tracecontext": [
-                        "OpenTelemetry\\API\\Trace\\Propagation\\TraceContextPropagator",
-                        "getInstance"
-                    ],
-                    "none": [
-                        "OpenTelemetry\\Context\\Propagation\\NoopTextMapPropagator",
-                        "getInstance"
-                    ],
-                    "b3": [
-                        "OpenTelemetry\\Extension\\Propagator\\B3\\B3Propagator",
-                        "getB3SingleHeaderInstance"
-                    ],
-                    "b3multi": [
-                        "OpenTelemetry\\Extension\\Propagator\\B3\\B3Propagator",
-                        "getB3MultiHeaderInstance"
-                    ],
-                    "cloudtrace": [
-                        "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagator",
-                        "getInstance"
-                    ],
-                    "cloudtrace-oneway": [
-                        "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagator",
-                        "getOneWayInstance"
-                    ],
-                    "jaeger": [
-                        "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerPropagator",
-                        "getInstance"
-                    ],
-                    "jaeger-baggage": [
-                        "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerBaggagePropagator",
-                        "getInstance"
-                    ]
-                },
-                "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": {
-                    "console": "OpenTelemetry\\SDK\\Logs\\Exporter\\ConsoleExporterFactory",
-                    "memory": "OpenTelemetry\\SDK\\Logs\\Exporter\\InMemoryExporterFactory",
-                    "otlp": "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
-                },
-                "OpenTelemetry\\SDK\\Resource\\ResourceDetectorInterface": {
-                    "test": "OpenTelemetry\\Example\\TestResourceDetector"
-                }
-            }
-        },
         "spi": {
+            "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
+                "OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory",
+                "OpenTelemetry\\Contrib\\Grpc\\GrpcTransportFactory",
+                "OpenTelemetry\\SDK\\Common\\Export\\Stream\\StreamTransportFactory"
+            ],
+            "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
+                "OpenTelemetry\\SDK\\Trace\\SpanExporter\\ConsoleSpanExporterFactory",
+                "OpenTelemetry\\SDK\\Trace\\SpanExporter\\InMemorySpanExporterFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory",
+                "OpenTelemetry\\Contrib\\Zipkin\\SpanExporterFactory"
+            ],
+            "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": [
+                "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\InMemoryExporterFactory",
+                "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\ConsoleMetricExporterFactory",
+                "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\NoopMetricExporterFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory"
+            ],
+            "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": [
+                "OpenTelemetry\\SDK\\Logs\\Exporter\\ConsoleExporterFactory",
+                "OpenTelemetry\\SDK\\Logs\\Exporter\\InMemoryExporterFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
+            ],
+            "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
+                    "OpenTelemetry\\API\\Baggage\\Propagation\\BaggagePropagatorFactory",
+                    "OpenTelemetry\\API\\Trace\\Propagation\\TraceContextPropagatorFactory",
+                    "OpenTelemetry\\Context\\Propagation\\NoopTextMapPropagatorFactory",
+                    "OpenTelemetry\\Extension\\Propagator\\B3\\B3PropagatorFactory",
+                    "OpenTelemetry\\Extension\\Propagator\\B3\\B3MultiPropagatorFactory",
+                    "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagatorFactory",
+                    "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTraceOneWayPropagatorFactory",
+                    "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerPropagatorFactory",
+                    "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerBaggagePropagatorFactory"
+            ],
+            "OpenTelemetry\\SDK\\Resource\\ResourceDetectorFactoryInterface": [
+                "OpenTelemetry\\Example\\TestResourceDetectorFactory"
+            ],
             "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",

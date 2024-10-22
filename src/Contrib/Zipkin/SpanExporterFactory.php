@@ -20,4 +20,13 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
 
         return new Exporter($transport);
     }
+
+    public function type(): string
+    {
+        return 'zipkin';
+    }
+    public function priority(): int
+    {
+        return 0;
+    }
 }

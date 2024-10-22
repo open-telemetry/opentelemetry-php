@@ -36,6 +36,16 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         return new MetricExporter($this->buildTransport($protocol), $temporality);
     }
 
+    public function type(): string
+    {
+        return 'otlp';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
+
     /**
      * @psalm-suppress UndefinedClass
      */

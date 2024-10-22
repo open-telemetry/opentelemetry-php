@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
-use OpenTelemetry\SDK\ComposerRegistry;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
@@ -150,8 +149,8 @@ class FactoryRegistryTest extends TestCase
 
     public function test_retrieve_from_composer_extra(): void
     {
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXPERIMENTAL_JSON_REGISTRY, 'true');
-        $this->assertFileExists(dirname(__DIR__, 3) . '/vendor/composer/' . ComposerRegistry::FILENAME);
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXPERIMENTAL_SPI_REGISTRY, 'true');
+        $this->assertFileExists(dirname(__DIR__, 3) . '/vendor/composer/GeneratedServiceProviderData.php');
         $this->assertInstanceOf(ResourceDetectorInterface::class, Registry::resourceDetector('test'));
     }
 }
