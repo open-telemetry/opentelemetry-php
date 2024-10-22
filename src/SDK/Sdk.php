@@ -30,9 +30,9 @@ class Sdk
         return Configuration::getBoolean(Variables::OTEL_SDK_DISABLED);
     }
 
-    public static function useJsonRegistry(): bool
+    public static function useSpiRegistry(): bool
     {
-        return Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_JSON_REGISTRY, false);
+        return Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_SPI_REGISTRY, false);
     }
 
     /**

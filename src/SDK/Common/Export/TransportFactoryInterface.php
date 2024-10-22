@@ -29,4 +29,7 @@ interface TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null,
     ): TransportInterface;
+
+    public function type(): string;
+    public function priority(): int;
 }

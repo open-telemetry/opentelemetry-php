@@ -31,4 +31,14 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
         return (new PsrTransportFactory())
             ->create($endpoint, $contentType, $headers, $compression, $timeout, $retryDelay, $maxRetries, $cacert, $cert, $key);
     }
+
+    public function type(): string
+    {
+        return 'http';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

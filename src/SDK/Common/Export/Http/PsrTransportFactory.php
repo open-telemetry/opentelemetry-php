@@ -43,6 +43,9 @@ final class PsrTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));
         }
         assert(!empty($endpoint));
+        if ($compression === 'none') {
+            $compression = null;
+        }
 
         $this->client ??= Discovery::find([
             'timeout' => $timeout,
@@ -73,5 +76,15 @@ final class PsrTransportFactory implements TransportFactoryInterface
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
         );
+    }
+
+    public function type(): string
+    {
+        return 'http';
+    }
+
+    public function priority(): int
+    {
+        return 0;
     }
 }

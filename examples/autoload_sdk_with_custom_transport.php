@@ -45,6 +45,16 @@ $factory = new class() implements \OpenTelemetry\SDK\Common\Export\TransportFact
             }
         };
     }
+
+    public function type(): string
+    {
+        return 'grpc';
+    }
+
+    public function priority(): int
+    {
+        return 100;
+    }
 };
 
 \OpenTelemetry\SDK\Registry::registerTransportFactory('grpc', $factory, true);
