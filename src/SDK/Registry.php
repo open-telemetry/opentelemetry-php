@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
@@ -24,8 +23,6 @@ use TypeError;
  */
 class Registry
 {
-    private static bool $initialized = false;
-
     /** @var array<string, SpanExporterFactoryInterface> $spanExporterFactories */
     private static array $spanExporterFactories = [];
     /** @var array<string, TransportFactoryInterface> $transportFactories */
@@ -40,27 +37,11 @@ class Registry
     /** @var array<string, ResourceDetectorInterface> $resourceDetectors */
     private static array $resourceDetectors = [];
 
-    public static function maybeInitFromSpi(): void
-    {
-        if (self::$initialized || Sdk::useSpiRegistry() === false) {
-            return;
-        }
-
-        self::$spanExporterFactories = self::initFactories(SpanExporterFactoryInterface::class);
-        self::$logRecordExporterFactories = self::initFactories(LogRecordExporterFactoryInterface::class);
-        self::$metricExporterFactories = self::initFactories(MetricExporterFactoryInterface::class);
-        self::$transportFactories = self::initFactories(TransportFactoryInterface::class);
-        self::$resourceDetectors = self::initFactoryInstances(ResourceDetectorFactoryInterface::class);
-        self::$textMapPropagators = self::initFactoryInstances(TextMapPropagatorFactoryInterface::class);
-
-        self::$initialized = true;
-    }
-
     /**
      * @param class-string $class
      * @phan-suppress PhanTypeNonVarPassByRef
      */
-    private static function initFactories(string $class): array
+    private static function getFactories(string $class): array
     {
         $factories = iterator_to_array(ServiceLoader::load($class));
         array_multisort(
@@ -80,7 +61,7 @@ class Registry
      * @param class-string $class
      * @phan-suppress PhanTypeNonVarPassByRef
      */
-    private static function initFactoryInstances(string $class): array
+    private static function getFactoryInstances(string $class): array
     {
         $factories = iterator_to_array(ServiceLoader::load($class));
         array_multisort(
@@ -216,11 +197,15 @@ class Registry
      */
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
-        self::maybeInitFromSpi();
-        if (!array_key_exists($exporter, self::$spanExporterFactories)) {
+        if (Sdk::useSpiRegistry()) {
+            $factories = self::getFactories(SpanExporterFactoryInterface::class);
+        } else {
+            $factories = self::$spanExporterFactories;
+        }
+        if (!array_key_exists($exporter, $factories)) {
             throw new RuntimeException('Span exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$spanExporterFactories[$exporter];
+        $class = $factories[$exporter];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof SpanExporterFactoryInterface);
 
@@ -232,11 +217,15 @@ class Registry
      */
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
-        self::maybeInitFromSpi();
-        if (!array_key_exists($exporter, self::$logRecordExporterFactories)) {
+        if (Sdk::useSpiRegistry()) {
+            $factories = self::getFactories(LogRecordExporterFactoryInterface::class);
+        } else {
+            $factories = self::$logRecordExporterFactories;
+        }
+        if (!array_key_exists($exporter, $factories)) {
             throw new RuntimeException('LogRecord exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$logRecordExporterFactories[$exporter];
+        $class = $factories[$exporter];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof LogRecordExporterFactoryInterface);
 
@@ -250,12 +239,16 @@ class Registry
      */
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
-        self::maybeInitFromSpi();
+        if (Sdk::useSpiRegistry()) {
+            $factories = self::getFactories(TransportFactoryInterface::class);
+        } else {
+            $factories = self::$transportFactories;
+        }
         $protocol = explode('/', $protocol)[0];
-        if (!array_key_exists($protocol, self::$transportFactories)) {
+        if (!array_key_exists($protocol, $factories)) {
             throw new RuntimeException('Transport factory not defined for protocol: ' . $protocol);
         }
-        $class = self::$transportFactories[$protocol];
+        $class = $factories[$protocol];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof TransportFactoryInterface);
 
@@ -267,11 +260,15 @@ class Registry
      */
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
-        self::maybeInitFromSpi();
-        if (!array_key_exists($exporter, self::$metricExporterFactories)) {
+        if (Sdk::useSpiRegistry()) {
+            $factories = self::getFactories(MetricExporterFactoryInterface::class);
+        } else {
+            $factories = self::$metricExporterFactories;
+        }
+        if (!array_key_exists($exporter, $factories)) {
             throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $exporter);
         }
-        $class = self::$metricExporterFactories[$exporter];
+        $class = $factories[$exporter];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof MetricExporterFactoryInterface);
 
@@ -280,22 +277,30 @@ class Registry
 
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
-        self::maybeInitFromSpi();
-        if (!array_key_exists($name, self::$textMapPropagators)) {
+        if (Sdk::useSpiRegistry()) {
+            $propagators = self::getFactoryInstances(TextMapPropagatorInterface::class);
+        } else {
+            $propagators = self::$textMapPropagators;
+        }
+        if (!array_key_exists($name, $propagators)) {
             throw new RuntimeException('Text map propagator not registered for: ' . $name);
         }
 
-        return self::$textMapPropagators[$name];
+        return $propagators[$name];
     }
 
     public static function resourceDetector(string $name): ResourceDetectorInterface
     {
-        self::maybeInitFromSpi();
-        if (!array_key_exists($name, self::$resourceDetectors)) {
+        if (Sdk::useSpiRegistry()) {
+            $detectors = self::getFactoryInstances(ResourceDetectorFactoryInterface::class);
+        } else {
+            $detectors = self::$resourceDetectors;
+        }
+        if (!array_key_exists($name, $detectors)) {
             throw new RuntimeException('Resource detector not registered for: ' . $name);
         }
 
-        return self::$resourceDetectors[$name];
+        return $detectors[$name];
     }
 
     /**
@@ -303,8 +308,12 @@ class Registry
      */
     public static function resourceDetectors(): array
     {
-        self::maybeInitFromSpi();
+        if (Sdk::useSpiRegistry()) {
+            $detectors = self::getFactoryInstances(ResourceDetectorFactoryInterface::class);
+        } else {
+            $detectors = self::$resourceDetectors;
+        }
 
-        return array_values(self::$resourceDetectors);
+        return array_values($detectors);
     }
 }
