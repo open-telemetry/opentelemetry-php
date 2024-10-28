@@ -8,6 +8,9 @@ use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 
+/**
+ * @deprecated Use PsrTransportFactory
+ */
 class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
