@@ -68,7 +68,6 @@
             "src/Extension/Propagator/Jaeger/_register.php",
             "src/SDK/Logs/Exporter/_register.php",
             "src/SDK/Metrics/MetricExporter/_register.php",
-            "src/SDK/Propagation/_register.php",
             "src/SDK/Trace/SpanExporter/_register.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
             "src/SDK/Common/Util/functions.php",
@@ -133,15 +132,14 @@
                 "src/Extension/Propagator/Jaeger/_register.php",
                 "src/SDK/Logs/Exporter/_register.php",
                 "src/SDK/Metrics/MetricExporter/_register.php",
-                "src/SDK/Propagation/_register.php",
                 "src/SDK/Trace/SpanExporter/_register.php"
             ]
         },
         "spi": {
             "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
-                "OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory",
                 "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory",
                 "OpenTelemetry\\Contrib\\Grpc\\GrpcTransportFactory",
+                "OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory",
                 "OpenTelemetry\\SDK\\Common\\Export\\Stream\\StreamTransportFactory"
             ],
             "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
@@ -162,9 +160,6 @@
                 "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
             ],
             "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
-                "OpenTelemetry\\API\\Baggage\\Propagation\\BaggagePropagatorFactory",
-                "OpenTelemetry\\API\\Trace\\Propagation\\TraceContextPropagatorFactory",
-                "OpenTelemetry\\Context\\Propagation\\NoopTextMapPropagatorFactory",
                 "OpenTelemetry\\Extension\\Propagator\\B3\\B3PropagatorFactory",
                 "OpenTelemetry\\Extension\\Propagator\\B3\\B3MultiPropagatorFactory",
                 "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagatorFactory",
