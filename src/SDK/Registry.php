@@ -18,7 +18,6 @@ use RuntimeException;
 /**
  * A registry to enable central registration of components that the SDK requires but which may be provided
  * by non-SDK modules, such as contrib and extension.
- * @phan-file-suppress PhanTypeMismatchProperty
  * @todo [breaking] deprecate this mechanism of setting up components, in favor of using SPI.
  */
 class Registry
@@ -95,9 +94,6 @@ class Registry
         //no-op
     }
 
-    /**
-     * @phan-suppress PhanNonClassMethodCall,PhanTypeExpectedObjectOrClassName
-     */
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
         $factories = self::getFactories(SpanExporterFactoryInterface::class);
@@ -111,9 +107,6 @@ class Registry
         return $factory;
     }
 
-    /**
-     * @phan-suppress PhanNonClassMethodCall,PhanTypeExpectedObjectOrClassName
-     */
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
         $factories = self::getFactories(LogRecordExporterFactoryInterface::class);
@@ -130,7 +123,6 @@ class Registry
     /**
      * Get transport factory registered for protocol. If $protocol contains a content-type eg `http/xyz` then
      * only the first part, `http`, is used.
-     * @phan-suppress PhanNonClassMethodCall,PhanTypeExpectedObjectOrClassName
      */
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
@@ -146,9 +138,6 @@ class Registry
         return $factory;
     }
 
-    /**
-     * @phan-suppress PhanNonClassMethodCall,PhanTypeExpectedObjectOrClassName
-     */
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
         $factories = self::getFactories(MetricExporterFactoryInterface::class);
