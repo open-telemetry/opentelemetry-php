@@ -20,6 +20,7 @@ class ConsoleSpanExporterFactory implements SpanExporterFactoryInterface
     {
         return 'console';
     }
+
     public function priority(): int
     {
         return 0;

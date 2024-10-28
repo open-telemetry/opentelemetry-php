@@ -25,6 +25,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
     {
         return 'zipkin';
     }
+
     public function priority(): int
     {
         return 0;

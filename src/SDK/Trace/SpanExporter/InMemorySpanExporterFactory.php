@@ -17,6 +17,7 @@ class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
     {
         return 'memory';
     }
+
     public function priority(): int
     {
         return 0;

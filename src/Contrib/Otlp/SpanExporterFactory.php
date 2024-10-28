@@ -96,6 +96,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
     {
         return 'otlp';
     }
+
     public function priority(): int
     {
         return 0;
