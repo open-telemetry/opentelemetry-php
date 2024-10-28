@@ -137,7 +137,6 @@
         },
         "spi": {
             "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
-                "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory",
                 "OpenTelemetry\\Contrib\\Grpc\\GrpcTransportFactory",
                 "OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory",
                 "OpenTelemetry\\SDK\\Common\\Export\\Stream\\StreamTransportFactory"

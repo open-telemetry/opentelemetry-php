@@ -8,9 +8,9 @@ use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\LogRecord;
 
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
-putenv('OTEL_TRACES_EXPORTER=otlp');
+putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=none');
-putenv('OTEL_LOGS_EXPORTER=otlp');
+putenv('OTEL_LOGS_EXPORTER=console');
 putenv('OTEL_EXPORTER_OTLP_ENDPOINT=http://collector:4318');
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf');
 putenv('OTEL_PROPAGATORS=tracecontext');

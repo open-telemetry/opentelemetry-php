@@ -9,7 +9,6 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 class B3MultiPropagatorFactory implements TextMapPropagatorFactoryInterface
 {
-
     public function create(): TextMapPropagatorInterface
     {
         return B3Propagator::getB3MultiHeaderInstance();
