@@ -123,6 +123,20 @@
             "target-directory": "vendor-bin",
             "forward-command": true
         },
+        "spi-config": {
+            "prune-autoload-files": [
+                "src/Contrib/Otlp/_register.php",
+                "src/Contrib/Grpc/_register.php",
+                "src/Contrib/Zipkin/_register.php",
+                "src/Extension/Propagator/B3/_register.php",
+                "src/Extension/Propagator/CloudTrace/_register.php",
+                "src/Extension/Propagator/Jaeger/_register.php",
+                "src/SDK/Logs/Exporter/_register.php",
+                "src/SDK/Metrics/MetricExporter/_register.php",
+                "src/SDK/Propagation/_register.php",
+                "src/SDK/Trace/SpanExporter/_register.php"
+            ]
+        },
         "spi": {
             "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
                 "OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory",
@@ -148,15 +162,15 @@
                 "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
             ],
             "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
-                    "OpenTelemetry\\API\\Baggage\\Propagation\\BaggagePropagatorFactory",
-                    "OpenTelemetry\\API\\Trace\\Propagation\\TraceContextPropagatorFactory",
-                    "OpenTelemetry\\Context\\Propagation\\NoopTextMapPropagatorFactory",
-                    "OpenTelemetry\\Extension\\Propagator\\B3\\B3PropagatorFactory",
-                    "OpenTelemetry\\Extension\\Propagator\\B3\\B3MultiPropagatorFactory",
-                    "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagatorFactory",
-                    "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTraceOneWayPropagatorFactory",
-                    "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerPropagatorFactory",
-                    "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerBaggagePropagatorFactory"
+                "OpenTelemetry\\API\\Baggage\\Propagation\\BaggagePropagatorFactory",
+                "OpenTelemetry\\API\\Trace\\Propagation\\TraceContextPropagatorFactory",
+                "OpenTelemetry\\Context\\Propagation\\NoopTextMapPropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\B3\\B3PropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\B3\\B3MultiPropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTraceOneWayPropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerPropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerBaggagePropagatorFactory"
             ],
             "OpenTelemetry\\SDK\\Resource\\ResourceDetectorFactoryInterface": [
                 "OpenTelemetry\\Example\\TestResourceDetectorFactory"

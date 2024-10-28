@@ -30,11 +30,6 @@ class Sdk
         return Configuration::getBoolean(Variables::OTEL_SDK_DISABLED);
     }
 
-    public static function useSpiRegistry(): bool
-    {
-        return Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_SPI_REGISTRY, false);
-    }
-
     /**
      * Tests whether an auto-instrumentation package has been disabled by config
      */

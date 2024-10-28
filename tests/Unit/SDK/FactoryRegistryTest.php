@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
@@ -20,7 +19,6 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
 #[CoversClass(Registry::class)]
 class FactoryRegistryTest extends TestCase
@@ -115,62 +113,20 @@ class FactoryRegistryTest extends TestCase
         ];
     }
 
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_transport_factory($factory): void
-    {
-        $this->expectException(TypeError::class);
-        Registry::registerTransportFactory('http', $factory, true);
-    }
-
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_span_exporter_factory($factory): void
-    {
-        $this->expectException(TypeError::class);
-        Registry::registerSpanExporterFactory('foo', $factory, true);
-    }
-
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_metric_exporter_factory($factory): void
-    {
-        $this->expectException(TypeError::class);
-        Registry::registerMetricExporterFactory('foo', $factory, true);
-    }
-
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_log_record_exporter_factory($factory): void
-    {
-        $this->expectException(TypeError::class);
-        Registry::registerLogRecordExporterFactory('foo', $factory, true);
-    }
-
-    public static function invalidFactoryProvider(): array
-    {
-        return [
-            [new \stdClass()],
-            ['\stdClass'],
-        ];
-    }
-
     public function test_retrieve_from_spi(): void
     {
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXPERIMENTAL_SPI_REGISTRY, 'true');
         $this->assertFileExists(dirname(__DIR__, 3) . '/vendor/composer/GeneratedServiceProviderData.php');
         $this->assertInstanceOf(ResourceDetectorInterface::class, Registry::resourceDetector('test'));
     }
 
     public function test_add_to_spi(): void
     {
-        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXPERIMENTAL_SPI_REGISTRY, 'true');
         $factory = new class() implements ResourceDetectorFactoryInterface {
             public function create(): ResourceDetectorInterface
             {
                 return new class() implements ResourceDetectorInterface {
                     public function getResource(): ResourceInfo
                     {
-                        $attributes = [
-                            'foo-resource' => 'test-value',
-                        ];
-
                         return ResourceInfo::create(Attributes::create(['foo-resource' => 'foo']));
                     }
                 };
