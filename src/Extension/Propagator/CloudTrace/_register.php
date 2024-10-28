@@ -2,19 +2,10 @@
 
 declare(strict_types=1);
 
-use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagator;
-use OpenTelemetry\SDK\Registry;
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
+use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTraceOneWayPropagatorFactory;
+use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagatorFactory;
 
-if (!class_exists(Registry::class)) {
-    return;
-}
-
-Registry::registerTextMapPropagator(
-    'cloudtrace',
-    CloudTracePropagator::getInstance()
-);
-
-Registry::registerTextMapPropagator(
-    'cloudtrace-oneway',
-    CloudTracePropagator::getOneWayInstance()
-);
+ServiceLoader::register(TextMapPropagatorFactoryInterface::class, CloudTracePropagatorFactory::class);
+ServiceLoader::register(TextMapPropagatorFactoryInterface::class, CloudTraceOneWayPropagatorFactory::class);

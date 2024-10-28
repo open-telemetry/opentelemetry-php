@@ -2,20 +2,10 @@
 
 declare(strict_types=1);
 
-use OpenTelemetry\Extension\Propagator\Jaeger\JaegerBaggagePropagator;
-use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagator;
-use OpenTelemetry\SDK\Registry;
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
+use OpenTelemetry\Extension\Propagator\Jaeger\JaegerBaggagePropagatorFactory;
+use OpenTelemetry\Extension\Propagator\Jaeger\JaegerPropagatorFactory;
 
-if (!class_exists(Registry::class)) {
-    return;
-}
-
-Registry::registerTextMapPropagator(
-    'jaeger',
-    JaegerPropagator::getInstance()
-);
-
-Registry::registerTextMapPropagator(
-    'jaeger-baggage',
-    JaegerBaggagePropagator::getInstance()
-);
+ServiceLoader::register(TextMapPropagatorFactoryInterface::class, JaegerPropagatorFactory::class);
+ServiceLoader::register(TextMapPropagatorFactoryInterface::class, JaegerBaggagePropagatorFactory::class);

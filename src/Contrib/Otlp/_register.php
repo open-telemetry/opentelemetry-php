@@ -1,9 +1,19 @@
 <?php
 
 declare(strict_types=1);
-\OpenTelemetry\SDK\Registry::registerSpanExporterFactory('otlp', \OpenTelemetry\Contrib\Otlp\SpanExporterFactory::class);
-\OpenTelemetry\SDK\Registry::registerMetricExporterFactory('otlp', \OpenTelemetry\Contrib\Otlp\MetricExporterFactory::class);
 
-\OpenTelemetry\SDK\Registry::registerTransportFactory('http', \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory::class);
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\Contrib\Otlp\LogsExporterFactory;
+use OpenTelemetry\Contrib\Otlp\MetricExporterFactory;
+use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
+use OpenTelemetry\Contrib\Otlp\SpanExporterFactory;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
+use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 
-\OpenTelemetry\SDK\Registry::registerLogRecordExporterFactory('otlp', \OpenTelemetry\Contrib\Otlp\LogsExporterFactory::class);
+ServiceLoader::register(SpanExporterFactoryInterface::class, SpanExporterFactory::class);
+ServiceLoader::register(MetricExporterFactoryInterface::class, MetricExporterFactory::class);
+ServiceLoader::register(LogRecordExporterFactoryInterface::class, LogsExporterFactory::class);
+
+ServiceLoader::register(TransportFactoryInterface::class, OtlpHttpTransportFactory::class);

@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
-\OpenTelemetry\SDK\Registry::registerMetricExporterFactory('memory', \OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory::class);
-\OpenTelemetry\SDK\Registry::registerMetricExporterFactory('console', \OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory::class);
-\OpenTelemetry\SDK\Registry::registerMetricExporterFactory('none', \OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporterFactory::class);
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory;
+use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporterFactory;
+use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
+
+ServiceLoader::register(MetricExporterFactoryInterface::class, InMemoryExporterFactory::class);
+ServiceLoader::register(MetricExporterFactoryInterface::class, ConsoleMetricExporterFactory::class);
+ServiceLoader::register(MetricExporterFactoryInterface::class, NoopMetricExporterFactory::class);
