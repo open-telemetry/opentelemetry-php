@@ -16,7 +16,7 @@ final class ExampleInstrumentation implements Instrumentation
 
     public function register(HookManagerInterface $hookManager, ConfigProperties $configuration, InstrumentationContext $context): void
     {
-        $config = $configuration->get(ExampleConfig::class) ?? new ExampleConfig('example');
+        $config = $configuration->get(ExampleConfig::class) ?? ExampleConfig::default();
         if (!$config->enabled) {
             return;
         }
