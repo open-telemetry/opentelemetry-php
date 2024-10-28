@@ -32,6 +32,17 @@
     "extra": {
         "branch-alias": {
             "dev-main": "1.0.x-dev"
+        },
+        "spi": {
+            "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
+                "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerPropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerBaggagePropagatorFactory"
+            ]
+        },
+        "spi-config": {
+            "prune-autoload-files": [
+                "src/Extension/Propagagor/Jaeger/_register.php"
+            ]
         }
     }
 }

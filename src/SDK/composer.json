@@ -42,7 +42,6 @@
             "Common/Util/functions.php",
             "Logs/Exporter/_register.php",
             "Metrics/MetricExporter/_register.php",
-            "Propagation/_register.php",
             "Trace/SpanExporter/_register.php",
             "Common/Dev/Compatibility/_load.php",
             "_autoload.php"
@@ -58,8 +57,29 @@
             "dev-main": "1.0.x-dev"
         },
         "spi": {
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
-                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
+                "OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrTransportFactory",
+                "OpenTelemetry\\SDK\\Common\\Export\\Stream\\StreamTransportFactory"
+            ],
+            "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
+                "OpenTelemetry\\SDK\\Trace\\SpanExporter\\ConsoleSpanExporterFactory",
+                "OpenTelemetry\\SDK\\Trace\\SpanExporter\\InMemorySpanExporterFactory"
+            ],
+            "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": [
+                "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\InMemoryExporterFactory",
+                "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\ConsoleMetricExporterFactory",
+                "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\NoopMetricExporterFactory"
+            ],
+            "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": [
+                "OpenTelemetry\\SDK\\Logs\\Exporter\\ConsoleExporterFactory",
+                "OpenTelemetry\\SDK\\Logs\\Exporter\\InMemoryExporterFactory"
+            ]
+        },
+        "spi-config": {
+            "prune-autoload-files": [
+                "Logs/Exporter/_register.php",
+                "Metrics/MetricExporter/_register.php",
+                "Trace/SpanExporter/_register.php"
             ]
         }
     }
