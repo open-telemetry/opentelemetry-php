@@ -56,6 +56,8 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     disabled: bool,
      *     resource: array{
      *         attributes: array,
+     *         attributes_list: ?string,
+     *         detectors: array,
      *         schema_url: ?string,
      *     },
      *     attribute_limits: array{
@@ -114,9 +116,11 @@ final class OpenTelemetrySdk implements ComponentProvider
             return $sdkBuilder;
         }
 
+        $attributes = array_column($properties['resource']['attributes'], 'value', 'name');
+
         $resource = ResourceInfoFactory::defaultResource()
             ->merge(ResourceInfo::create(
-                attributes: Attributes::create($properties['resource']['attributes']),
+                attributes: Attributes::create($attributes),
                 schemaUrl: $properties['resource']['schema_url'],
             ));
 
@@ -284,7 +288,19 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('attributes')
-                    ->variablePrototype()->end()
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->end()
+                            ->variableNode('value')->isRequired()->end()
+                            ->enumNode('type')->defaultNull()
+                                ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->arrayNode('detectors')
+                    ->variablePrototype()->end() //todo types
                 ->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
@@ -345,9 +361,16 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('attribute_keys')
-                                        ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                        ->children()
+                                            ->arrayNode('included')
+                                                ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                            ->end()
+                                            ->arrayNode('excluded')
+                                                ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
-                                    ->append($registry->component('aggregation', DefaultAggregationProviderInterface::class))
+                                    ->append($registry->componentList('aggregation', DefaultAggregationProviderInterface::class))
                                 ->end()
                             ->end()
                             ->arrayNode('selector')
@@ -374,7 +397,22 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
-                ->append($registry->componentArrayList('readers', MetricReaderInterface::class))
+                ->arrayNode('readers')
+                    ->arrayPrototype()
+                        ->children()
+                            ->arrayNode('pull')
+                                ->variablePrototype()->end()
+                            ->end()
+                            ->arrayNode('periodic')
+                                ->variablePrototype()->end()
+                            ->end()
+                            ->arrayNode('producers')
+                                ->variablePrototype()->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                //->append($registry->componentArrayList('readers', MetricReaderInterface::class))
             ->end()
         ;
 

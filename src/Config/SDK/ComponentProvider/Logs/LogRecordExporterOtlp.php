@@ -31,9 +31,11 @@ final class LogRecordExporterOtlp implements ComponentProvider
      *     certificate: ?string,
      *     client_key: ?string,
      *     client_certificate: ?string,
-     *     headers: array<string, string>,
+     *     headers: array,
+     *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     insecure: ?bool,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
@@ -63,10 +65,17 @@ final class LogRecordExporterOtlp implements ComponentProvider
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('headers')
-                    ->scalarPrototype()->end()
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                        ->end()
+                    ->end()
                 ->end()
+                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->booleanNode('insecure')->defaultNull()->end()
             ->end()
         ;
 

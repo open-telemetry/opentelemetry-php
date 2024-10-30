@@ -37,6 +37,20 @@ final class Validation
         };
     }
 
+    public static function ensureNumber(): Closure
+    {
+        return static function (mixed $value): null|int|float {
+            if ($value === null) {
+                return null;
+            }
+            if (!is_numeric($value)) {
+                throw new InvalidArgumentException('must be of type numeric');
+            }
+
+            return $value;
+        };
+    }
+
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */

@@ -32,11 +32,13 @@ final class MetricExporterOtlp implements ComponentProvider
      *     certificate: ?string,
      *     client_key: ?string,
      *     client_certificate: ?string,
-     *     headers: array<string, string>,
+     *     headers: array,
+     *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     insecure: ?bool,
      *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
-     *     default_histogram_aggregation: 'explicit_bucket_histogram',
+     *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
@@ -72,16 +74,23 @@ final class MetricExporterOtlp implements ComponentProvider
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('headers')
-                    ->scalarPrototype()->end()
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                        ->end()
+                    ->end()
                 ->end()
+                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->booleanNode('insecure')->defaultNull()->end()
                 ->enumNode('temporality_preference')
                     ->values(['cumulative', 'delta', 'lowmemory'])
                     ->defaultValue('cumulative')
                 ->end()
                 ->enumNode('default_histogram_aggregation')
-                    ->values(['explicit_bucket_histogram'])
+                    ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
                     ->defaultValue('explicit_bucket_histogram')
                 ->end()
             ->end()
