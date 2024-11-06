@@ -9,7 +9,7 @@ This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **mai
 ## Documentation
 
 Please read the official documentation: https://opentelemetry.io/docs/instrumentation/php/
-
+API Documentation is available here: https://open-telemetry.github.io/opentelemetry-php/
 ## Packages and versions
 
 | Package              | Latest                                                                                                                                                                                                                                                                                                                                                  |
