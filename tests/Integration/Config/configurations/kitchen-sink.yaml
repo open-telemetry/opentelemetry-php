@@ -74,11 +74,13 @@ logger_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE, OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE
                       client_certificate: /app/cert.pem
-                      # Configure headers.
-                      #
-                      # Environment variable: OTEL_EXPORTER_OTLP_HEADERS, OTEL_EXPORTER_OTLP_LOGS_HEADERS
+                      # Configure headers. Entries have higher priority than entries from .headers_list.
                       headers:
-                          api-key: "1234"
+                          - name: api-key
+                            value: "1234"
+                      # Configure headers. Entries have lower priority than entries from .headers.
+                      # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+                      headers_list: "api-key=1234"
                       # Configure compression.
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_COMPRESSION, OTEL_EXPORTER_OTLP_LOGS_COMPRESSION
@@ -138,11 +140,13 @@ meter_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE, OTEL_EXPORTER_OTLP_METRICS_CLIENT_CERTIFICATE
                       client_certificate: /app/cert.pem
-                      # Configure headers.
-                      #
-                      # Environment variable: OTEL_EXPORTER_OTLP_HEADERS, OTEL_EXPORTER_OTLP_METRICS_HEADERS
+                      # Configure headers. Entries have higher priority than entries from .headers_list.
                       headers:
-                          api-key: !!str 1234
+                          - name: api-key
+                            value: "1234"
+                      # Configure headers. Entries have lower priority than entries from .headers.
+                      # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+                      headers_list: "api-key=1234"
                       # Configure compression.
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_COMPRESSION, OTEL_EXPORTER_OTLP_METRICS_COMPRESSION
@@ -244,11 +248,13 @@ tracer_provider:
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE, OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE
                       client_certificate: /app/cert.pem
-                      # Configure headers.
-                      #
-                      # Environment variable: OTEL_EXPORTER_OTLP_HEADERS, OTEL_EXPORTER_OTLP_TRACES_HEADERS
+                      # Configure headers. Entries have higher priority than entries from .headers_list.
                       headers:
-                          api-key: !!str 1234
+                          - name: api-key
+                            value: "1234"
+                      # Configure headers. Entries have lower priority than entries from .headers.
+                      # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+                      headers_list: "api-key=1234"
                       # Configure compression.
                       #
                       # Environment variable: OTEL_EXPORTER_OTLP_COMPRESSION, OTEL_EXPORTER_OTLP_TRACES_COMPRESSION
@@ -340,14 +346,38 @@ tracer_provider:
 
 # Configure resource for all signals.
 resource:
-    # Configure resource attributes.
-    #
-    # Environment variable: OTEL_RESOURCE_ATTRIBUTES
+    # Configure resource attributes. Entries have higher priority than entries from .resource.attributes_list.
+    # Entries must contain .name nand .value, and may optionally include .type, which defaults ot "string" if not set. The value must match the type. Values for .type include: string, bool, int, double, string_array, bool_array, int_array, double_array.
     attributes:
-        # Configure `service.name` resource attribute
-        #
-        # Environment variable: OTEL_SERVICE_NAME
-        service.name: !!str "unknown_service"
+      - name: service.name
+        value: unknown_service
+      - name: string_key
+        value: value
+        type: string
+      - name: bool_key
+        value: true
+        type: bool
+      - name: int_key
+        value: 1
+        type: int
+      - name: double_key
+        value: 1.1
+        type: double
+      - name: string_array_key
+        value: [ "value1", "value2" ]
+        type: string_array
+      - name: bool_array_key
+        value: [ true, false ]
+        type: bool_array
+      - name: int_array_key
+        value: [ 1, 2 ]
+        type: int_array
+      - name: double_array_key
+        value: [ 1.1, 2.2 ]
+        type: double_array
+    # Configure resource attributes. Entries have lower priority than entries from .resource.attributes.
+    # The value is a list of comma separated key-value pairs matching the format of OTEL_RESOURCE_ATTRIBUTES. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
+    attributes_list: "service.namespace=my-namespace,service.version=1.0.0"
     # Configure the resource schema URL.
     schema_url: https://opentelemetry.io/schemas/1.27.0
 

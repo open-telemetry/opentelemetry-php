@@ -56,6 +56,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     disabled: bool,
      *     resource: array{
      *         attributes: array,
+     *         attributes_list: ?string,
      *         schema_url: ?string,
      *     },
      *     attribute_limits: array{
@@ -113,10 +114,12 @@ final class OpenTelemetrySdk implements ComponentProvider
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
-
+        $attributes_list = array_column(array_map(fn ($item) => explode('=', $item), explode(',', $properties['resource']['attributes_list'] ?? '')), 1, 0);
+        $attributes = array_column($properties['resource']['attributes'], 'value', 'name') + $attributes_list;
+        //todo merge with attributes_list
         $resource = ResourceInfoFactory::defaultResource()
             ->merge(ResourceInfo::create(
-                attributes: Attributes::create($properties['resource']['attributes']),
+                attributes: Attributes::create($attributes),
                 schemaUrl: $properties['resource']['schema_url'],
             ));
 
@@ -284,8 +287,18 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('attributes')
-                    ->variablePrototype()->end()
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->end()
+                            ->variableNode('value')->isRequired()->end()
+                            // @todo use type to validate and/or cast attributes
+                            ->enumNode('type')->defaultNull()
+                                ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
 
