@@ -54,7 +54,8 @@ final class Host implements ResourceDetectorInterface
         foreach ($paths as $path) {
             $file = $this->dir . $path;
             if (is_file($file) && is_readable($file)) {
-                return trim(file_get_contents($file));
+                $contents = file_get_contents($file);
+                return $contents !== false ? trim($contents) : null;
             }
         }
 
@@ -65,7 +66,8 @@ final class Host implements ResourceDetectorInterface
     {
         $file = $this->dir . self::PATH_ETC_HOSTID;
         if (is_file($file) && is_readable($file)) {
-            return trim(file_get_contents($file));
+            $contents = file_get_contents($file);
+            return $contents !== false ? trim($contents) : null;
         }
 
         $out = exec('which kenv && kenv -q smbios.system.uuid');
