@@ -55,6 +55,7 @@ final class Host implements ResourceDetectorInterface
             $file = $this->dir . $path;
             if (is_file($file) && is_readable($file)) {
                 $contents = file_get_contents($file);
+
                 return $contents !== false ? trim($contents) : null;
             }
         }
@@ -67,6 +68,7 @@ final class Host implements ResourceDetectorInterface
         $file = $this->dir . self::PATH_ETC_HOSTID;
         if (is_file($file) && is_readable($file)) {
             $contents = file_get_contents($file);
+
             return $contents !== false ? trim($contents) : null;
         }
 
