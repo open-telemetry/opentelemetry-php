@@ -11,7 +11,7 @@ use Attribute;
  * attribute, adding this attribute to an argument will
  * add the argument as a span attribute.
  */
-#[Attribute(Attribute::TARGET_PROPERTY)]
+#[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
 final class SpanAttribute
 {
     /**
