@@ -32,7 +32,7 @@ final class LogRecordExporterOtlp implements ComponentProvider
      *     certificate: ?string,
      *     client_key: ?string,
      *     client_certificate: ?string,
-     *     headers: list<array{name: string, value: string, type: ?string}>,
+     *     headers: list<array{name: string, value: string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
