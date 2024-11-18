@@ -13,6 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
@@ -114,9 +115,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
-        $attributes_list = array_column(array_map(fn ($item) => explode('=', $item), explode(',', $properties['resource']['attributes_list'] ?? '')), 1, 0);
-        $attributes = array_column($properties['resource']['attributes'], 'value', 'name') + $attributes_list;
-        //todo merge with attributes_list
+        $attributes = array_column($properties['resource']['attributes'], 'value', 'name') + MapParser::parse($properties['resource']['attributes_list']);
         $resource = ResourceInfoFactory::defaultResource()
             ->merge(ResourceInfo::create(
                 attributes: Attributes::create($attributes),
