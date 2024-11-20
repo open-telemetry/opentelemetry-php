@@ -19,11 +19,20 @@ class BooleanParser
         if (is_bool($value)) {
             return $value;
         }
+
         if (strtolower($value) === self::TRUE_VALUE) {
             return true;
         }
 
         if (strtolower($value) === self::FALSE_VALUE) {
+            return false;
+        }
+
+        if ((int)($value) === 1) {
+            return true;
+        }
+
+        if ((int)($value) === 0) {
             return false;
         }
 
