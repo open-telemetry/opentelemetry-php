@@ -28,11 +28,11 @@ class BooleanParser
             return false;
         }
 
-        if ((int)($value) === 1) {
+        if ((int) ($value) === 1) {
             return true;
         }
 
-        if ((int)($value) === 0) {
+        if ((int) ($value) === 0) {
             return false;
         }
 
