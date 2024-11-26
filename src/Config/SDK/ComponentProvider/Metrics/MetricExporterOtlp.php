@@ -13,6 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
@@ -32,7 +33,8 @@ final class MetricExporterOtlp implements ComponentProvider
      *     certificate: ?string,
      *     client_key: ?string,
      *     client_certificate: ?string,
-     *     headers: array<string, string>,
+     *     headers: list<array{name: string, value: string}>,
+     *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
      *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
@@ -43,6 +45,8 @@ final class MetricExporterOtlp implements ComponentProvider
     {
         $protocol = $properties['protocol'];
 
+        $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+
         $temporality = match ($properties['temporality_preference']) {
             'cumulative' => Temporality::CUMULATIVE,
             'delta' => Temporality::DELTA,
@@ -52,7 +56,7 @@ final class MetricExporterOtlp implements ComponentProvider
         return new MetricExporter(Registry::transportFactory($protocol)->create(
             endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::METRICS, $protocol),
             contentType: Protocols::contentType($protocol),
-            headers: $properties['headers'],
+            headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'],
             cacert: $properties['certificate'],
@@ -72,8 +76,14 @@ final class MetricExporterOtlp implements ComponentProvider
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('headers')
-                    ->scalarPrototype()->end()
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                        ->end()
+                    ->end()
                 ->end()
+                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
                 ->enumNode('temporality_preference')
