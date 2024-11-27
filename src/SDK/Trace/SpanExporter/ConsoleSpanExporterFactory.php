@@ -15,4 +15,14 @@ class ConsoleSpanExporterFactory implements SpanExporterFactoryInterface
 
         return new ConsoleSpanExporter($transport);
     }
+
+    public function type(): string
+    {
+        return 'console';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

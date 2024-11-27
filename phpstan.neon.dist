@@ -50,3 +50,7 @@ parameters:
             message: "#.*return with type T is not subtype.*#"
             paths:
                 - src/SDK/Common/InstrumentationScope
+        -
+            message: "#.*array_multisort.*#"
+            paths:
+                - src/SDK/Registry

@@ -108,6 +108,7 @@ final class PsrUtilsTest extends TestCase
         return [
             ['gzip', ['gzip']],
             ['', []],
+            ['none', []],
             ['gzip,br', ['gzip','br']],
             ['gzip , brotli', ['gzip','brotli']],
             [['gzip'], ['gzip']],

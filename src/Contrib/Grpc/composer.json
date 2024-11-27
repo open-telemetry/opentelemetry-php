@@ -31,6 +31,16 @@
     ]
   },
   "extra": {
+    "spi": {
+      "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Grpc\\GrpcTransportFactory"
+      ]
+    },
+    "spi-config": {
+      "prune-autoload-files": [
+        "src/Contrib/Grpc/_register.php"
+      ]
+    },
     "branch-alias": {
       "dev-main": "1.0.x-dev"
     }

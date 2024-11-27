@@ -117,7 +117,7 @@ final class PsrUtils
         if (is_array($compression)) {
             return $compression;
         }
-        if (!$compression) {
+        if ($compression === 'none' || !$compression) {
             return [];
         }
         if (!str_contains((string) $compression, ',')) {

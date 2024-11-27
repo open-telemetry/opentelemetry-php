@@ -2,5 +2,10 @@
 
 declare(strict_types=1);
 
-\OpenTelemetry\SDK\Registry::registerLogRecordExporterFactory('console', \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory::class);
-\OpenTelemetry\SDK\Registry::registerLogRecordExporterFactory('memory', \OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory::class);
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
+use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory;
+use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
+
+ServiceLoader::register(LogRecordExporterFactoryInterface::class, ConsoleExporterFactory::class);
+ServiceLoader::register(LogRecordExporterFactoryInterface::class, InMemoryExporterFactory::class);

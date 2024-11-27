@@ -91,4 +91,14 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
 
         return $value/1000;
     }
+
+    public function type(): string
+    {
+        return 'otlp';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

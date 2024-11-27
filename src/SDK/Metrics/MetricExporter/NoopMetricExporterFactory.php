@@ -13,4 +13,14 @@ class NoopMetricExporterFactory implements MetricExporterFactoryInterface
     {
         return new NoopMetricExporter();
     }
+
+    public function type(): string
+    {
+        return 'none';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

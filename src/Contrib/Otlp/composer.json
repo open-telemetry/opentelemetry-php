@@ -36,6 +36,25 @@
   "extra": {
     "branch-alias": {
       "dev-main": "1.0.x-dev"
+    },
+    "spi": {
+      "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory"
+      ],
+      "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory"
+      ],
+      "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory"
+      ],
+      "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
+      ]
+    },
+    "spi-config": {
+      "prune-autoload-files": [
+        "src/Contrib/Otlp/_register.php"
+      ]
     }
   }
 }

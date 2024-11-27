@@ -8,6 +8,9 @@ use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 
+/**
+ * @deprecated Use PsrTransportFactory
+ */
 class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
@@ -30,5 +33,15 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
 
         return (new PsrTransportFactory())
             ->create($endpoint, $contentType, $headers, $compression, $timeout, $retryDelay, $maxRetries, $cacert, $cert, $key);
+    }
+
+    public function type(): string
+    {
+        return 'http';
+    }
+
+    public function priority(): int
+    {
+        return 0;
     }
 }

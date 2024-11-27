@@ -32,6 +32,17 @@
     "extra": {
         "branch-alias": {
             "dev-main": "1.0.x-dev"
+        },
+        "spi": {
+            "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
+                "OpenTelemetry\\Extension\\Propagator\\B3\\B3PropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\B3\\B3MultiPropagatorFactory"
+            ]
+        },
+        "spi-config": {
+            "prune-autoload-files": [
+                "src/Extension/Propagagor/B3/_register.php"
+            ]
         }
     }
 }

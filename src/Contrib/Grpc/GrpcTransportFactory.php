@@ -157,4 +157,14 @@ final class GrpcTransportFactory implements TransportFactoryInterface
 
         return $content;
     }
+
+    public function type(): string
+    {
+        return 'grpc';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

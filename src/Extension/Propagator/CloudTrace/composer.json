@@ -32,6 +32,17 @@
     "extra": {
         "branch-alias": {
             "dev-main": "1.0.x-dev"
+        },
+        "spi": {
+            "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
+                "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTracePropagatorFactory",
+                "OpenTelemetry\\Extension\\Propagator\\CloudTrace\\CloudTraceOneWayPropagatorFactory"
+            ]
+        },
+        "spi-config": {
+            "prune-autoload-files": [
+                "src/Extension/Propagagor/CloudTrace/_register.php"
+            ]
         }
     }
 }

@@ -116,4 +116,14 @@ final class StreamTransportFactory implements TransportFactoryInterface
 
         return $header;
     }
+
+    public function type(): string
+    {
+        return 'stream';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

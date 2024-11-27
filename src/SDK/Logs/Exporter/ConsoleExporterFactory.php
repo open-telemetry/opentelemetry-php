@@ -16,4 +16,14 @@ class ConsoleExporterFactory implements LogRecordExporterFactoryInterface
 
         return new ConsoleExporter($transport);
     }
+
+    public function type(): string
+    {
+        return 'console';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

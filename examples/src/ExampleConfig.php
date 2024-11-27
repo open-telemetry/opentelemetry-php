@@ -14,4 +14,9 @@ final class ExampleConfig implements InstrumentationConfiguration
         public readonly bool $enabled = true,
     ) {
     }
+
+    public static function default(): self
+    {
+        return new self('example');
+    }
 }
