@@ -37,6 +37,10 @@ final class MetricExporterOtlp implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     retry: array{
+     *         initial_delay: int,
+     *         max_attempts: int,
+     *     },
      *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
      *     default_histogram_aggregation: 'explicit_bucket_histogram',
      * } $properties
@@ -59,6 +63,8 @@ final class MetricExporterOtlp implements ComponentProvider
             headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'],
+            retryDelay: $properties['retry']['initial_delay'],
+            maxRetries: $properties['retry']['max_attempts'],
             cacert: $properties['certificate'],
             cert: $properties['client_certificate'],
             key: $properties['client_certificate'],
@@ -86,6 +92,13 @@ final class MetricExporterOtlp implements ComponentProvider
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->arrayNode('retry')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('max_attempts')->min(0)->defaultValue(3)->end()
+                        ->integerNode('initial_delay')->min(0)->defaultValue(0)->end()
+                    ->end()
+                ->end()
                 ->enumNode('temporality_preference')
                     ->values(['cumulative', 'delta', 'lowmemory'])
                     ->defaultValue('cumulative')
