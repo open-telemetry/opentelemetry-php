@@ -2,7 +2,9 @@ file_format: '0.3'
 
 resource:
   attributes:
-    service.name: opentelemetry-demo
+    - name: service.name
+      value: opentelemetry-demo
+  attributes_list: service.name=unused,example.foo=foo_value,example.bar=bar_value
 
 propagators:
   composite: [ tracecontext, baggage ]

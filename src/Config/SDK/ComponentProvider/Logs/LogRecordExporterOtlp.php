@@ -13,6 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
+use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -31,7 +32,7 @@ final class LogRecordExporterOtlp implements ComponentProvider
      *     certificate: ?string,
      *     client_key: ?string,
      *     client_certificate: ?string,
-     *     headers: array,
+     *     headers: list<array{name: string, value: string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
@@ -42,10 +43,12 @@ final class LogRecordExporterOtlp implements ComponentProvider
     {
         $protocol = $properties['protocol'];
 
+        $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+
         return new LogsExporter(Registry::transportFactory($protocol)->create(
             endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::LOGS, $protocol),
             contentType: Protocols::contentType($protocol),
-            headers: $properties['headers'],
+            headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'],
             cacert: $properties['certificate'],

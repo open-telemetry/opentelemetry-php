@@ -13,6 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
@@ -57,7 +58,10 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     resource: array{
      *         attributes: array,
      *         attributes_list: ?string,
+<<<<<<< HEAD
      *         detectors: array,
+=======
+>>>>>>> main
      *         schema_url: ?string,
      *     },
      *     attribute_limits: array{
@@ -115,9 +119,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
-
-        $attributes = array_column($properties['resource']['attributes'], 'value', 'name');
-
+        $attributes = array_column($properties['resource']['attributes'], 'value', 'name') + MapParser::parse($properties['resource']['attributes_list']);
         $resource = ResourceInfoFactory::defaultResource()
             ->merge(ResourceInfo::create(
                 attributes: Attributes::create($attributes),
@@ -292,6 +294,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
                             ->variableNode('value')->isRequired()->end()
+                            // @todo use type to validate and/or cast attributes
                             ->enumNode('type')->defaultNull()
                                 ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
                             ->end()
@@ -302,6 +305,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->arrayNode('detectors')
                     ->variablePrototype()->end() //todo types
                 ->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
 

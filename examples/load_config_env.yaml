@@ -4,7 +4,8 @@ disabled: ${OTEL_SDK_DISABLED}
 
 resource:
   attributes:
-    service.name: ${OTEL_SERVICE_NAME}
+    - name: service.name
+      value: ${OTEL_SERVICE_NAME}
 
 propagators:
   composite: [ tracecontext, baggage ]
