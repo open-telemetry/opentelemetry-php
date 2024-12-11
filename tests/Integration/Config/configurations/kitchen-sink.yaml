@@ -80,7 +80,7 @@ logger_provider:
         # Configure exporter.
         exporter:
           # Configure exporter to be console.
-          console: {}
+          console:
   # Configure log record limits. See also attribute_limits.
   limits:
     # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit.
@@ -98,7 +98,7 @@ meter_provider:
       pull:
         # Configure exporter.
         exporter:
-          console: {}
+          console:
         # Configure metric producers.
         producers:
           - # Configure metric producer to be opencensus.
@@ -162,7 +162,7 @@ meter_provider:
         # Configure exporter.
         exporter:
           # Configure exporter to be console.
-          console: {}
+          console:
   # Configure views. Each view has a selector which determines the instrument(s) it applies to, and a configuration for the resulting stream(s).
   views:
     - # Configure view selector. Selection criteria is additive as described in https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#instrument-selection-criteria.
@@ -312,7 +312,7 @@ tracer_provider:
         # Configure exporter.
         exporter:
           # Configure exporter to be console.
-          console: {}
+          console:
   # Configure span limits. See also attribute_limits.
   limits:
     # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit.
@@ -348,24 +348,24 @@ tracer_provider:
           ratio: 0.0001
       # Configure remote_parent_sampled sampler.
       # If omitted or null, always_on is used.
-     # remote_parent_sampled:
-     #   # Configure sampler to be always_on.
-     #   always_on:
+      remote_parent_sampled:
+        # Configure sampler to be always_on.
+        always_on:
       # Configure remote_parent_not_sampled sampler.
       # If omitted or null, always_off is used.
-     # remote_parent_not_sampled:
-     #   # Configure sampler to be always_off.
-     #   always_off:
+      remote_parent_not_sampled:
+        # Configure sampler to be always_off.
+        always_off:
       # Configure local_parent_sampled sampler.
       # If omitted or null, always_on is used.
-     # local_parent_sampled:
-     #   # Configure sampler to be always_on.
-     #   always_on:
+      local_parent_sampled:
+        # Configure sampler to be always_on.
+        always_on:
       # Configure local_parent_not_sampled sampler.
       # If omitted or null, always_off is used.
-     # local_parent_not_sampled:
-     #   # Configure sampler to be always_off.
-     #   always_off:
+      local_parent_not_sampled:
+        # Configure sampler to be always_off.
+        always_off:
 # Configure resource for all signals.
 # If omitted, the default resource is used.
 resource:

@@ -126,8 +126,7 @@ final class ConfigurationFactoryTest extends TestCase
                 float_key: 1.1                                 # Interpreted as type float, tag URI tag:yaml.org,2002:float
                 combo_string_key: foo value 1.1                # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 string_key_with_default: fallback              # Interpreted as type string, tag URI tag:yaml.org,2002:str
-                # undefined_key removed as null is treated as unset
-                # undefined_key:                               # Interpreted as type null, tag URI tag:yaml.org,2002:null
+                undefined_key:                                 # Interpreted as type null, tag URI tag:yaml.org,2002:null
                 ${STRING_VALUE}: value                         # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 YAML),
             self::getPropertiesFromPlugin($parsed),
@@ -165,19 +164,6 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->assertInstanceOf(ComponentPlugin::class, $parsed);
         $this->assertSame(2048, self::getPropertiesFromPlugin($parsed)['attribute_limits']['attribute_value_length_limit']);
-    }
-
-    public function test_treat_null_as_unset(): void
-    {
-        $parsed = self::factory()->process([[
-            'file_format' => '0.1',
-            'attribute_limits' => [
-                'attribute_count_limit' => null,
-            ],
-        ]]);
-
-        $this->assertInstanceOf(ComponentPlugin::class, $parsed);
-        $this->assertSame(128, self::getPropertiesFromPlugin($parsed)['attribute_limits']['attribute_count_limit']);
     }
 
     /**
