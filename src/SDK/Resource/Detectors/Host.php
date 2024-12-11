@@ -53,10 +53,14 @@ final class Host implements ResourceDetectorInterface
 
         foreach ($paths as $path) {
             $file = $this->dir . $path;
-            if (is_file($file) && is_readable($file)) {
-                $contents = file_get_contents($file);
+            try {
+                if (is_file($file) && is_readable($file)) {
+                    $contents = file_get_contents($file);
 
-                return $contents !== false ? trim($contents) : null;
+                    return $contents !== false ? trim($contents) : null;
+                }
+            } catch (ErrorException $ex) {
+                // This may occur if open_basedir is enabled.
             }
         }
 
@@ -66,10 +70,14 @@ final class Host implements ResourceDetectorInterface
     private function getBsdId(): ?string
     {
         $file = $this->dir . self::PATH_ETC_HOSTID;
-        if (is_file($file) && is_readable($file)) {
-            $contents = file_get_contents($file);
+        try {
+            if (is_file($file) && is_readable($file)) {
+                $contents = file_get_contents($file);
 
-            return $contents !== false ? trim($contents) : null;
+                return $contents !== false ? trim($contents) : null;
+            }
+        } catch (ErrorException $ex) {
+            // This may occur if open_basedir is enabled.
         }
 
         $out = exec('which kenv && kenv -q smbios.system.uuid');
