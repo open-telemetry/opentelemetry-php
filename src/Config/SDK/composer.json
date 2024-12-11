@@ -61,6 +61,7 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlp",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPull",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlp",

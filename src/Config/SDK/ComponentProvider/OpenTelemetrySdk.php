@@ -58,10 +58,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     resource: array{
      *         attributes: array,
      *         attributes_list: ?string,
-<<<<<<< HEAD
      *         detectors: array,
-=======
->>>>>>> main
      *         schema_url: ?string,
      *     },
      *     attribute_limits: array{
@@ -356,6 +353,14 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node
             ->addDefaultsIfNotSet()
             ->children()
+                ->enumNode('exemplar_filter')
+                    ->values([
+                        'trace_based',
+                        'always_on',
+                        'always_off',
+                    ])
+                    ->defaultValue('trace_based')
+                ->end()
                 ->arrayNode('views')
                     ->arrayPrototype()
                         ->children()
@@ -401,22 +406,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('readers')
-                    ->arrayPrototype()
-                        ->children()
-                            ->arrayNode('pull')
-                                ->variablePrototype()->end()
-                            ->end()
-                            ->arrayNode('periodic')
-                                ->variablePrototype()->end()
-                            ->end()
-                            ->arrayNode('producers')
-                                ->variablePrototype()->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-                //->append($registry->componentArrayList('readers', MetricReaderInterface::class))
+                ->append($registry->componentArrayList('readers', MetricReaderInterface::class))
             ->end()
         ;
 

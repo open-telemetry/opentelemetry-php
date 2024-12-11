@@ -42,6 +42,7 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
                 ->end()
                 ->booleanNode('record_min_max')->defaultValue(false)->end()
             ->end();
+
         return $node;
     }
 }

@@ -37,8 +37,12 @@ final class Validation
         };
     }
 
+    /**
+     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
+     */
     public static function ensureNumber(): Closure
     {
+
         return static function (mixed $value): null|int|float {
             if ($value === null) {
                 return null;
