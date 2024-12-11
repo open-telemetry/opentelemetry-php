@@ -98,7 +98,39 @@ meter_provider:
       pull:
         # Configure exporter.
         exporter:
-          console:
+          # Configure exporter to be prometheus.
+          prometheus:
+            # Configure host.
+            # If omitted or null, localhost is used.
+            host: localhost
+            # Configure port.
+            # If omitted or null, 9464 is used.
+            port: 9464
+            # Configure Prometheus Exporter to produce metrics without a unit suffix or UNIT metadata.
+            # If omitted or null, false is used.
+            without_units: false
+            # Configure Prometheus Exporter to produce metrics without a type suffix.
+            # If omitted or null, false is used.
+            without_type_suffix: false
+            # Configure Prometheus Exporter to produce metrics without a scope info metric.
+            # If omitted or null, false is used.
+            without_scope_info: false
+            # Configure Prometheus Exporter to add resource attributes as metrics attributes.
+            with_resource_constant_labels:
+              # Configure resource attributes to be included.
+              # Attribute keys from resources are evaluated to match as follows:
+              #  * If the value of the attribute key exactly matches.
+              #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+              # If omitted, no resource attributes are included.
+              included:
+                - "service*"
+              # Configure resource attributes to be excluded. Applies after .with_resource_constant_labels.included (i.e. excluded has higher priority than included).
+              # Attribute keys from resources are evaluated to match as follows:
+              #  * If the value of the attribute key exactly matches.
+              #  * If the value of the attribute key matches the wildcard pattern, where '?' matches any single character and '*' matches any number of characters including none.
+              # If omitted, .included resource attributes are included.
+              excluded:
+                - "service.attr1"
         # Configure metric producers.
         producers:
           - # Configure metric producer to be opencensus.
@@ -239,7 +271,7 @@ meter_provider:
 # If omitted, tracecontext and baggage are used.
 propagator:
   # Configure the set of propagators to include in the composite text map propagator. Built-in values include: tracecontext, baggage, b3, b3multi, jaeger, none. Known third party values include: xray, ottrace. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration.
-  composite: [ tracecontext, baggage, b3, b3multi, jaeger ] # , xray, ottrace
+  composite: [ tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace ]
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:

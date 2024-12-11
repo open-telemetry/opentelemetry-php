@@ -83,7 +83,10 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             stream: array{
      *                 name: ?string,
      *                 description: ?string,
-     *                 attribute_keys: list<string>,
+     *                 attribute_keys: array{
+     *                     included: list<string>,
+     *                     excluded: list<string>,
+     *                 },
      *                 aggregation: ?ComponentPlugin<DefaultAggregationProviderInterface>,
      *             },
      *             selector: array{
@@ -205,8 +208,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             if (isset($view['stream']['description'])) {
                 $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
             }
-            if ($view['stream']['attribute_keys']) {
-                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']);
+            // TODO Add support for excluded keys to view template
+            if ($view['stream']['attribute_keys']['included']) {
+                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']['included']);
             }
             if (isset($view['stream']['aggregation'])) {
                 // TODO Add support for aggregation providers in views to allow usage of advisory
