@@ -130,7 +130,9 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorOttrace",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
@@ -146,6 +148,7 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPull",
 

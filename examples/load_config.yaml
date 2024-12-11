@@ -18,11 +18,11 @@ tracer_provider:
   sampler:
     parent_based:
       root:
-        always_on: {}
+        always_on:
   processors:
     - simple:
         exporter:
-          console: {}
+          console:
     - batch:
         exporter:
           otlp: *otlp-exporter
@@ -30,7 +30,7 @@ meter_provider:
   readers:
     - periodic:
         exporter:
-          console: {}
+          console:
     - periodic:
         exporter:
           otlp:
@@ -40,7 +40,7 @@ logger_provider:
   processors:
     - simple:
         exporter:
-          console: {}
+          console:
     - batch:
         exporter:
           otlp: *otlp-exporter
