@@ -14,6 +14,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * @implements ComponentProvider<TextMapPropagatorInterface>
+ * @todo xray propagator exists in contrib, should it be moved to core?
  */
 final class TextMapPropagatorXray implements ComponentProvider
 {

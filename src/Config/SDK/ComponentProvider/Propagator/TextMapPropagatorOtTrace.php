@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 /**
  * @implements ComponentProvider<TextMapPropagatorInterface>
  */
-final class TextMapPropagatorOttrace implements ComponentProvider
+final class TextMapPropagatorOtTrace implements ComponentProvider
 {
     use LogsMessagesTrait;
 
@@ -24,7 +24,7 @@ final class TextMapPropagatorOttrace implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
-        self::logWarning('ottrace propagator not configurable from declarative config');
+        self::logWarning('ottrace propagator not implemented');
 
         return NoopTextMapPropagator::getInstance();
     }
