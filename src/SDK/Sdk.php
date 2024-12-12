@@ -35,6 +35,9 @@ class Sdk
      */
     public static function isInstrumentationDisabled(string $name): bool
     {
+        if (static::isDisabled()) {
+            return true;
+        }
         $disabledInstrumentations = Configuration::getList(Variables::OTEL_PHP_DISABLED_INSTRUMENTATIONS);
 
         return [self::OTEL_PHP_DISABLED_INSTRUMENTATIONS_ALL] === $disabledInstrumentations || in_array($name, $disabledInstrumentations);
