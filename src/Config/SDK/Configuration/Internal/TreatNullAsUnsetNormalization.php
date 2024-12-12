@@ -22,6 +22,9 @@ final class TreatNullAsUnsetNormalization
         }
     }
 
+    /**
+     * @psalm-suppress PossiblyNullFunctionCall,InaccessibleProperty
+     */
     private function allowEmpty(ArrayNodeDefinition $node): bool
     {
         static $accessor; //@todo inaccessible property $node->attributes
