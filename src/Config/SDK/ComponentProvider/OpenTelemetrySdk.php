@@ -58,6 +58,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     resource: array{
      *         attributes: array,
      *         attributes_list: ?string,
+     *         detectors: array,
      *         schema_url: ?string,
      *     },
      *     attribute_limits: array{
@@ -82,7 +83,10 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             stream: array{
      *                 name: ?string,
      *                 description: ?string,
-     *                 attribute_keys: list<string>,
+     *                 attribute_keys: array{
+     *                     included: list<string>,
+     *                     excluded: list<string>,
+     *                 },
      *                 aggregation: ?ComponentPlugin<DefaultAggregationProviderInterface>,
      *             },
      *             selector: array{
@@ -204,8 +208,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             if (isset($view['stream']['description'])) {
                 $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
             }
-            if ($view['stream']['attribute_keys']) {
-                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']);
+            // TODO Add support for excluded keys to view template
+            if ($view['stream']['attribute_keys']['included']) {
+                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']['included']);
             }
             if (isset($view['stream']['aggregation'])) {
                 // TODO Add support for aggregation providers in views to allow usage of advisory
@@ -298,6 +303,10 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->arrayNode('detectors')
+                    ->variablePrototype()->end() //todo types
+                ->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
 
@@ -348,6 +357,14 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node
             ->addDefaultsIfNotSet()
             ->children()
+                ->enumNode('exemplar_filter')
+                    ->values([
+                        'trace_based',
+                        'always_on',
+                        'always_off',
+                    ])
+                    ->defaultValue('trace_based')
+                ->end()
                 ->arrayNode('views')
                     ->arrayPrototype()
                         ->children()
@@ -357,9 +374,16 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('attribute_keys')
-                                        ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                        ->children()
+                                            ->arrayNode('included')
+                                                ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                            ->end()
+                                            ->arrayNode('excluded')
+                                                ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
-                                    ->append($registry->component('aggregation', DefaultAggregationProviderInterface::class))
+                                    ->append($registry->componentList('aggregation', DefaultAggregationProviderInterface::class))
                                 ->end()
                             ->end()
                             ->arrayNode('selector')

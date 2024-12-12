@@ -36,6 +36,7 @@ final class LogRecordExporterOtlp implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     insecure: ?bool,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
@@ -77,6 +78,7 @@ final class LogRecordExporterOtlp implements ComponentProvider
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->booleanNode('insecure')->defaultNull()->end()
             ->end()
         ;
 
