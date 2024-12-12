@@ -7,6 +7,7 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\Config\SDK\Configuration\Internal\TreatNullAsUnsetNormalization;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -27,6 +28,6 @@ final class SamplerAlwaysOff implements ComponentProvider
 
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('always_off');
+        return (new ArrayNodeDefinition('always_off'))->attribute(TreatNullAsUnsetNormalization::ALLOW_EMPTY, true);
     }
 }

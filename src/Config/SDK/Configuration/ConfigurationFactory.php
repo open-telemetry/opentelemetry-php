@@ -16,6 +16,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationLoader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
+use OpenTelemetry\Config\SDK\Configuration\Internal\TreatNullAsUnsetNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlExtensionFileLoader;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlSymfonyFileLoader;
 use function serialize;
@@ -133,6 +134,8 @@ final class ConfigurationFactory
         $envReader = new TrackingEnvReader($this->envReader);
         // Parse MUST perform environment variable substitution.
         (new EnvSubstitutionNormalization($envReader))->apply($root);
+        // Most nodes should be removed if empty
+        (new TreatNullAsUnsetNormalization())->apply($root);
 
         $node = $root->getNode(forceRootNode: true);
 
