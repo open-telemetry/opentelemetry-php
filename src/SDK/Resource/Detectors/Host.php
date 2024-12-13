@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use function php_uname;
+use Throwable;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/semantic_conventions/host.md#host
@@ -53,10 +54,15 @@ final class Host implements ResourceDetectorInterface
 
         foreach ($paths as $path) {
             $file = $this->dir . $path;
-            if (is_file($file) && is_readable($file)) {
-                $contents = file_get_contents($file);
 
-                return $contents !== false ? trim($contents) : null;
+            try {
+                if (is_file($file) && is_readable($file)) {
+                    $contents = file_get_contents($file);
+
+                    return $contents !== false ? trim($contents) : null;
+                }
+            } catch (Throwable $t) {
+                //do nothing
             }
         }
 
@@ -66,10 +72,15 @@ final class Host implements ResourceDetectorInterface
     private function getBsdId(): ?string
     {
         $file = $this->dir . self::PATH_ETC_HOSTID;
-        if (is_file($file) && is_readable($file)) {
-            $contents = file_get_contents($file);
 
-            return $contents !== false ? trim($contents) : null;
+        try {
+            if (is_file($file) && is_readable($file)) {
+                $contents = file_get_contents($file);
+
+                return $contents !== false ? trim($contents) : null;
+            }
+        } catch (Throwable $t) {
+            //do nothing
         }
 
         $out = exec('which kenv && kenv -q smbios.system.uuid');
