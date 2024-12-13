@@ -59,7 +59,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * events, and is assumed to be monotonic over the values of these events.
      * Negative events *can* be recorded, but sum should not be filled out when
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     * see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
      *
      * Generated from protobuf field <code>optional double sum = 5;</code>
      */
@@ -173,7 +173,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      *           events, and is assumed to be monotonic over the values of these events.
      *           Negative events *can* be recorded, but sum should not be filled out when
      *           doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     *           see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     *           see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
      *     @type int $scale
      *           scale describes the resolution of the histogram.  Boundaries are
      *           located at powers of the base, where:
@@ -353,7 +353,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * events, and is assumed to be monotonic over the values of these events.
      * Negative events *can* be recorded, but sum should not be filled out when
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     * see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
      *
      * Generated from protobuf field <code>optional double sum = 5;</code>
      * @return float
@@ -380,7 +380,7 @@ class ExponentialHistogramDataPoint extends \Google\Protobuf\Internal\Message
      * events, and is assumed to be monotonic over the values of these events.
      * Negative events *can* be recorded, but sum should not be filled out when
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram
+     * see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#histogram
      *
      * Generated from protobuf field <code>optional double sum = 5;</code>
      * @param float $var
