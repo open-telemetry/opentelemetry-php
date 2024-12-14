@@ -59,7 +59,11 @@ final class Host implements ResourceDetectorInterface
                 if (is_file($file) && is_readable($file)) {
                     $contents = file_get_contents($file);
 
-                    return $contents !== false ? trim($contents) : null;
+                    if ($contents === false) {
+                        continue;
+                    }
+
+                    return trim($contents);
                 }
             } catch (Throwable $t) {
                 //do nothing
@@ -77,7 +81,9 @@ final class Host implements ResourceDetectorInterface
             if (is_file($file) && is_readable($file)) {
                 $contents = file_get_contents($file);
 
-                return $contents !== false ? trim($contents) : null;
+                if ($contents !== false) {
+                    return trim($contents);
+                }
             }
         } catch (Throwable $t) {
             //do nothing
