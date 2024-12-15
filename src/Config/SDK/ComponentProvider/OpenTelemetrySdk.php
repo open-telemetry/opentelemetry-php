@@ -383,7 +383,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                             ->end()
                                         ->end()
                                     ->end()
-                                    ->append($registry->componentList('aggregation', DefaultAggregationProviderInterface::class))
+                                    ->append($registry->component('aggregation', DefaultAggregationProviderInterface::class))
                                 ->end()
                             ->end()
                             ->arrayNode('selector')
