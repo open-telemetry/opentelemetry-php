@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 /**
  * @implements ComponentProvider<TextMapPropagatorInterface>
- * @todo xray propagator exists in contrib, should it be moved to core?
+ * @psalm-suppress UndefinedClass
  */
 #[PackageDependency('open-telemetry/contrib-aws', '>=1.0.0beta12')]
 final class TextMapPropagatorXray implements ComponentProvider
@@ -23,10 +23,12 @@ final class TextMapPropagatorXray implements ComponentProvider
     use LogsMessagesTrait;
 
     /**
+     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
      * @param array{} $properties
      */
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
+        // @phpstan-ignore-next-line
         return new Propagator();
     }
 
