@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Metrics\MetricReader\NoopReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
@@ -27,7 +25,7 @@ final class MetricReaderPull implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
-        return new class implements MetricReaderInterface {
+        return new class() implements MetricReaderInterface {
 
             public function collect(): bool
             {
@@ -54,6 +52,7 @@ final class MetricReaderPull implements ComponentProvider
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
                 ->arrayNode('producers') //@todo
                     ->variablePrototype()->end()
+                ->end()
             ->end()
         ;
 

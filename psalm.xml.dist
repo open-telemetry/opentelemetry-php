@@ -40,6 +40,7 @@
         <UndefinedInterfaceMethod>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
             </errorLevel>
         </UndefinedInterfaceMethod>
         <PossiblyNullReference>
@@ -50,6 +51,7 @@
         <MoreSpecificImplementedParamType>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
             </errorLevel>
         </MoreSpecificImplementedParamType>
         <InvalidDocblock>

@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
@@ -33,7 +31,7 @@ final class MetricExporterPrometheus implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        return new class implements MetricExporterInterface {
+        return new class() implements MetricExporterInterface {
 
             public function export(iterable $batch): bool
             {
@@ -68,6 +66,7 @@ final class MetricExporterPrometheus implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
+            ->end()
         ;
 
         return $node;

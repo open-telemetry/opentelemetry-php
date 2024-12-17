@@ -26,7 +26,6 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
      */
     public function createPlugin(array $properties, Context $context): DefaultAggregationProviderInterface
     {
-        // TODO Implement proper aggregation providers (default, drop, explicit_bucket_histogram, last_value, sum) to handle advisory
         return new class() implements DefaultAggregationProviderInterface {
             use DefaultAggregationProviderTrait;
         };
@@ -38,9 +37,11 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
         $node
             ->children()
                 ->arrayNode('boundaries')
-                    ->prototype('scalar')->validate()->always(Validation::ensureNumber())->end()->end()
+                    ->prototype('scalar')
+                        ->validate()->always(Validation::ensureNumber())->end()
+                    ->end()
                 ->end()
-                ->booleanNode('record_min_max')->defaultValue(false)->end()
+                ->booleanNode('record_min_max')->defaultTrue()->end()
             ->end();
 
         return $node;
