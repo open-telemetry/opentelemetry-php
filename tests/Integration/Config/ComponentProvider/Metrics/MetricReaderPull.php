@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
+namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
@@ -19,8 +19,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class MetricReaderPull implements ComponentProvider
 {
-    use LogsMessagesTrait;
-
     /**
      * @param array{
      *     exporter: ComponentPlugin<MetricExporterInterface>,
@@ -29,9 +27,23 @@ final class MetricReaderPull implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
-        self::logWarning('pull metric reader not implemented');
+        return new class implements MetricReaderInterface {
 
-        return new NoopReader();
+            public function collect(): bool
+            {
+                return true;
+            }
+
+            public function shutdown(): bool
+            {
+                return true;
+            }
+
+            public function forceFlush(): bool
+            {
+                return true;
+            }
+        };
     }
 
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition

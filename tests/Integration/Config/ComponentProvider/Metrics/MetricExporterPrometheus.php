@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
+namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
@@ -18,8 +18,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class MetricExporterPrometheus implements ComponentProvider
 {
-    use LogsMessagesTrait;
-
     /**
      * @param array{
      *     host: string,
@@ -35,9 +33,18 @@ final class MetricExporterPrometheus implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        self::logWarning('prometheus exporter not implemented');
+        return new class implements MetricExporterInterface {
 
-        return new NoopMetricExporter();
+            public function export(iterable $batch): bool
+            {
+                return true;
+            }
+
+            public function shutdown(): bool
+            {
+                return true;
+            }
+        };
     }
 
     public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
