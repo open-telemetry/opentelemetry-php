@@ -11,6 +11,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<MetricReaderInterface>
@@ -44,9 +45,9 @@ final class MetricReaderPull implements ComponentProvider
         };
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('pull');
+        $node = $builder->arrayNode('pull');
         $node
             ->children()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())

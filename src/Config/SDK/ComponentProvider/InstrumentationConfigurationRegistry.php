@@ -12,6 +12,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @internal
@@ -24,7 +25,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
      * @param array{
      *     instrumentation: array{
      *         php: list<ComponentPlugin<InstrumentationConfiguration>>,
-     *         general: list<ComponentPlugin<InstrumentationConfiguration>>
+     *         general: list<ComponentPlugin<GeneralInstrumentationConfiguration>>
      *     }
      * } $properties
      */
@@ -43,18 +44,16 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
         return $configurationRegistry;
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $root = new ArrayNodeDefinition('open_telemetry');
+        $root = $builder->arrayNode('open_telemetry');
         $root
             ->ignoreExtraKeys()
             ->children()
                 ->arrayNode('instrumentation')
                     ->ignoreExtraKeys()
-                    ->children()
-                        ->append($registry->componentList('php', InstrumentationConfiguration::class))
-                        ->append($registry->componentList('general', GeneralInstrumentationConfiguration::class))
-                    ->end()
+                    ->append($registry->componentList('php', InstrumentationConfiguration::class))
+                    ->append($registry->componentList('general', GeneralInstrumentationConfiguration::class))
                 ->end()
             ->end()
         ;

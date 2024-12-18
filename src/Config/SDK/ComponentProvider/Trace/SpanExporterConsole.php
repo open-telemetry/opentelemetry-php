@@ -7,11 +7,11 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
-use OpenTelemetry\Config\SDK\Configuration\Internal\TreatNullAsUnsetNormalization;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<SpanExporterInterface>
@@ -30,8 +30,8 @@ final class SpanExporterConsole implements ComponentProvider
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return (new ArrayNodeDefinition('console'))->attribute(TreatNullAsUnsetNormalization::ALLOW_EMPTY, true);
+        return $builder->arrayNode('console');
     }
 }

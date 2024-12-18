@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<GeneralInstrumentationConfiguration>
@@ -22,22 +23,22 @@ class HttpConfigProvider implements ComponentProvider
         return new HttpConfig($properties);
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('http');
+        $node = $builder->arrayNode('http');
         $node
             ->children()
-                ->append($this->capturedHeaders('client'))
-                ->append($this->capturedHeaders('server'))
+                ->append($this->capturedHeaders('client', $builder))
+                ->append($this->capturedHeaders('server', $builder))
             ->end()
         ;
 
         return $node;
     }
 
-    private function capturedHeaders(string $name): ArrayNodeDefinition
+    private function capturedHeaders(string $name, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition($name);
+        $node = $builder->arrayNode($name);
         $node
             ->children()
                 ->arrayNode('request_captured_headers')

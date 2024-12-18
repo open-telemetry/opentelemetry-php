@@ -11,6 +11,7 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<DefaultAggregationProviderInterface>
@@ -31,9 +32,9 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
         };
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('explicit_bucket_histogram');
+        $node = $builder->arrayNode('explicit_bucket_histogram');
         $node
             ->children()
                 ->arrayNode('boundaries')

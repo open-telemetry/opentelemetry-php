@@ -43,6 +43,11 @@
                 <directory name="tests/Integration/Config/ComponentProvider"/>
             </errorLevel>
         </UndefinedInterfaceMethod>
+        <PossiblyInvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration"/>
+            </errorLevel>
+        </PossiblyInvalidArgument>
         <PossiblyNullReference>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>

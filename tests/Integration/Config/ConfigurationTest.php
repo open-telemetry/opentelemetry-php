@@ -29,7 +29,7 @@ final class ConfigurationTest extends TestCase
     public function test_open_telemetry_configuration(string $file): void
     {
         $this->expectNotToPerformAssertions();
-        Configuration::parseFile($file)->create();
+        $sdkBuilder = Configuration::parseFile($file)->create();
     }
 
     public static function openTelemetryConfigurationDataProvider(): iterable

@@ -7,11 +7,11 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
-use OpenTelemetry\Config\SDK\Configuration\Internal\TreatNullAsUnsetNormalization;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<LogRecordExporterInterface>
@@ -30,8 +30,8 @@ final class LogRecordExporterConsole implements ComponentProvider
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return (new ArrayNodeDefinition('console'))->attribute(TreatNullAsUnsetNormalization::ALLOW_EMPTY, true);
+        return $builder->arrayNode('console');
     }
 }

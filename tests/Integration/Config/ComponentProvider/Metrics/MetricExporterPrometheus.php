@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<MetricExporterInterface>
@@ -45,9 +46,9 @@ final class MetricExporterPrometheus implements ComponentProvider
         };
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('prometheus');
+        $node = $builder->arrayNode('prometheus');
         $node
             ->children()
                 ->scalarNode('host')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
