@@ -168,14 +168,18 @@ final class ConfigurationFactoryTest extends TestCase
         $this->assertSame(2048, self::getPropertiesFromPlugin($parsed)['attribute_limits']['attribute_value_length_limit']);
     }
 
+    /**
+     * If a property has a default value defined (i.e. is _not_ required) and is
+     * missing or present but null, Create MUST ensure the SDK component is configured
+     * with the default value.
+     */
     #[BackupGlobals(true)]
     public function test_env_substitution_missing_value(): void
     {
-        unset($_SERVER['OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT']);
+        unset($_SERVER['OTEL_ATTRIBUTE_COUNT_LIMIT']);
         $parsed = self::factory()->process([[
             'file_format' => '0.1',
             'attribute_limits' => [
-                'attribute_value_length_limit' => '${OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}',
                 'attribute_count_limit' => '${OTEL_ATTRIBUTE_COUNT_LIMIT}',
             ],
         ]]);

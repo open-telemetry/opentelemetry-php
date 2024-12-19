@@ -14,4 +14,13 @@ trait NodeDefinitionTrait
 
         return $this;
     }
+
+    public function defaultValue(mixed $value): static
+    {
+        $this->validate()->ifNull()->then(static function () use ($value): mixed {
+            return $value;
+        });
+
+        return parent::defaultValue($value);
+    }
 }
