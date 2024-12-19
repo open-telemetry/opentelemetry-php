@@ -52,8 +52,8 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
             ->children()
                 ->arrayNode('instrumentation')
                     ->ignoreExtraKeys()
-                    ->append($registry->componentList('php', InstrumentationConfiguration::class))
-                    ->append($registry->componentList('general', GeneralInstrumentationConfiguration::class))
+                    ->append($registry->componentMap('php', InstrumentationConfiguration::class))
+                    ->append($registry->componentMap('general', GeneralInstrumentationConfiguration::class))
                 ->end()
             ->end()
         ;

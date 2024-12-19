@@ -15,5 +15,4 @@ instrumentation:
   general:
   php:
     example_instrumentation:
-      enabled: true
       span_name: ${EXAMPLE_INSTRUMENTATION_SPAN_NAME:-example span}

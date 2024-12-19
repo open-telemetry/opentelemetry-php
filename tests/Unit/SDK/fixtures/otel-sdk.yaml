@@ -5,6 +5,11 @@ tracer_provider:
     - simple:
         exporter:
           console:
+  sampler:
+    always_off:
+
+propagator:
+  composite: []
 
 instrumentation:
   php:

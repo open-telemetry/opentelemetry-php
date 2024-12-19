@@ -83,10 +83,20 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
         return $node;
     }
 
-    public function componentArrayList(string $name, string $type): ArrayNodeDefinition
+    public function componentMap(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name);
-        $this->applyToArrayNode($node->arrayPrototype(), $type);
+        $node->info(sprintf('Component "%s"', $type));
+        $node->performNoDeepMerging();
+        $node->ignoreExtraKeys(false);
+        $node->validate()->always(function (array|null $value) use ($type): array {
+            $components = [];
+            foreach ($value ?? [] as $name => $config) {
+                $components[] = $this->process($type, $name, [$name => $config]);
+            }
+
+            return $components;
+        });
 
         return $node;
     }
@@ -107,7 +117,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
         return $node;
     }
 
-    private function applyToArrayNode(ArrayNodeDefinition $node, string $type, bool $forceArray = false): void
+    private function applyToArrayNode(ArrayNodeDefinition $node, string $type): void
     {
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
