@@ -55,17 +55,12 @@ final class Host implements ResourceDetectorInterface
         set_error_handler(static fn () => true);
 
         try {
-            if (is_file($file) && is_readable($file)) {
-                $contents = file_get_contents($file);
-                if ($contents !== false) {
-                    return $contents;
-                }
-            }
+            $contents = file_get_contents($file);
+
+            return $contents !== false ? trim($contents) : false;
         } finally {
             restore_error_handler();
         }
-
-        return false;
     }
 
     private function getLinuxId(): ?string
