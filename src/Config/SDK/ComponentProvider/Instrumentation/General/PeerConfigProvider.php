@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<GeneralInstrumentationConfiguration>
@@ -21,9 +22,9 @@ class PeerConfigProvider implements ComponentProvider
         return new PeerConfig($properties);
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('peer');
+        $node = $builder->arrayNode('peer');
         $node
             ->children()
                 ->arrayNode('service_mapping')
