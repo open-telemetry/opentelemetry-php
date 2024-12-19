@@ -69,7 +69,6 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
     public function component(string $name, string $type): NodeDefinition
     {
         $node = $this->builder->arrayNode($name);
-        //$node->defaultNull();
         $this->applyToArrayNode($node, $type);
 
         return $node;
