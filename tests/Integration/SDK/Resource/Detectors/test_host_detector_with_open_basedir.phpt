@@ -5,8 +5,6 @@ An error handler is installed which converts PHP warnings to exceptions, and ope
 is configured such that /etc/machine-id and friends cannot be read
 --SKIPIF--
 <?php if (!in_array(PHP_OS_FAMILY, ['Linux', 'BSD'])) die('skip requires Linux or BSD'); ?>
---ENV--
-OTEL_PHP_FIBERS_ENABLED=0
 --INI--
 open_basedir=${PWD}
 --FILE--
