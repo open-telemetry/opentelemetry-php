@@ -106,6 +106,12 @@ interface Variables
     public const OTEL_EXPORTER_ZIPKIN_TIMEOUT = 'OTEL_EXPORTER_ZIPKIN_TIMEOUT';
     public const OTEL_EXPORTER_ZIPKIN_PROTOCOL = 'OTEL_EXPORTER_ZIPKIN_PROTOCOL';
     /**
+    * Instana Exporter
+    * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#instana-exporter
+    */
+    public const OTEL_EXPORTER_INSTANA_ENDPOINT = 'OTEL_EXPORTER_INSTANA_ENDPOINT';
+    public const OTEL_EXPORTER_INSTANA_TIMEOUT = 'OTEL_EXPORTER_INSTANA_TIMEOUT';
+    /**
      * Prometheus Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#prometheus-exporter
      */
