@@ -47,16 +47,32 @@ final class Host implements ResourceDetectorInterface
         };
     }
 
+    /**
+     * @phan-suppress PhanTypeMismatchArgumentInternal
+     */
+    private function readFile(string $file): string|false
+    {
+        set_error_handler(static fn () => true);
+
+        try {
+            $contents = file_get_contents($file);
+
+            return $contents !== false ? trim($contents) : false;
+        } finally {
+            restore_error_handler();
+        }
+    }
+
     private function getLinuxId(): ?string
     {
         $paths = [self::PATH_ETC_MACHINEID, self::PATH_VAR_LIB_DBUS_MACHINEID];
 
         foreach ($paths as $path) {
             $file = $this->dir . $path;
-            if (is_file($file) && is_readable($file)) {
-                $contents = file_get_contents($file);
 
-                return $contents !== false ? trim($contents) : null;
+            $contents = $this->readFile($file);
+            if ($contents !== false) {
+                return $contents;
             }
         }
 
@@ -66,10 +82,10 @@ final class Host implements ResourceDetectorInterface
     private function getBsdId(): ?string
     {
         $file = $this->dir . self::PATH_ETC_HOSTID;
-        if (is_file($file) && is_readable($file)) {
-            $contents = file_get_contents($file);
 
-            return $contents !== false ? trim($contents) : null;
+        $contents = $this->readFile($file);
+        if ($contents !== false) {
+            return $contents;
         }
 
         $out = exec('which kenv && kenv -q smbios.system.uuid');
