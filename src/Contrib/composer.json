@@ -1,7 +1,7 @@
 {
     "name": "open-telemetry/sdk-contrib",
     "description": "Vendor specific implementations for OpenTelemetry PHP API/SDK.",
-    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "otlp", "zipkin"],
+    "keywords": ["opentelemetry", "otel", "metrics", "tracing", "logging", "apm", "otlp", "instana", "zipkin"],
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
@@ -31,6 +31,7 @@
         },
         "files": [
             "Grpc/_register.php",
+            "Instana/_register.php",
             "Otlp/_register.php",
             "Zipkin/_register.php"
 

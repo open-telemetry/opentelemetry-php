@@ -1,0 +1,45 @@
+{
+    "name": "open-telemetry/exporter-instana",
+    "description": "Instana exporter for OpenTelemetry PHP.",
+    "keywords": [
+        "opentelemetry",
+        "otel",
+        "tracing",
+        "contrib",
+        "exporter",
+        "instana"
+    ],
+    "type": "library",
+    "support": {
+        "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
+        "source": "https://github.com/open-telemetry/opentelemetry-php",
+        "docs": "https://opentelemetry.io/docs/php",
+        "chat": "https://app.slack.com/client/T08PSQ7BQ/C01NFPCV44V"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "opentelemetry-php contributors",
+            "homepage": "https://github.com/open-telemetry/opentelemetry-php/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "open-telemetry/api": "^1.0",
+        "open-telemetry/sdk": "^1.0",
+        "guzzlehttp/guzzle": "^7.4.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "OpenTelemetry\\Contrib\\Instana\\": "."
+        },
+        "files": [
+            "_register.php"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev"
+        }
+    }
+}

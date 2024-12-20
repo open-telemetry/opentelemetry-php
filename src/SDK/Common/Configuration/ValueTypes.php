@@ -98,6 +98,12 @@ interface ValueTypes
     public const OTEL_EXPORTER_ZIPKIN_TIMEOUT = VariableTypes::INTEGER;
     public const OTEL_EXPORTER_ZIPKIN_PROTOCOL = VariableTypes::STRING;
     /**
+     * Instana Exporter
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#instana-exporter
+     */
+    public const OTEL_EXPORTER_INSTANA_ENDPOINT = VariableTypes::STRING;
+    public const OTEL_EXPORTER_INSTANA_TIMEOUT = VariableTypes::INTEGER;
+    /**
      * Prometheus Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#prometheus-exporter
      */

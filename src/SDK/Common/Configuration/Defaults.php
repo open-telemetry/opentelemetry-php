@@ -87,6 +87,12 @@ interface Defaults
     // Timeout (seconds)
     public const OTEL_EXPORTER_ZIPKIN_TIMEOUT = 10000; //10s
     /**
+     * Instana Exporter
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#instana-exporter
+     */
+    public const OTEL_EXPORTER_INSTANA_ENDPOINT = '127.0.0.1:42699';
+    public const OTEL_EXPORTER_INSTANA_TIMEOUT = 10000; //10s
+    /**
      * Prometheus Exporter
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#prometheus-exporter
      */
