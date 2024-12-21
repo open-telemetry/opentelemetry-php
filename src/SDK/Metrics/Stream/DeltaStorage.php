@@ -14,7 +14,7 @@ use OpenTelemetry\SDK\Metrics\AggregationInterface;
  */
 final class DeltaStorage
 {
-    private Delta $head;
+    private readonly Delta $head;
 
     public function __construct(private readonly AggregationInterface $aggregation)
     {

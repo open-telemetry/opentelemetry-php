@@ -34,9 +34,14 @@ meter_provider:
                       temporality_preference: delta
 
 tracer_provider:
+    sampler:
+      always_off:
     processors:
         - batch:
               exporter:
                   otlp:
                       # expand the otlp-exporter anchor
                       <<: *otlp-exporter
+
+propagator:
+  composite: []

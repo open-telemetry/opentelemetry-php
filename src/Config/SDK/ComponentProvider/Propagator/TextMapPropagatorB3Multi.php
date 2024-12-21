@@ -11,6 +11,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<TextMapPropagatorInterface>
@@ -27,8 +28,8 @@ final class TextMapPropagatorB3Multi implements ComponentProvider
         return B3Propagator::getB3MultiHeaderInstance();
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('b3multi');
+        return $builder->arrayNode('b3multi');
     }
 }

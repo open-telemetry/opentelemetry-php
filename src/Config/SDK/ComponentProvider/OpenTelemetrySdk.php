@@ -42,6 +42,7 @@ use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @internal
@@ -58,6 +59,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     resource: array{
      *         attributes: array,
      *         attributes_list: ?string,
+     *         detectors: array,
      *         schema_url: ?string,
      *     },
      *     attribute_limits: array{
@@ -82,7 +84,10 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             stream: array{
      *                 name: ?string,
      *                 description: ?string,
-     *                 attribute_keys: list<string>,
+     *                 attribute_keys: array{
+     *                     included: list<string>,
+     *                     excluded: list<string>,
+     *                 },
      *                 aggregation: ?ComponentPlugin<DefaultAggregationProviderInterface>,
      *             },
      *             selector: array{
@@ -204,8 +209,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             if (isset($view['stream']['description'])) {
                 $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
             }
-            if ($view['stream']['attribute_keys']) {
-                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']);
+            // TODO Add support for excluded keys to view template
+            if ($view['stream']['attribute_keys']['included']) {
+                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']['included']);
             }
             if (isset($view['stream']['aggregation'])) {
                 // TODO Add support for aggregation providers in views to allow usage of advisory
@@ -254,9 +260,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $sdkBuilder;
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('open_telemetry');
+        $node = $builder->arrayNode('open_telemetry');
         $node
             ->addDefaultsIfNotSet()
             ->ignoreExtraKeys()
@@ -268,20 +274,20 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->validate()->ifNotInArray(['0.3'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
-                ->append($this->getResourceConfig())
-                ->append($this->getAttributeLimitsConfig())
+                ->append($this->getResourceConfig($builder))
+                ->append($this->getAttributeLimitsConfig($builder))
                 ->append($registry->component('propagator', TextMapPropagatorInterface::class))
-                ->append($this->getTracerProviderConfig($registry))
-                ->append($this->getMeterProviderConfig($registry))
-                ->append($this->getLoggerProviderConfig($registry))
+                ->append($this->getTracerProviderConfig($registry, $builder))
+                ->append($this->getMeterProviderConfig($registry, $builder))
+                ->append($this->getLoggerProviderConfig($registry, $builder))
             ->end();
 
         return $node;
     }
 
-    private function getResourceConfig(): ArrayNodeDefinition
+    private function getResourceConfig(NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('resource');
+        $node = $builder->arrayNode('resource');
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -298,15 +304,19 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->arrayNode('detectors')
+                    ->variablePrototype()->end()
+                ->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
 
         return $node;
     }
 
-    private function getAttributeLimitsConfig(): ArrayNodeDefinition
+    private function getAttributeLimitsConfig(NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('attribute_limits');
+        $node = $builder->arrayNode('attribute_limits');
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -317,9 +327,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $node;
     }
 
-    private function getTracerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    private function getTracerProviderConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('tracer_provider');
+        $node = $builder->arrayNode('tracer_provider');
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -335,19 +345,27 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
-                ->append($registry->componentArrayList('processors', SpanProcessorInterface::class))
+                ->append($registry->componentList('processors', SpanProcessorInterface::class))
             ->end()
         ;
 
         return $node;
     }
 
-    private function getMeterProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    private function getMeterProviderConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('meter_provider');
+        $node = $builder->arrayNode('meter_provider');
         $node
             ->addDefaultsIfNotSet()
             ->children()
+                ->enumNode('exemplar_filter')
+                    ->values([
+                        'trace_based',
+                        'always_on',
+                        'always_off',
+                    ])
+                    ->defaultValue('trace_based')
+                ->end()
                 ->arrayNode('views')
                     ->arrayPrototype()
                         ->children()
@@ -357,7 +375,14 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('attribute_keys')
-                                        ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                        ->children()
+                                            ->arrayNode('included')
+                                                ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                            ->end()
+                                            ->arrayNode('excluded')
+                                                ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                     ->append($registry->component('aggregation', DefaultAggregationProviderInterface::class))
                                 ->end()
@@ -386,16 +411,16 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
-                ->append($registry->componentArrayList('readers', MetricReaderInterface::class))
+                ->append($registry->componentList('readers', MetricReaderInterface::class))
             ->end()
         ;
 
         return $node;
     }
 
-    private function getLoggerProviderConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    private function getLoggerProviderConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('logger_provider');
+        $node = $builder->arrayNode('logger_provider');
         $node
             ->addDefaultsIfNotSet()
             ->children()
@@ -406,7 +431,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->integerNode('attribute_count_limit')->min(0)->defaultNull()->end()
                     ->end()
                 ->end()
-                ->append($registry->componentArrayList('processors', LogRecordProcessorInterface::class))
+                ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
             ->end()
         ;
 

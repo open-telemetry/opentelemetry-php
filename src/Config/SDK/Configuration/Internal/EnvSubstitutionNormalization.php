@@ -26,7 +26,7 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 /**
  * @internal
  */
-final class EnvSubstitutionNormalization
+final class EnvSubstitutionNormalization implements Normalization
 {
 
     public function __construct(
