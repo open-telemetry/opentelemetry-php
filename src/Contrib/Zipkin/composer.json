@@ -17,9 +17,9 @@
     }
   ],
   "require": {
-    "php": "^8.1",
-    "open-telemetry/api": "^1.0",
-    "open-telemetry/sdk": "^1.0",
+    "php": "^8.2",
+    "open-telemetry/api": "^2.0",
+    "open-telemetry/sdk": "^2.0",
     "php-http/async-client-implementation": "^1.0",
     "php-http/discovery": "^1.14",
     "psr/http-factory-implementation": "^1.0"
@@ -34,7 +34,8 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-main": "1.0.x-dev"
+      "dev-main": "1.0.x-dev",
+      "dev-2.x": "2.x-dev"
     }
   }
 }

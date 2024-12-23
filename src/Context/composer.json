@@ -17,8 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "symfony/polyfill-php82": "^1.26"
+        "php": "^8.2"
     },
     "autoload": {
         "psr-4": {
@@ -33,7 +32,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0.x-dev"
+            "dev-main": "1.0.x-dev",
+            "dev-2.x": "2.x-dev"
         }
     }
 }

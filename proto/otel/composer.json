@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "^8.2",
         "google/protobuf": "^3.22 || ^4.0"
     },
     "autoload": {
@@ -31,7 +31,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.x-dev"
+            "dev-main": "1.x-dev",
+            "dev-2.x": "2.x-dev"
         }
     }
 }
