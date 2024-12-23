@@ -9,13 +9,13 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 /**
  * Represents the instrumentation scope information associated with the Tracer or Meter
  */
-final class InstrumentationScope implements InstrumentationScopeInterface
+final readonly class InstrumentationScope implements InstrumentationScopeInterface
 {
     public function __construct(
-        private readonly string $name,
-        private readonly ?string $version,
-        private readonly ?string $schemaUrl,
-        private readonly AttributesInterface $attributes,
+        private string $name,
+        private ?string $version,
+        private ?string $schemaUrl,
+        private AttributesInterface $attributes,
     ) {
     }
 

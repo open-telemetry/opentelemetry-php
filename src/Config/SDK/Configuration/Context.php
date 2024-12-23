@@ -14,7 +14,7 @@ use Psr\Log\NullLogger;
 /**
  * Context used for component creation.
  */
-final class Context
+final readonly class Context
 {
 
     /**
@@ -23,9 +23,9 @@ final class Context
      * @param LoggerInterface $logger logger to use for self diagnostics
      */
     public function __construct(
-        public readonly TracerProviderInterface $tracerProvider = new NoopTracerProvider(),
-        public readonly MeterProviderInterface $meterProvider = new NoopMeterProvider(),
-        public readonly LoggerInterface $logger = new NullLogger(),
+        public TracerProviderInterface $tracerProvider = new NoopTracerProvider(),
+        public MeterProviderInterface $meterProvider = new NoopMeterProvider(),
+        public LoggerInterface $logger = new NullLogger(),
     ) {
     }
 }

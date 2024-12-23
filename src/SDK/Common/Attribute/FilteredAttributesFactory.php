@@ -7,14 +7,14 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 /**
  * @internal
  */
-final class FilteredAttributesFactory implements AttributesFactoryInterface
+final readonly class FilteredAttributesFactory implements AttributesFactoryInterface
 {
     /**
      * @param list<string> $rejectedKeys
      */
     public function __construct(
-        private readonly AttributesFactoryInterface $factory,
-        private readonly array $rejectedKeys,
+        private AttributesFactoryInterface $factory,
+        private array $rejectedKeys,
     ) {
     }
 

@@ -28,9 +28,9 @@ use function ucwords;
  * @internal
  * @psalm-type SUPPORTED_CONTENT_TYPES = ContentTypes::PROTOBUF|ContentTypes::JSON|ContentTypes::NDJSON
  */
-final class ProtobufSerializer
+final readonly class ProtobufSerializer
 {
-    private function __construct(private readonly string $contentType)
+    private function __construct(private string $contentType)
     {
     }
 

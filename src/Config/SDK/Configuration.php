@@ -15,14 +15,14 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\SDK\SdkBuilder;
 
-final class Configuration
+final readonly class Configuration
 {
 
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
      */
     private function __construct(
-        private readonly ComponentPlugin $sdkPlugin,
+        private ComponentPlugin $sdkPlugin,
     ) {
     }
 

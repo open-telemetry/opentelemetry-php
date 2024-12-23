@@ -7,14 +7,14 @@ namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 use function is_string;
 use function trim;
 
-final class EnvSourceReader implements EnvReader
+final readonly class EnvSourceReader implements EnvReader
 {
 
     /**
      * @param iterable<EnvSource> $envSources
      */
     public function __construct(
-        private readonly iterable $envSources,
+        private iterable $envSources,
     ) {
     }
 

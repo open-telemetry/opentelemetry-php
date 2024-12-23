@@ -16,13 +16,13 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 /**
  * Context used for component creation.
  */
-final class Context
+final readonly class Context
 {
     public function __construct(
-        public readonly TracerProviderInterface $tracerProvider = new NoopTracerProvider(),
-        public readonly MeterProviderInterface $meterProvider = new NoopMeterProvider(),
-        public readonly LoggerProviderInterface $loggerProvider = new NoopLoggerProvider(),
-        public readonly TextMapPropagatorInterface $propagator = new NoopTextMapPropagator(),
+        public TracerProviderInterface $tracerProvider = new NoopTracerProvider(),
+        public MeterProviderInterface $meterProvider = new NoopMeterProvider(),
+        public LoggerProviderInterface $loggerProvider = new NoopLoggerProvider(),
+        public TextMapPropagatorInterface $propagator = new NoopTextMapPropagator(),
     ) {
     }
 }

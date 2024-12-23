@@ -9,12 +9,12 @@ use OpenTelemetry\SDK\Metrics\ReferenceCounterInterface;
 /**
  * @internal
  */
-final class MultiReferenceCounter implements ReferenceCounterInterface
+final readonly class MultiReferenceCounter implements ReferenceCounterInterface
 {
     /**
      * @param list<ReferenceCounterInterface> $referenceCounters
      */
-    public function __construct(private readonly array $referenceCounters)
+    public function __construct(private array $referenceCounters)
     {
     }
 

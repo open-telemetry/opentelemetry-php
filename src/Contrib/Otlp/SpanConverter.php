@@ -26,9 +26,9 @@ use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use function serialize;
 use function spl_object_id;
 
-final class SpanConverter
+final readonly class SpanConverter
 {
-    private readonly ProtobufSerializer $serializer;
+    private ProtobufSerializer $serializer;
 
     public function __construct(?ProtobufSerializer $serializer = null)
     {

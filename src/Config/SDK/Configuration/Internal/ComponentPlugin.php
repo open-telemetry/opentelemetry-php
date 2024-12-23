@@ -13,7 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
  *
  * @internal
  */
-final class ComponentPlugin implements \OpenTelemetry\Config\SDK\Configuration\ComponentPlugin
+final readonly class ComponentPlugin implements \OpenTelemetry\Config\SDK\Configuration\ComponentPlugin
 {
 
     /**
@@ -21,8 +21,8 @@ final class ComponentPlugin implements \OpenTelemetry\Config\SDK\Configuration\C
      * @param ComponentProvider<T> $provider component provider used to create the component
      */
     public function __construct(
-        private readonly array $properties,
-        private readonly ComponentProvider $provider,
+        private array $properties,
+        private ComponentProvider $provider,
     ) {
     }
 

@@ -10,14 +10,14 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 /**
  * @internal
  */
-final class ConfiguratorClosure
+final readonly class ConfiguratorClosure
 {
 
     public function __construct(
-        public readonly Closure $closure,
-        private readonly ?string $name,
-        private readonly ?string $version,
-        private readonly ?string $schemaUrl,
+        public Closure $closure,
+        private ?string $name,
+        private ?string $version,
+        private ?string $schemaUrl,
     ) {
     }
 

@@ -12,7 +12,7 @@ use OpenTelemetry\API\Trace\SpanKind; //@phan-suppress-current-line PhanUnrefere
  * by the OpenTelemetry extension.
  */
 #[Attribute(Attribute::TARGET_FUNCTION|Attribute::TARGET_METHOD)]
-final class WithSpan
+final readonly class WithSpan
 {
     /**
      * @param string|null $span_name Optional span name. Default: function name or class::method
@@ -20,9 +20,9 @@ final class WithSpan
      * @param array $attributes Optional attributes to be added to the span.
      */
     public function __construct(
-        public readonly ?string $span_name = null,
-        public readonly ?int $span_kind = null,
-        public readonly array $attributes = [],
+        public ?string $span_name = null,
+        public ?int $span_kind = null,
+        public array $attributes = [],
     ) {
     }
 }
