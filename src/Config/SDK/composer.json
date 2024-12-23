@@ -20,7 +20,7 @@
         "php": "^8.2",
         "open-telemetry/context": "^2.0",
         "open-telemetry/sdk": "^2.0",
-        "symfony/config": "^5.4 || ^6.4 || ^7.0",
+        "symfony/config": "^6.4 || ^7.0",
         "tbachert/spi": "^1.0.1"
     },
     "autoload": {

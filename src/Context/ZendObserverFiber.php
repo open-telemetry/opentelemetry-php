@@ -40,8 +40,8 @@ final class ZendObserverFiber
             return true;
         }
 
-        if (PHP_ZTS || PHP_VERSION_ID < 80100 || !extension_loaded('ffi')) {
-            trigger_error('Context: Fiber context switching not supported, requires PHP >= 8.1, an NTS build, and the FFI extension');
+        if (PHP_ZTS || !extension_loaded('ffi')) {
+            trigger_error('Context: Fiber context switching not supported, requires an NTS build, and the FFI extension');
 
             return false;
         }
