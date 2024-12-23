@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 /**
  * @implements ComponentProvider<LogRecordExporterInterface>
  */
-#[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
+#[PackageDependency('open-telemetry/exporter-otlp', '^2')]
 final class LogRecordExporterOtlp implements ComponentProvider
 {
 

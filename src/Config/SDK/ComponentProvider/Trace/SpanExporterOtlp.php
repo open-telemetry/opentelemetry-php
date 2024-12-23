@@ -21,7 +21,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 /**
  * @implements ComponentProvider<SpanExporterInterface>
  */
-#[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
+#[PackageDependency('open-telemetry/exporter-otlp', '^2')]
 final class SpanExporterOtlp implements ComponentProvider
 {
 
