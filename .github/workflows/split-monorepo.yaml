@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - split
+      - 2.x
   release:
     types: [published]
   create:
