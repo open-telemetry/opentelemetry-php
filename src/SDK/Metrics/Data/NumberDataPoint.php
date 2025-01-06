@@ -6,14 +6,14 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final readonly class NumberDataPoint
+final class NumberDataPoint
 {
     public function __construct(
-        public float|int $value,
-        public AttributesInterface $attributes,
-        public int $startTimestamp,
-        public int $timestamp,
-        public iterable $exemplars = [],
+        public readonly float|int $value,
+        public readonly AttributesInterface $attributes,
+        public readonly int $startTimestamp,
+        public readonly int $timestamp,
+        public readonly iterable $exemplars = [],
     ) {
     }
 }

@@ -13,15 +13,15 @@ use function php_uname;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/semantic_conventions/host.md#host
  */
-final readonly class Host implements ResourceDetectorInterface
+final class Host implements ResourceDetectorInterface
 {
     private const PATH_ETC_MACHINEID = 'etc/machine-id';
     private const PATH_VAR_LIB_DBUS_MACHINEID = 'var/lib/dbus/machine-id';
     private const PATH_ETC_HOSTID = 'etc/hostid';
 
     public function __construct(
-        private string $dir = '/',
-        private string $os = PHP_OS_FAMILY,
+        private readonly string $dir = '/',
+        private readonly string $os = PHP_OS_FAMILY,
     ) {
     }
 

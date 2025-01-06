@@ -10,11 +10,11 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 /**
  * @internal
  */
-final readonly class ComposerPackageResource implements SelfCheckingResourceInterface
+final class ComposerPackageResource implements SelfCheckingResourceInterface
 {
 
-    public string $packageName;
-    public string|false $version;
+    public readonly string $packageName;
+    public readonly string|false $version;
 
     public function __construct(string $packageName)
     {

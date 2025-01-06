@@ -8,9 +8,9 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
-final readonly class InstrumentationScopeVersionCriteria implements SelectionCriteriaInterface
+final class InstrumentationScopeVersionCriteria implements SelectionCriteriaInterface
 {
-    public function __construct(private ?string $version)
+    public function __construct(private readonly ?string $version)
     {
     }
 

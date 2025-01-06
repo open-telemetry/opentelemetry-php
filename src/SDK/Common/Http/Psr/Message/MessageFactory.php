@@ -11,12 +11,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final readonly class MessageFactory implements MessageFactoryInterface
+final class MessageFactory implements MessageFactoryInterface
 {
     public function __construct(
-        private RequestFactoryInterface $requestFactory,
-        private ResponseFactoryInterface $responseFactory,
-        private ServerRequestFactoryInterface $serverRequestFactory,
+        private readonly RequestFactoryInterface $requestFactory,
+        private readonly ResponseFactoryInterface $responseFactory,
+        private readonly ServerRequestFactoryInterface $serverRequestFactory,
     ) {
     }
 

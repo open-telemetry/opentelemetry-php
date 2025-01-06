@@ -10,11 +10,11 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 /**
  * @internal
  */
-final readonly class MetricAggregatorFactory implements MetricAggregatorFactoryInterface
+final class MetricAggregatorFactory implements MetricAggregatorFactoryInterface
 {
     public function __construct(
-        private ?AttributeProcessorInterface $attributeProcessor,
-        private AggregationInterface $aggregation,
+        private readonly ?AttributeProcessorInterface $attributeProcessor,
+        private readonly AggregationInterface $aggregation,
     ) {
     }
 

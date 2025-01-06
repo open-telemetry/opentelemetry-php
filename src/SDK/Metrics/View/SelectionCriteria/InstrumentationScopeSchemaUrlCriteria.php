@@ -8,9 +8,9 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
-final readonly class InstrumentationScopeSchemaUrlCriteria implements SelectionCriteriaInterface
+final class InstrumentationScopeSchemaUrlCriteria implements SelectionCriteriaInterface
 {
-    public function __construct(private ?string $schemaUrl)
+    public function __construct(private readonly ?string $schemaUrl)
     {
     }
 

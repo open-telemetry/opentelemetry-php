@@ -6,23 +6,23 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final readonly class HistogramDataPoint
+final class HistogramDataPoint
 {
     /**
      * @param int[] $bucketCounts
      * @param list<float|int> $explicitBounds
      */
     public function __construct(
-        public int $count,
-        public float|int $sum,
-        public float|int $min,
-        public float|int $max,
-        public array $bucketCounts,
-        public array $explicitBounds,
-        public AttributesInterface $attributes,
-        public int $startTimestamp,
-        public int $timestamp,
-        public iterable $exemplars = [],
+        public readonly int $count,
+        public readonly float|int $sum,
+        public readonly float|int $min,
+        public readonly float|int $max,
+        public readonly array $bucketCounts,
+        public readonly array $explicitBounds,
+        public readonly AttributesInterface $attributes,
+        public readonly int $startTimestamp,
+        public readonly int $timestamp,
+        public readonly iterable $exemplars = [],
     ) {
     }
 }

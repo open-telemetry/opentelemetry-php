@@ -11,14 +11,14 @@ use function str_replace;
 use function trim;
 use function urldecode;
 
-final readonly class Parser
+final class Parser
 {
     private const EXCLUDED_KEY_CHARS = [' ', '(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=', '{', '}'];
     private const EXCLUDED_VALUE_CHARS = [' ', '"', ',', ';', '\\'];
     private const EQUALS = '=';
 
     public function __construct(
-        private string $baggageHeader,
+        private readonly string $baggageHeader,
     ) {
     }
 

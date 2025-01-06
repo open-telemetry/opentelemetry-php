@@ -16,13 +16,13 @@ use OpenTelemetry\SDK\Metrics\Data;
 /**
  * @implements AggregationInterface<ExplicitBucketHistogramSummary>
  */
-final readonly class ExplicitBucketHistogramAggregation implements AggregationInterface
+final class ExplicitBucketHistogramAggregation implements AggregationInterface
 {
     /**
      * @param list<float|int> $boundaries strictly ascending histogram bucket boundaries
      */
     public function __construct(
-        public array $boundaries,
+        public readonly array $boundaries,
     ) {
     }
 

@@ -6,15 +6,15 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final readonly class Exemplar
+final class Exemplar
 {
     public function __construct(
-        private int|string $index,
-        public float|int $value,
-        public int $timestamp,
-        public AttributesInterface $attributes,
-        public ?string $traceId,
-        public ?string $spanId,
+        private readonly int|string $index,
+        public readonly float|int $value,
+        public readonly int $timestamp,
+        public readonly AttributesInterface $attributes,
+        public readonly ?string $traceId,
+        public readonly ?string $spanId,
     ) {
     }
 

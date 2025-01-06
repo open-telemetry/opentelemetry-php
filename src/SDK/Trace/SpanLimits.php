@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
-final readonly class SpanLimits
+final class SpanLimits
 {
     public const DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT = PHP_INT_MAX;
     public const DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT = 128;
@@ -46,11 +46,11 @@ final readonly class SpanLimits
      * @internal Use {@see SpanLimitsBuilder} to create {@see SpanLimits} instance.
      */
     public function __construct(
-        private AttributesFactoryInterface $attributesFactory,
-        private AttributesFactoryInterface $eventAttributesFactory,
-        private AttributesFactoryInterface $linkAttributesFactory,
-        private int $eventCountLimit,
-        private int $linkCountLimit,
+        private readonly AttributesFactoryInterface $attributesFactory,
+        private readonly AttributesFactoryInterface $eventAttributesFactory,
+        private readonly AttributesFactoryInterface $linkAttributesFactory,
+        private readonly int $eventCountLimit,
+        private readonly int $linkCountLimit,
     ) {
     }
 }

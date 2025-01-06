@@ -8,12 +8,12 @@ use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
-final readonly class Composite implements ResourceDetectorInterface
+final class Composite implements ResourceDetectorInterface
 {
     /**
      * @param iterable<ResourceDetectorInterface> $resourceDetectors
      */
-    public function __construct(private iterable $resourceDetectors)
+    public function __construct(private readonly iterable $resourceDetectors)
     {
     }
 
