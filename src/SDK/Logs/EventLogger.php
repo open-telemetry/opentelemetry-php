@@ -12,6 +12,9 @@ use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 
+/**
+ * @phan-suppress PhanDeprecatedInterface
+ */
 class EventLogger implements EventLoggerInterface
 {
     /**
