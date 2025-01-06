@@ -6,7 +6,7 @@ namespace OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition;
 
 trait NodeDefinitionTrait
 {
-    protected bool $allowEmptyValue = true;
+    protected $allowEmptyValue = true; //@todo type bool from symfony/config 7.2
 
     public function cannotBeEmpty(): static
     {
