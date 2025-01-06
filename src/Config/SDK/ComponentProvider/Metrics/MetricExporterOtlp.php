@@ -22,7 +22,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 /**
  * @implements ComponentProvider<MetricExporterInterface>
  */
-#[PackageDependency('open-telemetry/exporter-otlp', '^2')]
+#[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
 final class MetricExporterOtlp implements ComponentProvider
 {
 

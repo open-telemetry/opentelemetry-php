@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 /**
  * @implements ComponentProvider<TextMapPropagatorInterface>
  */
-#[PackageDependency('open-telemetry/extension-propagator-b3', '^2')]
+#[PackageDependency('open-telemetry/extension-propagator-b3', '^1.0.1')]
 final class TextMapPropagatorB3 implements ComponentProvider
 {
 
