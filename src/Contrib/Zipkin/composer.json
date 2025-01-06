@@ -18,8 +18,8 @@
   ],
   "require": {
     "php": "^8.2",
-    "open-telemetry/api": "^2.0",
-    "open-telemetry/sdk": "^2.0",
+    "open-telemetry/api": "^1.0",
+    "open-telemetry/sdk": "^1.0",
     "php-http/async-client-implementation": "^1.0",
     "php-http/discovery": "^1.14",
     "psr/http-factory-implementation": "^1.0"
