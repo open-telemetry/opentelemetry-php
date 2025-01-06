@@ -39,17 +39,17 @@
         }
     ],
     "replace": {
-        "open-telemetry/api": "2.x-dev",
-        "open-telemetry/context": "2.x-dev",
-        "open-telemetry/exporter-otlp": "2.x-dev",
-        "open-telemetry/exporter-zipkin": "2.x-dev",
-        "open-telemetry/extension-propagator-b3": "2.x-dev",
-        "open-telemetry/extension-propagator-jaeger": "2.x-dev",
-        "open-telemetry/gen-otlp-protobuf": "2.x-dev",
-        "open-telemetry/sdk": "2.x-dev",
-        "open-telemetry/sdk-configuration": "2.x-dev",
-        "open-telemetry/sdk-contrib": "2.x-dev",
-        "open-telemetry/sem-conv": "2.x-dev"
+        "open-telemetry/api": "1.0.x-dev",
+        "open-telemetry/context": "1.0.x-dev",
+        "open-telemetry/exporter-otlp": "1.0.x-dev",
+        "open-telemetry/exporter-zipkin": "1.0.x-dev",
+        "open-telemetry/extension-propagator-b3": "1.0.x-dev",
+        "open-telemetry/extension-propagator-jaeger": "0.0.2",
+        "open-telemetry/gen-otlp-protobuf": "1.0.x-dev",
+        "open-telemetry/sdk": "1.0.x-dev",
+        "open-telemetry/sdk-configuration": "1.0.x-dev",
+        "open-telemetry/sdk-contrib": "1.0.x-dev",
+        "open-telemetry/sem-conv": "1.0.x-dev"
     },
     "autoload": {
         "psr-4": {
