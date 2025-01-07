@@ -16,6 +16,9 @@ class EventLoggerProvider implements EventLoggerProviderInterface
     {
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public function getEventLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): EventLoggerInterface
     {
         return new EventLogger(
