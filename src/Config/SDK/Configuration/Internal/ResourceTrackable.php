@@ -8,6 +8,5 @@ use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
 
 interface ResourceTrackable
 {
-
     public function trackResources(?ResourceCollection $resources): void;
 }

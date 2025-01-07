@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class SpanExporterConsole implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

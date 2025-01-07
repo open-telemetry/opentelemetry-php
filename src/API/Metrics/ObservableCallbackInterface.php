@@ -48,7 +48,6 @@ namespace OpenTelemetry\API\Metrics;
  */
 interface ObservableCallbackInterface
 {
-
     /**
      * Detaches the associated callback from the instrument.
      */

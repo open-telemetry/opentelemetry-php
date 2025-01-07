@@ -30,7 +30,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry, ResourceTrackable
 {
-
     /** @var array<string, array<string, ComponentProvider>> */
     private array $providers = [];
     /** @var array<string, array<string, true>> */

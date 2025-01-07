@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class MetricExporterPrometheus implements ComponentProvider
 {
-
     /**
      * @param array{
      *     host: string,

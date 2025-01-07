@@ -6,7 +6,6 @@ namespace OpenTelemetry\API\Metrics;
 
 interface ObserverInterface
 {
-
     /**
      * Records the given absolute datapoint.
      *

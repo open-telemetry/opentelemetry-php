@@ -11,7 +11,6 @@ namespace OpenTelemetry\Extension\Propagator\CloudTrace;
  */
 final class Utils
 {
-
     /**
      * Pads the string with zero string characters on left hand side, to max total string size.
      *

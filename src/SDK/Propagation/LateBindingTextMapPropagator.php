@@ -15,7 +15,6 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
  */
 final class LateBindingTextMapPropagator implements TextMapPropagatorInterface
 {
-
     /**
      * @param TextMapPropagatorInterface|Closure(): TextMapPropagatorInterface $propagator
      */

@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class TextMapPropagatorComposite implements ComponentProvider
 {
-
     /**
      * @param list<ComponentPlugin<TextMapPropagatorInterface>> $properties
      */

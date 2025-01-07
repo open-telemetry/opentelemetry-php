@@ -13,6 +13,5 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricCollectorInterface;
  */
 interface MetricSourceRegistryUnregisterInterface
 {
-
     public function unregisterStream(MetricCollectorInterface $collector, int $streamId): void;
 }

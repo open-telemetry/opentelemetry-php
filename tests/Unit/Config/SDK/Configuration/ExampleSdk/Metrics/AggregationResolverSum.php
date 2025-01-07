@@ -13,7 +13,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class AggregationResolverSum implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

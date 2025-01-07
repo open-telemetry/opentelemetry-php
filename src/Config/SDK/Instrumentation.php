@@ -17,7 +17,6 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 
 final class Instrumentation
 {
-
     /**
      * @param ComponentPlugin<ConfigurationRegistry> $plugin
      */
