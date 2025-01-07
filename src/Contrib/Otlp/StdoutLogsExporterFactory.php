@@ -10,7 +10,6 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 
 class StdoutLogsExporterFactory implements LogRecordExporterFactoryInterface
 {
-
     public function create(): LogRecordExporterInterface
     {
         $transport = (new StreamTransportFactory())->create('php://stdout', ContentTypes::NDJSON);
