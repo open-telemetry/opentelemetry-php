@@ -17,7 +17,6 @@ use Symfony\Component\Config\Resource\FileResource;
 
 final class YamlExtensionFileLoader extends FileLoader
 {
-
     public function __construct(private readonly ConfigurationLoader $configuration, FileLocatorInterface $locator, ?string $env = null)
     {
         parent::__construct($locator, $env);

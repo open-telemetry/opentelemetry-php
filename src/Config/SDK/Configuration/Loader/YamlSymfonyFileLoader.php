@@ -19,7 +19,6 @@ use Symfony\Component\Yaml\Yaml;
 
 final class YamlSymfonyFileLoader extends FileLoader
 {
-
     public function __construct(private readonly ConfigurationLoader $configuration, FileLocatorInterface $locator, ?string $env = null)
     {
         parent::__construct($locator, $env);

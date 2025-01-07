@@ -12,7 +12,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 final class ConfigurationLoader implements \OpenTelemetry\Config\SDK\Configuration\Loader\ConfigurationLoader
 {
-
     private array $configurations = [];
     private readonly ?ResourceCollection $resources;
 

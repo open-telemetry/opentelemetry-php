@@ -50,7 +50,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class OpenTelemetrySdk implements ComponentProvider
 {
-
     /**
      * @param array{
      *     file_format: '0.3',

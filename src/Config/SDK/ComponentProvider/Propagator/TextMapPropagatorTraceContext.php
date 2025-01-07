@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class TextMapPropagatorTraceContext implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

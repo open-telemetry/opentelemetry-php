@@ -9,7 +9,6 @@ use function trim;
 
 final class EnvSourceReader implements EnvReader
 {
-
     /**
      * @param iterable<EnvSource> $envSources
      */

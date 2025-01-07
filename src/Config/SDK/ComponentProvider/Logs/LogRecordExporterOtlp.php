@@ -24,7 +24,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
 final class LogRecordExporterOtlp implements ComponentProvider
 {
-
     /**
      * @param array{
      *     protocol: 'http/protobuf'|'http/json'|'grpc',

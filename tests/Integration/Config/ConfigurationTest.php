@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
-
     #[DataProvider('openTelemetryConfigurationDataProvider')]
     public function test_open_telemetry_configuration(string $file): void
     {

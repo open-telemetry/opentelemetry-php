@@ -15,7 +15,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class SpanProcessorSimple implements ComponentProvider
 {
-
     /**
      * @param array{
      *     exporter: ComponentPlugin<SpanExporter>,

@@ -8,7 +8,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 
 class EnvResource implements ResourceInterface
 {
-
     public function __construct(
         public readonly string $name,
         public readonly ?string $value,
