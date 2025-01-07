@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 final class Gauge implements DataInterface
 {
-
     /**
      * @param iterable<NumberDataPoint> $dataPoints
      */

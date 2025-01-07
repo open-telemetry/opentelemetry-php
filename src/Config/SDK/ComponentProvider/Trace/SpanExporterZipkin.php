@@ -20,7 +20,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 #[PackageDependency('open-telemetry/exporter-zipkin', '^1.0')]
 final class SpanExporterZipkin implements ComponentProvider
 {
-
     /**
      * @param array{
      *     endpoint: string,

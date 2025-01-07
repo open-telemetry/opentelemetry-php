@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Processor;
  */
 final class CompiledConfigurationFactory
 {
-
     /**
      * @param ComponentProvider<T> $rootComponent
      * @param NodeInterface $node

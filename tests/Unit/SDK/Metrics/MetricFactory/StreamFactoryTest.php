@@ -163,7 +163,6 @@ final class StreamFactoryTest extends TestCase
 
 final class CollectingSourceRegistry implements MetricSourceRegistryInterface
 {
-
     /**
      * @var list<array{MetricSourceProviderInterface, MetricMetadataInterface, StalenessHandlerInterface}>
      */

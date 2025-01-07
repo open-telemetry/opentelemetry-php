@@ -15,7 +15,6 @@ use OpenTelemetry\Context\ContextInterface;
  */
 interface GaugeInterface extends SynchronousInstrument
 {
-
     /**
      * @param float|int $amount current absolute value
      * @param iterable<non-empty-string, string|bool|float|int|array|null> $attributes

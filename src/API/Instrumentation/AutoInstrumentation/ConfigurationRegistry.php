@@ -8,7 +8,6 @@ use OpenTelemetry\API\Configuration\ConfigProperties;
 
 final class ConfigurationRegistry implements ConfigProperties
 {
-
     private array $configurations = [];
 
     public function add(InstrumentationConfiguration $configuration): self

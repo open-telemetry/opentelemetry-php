@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class LogRecordExporterOtlp implements ComponentProvider
 {
-
     /**
      * @param array{
      *     protocol: 'http/protobuf'|'http/json'|'grpc/protobuf'|'grpc/json',

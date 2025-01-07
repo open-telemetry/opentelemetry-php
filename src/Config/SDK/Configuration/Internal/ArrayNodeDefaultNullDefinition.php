@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\NodeInterface;
  */
 final class ArrayNodeDefaultNullDefinition extends ArrayNodeDefinition
 {
-
     protected function createNode(): NodeInterface
     {
         $node = parent::createNode();

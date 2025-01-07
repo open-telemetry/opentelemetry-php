@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class SamplerTraceIdRatioBased implements ComponentProvider
 {
-
     /**
      * @param array{
      *     ratio: float,

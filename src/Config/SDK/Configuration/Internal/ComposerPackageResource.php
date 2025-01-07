@@ -12,7 +12,6 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
  */
 final class ComposerPackageResource implements SelfCheckingResourceInterface
 {
-
     public readonly string $packageName;
     public readonly string|false $version;
 

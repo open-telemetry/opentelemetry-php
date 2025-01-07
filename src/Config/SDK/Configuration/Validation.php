@@ -22,7 +22,6 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
  */
 final class Validation
 {
-
     public static function ensureString(): Closure
     {
         return static function (mixed $value): ?string {

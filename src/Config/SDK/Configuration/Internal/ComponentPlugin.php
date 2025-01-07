@@ -15,7 +15,6 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
  */
 final class ComponentPlugin implements \OpenTelemetry\Config\SDK\Configuration\ComponentPlugin
 {
-
     /**
      * @param array $properties resolved properties according to component provider config
      * @param ComponentProvider<T> $provider component provider used to create the component

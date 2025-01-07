@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class SpanExporterZipkin implements ComponentProvider
 {
-
     /**
      * @param array{
      *     endpoint: string,

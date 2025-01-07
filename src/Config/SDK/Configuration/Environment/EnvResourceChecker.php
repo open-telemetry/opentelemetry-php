@@ -10,7 +10,6 @@ use Symfony\Component\Config\ResourceCheckerInterface;
 
 final class EnvResourceChecker implements ResourceCheckerInterface
 {
-
     public function __construct(
         private readonly EnvReader $envReader,
     ) {

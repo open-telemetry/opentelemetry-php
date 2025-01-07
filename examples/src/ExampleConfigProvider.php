@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class ExampleConfigProvider implements ComponentProvider
 {
-
     /**
      * @psalm-suppress MoreSpecificImplementedParamType
      * @param array{

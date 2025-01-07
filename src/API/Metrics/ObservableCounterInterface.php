@@ -6,7 +6,6 @@ namespace OpenTelemetry\API\Metrics;
 
 interface ObservableCounterInterface extends AsynchronousInstrument
 {
-
     /**
      * @param callable(ObserverInterface): void $callback function responsible for
      *        reporting the measurements (as absolute values)

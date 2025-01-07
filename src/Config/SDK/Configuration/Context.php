@@ -16,7 +16,6 @@ use Psr\Log\NullLogger;
  */
 final class Context
 {
-
     /**
      * @param TracerProviderInterface $tracerProvider tracer provider to use for self diagnostics
      * @param MeterProviderInterface $meterProvider meter provider to use for self diagnostics

@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class SamplerParentBased implements ComponentProvider
 {
-
     /**
      * @param array{
      *     root: ComponentPlugin<SamplerInterface>,
