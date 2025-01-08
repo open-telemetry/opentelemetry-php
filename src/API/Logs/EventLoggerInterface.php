@@ -7,6 +7,7 @@ namespace OpenTelemetry\API\Logs;
 use OpenTelemetry\Context\ContextInterface;
 
 /**
+ * @deprecated
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/event-api.md#events-api-interface
  */
 interface EventLoggerInterface
