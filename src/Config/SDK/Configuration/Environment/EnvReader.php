@@ -6,6 +6,5 @@ namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 
 interface EnvReader
 {
-
     public function read(string $name): ?string;
 }

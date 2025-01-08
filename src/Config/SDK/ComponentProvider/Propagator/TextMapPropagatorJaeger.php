@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 #[PackageDependency('open-telemetry/extension-propagator-jaeger', '^0.0.2')]
 final class TextMapPropagatorJaeger implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

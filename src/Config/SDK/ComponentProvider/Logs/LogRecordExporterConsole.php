@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class LogRecordExporterConsole implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

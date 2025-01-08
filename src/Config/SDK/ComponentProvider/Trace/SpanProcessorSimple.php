@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class SpanProcessorSimple implements ComponentProvider
 {
-
     /**
      * @param array{
      *     exporter: ComponentPlugin<SpanExporterInterface>,

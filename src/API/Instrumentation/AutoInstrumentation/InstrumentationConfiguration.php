@@ -6,5 +6,4 @@ namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
 interface InstrumentationConfiguration
 {
-
 }

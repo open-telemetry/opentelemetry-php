@@ -21,7 +21,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 #[PackageDependency('open-telemetry/exporter-zipkin', '^1.0')]
 final class SpanExporterZipkin implements ComponentProvider
 {
-
     /**
      * @param array{
      *     endpoint: string,

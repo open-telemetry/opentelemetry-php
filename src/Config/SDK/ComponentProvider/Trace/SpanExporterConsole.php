@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class SpanExporterConsole implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

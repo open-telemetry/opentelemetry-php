@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 #[PackageDependency('open-telemetry/extension-propagator-b3', '^1.0.1')]
 final class TextMapPropagatorB3Multi implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

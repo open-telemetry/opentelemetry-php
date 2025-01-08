@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class MetricReaderPeriodic implements ComponentProvider
 {
-
     /**
      * @param array{
      *     interval: int<0, max>,

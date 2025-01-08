@@ -12,7 +12,6 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
  */
 interface ComponentProviderRegistry
 {
-
     /**
      * Creates a node to specify a component plugin.
      *

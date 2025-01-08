@@ -10,7 +10,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 
 interface ResourceCollection
 {
-
     /**
      * @param object|class-string $class
      *

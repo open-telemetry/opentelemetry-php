@@ -20,7 +20,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class SamplerParentBased implements ComponentProvider
 {
-
     /**
      * @param array{
      *     root: ComponentPlugin<SamplerInterface>,

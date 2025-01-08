@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class AggregationResolverDefault implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

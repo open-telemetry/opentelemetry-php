@@ -51,7 +51,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class OpenTelemetrySdk implements ComponentProvider
 {
-
     /**
      * @param array{
      *     file_format: '0.3',

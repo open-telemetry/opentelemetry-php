@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class ExampleConfigProvider implements ComponentProvider
 {
-
     /**
      * @psalm-suppress MoreSpecificImplementedParamType
      * @param array{

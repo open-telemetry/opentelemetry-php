@@ -11,7 +11,6 @@ namespace OpenTelemetry\Config\SDK\Configuration;
  */
 interface ComponentPlugin
 {
-
     /**
      * Creates the component that is provided by this plugin.
      *

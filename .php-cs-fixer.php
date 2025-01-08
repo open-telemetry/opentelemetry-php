@@ -29,6 +29,7 @@ return $config->setRules([
     'include' => true,
     'lowercase_cast' => true,
     'new_with_parentheses' => true,
+    'no_blank_lines_after_class_opening' => true,
     'no_extra_blank_lines' => true,
     'no_leading_import_slash' => true,
     'no_trailing_whitespace' => true,

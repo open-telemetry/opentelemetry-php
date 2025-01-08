@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class TextMapPropagatorXRay implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

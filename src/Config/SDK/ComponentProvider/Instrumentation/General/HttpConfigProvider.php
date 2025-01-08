@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class HttpConfigProvider implements ComponentProvider
 {
-
     public function createPlugin(array $properties, Context $context): GeneralInstrumentationConfiguration
     {
         return new HttpConfig($properties);

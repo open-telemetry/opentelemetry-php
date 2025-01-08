@@ -43,7 +43,6 @@ use function var_export;
  */
 final class ConfigurationFactory
 {
-
     private readonly CompiledConfigurationFactory $compiledFactory;
 
     /**

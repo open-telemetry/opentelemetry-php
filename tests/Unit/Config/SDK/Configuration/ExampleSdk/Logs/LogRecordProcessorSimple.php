@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class LogRecordProcessorSimple implements ComponentProvider
 {
-
     /**
      * @param array{
      *     exporter: ComponentPlugin<LogRecordExporter>,

@@ -6,7 +6,6 @@ namespace OpenTelemetry\API\Metrics;
 
 interface MeterInterface
 {
-
     /**
      * Reports measurements for multiple asynchronous instrument from a single callback.
      *

@@ -15,7 +15,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class SpanExporterOtlp implements ComponentProvider
 {
-
     /**
      * @param array{
      *     protocol: 'http/protobuf'|'http/json'|'grpc/protobuf'|'grpc/json',

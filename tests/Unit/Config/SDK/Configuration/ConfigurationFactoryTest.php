@@ -49,7 +49,6 @@ final class ConfigurationFactoryTest extends TestCase
         $factory = new ConfigurationFactory(
             [],
             new class() implements \OpenTelemetry\Config\SDK\Configuration\ComponentProvider {
-
                 public function createPlugin(array $properties, Context $context): mixed
                 {
                     throw new BadMethodCallException();

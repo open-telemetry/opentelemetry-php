@@ -25,7 +25,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
 final class SpanExporterOtlp implements ComponentProvider
 {
-
     /**
      * @param array{
      *     protocol: 'http/protobuf'|'http/json'|'grpc',

@@ -13,7 +13,6 @@ use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
  */
 final class TrackingEnvReader implements EnvReader, ResourceTrackable
 {
-
     private readonly EnvReader $envReader;
     private ?ResourceCollection $resources = null;
 

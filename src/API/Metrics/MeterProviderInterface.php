@@ -6,7 +6,6 @@ namespace OpenTelemetry\API\Metrics;
 
 interface MeterProviderInterface
 {
-
     /**
      * Returns a `Meter` for the given instrumentation scope.
      *

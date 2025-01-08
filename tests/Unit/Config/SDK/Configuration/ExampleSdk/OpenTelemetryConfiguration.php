@@ -22,7 +22,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class OpenTelemetryConfiguration implements ComponentProvider
 {
-
     /**
      * @param array{
      *     file_format: '0.1',
