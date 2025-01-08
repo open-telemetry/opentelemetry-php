@@ -46,6 +46,7 @@ final class Configurator implements ImplicitContextKeyedInterface
 
     /**
      * Creates a configurator that uses noop instances for not configured values.
+     * @phan-suppress PhanDeprecatedFunction
      */
     public static function createNoop(): Configurator
     {
@@ -63,6 +64,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         return $this->storeInContext()->activate();
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedFunction
+     */
     public function storeInContext(?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();
@@ -118,6 +122,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         return $self;
     }
 
+    /**
+     * @deprecated
+     */
     public function withEventLoggerProvider(?EventLoggerProviderInterface $eventLoggerProvider): Configurator
     {
         $self = clone $this;

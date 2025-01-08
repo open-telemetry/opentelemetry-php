@@ -68,6 +68,11 @@ final class CachedInstrumentation
 
         return $this->loggers[$loggerProvider] ??= $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
+
+    /**
+     * @deprecated
+     * @phan-suppress PhanDeprecatedFunction
+     */
     public function eventLogger(): EventLoggerInterface
     {
         $eventLoggerProvider = Globals::eventLoggerProvider();

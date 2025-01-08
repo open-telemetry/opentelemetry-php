@@ -60,6 +60,9 @@ class Sdk
         return $this->loggerProvider;
     }
 
+    /**
+     * @deprecated
+     */
     public function getEventLoggerProvider(): EventLoggerProviderInterface
     {
         return $this->eventLoggerProvider;
