@@ -35,4 +35,4 @@ splits:
 origins:
   - ^main$
   - ^split$
-  - ^2.x^
+  - ^2.x$
