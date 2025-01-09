@@ -13,7 +13,7 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 
 class PropagatorFactory
 {
@@ -55,7 +55,7 @@ class PropagatorFactory
                 return NoopTextMapPropagator::getInstance();
             default:
                 try {
-                    return Registry::textMapPropagator($name);
+                    return Loader::textMapPropagator($name);
                 } catch (\RuntimeException $e) {
                     self::logWarning($e->getMessage());
                 }

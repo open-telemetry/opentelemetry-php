@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK\Common\Services;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
@@ -16,10 +16,9 @@ use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 
 /**
- * A registry to enable central registration of components that the SDK requires but which may be provided
- * by non-SDK modules, such as contrib and extension.
+ * Loads services from SPI, handling type and priority.
  */
-class Registry
+class Loader
 {
     /**
      * @param class-string $class

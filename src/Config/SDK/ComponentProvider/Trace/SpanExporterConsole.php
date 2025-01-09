@@ -7,7 +7,7 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -22,7 +22,7 @@ final class SpanExporterConsole implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
-        return new ConsoleSpanExporter(Registry::transportFactory('stream')->create(
+        return new ConsoleSpanExporter(Loader::transportFactory('stream')->create(
             endpoint: 'php://stdout',
             contentType: 'application/json',
         ));

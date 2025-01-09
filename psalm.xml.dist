@@ -25,7 +25,6 @@
         <UndefinedClass>
             <errorLevel type="suppress">
                 <referencedClass name="GMP"/>
-                <file name="src/SDK/Registry.php"/>
             </errorLevel>
         </UndefinedClass>
         <UndefinedFunction>
@@ -58,10 +57,5 @@
                 <directory name="src/Config/SDK/ComponentProvider"/>
             </errorLevel>
         </InvalidDocblock>
-        <InvalidPropertyAssignmentValue>
-            <errorLevel type="suppress">
-                <file name="src/SDK/Registry.php"/>
-            </errorLevel>
-        </InvalidPropertyAssignmentValue>
     </issueHandlers>
 </psalm>

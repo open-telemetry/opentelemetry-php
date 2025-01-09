@@ -7,8 +7,8 @@ namespace OpenTelemetry\SDK\Logs;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
-use OpenTelemetry\SDK\Registry;
 
 class ExporterFactory
 {
@@ -22,7 +22,7 @@ class ExporterFactory
         if ($exporter === 'none') {
             return new NoopExporter();
         }
-        $factory = Registry::logRecordExporterFactory($exporter);
+        $factory = Loader::logRecordExporterFactory($exporter);
 
         return $factory->create();
     }

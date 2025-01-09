@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK;
+namespace Unit\SDK\Common\Services;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
-use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -20,15 +20,15 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Registry::class)]
-class FactoryRegistryTest extends TestCase
+#[CoversClass(Loader::class)]
+class LoaderTest extends TestCase
 {
     use TestState;
 
     #[DataProvider('transportProtocolsProvider')]
     public function test_default_transport_factories(string $name): void
     {
-        $factory = Registry::transportFactory($name);
+        $factory = Loader::transportFactory($name);
         $this->assertInstanceOf(TransportFactoryInterface::class, $factory);
     }
 
@@ -47,7 +47,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('spanExporterProvider')]
     public function test_default_span_exporter_factories(string $name): void
     {
-        $factory = Registry::spanExporterFactory($name);
+        $factory = Loader::spanExporterFactory($name);
         $this->assertInstanceOf(SpanExporterFactoryInterface::class, $factory);
     }
 
@@ -64,7 +64,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('metricExporterProvider')]
     public function test_default_metric_exporter_factories(string $name): void
     {
-        $factory = Registry::metricExporterFactory($name);
+        $factory = Loader::metricExporterFactory($name);
         $this->assertInstanceOf(MetricExporterFactoryInterface::class, $factory);
     }
 
@@ -80,7 +80,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('logRecordExporterProvider')]
     public function test_default_log_record_exporter_factories(string $name): void
     {
-        $factory = Registry::logRecordExporterFactory($name);
+        $factory = Loader::logRecordExporterFactory($name);
         $this->assertInstanceOf(LogRecordExporterFactoryInterface::class, $factory);
     }
 
@@ -95,7 +95,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('textMapPropagator')]
     public function test_default_text_map_propagator(string $name): void
     {
-        $propagator = Registry::textMapPropagator($name);
+        $propagator = Loader::textMapPropagator($name);
         $this->assertInstanceOf(TextMapPropagatorInterface::class, $propagator);
     }
 
@@ -113,8 +113,8 @@ class FactoryRegistryTest extends TestCase
 
     public function test_retrieve_from_spi(): void
     {
-        $this->assertFileExists(dirname(__DIR__, 3) . '/vendor/composer/GeneratedServiceProviderData.php');
-        $this->assertInstanceOf(ResourceDetectorInterface::class, Registry::resourceDetector('test'));
+        $this->assertFileExists(dirname(__DIR__, 5) . '/vendor/composer/GeneratedServiceProviderData.php');
+        $this->assertInstanceOf(ResourceDetectorInterface::class, Loader::resourceDetector('test'));
     }
 
     public function test_add_to_spi(): void
@@ -140,7 +140,7 @@ class FactoryRegistryTest extends TestCase
         };
         ServiceLoader::register(ResourceDetectorFactoryInterface::class, $factory::class);
 
-        $detector = Registry::resourceDetector('foo');
+        $detector = Loader::resourceDetector('foo');
         $this->assertInstanceOf(ResourceDetectorInterface::class, $detector);
         $this->assertTrue($detector->getResource()->getAttributes()->has('foo-resource'));
         $this->assertSame('foo', $detector->getResource()->getAttributes()->get('foo-resource'));

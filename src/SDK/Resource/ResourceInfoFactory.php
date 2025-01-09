@@ -10,7 +10,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use RuntimeException;
 
 class ResourceInfoFactory
@@ -33,7 +33,7 @@ class ResourceInfoFactory
                 new Detectors\Sdk(),
                 new Detectors\SdkProvided(),
                 new Detectors\Composer(),
-                ...Registry::resourceDetectors(),
+                ...Loader::resourceDetectors(),
                 new Detectors\Environment(),
             ]))->getResource();
         }
@@ -84,7 +84,7 @@ class ResourceInfoFactory
                     break;
                 default:
                     try {
-                        $resourceDetectors[] = Registry::resourceDetector($detector);
+                        $resourceDetectors[] = Loader::resourceDetector($detector);
                     } catch (RuntimeException $e) {
                         self::logWarning($e->getMessage());
                     }
