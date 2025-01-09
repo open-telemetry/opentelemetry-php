@@ -77,12 +77,12 @@ This does the following things:
 ### Other PHP versions
 
 We aim to support officially supported PHP versions, according to https://www.php.net/supported-versions.php. The
-developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.1`, `8.2` and `8.3`
-respectively, with `8.1` being the default. You can execute the test suite against other PHP versions by running the
+developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.2`, `8.3` and `8.4`
+respectively, with `8.2` being the default. You can execute the test suite against other PHP versions by running the
 following command:
 
 ```bash
-PHP_VERSION=8.1 make all
+PHP_VERSION=8.2 make all
 #or
 PHP_VERSION=8.3 make all
 ```

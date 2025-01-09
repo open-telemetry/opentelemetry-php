@@ -4,8 +4,8 @@ on:
     branches:
       - main
       - split
-  release:
-    types: [published]
+      - 1.x
+      - 2.x
   create:
   workflow_dispatch:
 
