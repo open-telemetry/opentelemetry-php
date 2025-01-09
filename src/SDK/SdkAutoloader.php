@@ -74,6 +74,9 @@ class SdkAutoloader
         return true;
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedClass,PhanDeprecatedFunction
+     */
     private static function environmentBasedInitializer(Configurator $configurator): Configurator
     {
         $propagator = (new PropagatorFactory())->create();
@@ -110,7 +113,7 @@ class SdkAutoloader
     }
 
     /**
-     * @phan-suppress PhanPossiblyUndeclaredVariable
+     * @phan-suppress PhanPossiblyUndeclaredVariable,PhanDeprecatedFunction
      */
     private static function fileBasedInitializer(Configurator $configurator): Configurator
     {

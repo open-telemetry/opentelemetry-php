@@ -59,6 +59,9 @@ class SdkBuilder
         return $this;
     }
 
+    /**
+     * @deprecated
+     */
     public function setEventLoggerProvider(EventLoggerProviderInterface $eventLoggerProvider): self
     {
         $this->eventLoggerProvider = $eventLoggerProvider;
@@ -95,6 +98,9 @@ class SdkBuilder
         );
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedFunction
+     */
     public function buildAndRegisterGlobal(): ScopeInterface
     {
         $sdk = $this->build();
