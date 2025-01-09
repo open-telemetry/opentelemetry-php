@@ -17,6 +17,7 @@ use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<SpanExporterInterface>
@@ -35,6 +36,7 @@ final class SpanExporterOtlp implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     insecure: ?bool,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
@@ -55,9 +57,9 @@ final class SpanExporterOtlp implements ComponentProvider
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('otlp');
+        $node = $builder->arrayNode('otlp');
         $node
             ->children()
                 ->enumNode('protocol')->isRequired()->values(['http/protobuf', 'http/json', 'grpc'])->end()
@@ -67,7 +69,7 @@ final class SpanExporterOtlp implements ComponentProvider
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('headers')
                     ->arrayPrototype()
-                            ->children()
+                        ->children()
                             ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                             ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                         ->end()
@@ -76,6 +78,7 @@ final class SpanExporterOtlp implements ComponentProvider
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->booleanNode('insecure')->defaultNull()->end()
             ->end()
         ;
 

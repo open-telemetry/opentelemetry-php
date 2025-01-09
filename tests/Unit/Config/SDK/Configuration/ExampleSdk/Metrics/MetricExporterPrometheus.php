@@ -11,6 +11,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class MetricExporterPrometheus implements ComponentProvider
 {
@@ -28,9 +29,9 @@ final class MetricExporterPrometheus implements ComponentProvider
         throw new BadMethodCallException('not implemented');
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('prometheus');
+        $node = $builder->arrayNode('prometheus');
         $node
             ->children()
                 ->scalarNode('host')->defaultValue('localhost')->validate()->always(Validation::ensureString())->end()->end()

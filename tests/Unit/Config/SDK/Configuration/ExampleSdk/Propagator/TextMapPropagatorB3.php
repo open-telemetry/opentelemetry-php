@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class TextMapPropagatorB3 implements ComponentProvider
 {
@@ -21,8 +22,8 @@ final class TextMapPropagatorB3 implements ComponentProvider
         throw new BadMethodCallException('not implemented');
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('b3');
+        return $builder->arrayNode('b3');
     }
 }
