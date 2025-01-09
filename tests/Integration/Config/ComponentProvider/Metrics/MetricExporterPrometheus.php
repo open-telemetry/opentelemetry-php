@@ -33,7 +33,6 @@ final class MetricExporterPrometheus implements ComponentProvider
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         return new class() implements MetricExporterInterface {
-
             public function export(iterable $batch): bool
             {
                 return true;

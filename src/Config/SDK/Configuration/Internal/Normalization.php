@@ -11,6 +11,5 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 interface Normalization
 {
-
     public function apply(ArrayNodeDefinition $root): void;
 }

@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class AggregationResolverExplicitBucketHistogram implements ComponentProvider
 {
-
     /**
      * @param array{
      *      boundaries: array<int|float>,

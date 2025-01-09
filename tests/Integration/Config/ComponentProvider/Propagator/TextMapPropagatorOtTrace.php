@@ -23,7 +23,6 @@ final class TextMapPropagatorOtTrace implements ComponentProvider
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
         return new class() implements TextMapPropagatorInterface {
-
             public function fields(): array
             {
                 return [];

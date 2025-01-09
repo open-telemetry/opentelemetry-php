@@ -27,7 +27,6 @@ final class MetricReaderPull implements ComponentProvider
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
         return new class() implements MetricReaderInterface {
-
             public function collect(): bool
             {
                 return true;
