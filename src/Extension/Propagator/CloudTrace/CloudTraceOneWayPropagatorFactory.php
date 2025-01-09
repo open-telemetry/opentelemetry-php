@@ -9,7 +9,6 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 class CloudTraceOneWayPropagatorFactory implements TextMapPropagatorFactoryInterface
 {
-
     public function create(): TextMapPropagatorInterface
     {
         return CloudTracePropagator::getOneWayInstance();

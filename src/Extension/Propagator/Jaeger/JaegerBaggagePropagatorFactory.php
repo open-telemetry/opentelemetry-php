@@ -9,7 +9,6 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 class JaegerBaggagePropagatorFactory implements TextMapPropagatorFactoryInterface
 {
-
     public function create(): TextMapPropagatorInterface
     {
         return JaegerBaggagePropagator::getInstance();

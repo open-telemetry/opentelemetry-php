@@ -145,18 +145,21 @@
                 "OpenTelemetry\\SDK\\Trace\\SpanExporter\\ConsoleSpanExporterFactory",
                 "OpenTelemetry\\SDK\\Trace\\SpanExporter\\InMemorySpanExporterFactory",
                 "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\StdoutSpanExporterFactory",
                 "OpenTelemetry\\Contrib\\Zipkin\\SpanExporterFactory"
             ],
             "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": [
                 "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\InMemoryExporterFactory",
                 "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\ConsoleMetricExporterFactory",
                 "OpenTelemetry\\SDK\\Metrics\\MetricExporter\\NoopMetricExporterFactory",
-                "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory"
+                "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\StdoutMetricExporterFactory"
             ],
             "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": [
                 "OpenTelemetry\\SDK\\Logs\\Exporter\\ConsoleExporterFactory",
                 "OpenTelemetry\\SDK\\Logs\\Exporter\\InMemoryExporterFactory",
-                "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
+                "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory",
+                "OpenTelemetry\\Contrib\\Otlp\\StdoutLogsExporterFactory"
             ],
             "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
                 "OpenTelemetry\\Extension\\Propagator\\B3\\B3PropagatorFactory",

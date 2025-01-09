@@ -16,4 +16,14 @@ class StdoutLogsExporterFactory implements LogRecordExporterFactoryInterface
 
         return new LogsExporter($transport);
     }
+
+    public function type(): string
+    {
+        return 'otlp/stdout';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

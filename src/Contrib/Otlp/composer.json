@@ -43,12 +43,15 @@
         "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory"
       ],
       "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\StdoutSpanExporterFactory",
         "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory"
       ],
       "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\StdoutMetricExporterFactory",
         "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory"
       ],
       "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": [
+        "OpenTelemetry\\Contrib\\Otlp\\StdoutLogsExporterFactory",
         "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
       ]
     },

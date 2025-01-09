@@ -9,7 +9,6 @@ use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 
 class TestResourceDetectorFactory implements ResourceDetectorFactoryInterface
 {
-
     public function create(): ResourceDetectorInterface
     {
         return new TestResourceDetector();
