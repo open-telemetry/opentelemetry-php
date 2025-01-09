@@ -185,6 +185,7 @@ interface KnownValues
     public const VALUE_STDOUT = 'stdout';
     public const VALUE_PSR3 = 'psr3';
     public const VALUE_EMPTY = '';
+    public const VALUE_DETECTORS_DEFAULT = 'default';
     public const VALUE_DETECTORS_ENVIRONMENT = 'env';
     public const VALUE_DETECTORS_HOST = 'host';
     public const VALUE_DETECTORS_OS = 'os';
@@ -195,6 +196,7 @@ interface KnownValues
     public const VALUE_DETECTORS_SERVICE = 'service';
     public const VALUE_DETECTORS_COMPOSER = 'composer';
     public const OTEL_PHP_DETECTORS = [
+        self::VALUE_DETECTORS_DEFAULT,
         self::VALUE_ALL,
         self::VALUE_DETECTORS_ENVIRONMENT,
         self::VALUE_DETECTORS_HOST,

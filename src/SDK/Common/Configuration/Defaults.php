@@ -113,7 +113,7 @@ interface Defaults
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#language-specific-environment-variables
      */
     public const OTEL_PHP_TRACES_PROCESSOR = 'batch';
-    public const OTEL_PHP_DETECTORS = 'all';
+    public const OTEL_PHP_DETECTORS = 'default';
     public const OTEL_PHP_AUTOLOAD_ENABLED = 'false';
     public const OTEL_PHP_INTERNAL_METRICS_ENABLED = 'false';
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
