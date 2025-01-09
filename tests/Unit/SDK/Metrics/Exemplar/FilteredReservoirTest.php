@@ -24,7 +24,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(WithSampledTraceExemplarFilter::class)]
 final class FilteredReservoirTest extends TestCase
 {
-
     public function test_all_reservoir_returns_exemplars(): void
     {
         $reservoir = new FilteredReservoir(new FixedSizeReservoir(4), new AllExemplarFilter());

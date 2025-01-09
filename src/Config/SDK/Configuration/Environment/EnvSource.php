@@ -6,6 +6,5 @@ namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 
 interface EnvSource
 {
-
     public function readRaw(string $name): mixed;
 }

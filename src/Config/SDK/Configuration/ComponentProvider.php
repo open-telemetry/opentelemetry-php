@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 interface ComponentProvider
 {
-
     /**
      * @param array $properties properties provided for this component provider
      * @param Context $context context that should be used to resolve component plugins

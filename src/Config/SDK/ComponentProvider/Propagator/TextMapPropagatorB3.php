@@ -18,7 +18,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 #[PackageDependency('open-telemetry/extension-propagator-b3', '^1.0.1')]
 final class TextMapPropagatorB3 implements ComponentProvider
 {
-
     /**
      * @param array{} $properties
      */

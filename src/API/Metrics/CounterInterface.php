@@ -8,7 +8,6 @@ use OpenTelemetry\Context\ContextInterface;
 
 interface CounterInterface extends SynchronousInstrument
 {
-
     /**
      * @param float|int $amount non-negative amount to increment by
      * @param iterable<non-empty-string, string|bool|float|int|array|null> $attributes

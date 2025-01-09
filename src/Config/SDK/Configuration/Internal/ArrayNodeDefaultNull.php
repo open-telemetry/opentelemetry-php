@@ -12,7 +12,6 @@ use Symfony\Component\Config\Definition\ArrayNode;
  */
 final class ArrayNodeDefaultNull extends ArrayNode
 {
-
     public static function fromNode(ArrayNode $node): ArrayNodeDefaultNull
     {
         $defaultNull = new ArrayNodeDefaultNull($node->getName());

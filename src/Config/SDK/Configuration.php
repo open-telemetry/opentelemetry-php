@@ -17,7 +17,6 @@ use OpenTelemetry\SDK\SdkBuilder;
 
 final class Configuration
 {
-
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
      */

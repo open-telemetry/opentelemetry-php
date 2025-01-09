@@ -13,7 +13,6 @@ use Symfony\Component\Config\Definition\Builder\ParentNodeDefinitionInterface;
  */
 final class TreatNullAsUnsetNormalization
 {
-
     public function apply(ArrayNodeDefinition $root): void
     {
         foreach ($root->getChildNodeDefinitions() as $childNode) {
