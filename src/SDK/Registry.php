@@ -18,7 +18,6 @@ use RuntimeException;
 /**
  * A registry to enable central registration of components that the SDK requires but which may be provided
  * by non-SDK modules, such as contrib and extension.
- * @todo [breaking] deprecate this mechanism of setting up components, in favor of using SPI.
  */
 class Registry
 {
@@ -40,58 +39,6 @@ class Registry
         }
 
         return $factoriesByType;
-    }
-
-    /**
-     * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
-     * @deprecated Register via SPI instead
-     */
-    public static function registerTransportFactory(string $protocol, TransportFactoryInterface|string $factory, bool $clobber = false): void
-    {
-        //no-op
-    }
-
-    /**
-     * @param SpanExporterFactoryInterface|class-string<SpanExporterFactoryInterface> $factory
-     * @deprecated Register via SPI instead
-     */
-    public static function registerSpanExporterFactory(string $exporter, SpanExporterFactoryInterface|string $factory, bool $clobber = false): void
-    {
-        //no-op
-    }
-
-    /**
-     * @param MetricExporterFactoryInterface|class-string<MetricExporterFactoryInterface> $factory
-     * @deprecated Register via SPI instead
-     */
-    public static function registerMetricExporterFactory(string $exporter, MetricExporterFactoryInterface|string $factory, bool $clobber = false): void
-    {
-        //no-op
-    }
-
-    /**
-     * @param LogRecordExporterFactoryInterface|class-string<LogRecordExporterFactoryInterface> $factory
-     * @deprecated Register via SPI instead
-     */
-    public static function registerLogRecordExporterFactory(string $exporter, LogRecordExporterFactoryInterface|string $factory, bool $clobber = false): void
-    {
-        //no-op
-    }
-
-    /**
-     * @deprecated Register via SPI instead
-     */
-    public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
-    {
-        //no-op
-    }
-
-    /**
-     * @deprecated Register via SPI instead
-     */
-    public static function registerResourceDetector(string $name, ResourceDetectorInterface $detector): void
-    {
-        //no-op
     }
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
