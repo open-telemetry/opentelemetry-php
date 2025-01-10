@@ -39,9 +39,6 @@
       "dev-2.x": "2.x-dev"
     },
     "spi": {
-      "OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface": [
-        "OpenTelemetry\\Contrib\\Otlp\\OtlpHttpTransportFactory"
-      ],
       "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
         "OpenTelemetry\\Contrib\\Otlp\\StdoutSpanExporterFactory",
         "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory"
