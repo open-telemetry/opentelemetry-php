@@ -53,7 +53,7 @@
       ]
     },
     "spi-config": {
-      "prune-autoload-files": true,
+      "prune-autoload-files": true
     }
   }
 }

@@ -38,7 +38,7 @@
       ]
     },
     "spi-config": {
-      "prune-autoload-files": true,
+      "prune-autoload-files": true
     },
     "branch-alias": {
       "dev-main": "1.0.x-dev",
