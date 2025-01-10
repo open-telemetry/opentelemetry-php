@@ -41,9 +41,7 @@
             ]
         },
         "spi-config": {
-            "prune-autoload-files": [
-                "src/Extension/Propagagor/CloudTrace/_register.php"
-            ]
+            "prune-autoload-files": true
         }
     }
 }

@@ -43,9 +43,7 @@
       ]
     },
     "spi-config": {
-      "prune-autoload-files": [
-        "src/Contrib/Zipkin/_register.php"
-      ]
+      "prune-autoload-files": true
     }
   }
 }

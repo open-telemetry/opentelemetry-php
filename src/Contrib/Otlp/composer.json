@@ -53,9 +53,7 @@
       ]
     },
     "spi-config": {
-      "prune-autoload-files": [
-        "src/Contrib/Otlp/_register.php"
-      ]
+      "prune-autoload-files": true,
     }
   }
 }

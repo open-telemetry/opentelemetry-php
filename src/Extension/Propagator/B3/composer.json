@@ -41,9 +41,7 @@
             ]
         },
         "spi-config": {
-            "prune-autoload-files": [
-                "src/Extension/Propagagor/B3/_register.php"
-            ]
+            "prune-autoload-files": true
         }
     }
 }
