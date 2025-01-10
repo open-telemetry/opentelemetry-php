@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Utils::class)]
 class UtilsTest extends TestCase
 {
-
     #[DataProvider('for_test_left_zero_pad')]
     public function test_left_zero_pad(string $pad, int $howMuch, string $equalsTo) : void
     {

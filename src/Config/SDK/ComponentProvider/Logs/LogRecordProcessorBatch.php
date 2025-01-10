@@ -19,7 +19,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 final class LogRecordProcessorBatch implements ComponentProvider
 {
-
     /**
      * @param array{
      *     schedule_delay: int<0, max>,

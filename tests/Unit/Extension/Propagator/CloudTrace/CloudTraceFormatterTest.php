@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CloudTraceFormatter::class)]
 class CloudTraceFormatterTest extends TestCase
 {
-
     #[DataProvider('for_test_deserialize')]
     public function test_deserialize(string $header, string $traceId, string $spanId, int $sample) : void
     {

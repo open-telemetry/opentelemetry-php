@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\SDK\Sdk;
 
+/**
+ * @deprecated
+ */
 class EventLoggerProviderFactory
 {
     public function create(LoggerProviderInterface $loggerProvider): EventLoggerProviderInterface

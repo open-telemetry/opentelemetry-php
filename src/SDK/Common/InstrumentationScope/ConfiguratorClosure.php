@@ -12,7 +12,6 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
  */
 final class ConfiguratorClosure
 {
-
     public function __construct(
         public readonly Closure $closure,
         private readonly ?string $name,

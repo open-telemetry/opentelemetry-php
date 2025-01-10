@@ -58,6 +58,10 @@ final class Globals
         return Context::getCurrent()->get(ContextKeys::loggerProvider()) ?? self::globals()->loggerProvider;
     }
 
+    /**
+     * @deprecated
+     * @phan-suppress PhanDeprecatedFunction
+     */
     public static function eventLoggerProvider(): EventLoggerProviderInterface
     {
         return Context::getCurrent()->get(ContextKeys::eventLoggerProvider()) ?? self::globals()->eventLoggerProvider;
@@ -76,7 +80,7 @@ final class Globals
     }
 
     /**
-     * @phan-suppress PhanTypeMismatchReturnNullable
+     * @phan-suppress PhanTypeMismatchReturnNullable,PhanDeprecatedFunction
      */
     private static function globals(): self
     {

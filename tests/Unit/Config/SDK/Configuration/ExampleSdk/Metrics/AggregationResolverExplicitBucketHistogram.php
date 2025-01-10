@@ -14,7 +14,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 final class AggregationResolverExplicitBucketHistogram implements ComponentProvider
 {
-
     /**
      * @param array{
      *     boundaries: list<float|int>,

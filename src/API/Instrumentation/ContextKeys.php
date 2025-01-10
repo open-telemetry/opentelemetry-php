@@ -58,6 +58,7 @@ final class ContextKeys
     }
 
     /**
+     * @deprecated
      * @return ContextKeyInterface<EventLoggerProviderInterface>
      */
     public static function eventLoggerProvider(): ContextKeyInterface

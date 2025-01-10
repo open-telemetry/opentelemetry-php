@@ -23,7 +23,6 @@ use Symfony\Component\Config\Resource\ResourceInterface;
  */
 final class ResourceCollection implements \OpenTelemetry\Config\SDK\Configuration\ResourceCollection
 {
-
     /** @var array<ResourceInterface> */
     private array $resources = [];
     private readonly ComposerResource $composerResource;

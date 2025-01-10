@@ -16,7 +16,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
  */
 class HttpConfigProvider implements ComponentProvider
 {
-
     public function createPlugin(array $properties, Context $context): GeneralInstrumentationConfiguration
     {
         return new HttpConfig($properties);
