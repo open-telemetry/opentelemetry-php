@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<LogRecordExporterInterface>
@@ -28,8 +29,8 @@ final class LogRecordExporterConsole implements ComponentProvider
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('console');
+        return $builder->arrayNode('console');
     }
 }

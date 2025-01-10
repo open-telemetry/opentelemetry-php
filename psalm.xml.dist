@@ -37,19 +37,32 @@
                 <directory name="./examples"/>
             </errorLevel>
         </ArgumentTypeCoercion>
+        <InvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal"/>
+            </errorLevel>
+        </InvalidArgument>
         <UndefinedInterfaceMethod>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
             </errorLevel>
         </UndefinedInterfaceMethod>
+        <PossiblyInvalidArgument>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration"/>
+            </errorLevel>
+        </PossiblyInvalidArgument>
         <PossiblyNullReference>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
             </errorLevel>
         </PossiblyNullReference>
         <MoreSpecificImplementedParamType>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="tests/Integration/Config/ComponentProvider"/>
             </errorLevel>
         </MoreSpecificImplementedParamType>
         <InvalidDocblock>
@@ -57,5 +70,15 @@
                 <directory name="src/Config/SDK/ComponentProvider"/>
             </errorLevel>
         </InvalidDocblock>
+        <NonInvariantDocblockPropertyType>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal"/>
+            </errorLevel>
+        </NonInvariantDocblockPropertyType>
+        <NonInvariantPropertyType>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal"/>
+            </errorLevel>
+        </NonInvariantPropertyType>
     </issueHandlers>
 </psalm>

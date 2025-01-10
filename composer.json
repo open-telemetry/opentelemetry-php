@@ -203,7 +203,13 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
 
-                "OpenTelemetry\\Example\\ExampleConfigProvider"
+                "OpenTelemetry\\Example\\ExampleConfigProvider",
+
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
             ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
               "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"

@@ -18,6 +18,7 @@ use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<MetricExporterInterface>
@@ -36,8 +37,9 @@ final class MetricExporterOtlp implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
+     *     insecure: ?bool,
      *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
-     *     default_histogram_aggregation: 'explicit_bucket_histogram',
+     *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
@@ -64,9 +66,9 @@ final class MetricExporterOtlp implements ComponentProvider
         ), $temporality);
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('otlp');
+        $node = $builder->arrayNode('otlp');
         $node
             ->children()
                 ->enumNode('protocol')->isRequired()->values(['http/protobuf', 'http/json', 'grpc'])->end()
@@ -85,12 +87,13 @@ final class MetricExporterOtlp implements ComponentProvider
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->booleanNode('insecure')->defaultNull()->end()
                 ->enumNode('temporality_preference')
                     ->values(['cumulative', 'delta', 'lowmemory'])
                     ->defaultValue('cumulative')
                 ->end()
                 ->enumNode('default_histogram_aggregation')
-                    ->values(['explicit_bucket_histogram'])
+                    ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
                     ->defaultValue('explicit_bucket_histogram')
                 ->end()
             ->end()

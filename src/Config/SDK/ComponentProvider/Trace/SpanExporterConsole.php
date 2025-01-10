@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<SpanExporterInterface>
@@ -28,8 +29,8 @@ final class SpanExporterConsole implements ComponentProvider
         ));
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('console');
+        return $builder->arrayNode('console');
     }
 }

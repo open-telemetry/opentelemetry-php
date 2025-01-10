@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<MetricReaderInterface>
@@ -23,6 +24,7 @@ final class MetricReaderPeriodic implements ComponentProvider
      *     interval: int<0, max>,
      *     timeout: int<0, max>,
      *     exporter: ComponentPlugin<MetricExporterInterface>,
+     *     producers: array,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
@@ -32,14 +34,16 @@ final class MetricReaderPeriodic implements ComponentProvider
         );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('periodic');
+        $node = $builder->arrayNode('periodic');
         $node
             ->children()
                 ->integerNode('interval')->min(0)->defaultValue(5000)->end()
                 ->integerNode('timeout')->min(0)->defaultValue(30000)->end()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
+                ->arrayNode('producers') //@todo
+                    ->variablePrototype()->end()
             ->end()
         ;
 

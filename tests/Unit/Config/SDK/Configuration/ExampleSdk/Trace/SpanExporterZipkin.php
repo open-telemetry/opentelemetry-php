@@ -11,6 +11,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class SpanExporterZipkin implements ComponentProvider
 {
@@ -25,9 +26,9 @@ final class SpanExporterZipkin implements ComponentProvider
         throw new BadMethodCallException('not implemented');
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('zipkin');
+        $node = $builder->arrayNode('zipkin');
         $node
             ->children()
                 ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()

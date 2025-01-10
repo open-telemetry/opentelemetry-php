@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 final class AggregationResolverSum implements ComponentProvider
 {
@@ -21,8 +22,8 @@ final class AggregationResolverSum implements ComponentProvider
         throw new BadMethodCallException('not implemented');
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('sum');
+        return $builder->arrayNode('sum');
     }
 }

@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<SamplerInterface>
@@ -39,9 +40,9 @@ final class SamplerParentBased implements ComponentProvider
         );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = new ArrayNodeDefinition('parent_based');
+        $node = $builder->arrayNode('parent_based');
         $node
             ->children()
                 ->append($registry->component('root', SamplerInterface::class)->isRequired())

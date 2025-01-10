@@ -4,7 +4,12 @@ tracer_provider:
   processors:
     - simple:
         exporter:
-          console: {}
+          console:
+  sampler:
+    always_off:
+
+propagator:
+  composite: []
 
 instrumentation:
   php:
