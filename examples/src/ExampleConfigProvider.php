@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<InstrumentationConfiguration>
@@ -34,16 +35,16 @@ final class ExampleConfigProvider implements ComponentProvider
     /**
      * @psalm-suppress UndefinedInterfaceMethod,PossiblyNullReference
      */
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $root = new ArrayNodeDefinition('example_instrumentation');
-        $root
+        $node = $builder->arrayNode('example_instrumentation');
+        $node
             ->children()
                 ->scalarNode('span_name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
             ->end()
             ->canBeDisabled()
         ;
 
-        return $root;
+        return $node;
     }
 }

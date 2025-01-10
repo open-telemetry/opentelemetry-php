@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<SamplerInterface>
@@ -24,8 +25,8 @@ final class SamplerAlwaysOff implements ComponentProvider
         return new AlwaysOffSampler();
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return new ArrayNodeDefinition('always_off');
+        return $builder->arrayNode('always_off');
     }
 }

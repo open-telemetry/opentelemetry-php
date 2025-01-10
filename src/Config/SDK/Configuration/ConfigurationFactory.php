@@ -14,13 +14,20 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory
 use OpenTelemetry\Config\SDK\Configuration\Internal\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationLoader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ArrayNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\BooleanNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\FloatNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\IntegerNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ScalarNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\StringNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\VariableNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
-use OpenTelemetry\Config\SDK\Configuration\Internal\TreatNullAsUnsetNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlExtensionFileLoader;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlSymfonyFileLoader;
 use function serialize;
 use function sprintf;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -123,18 +130,31 @@ final class ConfigurationFactory
 
     private function compileFactory(): CompiledConfigurationFactory
     {
-        $registry = new ComponentProviderRegistry();
+        $envReader = new TrackingEnvReader($this->envReader);
+        $normalizations = [
+            // Parse MUST perform environment variable substitution.
+            new EnvSubstitutionNormalization($envReader),
+        ];
+
+        $builder = new NodeBuilder();
+        $builder->setNodeClass('variable', VariableNodeDefinition::class);
+        $builder->setNodeClass('scalar', ScalarNodeDefinition::class);
+        $builder->setNodeClass('boolean', BooleanNodeDefinition::class);
+        $builder->setNodeClass('integer', IntegerNodeDefinition::class);
+        $builder->setNodeClass('float', FloatNodeDefinition::class);
+        $builder->setNodeClass('array', ArrayNodeDefinition::class);
+        $builder->setNodeClass('string', StringNodeDefinition::class);
+
+        $registry = new ComponentProviderRegistry($normalizations, $builder);
+
         foreach ($this->componentProviders as $provider) {
             $registry->register($provider);
         }
 
-        $root = $this->rootComponent->getConfig($registry);
-
-        $envReader = new TrackingEnvReader($this->envReader);
-        // Parse MUST perform environment variable substitution.
-        (new EnvSubstitutionNormalization($envReader))->apply($root);
-        // Parse MUST interpret null as equivalent to unset.
-        (new TreatNullAsUnsetNormalization())->apply($root);
+        $root = $this->rootComponent->getConfig($registry, $builder);
+        foreach ($normalizations as $normalization) {
+            $normalization->apply($root);
+        }
 
         $node = $root->getNode(forceRootNode: true);
 
