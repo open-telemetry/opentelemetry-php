@@ -55,8 +55,7 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
         $compression = $this->getCompression();
         $timeout = $this->getTimeout();
 
-        $factoryClass = Loader::transportFactory($protocol);
-        $factory = $this->transportFactory ?: new $factoryClass();
+        $factory = $this->transportFactory ?? Loader::transportFactory($protocol);
 
         return $factory->create(
             $endpoint,

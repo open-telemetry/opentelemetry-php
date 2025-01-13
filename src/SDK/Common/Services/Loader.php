@@ -24,7 +24,7 @@ class Loader
      * @param class-string $class
      * @phan-suppress PhanTypeNonVarPassByRef
      */
-    private static function getFactories(string $class): array
+    private static function getFactory(string $class, string $type): mixed
     {
         $factories = iterator_to_array(ServiceLoader::load($class));
         array_multisort(
@@ -32,36 +32,31 @@ class Loader
             SORT_DESC,
             $factories,
         );
-        $factoriesByType = [];
         foreach ($factories as $factory) {
-            $factoriesByType[$factory->type()] ??= $factory;
+            if ($factory->type() === $type) {
+                return $factory;
+            }
         }
 
-        return $factoriesByType;
+        return null;
     }
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
-        $factories = self::getFactories(SpanExporterFactoryInterface::class);
-        if (!array_key_exists($exporter, $factories)) {
+        $factory = self::getFactory(SpanExporterFactoryInterface::class, $exporter);
+        if (!$factory) {
             throw new RuntimeException('Span exporter factory not defined for: ' . $exporter);
         }
-        $class = $factories[$exporter];
-        $factory = new $class();
-        assert($factory instanceof SpanExporterFactoryInterface);
 
         return $factory;
     }
 
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
-        $factories = self::getFactories(LogRecordExporterFactoryInterface::class);
-        if (!array_key_exists($exporter, $factories)) {
+        $factory = self::getFactory(LogRecordExporterFactoryInterface::class, $exporter);
+        if (!$factory) {
             throw new RuntimeException('LogRecord exporter factory not defined for: ' . $exporter);
         }
-        $class = $factories[$exporter];
-        $factory = new $class();
-        assert($factory instanceof LogRecordExporterFactoryInterface);
 
         return $factory;
     }
@@ -72,49 +67,41 @@ class Loader
      */
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
-        $factories = self::getFactories(TransportFactoryInterface::class);
-        $protocol = explode('/', $protocol)[0];
-        if (!array_key_exists($protocol, $factories)) {
-            throw new RuntimeException('Transport factory not defined for protocol: ' . $protocol);
+        $type = explode('/', $protocol)[0];
+        $factory = self::getFactory(TransportFactoryInterface::class, $type);
+        if (!$factory) {
+            throw new RuntimeException('Transport factory not defined for protocol: ' . $type);
         }
-        $class = $factories[$protocol];
-        $factory = new $class();
-        assert($factory instanceof TransportFactoryInterface);
 
         return $factory;
     }
 
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
-        $factories = self::getFactories(MetricExporterFactoryInterface::class);
-        if (!array_key_exists($exporter, $factories)) {
+        $factory = self::getFactory(MetricExporterFactoryInterface::class, $exporter);
+        if (!$factory) {
             throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $exporter);
         }
-        $class = $factories[$exporter];
-        $factory = new $class();
-        assert($factory instanceof MetricExporterFactoryInterface);
 
         return $factory;
     }
 
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
-        $factories = self::getFactories(TextMapPropagatorFactoryInterface::class);
-        if (!array_key_exists($name, $factories)) {
+        $factory = self::getFactory(TextMapPropagatorFactoryInterface::class, $name);
+        if (!$factory) {
             throw new RuntimeException('Text map propagator not registered for: ' . $name);
         }
-        $factory = $factories[$name];
 
         return $factory->create();
     }
 
     public static function resourceDetector(string $name): ResourceDetectorInterface
     {
-        $factories = self::getFactories(ResourceDetectorFactoryInterface::class);
-        if (!array_key_exists($name, $factories)) {
+        $factory = self::getFactory(ResourceDetectorFactoryInterface::class, $name);
+        if (!$factory) {
             throw new RuntimeException('Resource detector not registered for: ' . $name);
         }
-        $factory = $factories[$name];
 
         return $factory->create();
     }
@@ -124,12 +111,8 @@ class Loader
      */
     public static function resourceDetectors(): array
     {
-        $factories = self::getFactories(ResourceDetectorFactoryInterface::class);
-        $instances = [];
-        foreach ($factories as $factory) {
-            $instances[] = $factory->create();
-        }
+        $factories = iterator_to_array(ServiceLoader::load(ResourceDetectorFactoryInterface::class));
 
-        return $instances;
+        return array_map(fn (ResourceDetectorFactoryInterface $factory) => $factory->create(), $factories);
     }
 }
