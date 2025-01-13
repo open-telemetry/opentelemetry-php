@@ -43,22 +43,14 @@ class Loader
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
-        $factory = self::getFactory(SpanExporterFactoryInterface::class, $exporter);
-        if (!$factory) {
-            throw new RuntimeException('Span exporter factory not defined for: ' . $exporter);
-        }
-
-        return $factory;
+        return self::getFactory(SpanExporterFactoryInterface::class, $exporter)
+            ?? throw new RuntimeException('Span exporter factory not defined for: ' . $exporter);
     }
 
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
-        $factory = self::getFactory(LogRecordExporterFactoryInterface::class, $exporter);
-        if (!$factory) {
-            throw new RuntimeException('LogRecord exporter factory not defined for: ' . $exporter);
-        }
-
-        return $factory;
+        return self::getFactory(LogRecordExporterFactoryInterface::class, $exporter)
+            ?? throw new RuntimeException('LogRecord exporter factory not defined for: ' . $exporter);
     }
 
     /**
@@ -68,40 +60,29 @@ class Loader
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
         $type = explode('/', $protocol)[0];
-        $factory = self::getFactory(TransportFactoryInterface::class, $type);
-        if (!$factory) {
-            throw new RuntimeException('Transport factory not defined for protocol: ' . $type);
-        }
 
-        return $factory;
+        return self::getFactory(TransportFactoryInterface::class, $type)
+            ?? throw new RuntimeException('Transport factory not defined for protocol: ' . $type);
     }
 
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
-        $factory = self::getFactory(MetricExporterFactoryInterface::class, $exporter);
-        if (!$factory) {
-            throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $exporter);
-        }
-
-        return $factory;
+        return self::getFactory(MetricExporterFactoryInterface::class, $exporter)
+            ?? throw new RuntimeException('Metric exporter factory not registered for protocol: ' . $exporter);
     }
 
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
-        $factory = self::getFactory(TextMapPropagatorFactoryInterface::class, $name);
-        if (!$factory) {
-            throw new RuntimeException('Text map propagator not registered for: ' . $name);
-        }
+        $factory = self::getFactory(TextMapPropagatorFactoryInterface::class, $name)
+            ?? throw new RuntimeException('Text map propagator not registered for: ' . $name);
 
         return $factory->create();
     }
 
     public static function resourceDetector(string $name): ResourceDetectorInterface
     {
-        $factory = self::getFactory(ResourceDetectorFactoryInterface::class, $name);
-        if (!$factory) {
-            throw new RuntimeException('Resource detector not registered for: ' . $name);
-        }
+        $factory = self::getFactory(ResourceDetectorFactoryInterface::class, $name)
+            ?? throw new RuntimeException('Resource detector not registered for: ' . $name);
 
         return $factory->create();
     }
