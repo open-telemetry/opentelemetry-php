@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Export;
 
-interface TransportFactoryInterface
+use OpenTelemetry\SDK\Common\Services\SpiLoadableInterface;
+
+interface TransportFactoryInterface extends SpiLoadableInterface
 {
     public const COMPRESSION_GZIP = 'gzip';
     public const COMPRESSION_DEFLATE = 'deflate';
@@ -29,7 +31,4 @@ interface TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null,
     ): TransportInterface;
-
-    public function type(): string;
-    public function priority(): int;
 }

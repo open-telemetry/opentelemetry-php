@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-interface MetricExporterFactoryInterface
+use OpenTelemetry\SDK\Common\Services\SpiLoadableInterface;
+
+interface MetricExporterFactoryInterface extends SpiLoadableInterface
 {
     public function create(): MetricExporterInterface;
-    public function type(): string;
-    public function priority(): int;
 }
