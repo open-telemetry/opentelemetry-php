@@ -120,16 +120,16 @@ class Loader
     }
 
     /**
-     * @return array<int, ResourceDetectorInterface>
+     * @return ResourceDetectorInterface[]
      */
     public static function resourceDetectors(): array
     {
         $factories = self::getFactories(ResourceDetectorFactoryInterface::class);
         $instances = [];
         foreach ($factories as $factory) {
-            $instances[$factory->type()] ??= $factory->create();
+            $instances[] = $factory->create();
         }
 
-        return array_values($instances);
+        return $instances;
     }
 }
