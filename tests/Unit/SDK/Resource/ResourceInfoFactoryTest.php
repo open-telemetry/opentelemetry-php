@@ -118,7 +118,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
     }
 
-    public function test_all_resources_uses_extra_resource_from_registry(): void
+    public function test_all_resources_uses_extra_resource_from_spi(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
 
@@ -127,7 +127,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertSame('test-value', $resource->getAttributes()->get('test-resource'));
     }
 
-    public function test_composite_default_with_extra_resource_from_registry(): void
+    public function test_composite_default_with_extra_resource_from_spi(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'test,sdk');
         $resource = ResourceInfoFactory::defaultResource();
