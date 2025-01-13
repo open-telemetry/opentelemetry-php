@@ -147,4 +147,22 @@ class LoaderTest extends TestCase
         $this->assertTrue($detector->getResource()->getAttributes()->has('foo-resource'));
         $this->assertSame('foo', $detector->getResource()->getAttributes()->get('foo-resource'));
     }
+
+    public function test_get_all_resource_detectors(): void
+    {
+        $detectors = Loader::resourceDetectors();
+        $this->assertNotEmpty($detectors);
+    }
+
+    public function test_missing_propagator(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        Loader::textMapPropagator('missing');
+    }
+
+    public function test_missing_detector(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        Loader::resourceDetector('missing');
+    }
 }
