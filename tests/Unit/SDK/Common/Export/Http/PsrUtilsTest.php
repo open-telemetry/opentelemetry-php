@@ -112,6 +112,7 @@ final class PsrUtilsTest extends TestCase
             ['gzip,br', ['gzip','br']],
             ['gzip , brotli', ['gzip','brotli']],
             [['gzip'], ['gzip']],
+            [['gzip', 'none'], ['gzip']],
         ];
     }
 }
