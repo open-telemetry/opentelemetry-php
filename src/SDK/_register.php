@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Nevay\SPI\ServiceLoader;
+
 use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
