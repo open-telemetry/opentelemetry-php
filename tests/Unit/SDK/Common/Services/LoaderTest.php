@@ -102,6 +102,8 @@ class LoaderTest extends TestCase
     public static function textMapPropagator(): array
     {
         return [
+            ['tracecontext'],
+            ['baggage'],
             ['b3'],
             ['b3multi'],
             ['cloudtrace'],

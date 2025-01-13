@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Propagation;
 
-use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -46,10 +44,6 @@ class PropagatorFactory
     private function buildPropagator(string $name): TextMapPropagatorInterface
     {
         switch ($name) {
-            case KnownValues::VALUE_BAGGAGE:
-                return BaggagePropagator::getInstance();
-            case KnownValues::VALUE_TRACECONTEXT:
-                return TraceContextPropagator::getInstance();
             case KnownValues::VALUE_NOOP:
             case KnownValues::VALUE_NONE:
                 return NoopTextMapPropagator::getInstance();
