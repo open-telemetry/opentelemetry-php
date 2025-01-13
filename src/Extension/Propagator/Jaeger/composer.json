@@ -34,13 +34,8 @@
             "dev-main": "1.0.x-dev",
             "dev-2.x": "2.x-dev"
         },
-        "spi": {
-            "OpenTelemetry\\Context\\Propagation\\TextMapPropagatorFactoryInterface": [
-                "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerPropagatorFactory",
-                "OpenTelemetry\\Extension\\Propagator\\Jaeger\\JaegerBaggagePropagatorFactory"
-            ]
-        },
         "spi-config": {
+            "autoload-files": true,
             "prune-autoload-files": true
         }
     }

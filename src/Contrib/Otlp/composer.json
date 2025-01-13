@@ -38,21 +38,8 @@
       "dev-main": "1.0.x-dev",
       "dev-2.x": "2.x-dev"
     },
-    "spi": {
-      "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
-        "OpenTelemetry\\Contrib\\Otlp\\StdoutSpanExporterFactory",
-        "OpenTelemetry\\Contrib\\Otlp\\SpanExporterFactory"
-      ],
-      "OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface": [
-        "OpenTelemetry\\Contrib\\Otlp\\StdoutMetricExporterFactory",
-        "OpenTelemetry\\Contrib\\Otlp\\MetricExporterFactory"
-      ],
-      "OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface": [
-        "OpenTelemetry\\Contrib\\Otlp\\StdoutLogsExporterFactory",
-        "OpenTelemetry\\Contrib\\Otlp\\LogsExporterFactory"
-      ]
-    },
     "spi-config": {
+      "autoload-files": true,
       "prune-autoload-files": true
     }
   }

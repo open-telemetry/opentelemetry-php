@@ -37,12 +37,8 @@
       "dev-main": "1.0.x-dev",
       "dev-2.x": "2.x-dev"
     },
-    "spi": {
-      "OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface": [
-        "OpenTelemetry\\Contrib\\Zipkin\\SpanExporterFactory"
-      ]
-    },
     "spi-config": {
+      "autoload-files": true,
       "prune-autoload-files": true
     }
   }
