@@ -41,12 +41,8 @@ logger_provider:
         max_export_batch_size: 512
         # Configure exporter.
         exporter:
-          # Configure exporter to be OTLP.
-          otlp:
-            # Configure protocol. Values include: http/protobuf, http/json, grpc.
-            protocol: http/protobuf
-            # Configure endpoint.
-            # If .protocol is http/protobuf or http/json, the signal specific path must be included (i.e. http://localhost:4318/v1/{signal}). If .protocol is grpc, a path should not be included (i.e. http://localhost:4317).
+          # Configure exporter to be OTLP with HTTP transport.
+          otlp_http:
             endpoint: http://localhost:4318/v1/logs
             # Configure certificate. Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
@@ -72,7 +68,43 @@ logger_provider:
             # Configure max time (in milliseconds) to wait for each export.
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. Only applicable when .protocol is grpc and .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # Configure the encoding used for messages. Values include: protobuf, json. Implementations may not support json.
+            # If omitted or null, protobuf is used.
+            encoding: protobuf
+    - # Configure a batch log record processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with gRPC transport.
+          otlp_grpc:
+            # Configure endpoint.
+            # If omitted or null, http://localhost:4317 is used.
+            endpoint: http://localhost:4317
+            # Configure certificate. Absolute path to certificate file.
+            # If omitted or null, system default certificate verification is used for secure connections.
+            certificate: /app/cert.pem
+            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # If omitted or null, mTLS is not used.
+            client_key: /app/cert.pem
+            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # If omitted or null, mTLS is not used.
+            client_certificate: /app/cert.pem
+            # Configure headers. Entries have higher priority than entries from .headers_list.
+            # If an entry's .value is null, the entry is ignored.
+            headers:
+              - name: api-key
+                value: "1234"
+            # Configure headers. Entries have lower priority than entries from .headers.
+            # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+            # If omitted or null, no headers are added.
+            headers_list: "api-key=1234"
+            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+            # Configure max time (in milliseconds) to wait for each export.
+            # If omitted or null, 10000 is used.
+            timeout: 10000
+            # Configure client transport security for the exporter's connection. Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
     - # Configure a simple log record processor.
@@ -145,12 +177,10 @@ meter_provider:
         timeout: 30000
         # Configure exporter.
         exporter:
-          # Configure exporter to be OTLP.
-          otlp:
-            # Configure protocol. Values include: http/protobuf, http/json, grpc.
-            protocol: http/protobuf
-            # Configure endpoint.
-            # If .protocol is http/protobuf or http/json, the signal specific path must be included (i.e. http://localhost:4318/v1/{signal}). If .protocol is grpc, a path should not be included (i.e. http://localhost:4317).
+          # Configure exporter to be OTLP with HTTP transport.
+          otlp_http:
+            # Configure endpoint, including the metric specific path.
+            # If omitted or null, http://localhost:4318/v1/metrics is used.
             endpoint: http://localhost:4318/v1/metrics
             # Configure certificate. Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
@@ -176,9 +206,9 @@ meter_provider:
             # Configure max time (in milliseconds) to wait for each export.
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. Only applicable when .protocol is grpc and .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
+            # Configure the encoding used for messages. Values include: protobuf, json. Implementations may not support json.
+            # If omitted or null, protobuf is used.
+            encoding: protobuf
             # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
             temporality_preference: delta
@@ -189,6 +219,48 @@ meter_provider:
         producers:
           - # Configure metric producer to be prometheus.
             prometheus:
+    - # Configure a periodic metric reader.
+      periodic:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with gRPC transport.
+          otlp_grpc:
+            # Configure endpoint.
+            # If omitted or null, http://localhost:4317 is used.
+            endpoint: http://localhost:4317
+            # Configure certificate. Absolute path to certificate file.
+            # If omitted or null, system default certificate verification is used for secure connections.
+            certificate: /app/cert.pem
+            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # If omitted or null, mTLS is not used.
+            client_key: /app/cert.pem
+            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # If omitted or null, mTLS is not used.
+            client_certificate: /app/cert.pem
+            # Configure headers. Entries have higher priority than entries from .headers_list.
+            # If an entry's .value is null, the entry is ignored.
+            headers:
+              - name: api-key
+                value: "1234"
+            # Configure headers. Entries have lower priority than entries from .headers.
+            # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+            # If omitted or null, no headers are added.
+            headers_list: "api-key=1234"
+            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+            # Configure max time (in milliseconds) to wait for each export.
+            # If omitted or null, 10000 is used.
+            timeout: 10000
+            # Configure client transport security for the exporter's connection. Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # If omitted or null, false is used.
+            insecure: false
+            # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # If omitted or null, cumulative is used.
+            temporality_preference: delta
+            # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # If omitted or null, explicit_bucket_histogram is used.
+            default_histogram_aggregation: base2_exponential_bucket_histogram
     - # Configure a periodic metric reader.
       periodic:
         # Configure exporter.
@@ -216,7 +288,7 @@ meter_provider:
         meter_version: 1.0.0
         # Configure meter schema url selection criteria.
         # If omitted or null, all meter schema URLs match.
-        meter_schema_url: https://opentelemetry.io/schemas/1.16.0
+        meter_schema_url: https://opentelemetry.io/schemas/1.27.0
       # Configure view stream.
       stream:
         # Configure metric name of the resulting stream(s).
@@ -293,12 +365,10 @@ tracer_provider:
         max_export_batch_size: 512
         # Configure exporter.
         exporter:
-          # Configure exporter to be OTLP.
-          otlp:
-            # Configure protocol. Values include: http/protobuf, http/json, grpc.
-            protocol: http/protobuf
-            # Configure endpoint.
-            # If .protocol is http/protobuf or http/json, the signal specific path must be included (i.e. http://localhost:4318/v1/{signal}). If .protocol is grpc, a path should not be included (i.e. http://localhost:4317).
+          # Configure exporter to be OTLP with HTTP transport.
+          otlp_http:
+            # Configure endpoint, including the trace specific path.
+            # If omitted or null, http://localhost:4318/v1/traces is used.
             endpoint: http://localhost:4318/v1/traces
             # Configure certificate. Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
@@ -324,7 +394,43 @@ tracer_provider:
             # Configure max time (in milliseconds) to wait for each export.
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. Only applicable when .protocol is grpc and .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # Configure the encoding used for messages. Values include: protobuf, json. Implementations may not support json.
+            # If omitted or null, protobuf is used.
+            encoding: protobuf
+    - # Configure a batch span processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with gRPC transport.
+          otlp_grpc:
+            # Configure endpoint.
+            # If omitted or null, http://localhost:4317 is used.
+            endpoint: http://localhost:4317
+            # Configure certificate. Absolute path to certificate file.
+            # If omitted or null, system default certificate verification is used for secure connections.
+            certificate: /app/cert.pem
+            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # If omitted or null, mTLS is not used.
+            client_key: /app/cert.pem
+            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # If omitted or null, mTLS is not used.
+            client_certificate: /app/cert.pem
+            # Configure headers. Entries have higher priority than entries from .headers_list.
+            # If an entry's .value is null, the entry is ignored.
+            headers:
+              - name: api-key
+                value: "1234"
+            # Configure headers. Entries have lower priority than entries from .headers.
+            # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
+            # If omitted or null, no headers are added.
+            headers_list: "api-key=1234"
+            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # If omitted or null, none is used.
+            compression: gzip
+            # Configure max time (in milliseconds) to wait for each export.
+            # If omitted or null, 10000 is used.
+            timeout: 10000
+            # Configure client transport security for the exporter's connection. Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
     - # Configure a batch span processor.
