@@ -37,7 +37,6 @@ final class MetricExporterOtlpHttp implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
-     *     insecure: ?bool,
      *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
      *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
@@ -88,7 +87,6 @@ final class MetricExporterOtlpHttp implements ComponentProvider
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10)->end()
-                ->booleanNode('insecure')->defaultNull()->end()
                 ->enumNode('temporality_preference')
                     ->values(['cumulative', 'delta', 'lowmemory'])
                     ->defaultValue('cumulative')

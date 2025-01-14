@@ -44,7 +44,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        $protocol = 'grpc';
+        $protocol = Protocols::GRPC;
 
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 

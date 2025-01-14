@@ -41,7 +41,7 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
-        $protocol = 'grpc';
+        $protocol = Protocols::GRPC;
 
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
