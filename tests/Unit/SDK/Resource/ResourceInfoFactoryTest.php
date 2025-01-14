@@ -84,6 +84,7 @@ class ResourceInfoFactoryTest extends TestCase
     #[Group('trace-compliance')]
     public function test_resource_service_name_default(): void
     {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
         $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get('service.name'));
     }
@@ -106,6 +107,7 @@ class ResourceInfoFactoryTest extends TestCase
     #[Group('compliance')]
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
         $resource = ResourceInfoFactory::defaultResource();
@@ -115,6 +117,7 @@ class ResourceInfoFactoryTest extends TestCase
     #[Group('compliance')]
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
         $resource = ResourceInfoFactory::defaultResource();
         $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
@@ -160,6 +163,35 @@ class ResourceInfoFactoryTest extends TestCase
         foreach (['service.name', 'telemetry.sdk.name', 'process.runtime.name', 'process.pid', 'host.arch'] as $key) {
             $this->assertContains($key, $keys);
         }
+    }
+
+    /**
+     * From SDK 2.x, the default detectors are reduced to: sdk, sdk_provided, env
+     */
+    #[DataProvider('defaultProvider')]
+    public function test_default_detectors(?string $value): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', $value);
+        $resource = ResourceInfoFactory::defaultResource();
+        $keys = array_keys($resource->getAttributes()->toArray());
+        $expected = [
+            'telemetry.sdk.name',
+            'telemetry.sdk.language',
+            'telemetry.sdk.version',
+            'telemetry.distro.name',
+            'telemetry.distro.version',
+            'service.name',
+        ];
+
+        $this->assertEquals($expected, $keys);
+    }
+
+    public static function defaultProvider(): array
+    {
+        return [
+            ['default'],
+            [null],
+        ];
     }
 
     public function test_default_with_none_detectors(): void

@@ -18,6 +18,7 @@ class ResourceInfoFactoryTest extends TestCase
 
     public function test_all_default_resources(): void
     {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
         $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
