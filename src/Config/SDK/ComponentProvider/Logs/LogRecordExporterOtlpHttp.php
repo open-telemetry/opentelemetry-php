@@ -45,9 +45,12 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
 
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
-        return new LogsExporter(Registry::transportFactory($protocol)->create(
-            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::LOGS, $protocol),
-            contentType: Protocols::contentType($protocol),
+        return new LogsExporter(Registry::transportFactory('http')->create(
+            endpoint: $properties['endpoint'],
+            contentType: match ($properties['encoding']) {
+                'protobuf' => ContentTypes::PROTOBUF,
+                'json' => ContentTypes::JSON,
+            },
             headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'],
@@ -62,8 +65,8 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
         $node = $builder->arrayNode('otlp_http');
         $node
             ->children()
-                ->enumNode('encoding')->isRequired()->values(['protobuf', 'json'])->end()
-                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
+                ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
+                ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/logs')->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
