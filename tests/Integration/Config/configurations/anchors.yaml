@@ -4,7 +4,6 @@ file_format: "0.3"
 exporters:
     otlp: &otlp-exporter
         encoding: protobuf
-        endpoint: http://localhost:4318
         certificate: /app/cert.pem
         client_key: /app/cert.pem
         client_certificate: /app/cert.pem
@@ -21,6 +20,7 @@ logger_provider:
                   otlp_http:
                       # expand the otlp-exporter anchor
                       <<: *otlp-exporter
+                      endpoint: http://localhost:4318/v1/logs
 
 meter_provider:
     readers:
@@ -31,6 +31,7 @@ meter_provider:
                   otlp_http:
                       # expand the otlp-exporter anchor and add metric specific configuration
                       <<: *otlp-exporter
+                      endpoint: http://localhost:4318/v1/metrics
                       temporality_preference: delta
 
 tracer_provider:
@@ -42,6 +43,7 @@ tracer_provider:
                   otlp_http:
                       # expand the otlp-exporter anchor
                       <<: *otlp-exporter
+                      endpoint: http://localhost:4318/v1/traces
 
 propagator:
   composite: []
