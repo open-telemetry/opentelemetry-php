@@ -71,7 +71,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
         $node = $builder->arrayNode('otlp_grpc');
         $node
             ->children()
-                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('endpoint')->defaultValue('http://localhost:4317')->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()

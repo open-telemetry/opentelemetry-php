@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
-use OpenTelemetry\API\Signals;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
-use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -43,9 +41,6 @@ final class MetricExporterOtlpHttp implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        $encoding = $properties['encoding'];
-        $protocol = 'http/' . $encoding;
-
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
         $temporality = match ($properties['temporality_preference']) {
@@ -54,9 +49,12 @@ final class MetricExporterOtlpHttp implements ComponentProvider
             'lowmemory' => null,
         };
 
-        return new MetricExporter(Registry::transportFactory($protocol)->create(
-            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::METRICS, $protocol),
-            contentType: Protocols::contentType($protocol),
+        return new MetricExporter(Registry::transportFactory('http')->create(
+            endpoint: $properties['endpoint'],
+            contentType: match ($properties['encoding']) {
+                'protobuf' => ContentTypes::PROTOBUF,
+                'json' => ContentTypes::JSON,
+            },
             headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'],
@@ -71,9 +69,9 @@ final class MetricExporterOtlpHttp implements ComponentProvider
         $node = $builder->arrayNode('otlp_http');
         $node
             ->children()
-                ->enumNode('encoding')->isRequired()->values(['protobuf', 'json'])->end()
-                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+            ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
+            ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/metrics')->validate()->always(Validation::ensureString())->end()->end()
+            ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('headers')

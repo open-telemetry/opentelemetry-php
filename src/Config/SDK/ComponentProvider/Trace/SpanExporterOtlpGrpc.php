@@ -42,7 +42,6 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         $protocol = Protocols::GRPC;
-
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
         return new SpanExporter(Registry::transportFactory($protocol)->create(
@@ -62,7 +61,7 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
         $node = $builder->arrayNode('otlp_grpc');
         $node
             ->children()
-                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('endpoint')->defaultValue('http://localhost:4317')->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()

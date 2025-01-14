@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
-use OpenTelemetry\API\Signals;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
-use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
@@ -40,9 +38,6 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
-        $encoding = $properties['encoding'];
-        $protocol = 'http/' . $encoding;
-
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
         return new LogsExporter(Registry::transportFactory('http')->create(
