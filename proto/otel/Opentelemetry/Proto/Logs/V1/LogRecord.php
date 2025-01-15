@@ -115,6 +115,19 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>bytes span_id = 10;</code>
      */
     protected $span_id = '';
+    /**
+     * A unique identifier of event category/type.
+     * All events with the same event_name are expected to conform to the same
+     * schema for both their attributes and their body.
+     * Recommended to be fully qualified and short (no longer than 256 characters).
+     * Presence of event_name on the log record identifies this record
+     * as an event.
+     * [Optional].
+     * Status: [Development]
+     *
+     * Generated from protobuf field <code>string event_name = 12;</code>
+     */
+    protected $event_name = '';
 
     /**
      * Constructor.
@@ -182,6 +195,15 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      *           span if any of the following is true:
      *             - the field is not present,
      *             - the field contains an invalid value.
+     *     @type string $event_name
+     *           A unique identifier of event category/type.
+     *           All events with the same event_name are expected to conform to the same
+     *           schema for both their attributes and their body.
+     *           Recommended to be fully qualified and short (no longer than 256 characters).
+     *           Presence of event_name on the log record identifies this record
+     *           as an event.
+     *           [Optional].
+     *           Status: [Development]
      * }
      */
     public function __construct($data = NULL) {
@@ -533,6 +555,46 @@ class LogRecord extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, False);
         $this->span_id = $var;
+
+        return $this;
+    }
+
+    /**
+     * A unique identifier of event category/type.
+     * All events with the same event_name are expected to conform to the same
+     * schema for both their attributes and their body.
+     * Recommended to be fully qualified and short (no longer than 256 characters).
+     * Presence of event_name on the log record identifies this record
+     * as an event.
+     * [Optional].
+     * Status: [Development]
+     *
+     * Generated from protobuf field <code>string event_name = 12;</code>
+     * @return string
+     */
+    public function getEventName()
+    {
+        return $this->event_name;
+    }
+
+    /**
+     * A unique identifier of event category/type.
+     * All events with the same event_name are expected to conform to the same
+     * schema for both their attributes and their body.
+     * Recommended to be fully qualified and short (no longer than 256 characters).
+     * Presence of event_name on the log record identifies this record
+     * as an event.
+     * [Optional].
+     * Status: [Development]
+     *
+     * Generated from protobuf field <code>string event_name = 12;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setEventName($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->event_name = $var;
 
         return $this;
     }

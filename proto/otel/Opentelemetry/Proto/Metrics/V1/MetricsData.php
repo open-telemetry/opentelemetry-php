@@ -12,6 +12,23 @@ use Google\Protobuf\Internal\GPBUtil;
  * MetricsData represents the metrics data that can be stored in a persistent
  * storage, OR can be embedded by other protocols that transfer OTLP metrics
  * data but do not implement the OTLP protocol.
+ * MetricsData
+ * └─── ResourceMetrics
+ *   ├── Resource
+ *   ├── SchemaURL
+ *   └── ScopeMetrics
+ *      ├── Scope
+ *      ├── SchemaURL
+ *      └── Metric
+ *         ├── Name
+ *         ├── Description
+ *         ├── Unit
+ *         └── data
+ *            ├── Gauge
+ *            ├── Sum
+ *            ├── Histogram
+ *            ├── ExponentialHistogram
+ *            └── Summary
  * The main difference between this message and collector protocol is that
  * in this message there will not be any "control" or "metadata" specific to
  * OTLP protocol.

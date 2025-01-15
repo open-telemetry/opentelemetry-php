@@ -10,7 +10,8 @@ use Google\Protobuf\Internal\GPBUtil;
 
 /**
  * SummaryDataPoint is a single data point in a timeseries that describes the
- * time-varying values of a Summary metric.
+ * time-varying values of a Summary metric. The count and sum fields represent
+ * cumulative values.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.SummaryDataPoint</code>
  */
@@ -55,7 +56,7 @@ class SummaryDataPoint extends \Google\Protobuf\Internal\Message
      * events, and is assumed to be monotonic over the values of these events.
      * Negative events *can* be recorded, but sum should not be filled out when
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
+     * see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#summary
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      */
@@ -104,7 +105,7 @@ class SummaryDataPoint extends \Google\Protobuf\Internal\Message
      *           events, and is assumed to be monotonic over the values of these events.
      *           Negative events *can* be recorded, but sum should not be filled out when
      *           doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     *           see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
+     *           see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#summary
      *     @type \Opentelemetry\Proto\Metrics\V1\SummaryDataPoint\ValueAtQuantile[]|\Google\Protobuf\Internal\RepeatedField $quantile_values
      *           (Optional) list of values at different quantiles of the distribution calculated
      *           from the current snapshot. The quantiles must be strictly increasing.
@@ -245,7 +246,7 @@ class SummaryDataPoint extends \Google\Protobuf\Internal\Message
      * events, and is assumed to be monotonic over the values of these events.
      * Negative events *can* be recorded, but sum should not be filled out when
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
+     * see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#summary
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      * @return float
@@ -262,7 +263,7 @@ class SummaryDataPoint extends \Google\Protobuf\Internal\Message
      * events, and is assumed to be monotonic over the values of these events.
      * Negative events *can* be recorded, but sum should not be filled out when
      * doing so.  This is specifically to enforce compatibility w/ OpenMetrics,
-     * see: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary
+     * see: https://github.com/prometheus/OpenMetrics/blob/v1.0.0/specification/OpenMetrics.md#summary
      *
      * Generated from protobuf field <code>double sum = 5;</code>
      * @param float $var

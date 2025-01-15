@@ -21,7 +21,7 @@ use Google\Protobuf\Internal\GPBUtil;
  * - Data is one of the possible types (Sum, Gauge, Histogram, Summary).
  * - DataPoint contains timestamps, attributes, and one of the possible value type
  *   fields.
- *     Metric
+ *    Metric
  *  +------------+
  *  |name        |
  *  |description |
