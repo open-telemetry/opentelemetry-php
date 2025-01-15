@@ -27,12 +27,11 @@ $loggerProvider = new LoggerProvider(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
-$eventLoggerProvider = new EventLoggerProvider($loggerProvider);
-$eventLogger = $eventLoggerProvider->getEventLogger('demo', '1.0', 'https://opentelemetry.io/schemas/1.7.1', ['foo' => 'bar']);
+$logger = $loggerProvider->getLogger('demo', '1.0', 'https://opentelemetry.io/schemas/1.7.1', ['foo' => 'bar']);
 
-$eventLogger->emit(
+$logger->emitEvent(
     name: 'foo',
-    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
     timestamp: (new \DateTime())->getTimestamp() * LogRecord::NANOS_PER_SECOND,
     severityNumber: Severity::INFO,
+    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
 );

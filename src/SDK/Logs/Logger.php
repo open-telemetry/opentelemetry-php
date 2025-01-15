@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\Severity;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 
@@ -20,6 +25,7 @@ class Logger implements LoggerInterface
 {
     use LogsMessagesTrait;
     private LoggerConfig $config;
+    private ClockInterface $clock;
 
     /**
      * @internal
@@ -29,8 +35,10 @@ class Logger implements LoggerInterface
         private readonly LoggerSharedState $loggerSharedState,
         private readonly InstrumentationScopeInterface $scope,
         ?Configurator $configurator = null,
+        ?ClockInterface $clock = null,
     ) {
         $this->config = $configurator ? $configurator->resolve($scope) : LoggerConfig::default();
+        $this->clock = $clock ?? Clock::getDefault();
     }
 
     public function emit(LogRecord $logRecord): void
@@ -63,5 +71,28 @@ class Logger implements LoggerInterface
     public function updateConfig(Configurator $configurator): void
     {
         $this->config = $configurator->resolve($this->scope);
+    }
+
+    public function emitEvent(
+        string $name,
+        ?int $timestamp = null,
+        ?int $observerTimestamp = null,
+        ?ContextInterface $context = null,
+        ?Severity $severityNumber = null,
+        ?string $severityText = null,
+        mixed $body = null,
+        iterable $attributes = [],
+    ): void {
+        $logRecord = new LogRecord();
+        $logRecord->setEventName($name);
+        $timestamp && $logRecord->setTimestamp($timestamp);
+        $logRecord->setObservedTimestamp($observerTimestamp ?? $this->clock->now());
+        $logRecord->setContext($context ?? Context::getCurrent());
+        $severityNumber && $logRecord->setSeverityNumber($severityNumber);
+        $severityText && $logRecord->setSeverityText($severityText);
+        $body && $logRecord->setBody($body);
+        $logRecord->setAttributes($attributes);
+
+        $this->emit($logRecord);
     }
 }

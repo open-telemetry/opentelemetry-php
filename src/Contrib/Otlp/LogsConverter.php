@@ -28,6 +28,7 @@ class LogsConverter
     /**
      * @param iterable<ReadableLogRecord> $logs
      * @psalm-suppress InvalidArgument
+     * @todo logs event_id from proto 1.5.0
      */
     public function convert(iterable $logs): ExportLogsServiceRequest
     {

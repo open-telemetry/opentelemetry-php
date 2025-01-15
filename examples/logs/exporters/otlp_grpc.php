@@ -11,7 +11,6 @@ use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -29,18 +28,17 @@ $loggerProvider = new LoggerProvider(
         (new LogRecordLimitsBuilder())->build()->getAttributeFactory()
     )
 );
-$eventLoggerProvider = new EventLoggerProvider($loggerProvider);
-$eventLogger = $eventLoggerProvider->getEventLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
+$logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 
-$eventLogger->emit(
+$logger->emitEvent(
     name: 'foo',
-    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
-    severityNumber: Severity::INFO
+    severityNumber: Severity::INFO,
+    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']
 );
 
-$eventLogger->emit(
-    'bar',
-    'otel is great'
+$logger->emitEvent(
+    name: 'bar',
+    body: 'otel is great'
 );
 
 $loggerProvider->shutdown();

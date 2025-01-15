@@ -16,13 +16,13 @@ $sdk = $config
 
 $tracer = $sdk->getTracerProvider()->getTracer('demo');
 $meter = $sdk->getMeterProvider()->getMeter('demo');
-$eventLogger = $sdk->getEventLoggerProvider()->getEventLogger('demo');
+$logger = $sdk->getLoggerProvider()->getLogger('demo');
 
 $span = $tracer->spanBuilder('root')->startSpan();
 $scope = $span->activate();
 $meter->createCounter('cnt')->add(1);
 
-$eventLogger->emit('foo', 'hello, otel');
+$logger->emitEvent(name: 'foo', body: 'hello, otel');
 $scope->detach();
 $span->end();
 
