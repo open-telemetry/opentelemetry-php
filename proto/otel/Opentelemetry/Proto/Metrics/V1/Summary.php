@@ -15,6 +15,9 @@ use Google\Protobuf\Internal\GPBUtil;
  * data type. These data points cannot always be merged in a meaningful way.
  * While they can be useful in some applications, histogram data points are
  * recommended for new applications.
+ * Summary metrics do not have an aggregation temporality field. This is
+ * because the count and sum fields of a SummaryDataPoint are assumed to be
+ * cumulative values.
  *
  * Generated from protobuf message <code>opentelemetry.proto.metrics.v1.Summary</code>
  */
