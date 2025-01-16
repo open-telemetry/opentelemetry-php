@@ -59,6 +59,7 @@
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
+            "src/API/_register.php",
             "src/API/Trace/functions.php",
             "src/Config/SDK/_register.php",
             "src/Contrib/Otlp/_register.php",
@@ -78,7 +79,11 @@
             "OpenTelemetry\\Tests\\": "tests/",
             "OpenTelemetry\\Example\\": "examples/src/",
             "ExampleSDK\\ComponentProvider\\": "tests/Unit/Config/SDK/Configuration/ExampleSdk/"
-        }
+        },
+        "files": [
+            "examples/src/_register.php",
+            "tests/_register.php"
+        ]
     },
     "require-dev": {
         "ext-grpc": "*",
@@ -124,32 +129,16 @@
         "spi-config": {
             "autoload-files": true,
             "prune-autoload-files": [
+                "examples/src/_register.php",
+                "src/API/_register.php",
                 "src/Contrib/Otlp/_register.php",
                 "src/Contrib/Grpc/_register.php",
                 "src/Contrib/Zipkin/_register.php",
                 "src/Extension/Propagator/B3/_register.php",
                 "src/Extension/Propagator/CloudTrace/_register.php",
                 "src/Extension/Propagator/Jaeger/_register.php",
-                "src/SDK/_register.php"
-            ]
-        },
-        "spi": {
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
-              "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
-            ],
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
-                "OpenTelemetry\\Example\\ExampleInstrumentation"
-            ],
-            "OpenTelemetry\\SDK\\Resource\\ResourceDetectorFactoryInterface": [
-                "OpenTelemetry\\Example\\TestResourceDetectorFactory"
-            ],
-            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
-                "OpenTelemetry\\Example\\ExampleConfigProvider",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
+                "src/SDK/_register.php",
+                "tests/_register.php"
             ]
         }
     }

@@ -19,7 +19,8 @@
     "require": {
         "php": "^8.2",
         "open-telemetry/context": "^1.0|^2.0",
-        "psr/log": "^1.1|^2.0|^3.0"
+        "psr/log": "^1.1|^2.0|^3.0",
+        "tbachert/spi": "^1.0.1"
     },
     "conflict": {
         "open-telemetry/sdk": "<=1.0.8"
@@ -29,6 +30,7 @@
             "OpenTelemetry\\API\\": "."
         },
         "files": [
+            "_register.php",
             "Trace/functions.php"
         ]
     },
@@ -37,9 +39,10 @@
             "dev-main": "1.1.x-dev",
             "dev-2.x": "2.x-dev"
         },
-        "spi": {
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
-                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+        "spi-config": {
+            "autoload-files": true,
+            "prune-autoload-files": [
+                "_register.php"
             ]
         }
     }

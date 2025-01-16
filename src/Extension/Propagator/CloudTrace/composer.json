@@ -19,7 +19,8 @@
     "require": {
         "php": "^8.2",
         "open-telemetry/api": "^1.0|^2.0",
-        "open-telemetry/context": "^1.0|^2.0"
+        "open-telemetry/context": "^1.0|^2.0",
+        "tbachert/spi": "^1.0.1"
     },
     "autoload": {
         "psr-4": {
