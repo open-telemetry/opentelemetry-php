@@ -21,7 +21,8 @@
     "ext-grpc": "*",
     "grpc/grpc": "*",
     "open-telemetry/sdk": "^1.0|^2.0",
-    "open-telemetry/exporter-otlp": "^1.0|^2.0"
+    "open-telemetry/exporter-otlp": "^1.0|^2.0",
+    "tbachert/spi": "^1.0.1"
   },
   "autoload": {
     "psr-4": {
