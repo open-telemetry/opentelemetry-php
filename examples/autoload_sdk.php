@@ -19,6 +19,6 @@ $instrumentation = new \OpenTelemetry\API\Instrumentation\CachedInstrumentation(
 
 $instrumentation->tracer()->spanBuilder('root')->startSpan()->end();
 $instrumentation->meter()->createCounter('cnt')->add(1);
-$instrumentation->logger()->emitEvent('foo', body: 'hello, otel');
+//$instrumentation->logger()->emitEvent('foo', body: 'hello, otel');
 
 echo 'Finished!' . PHP_EOL;

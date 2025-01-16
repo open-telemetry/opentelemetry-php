@@ -22,7 +22,7 @@ $span = $tracer->spanBuilder('root')->startSpan();
 $scope = $span->activate();
 $meter->createCounter('cnt')->add(1);
 
-$logger->emitEvent(name: 'foo', body: 'hello, otel');
+//$logger->emitEvent(name: 'foo', body: 'hello, otel');
 $scope->detach();
 $span->end();
 

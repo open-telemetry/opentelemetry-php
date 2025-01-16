@@ -27,9 +27,9 @@ $loggerTwo = $loggerProvider->getLogger('demo', '2.0');
 
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 
-$loggerOne->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
-$loggerOne->emitEvent('bar', body: 'hello world');
-$loggerTwo->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
+//$loggerOne->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
+//$loggerOne->emitEvent('bar', body: 'hello world');
+//$loggerTwo->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
 
 //shut down logger provider
 $loggerProvider->shutdown();

@@ -39,7 +39,7 @@ echo 'Span id: ' . $span->getContext()->getSpanId() . PHP_EOL;
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 
-$logger->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
+//$logger->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
 
 //end span
 $span->end();

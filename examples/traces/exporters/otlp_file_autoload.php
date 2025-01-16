@@ -17,7 +17,7 @@ $instrumentation = new CachedInstrumentation('demo');
 
 $instrumentation->tracer()->spanBuilder('root')->startSpan()->end();
 $instrumentation->meter()->createCounter('cnt')->add(1);
-$instrumentation->logger()->emitEvent('foo');
+//$instrumentation->logger()->emitEvent('foo');
 
 echo PHP_EOL . 'OTLP/stdout autoload example complete!';
 echo PHP_EOL;

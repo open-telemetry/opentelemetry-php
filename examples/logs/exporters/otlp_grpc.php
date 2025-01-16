@@ -30,7 +30,7 @@ $loggerProvider = new LoggerProvider(
 );
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 
-$logger->emitEvent(
+/*$logger->emitEvent(
     name: 'foo',
     severityNumber: Severity::INFO,
     body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']
@@ -39,6 +39,6 @@ $logger->emitEvent(
 $logger->emitEvent(
     name: 'bar',
     body: 'otel is great'
-);
+);*/
 
 $loggerProvider->shutdown();

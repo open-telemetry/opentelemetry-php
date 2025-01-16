@@ -25,6 +25,6 @@ $logger = $sdk->getLoggerProvider()->getLogger('demo');
 
 $tracer->spanBuilder('root')->startSpan()->end();
 $meter->createCounter('cnt')->add(1);
-$logger->emitEvent(name: 'foo', body: 'hello, otel');
+//$logger->emitEvent(name: 'foo', body: 'hello, otel');
 
 echo 'Finished!' . PHP_EOL;

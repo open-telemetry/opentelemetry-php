@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -132,32 +131,5 @@ class LoggerTest extends TestCase
         $this->processor->expects($this->never())->method('onEmit');
 
         $logger->emit(new LogRecord());
-    }
-
-    public function test_emit_event(): void
-    {
-        $logger = new Logger($this->sharedState, $this->scope);
-
-        $now = (int) (microtime(true) * LogRecord::NANOS_PER_SECOND);
-
-        $this->processor->expects($this->once())->method('onEmit')
-            ->with(
-                $this->callback(function (ReadWriteLogRecord $record) {
-                    $this->assertNotNull($record->getObservedTimestamp());
-                    $this->assertSame('my-event', $record->getEventName());
-
-                    return true;
-                }),
-                $this->anything(),
-            );
-
-        $logger->emitEvent(
-            name: 'my-event',
-            timestamp: $now,
-            severityNumber: Severity::DEBUG,
-            severityText: 'DEBUG',
-            body: 'my-event-body',
-            attributes: ['foo' => 'bar'],
-        );
     }
 }
