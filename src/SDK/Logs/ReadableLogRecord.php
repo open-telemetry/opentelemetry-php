@@ -37,6 +37,7 @@ class ReadableLogRecord extends LogRecord
         $this->spanContext = Span::fromContext($context)->getContext();
         $this->severityNumber = $logRecord->severityNumber;
         $this->severityText = $logRecord->severityText;
+        $this->eventName = $logRecord->eventName;
 
         //convert attributes now so that excess data is not sent to processors
         $this->convertedAttributes = $this->loggerSharedState
@@ -92,6 +93,11 @@ class ReadableLogRecord extends LogRecord
     public function getBody()
     {
         return $this->body;
+    }
+
+    public function getEventName(): ?string
+    {
+        return $this->eventName;
     }
 
     public function getAttributes(): AttributesInterface

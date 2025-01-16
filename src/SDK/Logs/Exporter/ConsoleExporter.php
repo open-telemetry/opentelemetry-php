@@ -68,6 +68,7 @@ class ConsoleExporter implements LogRecordExporterInterface
             'severity_number' => $record->getSeverityNumber(),
             'severity_text' => $record->getSeverityText(),
             'body' => $record->getBody(),
+            'event_name' => $record->getEventName(),
             'trace_id' => $spanContext !== null ? $spanContext->getTraceId() : '',
             'span_id' => $spanContext !== null ? $spanContext->getSpanId() : '',
             'trace_flags' => $spanContext !== null ? $spanContext->getTraceFlags() : null,
