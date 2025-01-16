@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
@@ -32,10 +33,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        $endpoint = $properties['output_stream'];
-        if ($endpoint === 'stdout') {
-            $endpoint = 'php://stdout';
-        }
+        $endpoint = OutputStreamParser::parse($properties['output_stream']);
 
         $temporality = match ($properties['temporality_preference']) {
             'cumulative' => Temporality::CUMULATIVE,

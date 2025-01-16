@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
@@ -29,10 +30,7 @@ final class LogRecordExporterOtlpFile implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
-        $endpoint = $properties['output_stream'];
-        if ($endpoint === 'stdout') {
-            $endpoint = 'php://stdout';
-        }
+        $endpoint = OutputStreamParser::parse($properties['output_stream']);
 
         return new LogsExporter(Registry::transportFactory('stream')->create(
             endpoint: $endpoint,

@@ -15,9 +15,11 @@ disabled: false
 # Configure general attribute limits. See also tracer_provider.limits, logger_provider.limits.
 attribute_limits:
   # Configure max attribute value size.
+  # Value must be non-negative.
   # If omitted or null, there is no limit.
   attribute_value_length_limit: 4096
   # Configure max attribute count.
+  # Value must be non-negative.
   # If omitted or null, 128 is used.
   attribute_count_limit: 128
 # Configure logger provider.
@@ -28,15 +30,17 @@ logger_provider:
     - # Configure a batch log record processor.
       batch:
         # Configure delay interval (in milliseconds) between two consecutive exports.
+        # Value must be non-negative.
         # If omitted or null, 1000 is used.
         schedule_delay: 5000
         # Configure maximum allowed time (in milliseconds) to export data.
+        # Value must be non-negative. A value of 0 indicates no limit (infinity).
         # If omitted or null, 30000 is used.
         export_timeout: 30000
-        # Configure maximum queue size.
+        # Configure maximum queue size. Value must be positive.
         # If omitted or null, 2048 is used.
         max_queue_size: 2048
-        # Configure maximum batch size.
+        # Configure maximum batch size. Value must be positive.
         # If omitted or null, 512 is used.
         max_export_batch_size: 512
         # Configure exporter.
@@ -44,13 +48,16 @@ logger_provider:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
             endpoint: http://localhost:4318/v1/logs
-            # Configure certificate. Absolute path to certificate file.
+            # Configure certificate.
+            # Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate: /app/cert.pem
-            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # Configure mTLS private client key.
+            # Absolute path to client key in PEM format. If set, .client_certificate must also be set.
             # If omitted or null, mTLS is not used.
             client_key: /app/cert.pem
-            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # Configure mTLS client certificate.
+            # Absolute path to certificate file. If set, .client_key must also be set.
             # If omitted or null, mTLS is not used.
             client_certificate: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
@@ -62,13 +69,16 @@ logger_provider:
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
             headers_list: "api-key=1234"
-            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure the encoding used for messages. Values include: protobuf, json. Implementations may not support json.
+            # Configure the encoding used for messages.
+            # Values include: protobuf, json. Implementations may not support json.
             # If omitted or null, protobuf is used.
             encoding: protobuf
     - # Configure a batch log record processor.
@@ -80,13 +90,16 @@ logger_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate. Absolute path to certificate file.
+            # Configure certificate.
+            # Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate: /app/cert.pem
-            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # Configure mTLS private client key.
+            # Absolute path to client key in PEM format. If set, .client_certificate must also be set.
             # If omitted or null, mTLS is not used.
             client_key: /app/cert.pem
-            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # Configure mTLS client certificate.
+            # Absolute path to certificate file. If set, .client_key must also be set.
             # If omitted or null, mTLS is not used.
             client_certificate: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
@@ -98,15 +111,38 @@ logger_provider:
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
             headers_list: "api-key=1234"
-            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # Configure client transport security for the exporter's connection.
+            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
+    - # Configure a batch log record processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with file transport.
+          otlp_file:
+            # Configure output stream.
+            # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+            # If omitted or null, stdout is used.
+            output_stream: file:///var/log/logs.jsonl
+    - # Configure a batch log record processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with file transport.
+          otlp_file:
+            # Configure output stream.
+            # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+            # If omitted or null, stdout is used.
+            output_stream: stdout
     - # Configure a simple log record processor.
       simple:
         # Configure exporter.
@@ -116,9 +152,11 @@ logger_provider:
   # Configure log record limits. See also attribute_limits.
   limits:
     # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit.
+    # Value must be non-negative.
     # If omitted or null, there is no limit.
     attribute_value_length_limit: 4096
     # Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
+    # Value must be non-negative.
     # If omitted or null, 128 is used.
     attribute_count_limit: 128
 # Configure meter provider.
@@ -170,9 +208,11 @@ meter_provider:
     - # Configure a periodic metric reader.
       periodic:
         # Configure delay interval (in milliseconds) between start of two consecutive exports.
+        # Value must be non-negative.
         # If omitted or null, 60000 is used.
         interval: 60000
         # Configure maximum allowed time (in milliseconds) to export data.
+        # Value must be non-negative. A value of 0 indicates no limit (infinity).
         # If omitted or null, 30000 is used.
         timeout: 30000
         # Configure exporter.
@@ -182,13 +222,16 @@ meter_provider:
             # Configure endpoint, including the metric specific path.
             # If omitted or null, http://localhost:4318/v1/metrics is used.
             endpoint: http://localhost:4318/v1/metrics
-            # Configure certificate. Absolute path to certificate file.
+            # Configure certificate.
+            # Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate: /app/cert.pem
-            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # Configure mTLS private client key.
+            # Absolute path to client key in PEM format. If set, .client_certificate must also be set.
             # If omitted or null, mTLS is not used.
             client_key: /app/cert.pem
-            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # Configure mTLS client certificate.
+            # Absolute path to certificate file. If set, .client_key must also be set.
             # If omitted or null, mTLS is not used.
             client_certificate: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
@@ -200,19 +243,24 @@ meter_provider:
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
             headers_list: "api-key=1234"
-            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure the encoding used for messages. Values include: protobuf, json. Implementations may not support json.
+            # Configure the encoding used for messages.
+            # Values include: protobuf, json. Implementations may not support json.
             # If omitted or null, protobuf is used.
             encoding: protobuf
-            # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # Configure temporality preference.
+            # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
             temporality_preference: delta
-            # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # Configure default histogram aggregation.
+            # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, explicit_bucket_histogram is used.
             default_histogram_aggregation: base2_exponential_bucket_histogram
         # Configure metric producers.
@@ -228,13 +276,16 @@ meter_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate. Absolute path to certificate file.
+            # Configure certificate.
+            # Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate: /app/cert.pem
-            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # Configure mTLS private client key.
+            # Absolute path to client key in PEM format. If set, .client_certificate must also be set.
             # If omitted or null, mTLS is not used.
             client_key: /app/cert.pem
-            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # Configure mTLS client certificate.
+            # Absolute path to certificate file. If set, .client_key must also be set.
             # If omitted or null, mTLS is not used.
             client_certificate: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
@@ -246,15 +297,52 @@ meter_provider:
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
             headers_list: "api-key=1234"
-            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # Configure client transport security for the exporter's connection.
+            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
+            # Configure temporality preference.
+            # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # If omitted or null, cumulative is used.
+            temporality_preference: delta
+            # Configure default histogram aggregation.
+            # Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # If omitted or null, explicit_bucket_histogram is used.
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - # Configure a periodic metric reader.
+      periodic:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with file transport.
+          otlp_file:
+            # Configure output stream.
+            # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+            # If omitted or null, stdout is used.
+            output_stream: file:///var/log/metrics.jsonl
+            # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # If omitted or null, cumulative is used.
+            temporality_preference: delta
+            # Configure default histogram aggregation. Values include: explicit_bucket_histogram, base2_exponential_bucket_histogram. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
+            # If omitted or null, explicit_bucket_histogram is used.
+            default_histogram_aggregation: base2_exponential_bucket_histogram
+    - # Configure a periodic metric reader.
+      periodic:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with file transport.
+          otlp_file:
+            # Configure output stream.
+            # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+            # If omitted or null, stdout is used.
+            output_stream: stdout
             # Configure temporality preference. Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
             temporality_preference: delta
@@ -267,9 +355,11 @@ meter_provider:
         exporter:
           # Configure exporter to be console.
           console:
-  # Configure views. Each view has a selector which determines the instrument(s) it applies to, and a configuration for the resulting stream(s).
+  # Configure views.
+  # Each view has a selector which determines the instrument(s) it applies to, and a configuration for the resulting stream(s).
   views:
-    - # Configure view selector. Selection criteria is additive as described in https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#instrument-selection-criteria.
+    - # Configure view selector.
+      # Selection criteria is additive as described in https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#instrument-selection-criteria.
       selector:
         # Configure instrument name selection criteria.
         # If omitted or null, all instrument names match.
@@ -288,7 +378,7 @@ meter_provider:
         meter_version: 1.0.0
         # Configure meter schema url selection criteria.
         # If omitted or null, all meter schema URLs match.
-        meter_schema_url: https://opentelemetry.io/schemas/1.27.0
+        meter_schema_url: https://opentelemetry.io/schemas/1.16.0
       # Configure view stream.
       stream:
         # Configure metric name of the resulting stream(s).
@@ -297,7 +387,8 @@ meter_provider:
         # Configure metric description of the resulting stream(s).
         # If omitted or null, the instrument's origin description is used.
         description: new_description
-        # Configure aggregation of the resulting stream(s). Values include: default, drop, explicit_bucket_histogram, base2_exponential_bucket_histogram, last_value, sum. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation.
+        # Configure aggregation of the resulting stream(s).
+        # Values include: default, drop, explicit_bucket_histogram, base2_exponential_bucket_histogram, last_value, sum. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation.
         # If omitted, default is used.
         aggregation:
           # Configure aggregation to be explicit_bucket_histogram.
@@ -336,13 +427,15 @@ meter_provider:
           # If omitted, .attribute_keys.included are included.
           excluded:
             - key3
-  # Configure the exemplar filter. Values include: trace_based, always_on, always_off. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration.
+  # Configure the exemplar filter.
+  # Values include: trace_based, always_on, always_off. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration.
   # If omitted or null, trace_based is used.
   exemplar_filter: trace_based
 # Configure text map context propagators.
 # If omitted, tracecontext and baggage are used.
 propagator:
-  # Configure the set of propagators to include in the composite text map propagator. Built-in values include: tracecontext, baggage, b3, b3multi, jaeger, none. Known third party values include: xray, ottrace. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration.
+  # Configure the set of propagators to include in the composite text map propagator.
+  # Built-in values include: tracecontext, baggage, b3, b3multi, jaeger, none. Known third party values include: xray, ottrace. For behavior of values see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration.
   composite: [ tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace ]
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
@@ -352,15 +445,17 @@ tracer_provider:
     - # Configure a batch span processor.
       batch:
         # Configure delay interval (in milliseconds) between two consecutive exports.
+        # Value must be non-negative.
         # If omitted or null, 5000 is used.
         schedule_delay: 5000
         # Configure maximum allowed time (in milliseconds) to export data.
+        # Value must be non-negative. A value of 0 indicates no limit (infinity).
         # If omitted or null, 30000 is used.
         export_timeout: 30000
-        # Configure maximum queue size.
+        # Configure maximum queue size. Value must be positive.
         # If omitted or null, 2048 is used.
         max_queue_size: 2048
-        # Configure maximum batch size.
+        # Configure maximum batch size. Value must be positive.
         # If omitted or null, 512 is used.
         max_export_batch_size: 512
         # Configure exporter.
@@ -370,13 +465,16 @@ tracer_provider:
             # Configure endpoint, including the trace specific path.
             # If omitted or null, http://localhost:4318/v1/traces is used.
             endpoint: http://localhost:4318/v1/traces
-            # Configure certificate. Absolute path to certificate file.
+            # Configure certificate.
+            # Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate: /app/cert.pem
-            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # Configure mTLS private client key.
+            # Absolute path to client key in PEM format. If set, .client_certificate must also be set.
             # If omitted or null, mTLS is not used.
             client_key: /app/cert.pem
-            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # Configure mTLS client certificate.
+            # Absolute path to certificate file. If set, .client_key must also be set.
             # If omitted or null, mTLS is not used.
             client_certificate: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
@@ -388,13 +486,16 @@ tracer_provider:
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
             headers_list: "api-key=1234"
-            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure the encoding used for messages. Values include: protobuf, json. Implementations may not support json.
+            # Configure the encoding used for messages.
+            # Values include: protobuf, json. Implementations may not support json.
             # If omitted or null, protobuf is used.
             encoding: protobuf
     - # Configure a batch span processor.
@@ -406,13 +507,16 @@ tracer_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate. Absolute path to certificate file.
+            # Configure certificate.
+            # Absolute path to certificate file.
             # If omitted or null, system default certificate verification is used for secure connections.
             certificate: /app/cert.pem
-            # Configure mTLS private client key. Absolute path to client key in PEM format. If set, .client_certificate must also be set.
+            # Configure mTLS private client key.
+            # Absolute path to client key in PEM format. If set, .client_certificate must also be set.
             # If omitted or null, mTLS is not used.
             client_key: /app/cert.pem
-            # Configure mTLS client certificate. Absolute path to certificate file. If set, .client_key must also be set.
+            # Configure mTLS client certificate.
+            # Absolute path to certificate file. If set, .client_key must also be set.
             # If omitted or null, mTLS is not used.
             client_certificate: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
@@ -424,15 +528,38 @@ tracer_provider:
             # The value is a list of comma separated key-value pairs matching the format of OTEL_EXPORTER_OTLP_HEADERS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options for details.
             # If omitted or null, no headers are added.
             headers_list: "api-key=1234"
-            # Configure compression. Values include: gzip, none. Implementations may support other compression algorithms.
+            # Configure compression.
+            # Values include: gzip, none. Implementations may support other compression algorithms.
             # If omitted or null, none is used.
             compression: gzip
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection. Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
+            # Configure client transport security for the exporter's connection.
+            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
             # If omitted or null, false is used.
             insecure: false
+    - # Configure a batch span processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with file transport.
+          otlp_file:
+            # Configure output stream.
+            # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+            # If omitted or null, stdout is used.
+            output_stream: file:///var/log/traces.jsonl
+    - # Configure a batch span processor.
+      batch:
+        # Configure exporter.
+        exporter:
+          # Configure exporter to be OTLP with file transport.
+          otlp_file:
+            # Configure output stream.
+            # Values include stdout, or scheme+destination. For example: file:///path/to/file.jsonl.
+            # If omitted or null, stdout is used.
+            output_stream: stdout
     - # Configure a batch span processor.
       batch:
         # Configure exporter.
@@ -443,6 +570,7 @@ tracer_provider:
             # If omitted or null, http://localhost:9411/api/v2/spans is used.
             endpoint: http://localhost:9411/api/v2/spans
             # Configure max time (in milliseconds) to wait for each export.
+            # Value must be non-negative. A value of 0 indicates indefinite.
             # If omitted or null, 10000 is used.
             timeout: 10000
     - # Configure a simple span processor.
@@ -454,21 +582,27 @@ tracer_provider:
   # Configure span limits. See also attribute_limits.
   limits:
     # Configure max attribute value size. Overrides .attribute_limits.attribute_value_length_limit.
+    # Value must be non-negative.
     # If omitted or null, there is no limit.
     attribute_value_length_limit: 4096
     # Configure max attribute count. Overrides .attribute_limits.attribute_count_limit.
+    # Value must be non-negative.
     # If omitted or null, 128 is used.
     attribute_count_limit: 128
     # Configure max span event count.
+    # Value must be non-negative.
     # If omitted or null, 128 is used.
     event_count_limit: 128
     # Configure max span link count.
+    # Value must be non-negative.
     # If omitted or null, 128 is used.
     link_count_limit: 128
     # Configure max attributes per span event.
+    # Value must be non-negative.
     # If omitted or null, 128 is used.
     event_attribute_count_limit: 128
     # Configure max attributes per span link.
+    # Value must be non-negative.
     # If omitted or null, 128 is used.
     link_attribute_count_limit: 128
   # Configure the sampler.
