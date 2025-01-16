@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
@@ -48,7 +49,7 @@ final class SpanExporterOtlpHttp implements ComponentProvider
             },
             headers: $headers,
             compression: $properties['compression'],
-            timeout: $properties['timeout'],
+            timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
             cacert: $properties['certificate'],
             cert: $properties['client_certificate'],
             key: $properties['client_certificate'],
@@ -75,7 +76,7 @@ final class SpanExporterOtlpHttp implements ComponentProvider
                 ->end()
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
             ->end()
         ;
 

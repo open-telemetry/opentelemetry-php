@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
@@ -57,7 +58,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
             },
             headers: $headers,
             compression: $properties['compression'],
-            timeout: $properties['timeout'],
+            timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
             cacert: $properties['certificate'],
             cert: $properties['client_certificate'],
             key: $properties['client_certificate'],
@@ -84,7 +85,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
                 ->end()
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
                 ->enumNode('temporality_preference')
                     ->values(['cumulative', 'delta', 'lowmemory'])
                     ->defaultValue('cumulative')

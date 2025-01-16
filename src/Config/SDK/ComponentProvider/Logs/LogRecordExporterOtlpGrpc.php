@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
@@ -49,7 +50,7 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
             contentType: Protocols::contentType($protocol),
             headers: $headers,
             compression: $properties['compression'],
-            timeout: $properties['timeout'],
+            timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
             cacert: $properties['certificate'],
             cert: $properties['client_certificate'],
             key: $properties['client_certificate'],
@@ -75,7 +76,7 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
                 ->end()
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10)->end()
+                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
                 ->booleanNode('insecure')->defaultNull()->end()
             ->end()
         ;
