@@ -146,7 +146,6 @@ deptrac:
           - Prometheus
       Extension:
           - +API
-          - SDK
       OtelProto:
           - GoogleProtobuf
           - Grpc
