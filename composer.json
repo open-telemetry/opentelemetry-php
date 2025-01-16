@@ -127,8 +127,7 @@
             "forward-command": true
         },
         "spi-config": {
-            "autoload-files": true,
-            "prune-autoload-files": [
+            "autoload-files": [
                 "examples/src/_register.php",
                 "src/API/_register.php",
                 "src/Contrib/Otlp/_register.php",
@@ -139,7 +138,8 @@
                 "src/Extension/Propagator/Jaeger/_register.php",
                 "src/SDK/_register.php",
                 "tests/_register.php"
-            ]
+            ],
+            "prune-autoload-files": true
         }
     }
 }

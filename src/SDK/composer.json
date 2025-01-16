@@ -55,7 +55,9 @@
             "dev-2.x": "2.x-dev"
         },
         "spi-config": {
-            "autoload-files": true,
+            "autoload-files": [
+                "_register.php"
+            ],
             "prune-autoload-files": true
         }
     }
