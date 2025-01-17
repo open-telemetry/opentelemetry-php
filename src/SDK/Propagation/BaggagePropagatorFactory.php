@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Propagation;
 ;
 
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 

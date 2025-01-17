@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Extension\Propagator\Jaeger;
+namespace OpenTelemetry\SDK\Propagation;
 
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
+use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\Extension\Propagator\Jaeger\JaegerBaggagePropagator;
 
+#[PackageDependency('open-telemetry/extension-propagator-jaeger', '^0')]
 class JaegerBaggagePropagatorFactory implements TextMapPropagatorFactoryInterface
 {
     public function create(): TextMapPropagatorInterface

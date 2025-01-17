@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Extension\Propagator\CloudTrace;
+namespace OpenTelemetry\SDK\Propagation;
 
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
+use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagator;
 
+#[PackageDependency('open-telemetry/extension-propagator-cloudtrace', '^0')]
 class CloudTraceOneWayPropagatorFactory implements TextMapPropagatorFactoryInterface
 {
     public function create(): TextMapPropagatorInterface

@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Extension\Propagator\B3;
+namespace OpenTelemetry\SDK\Propagation;
 
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
+use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 
+#[PackageDependency('open-telemetry/extension-propagator-b3', '^1')]
 class B3MultiPropagatorFactory implements TextMapPropagatorFactoryInterface
 {
     public function create(): TextMapPropagatorInterface

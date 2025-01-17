@@ -25,19 +25,12 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Extension\\Propagator\\Jaeger\\": "."
-        },
-        "files": [
-            "_register.php"
-        ]
+        }
     },
     "extra": {
         "branch-alias": {
             "dev-main": "1.0.x-dev",
             "dev-2.x": "2.x-dev"
-        },
-        "spi-config": {
-            "autoload-files": true,
-            "prune-autoload-files": true
         }
     }
 }

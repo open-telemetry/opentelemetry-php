@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Propagation;
 ;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 

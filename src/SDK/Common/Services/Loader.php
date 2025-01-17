@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Services;
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\Context\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
+use OpenTelemetry\SDK\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
@@ -21,7 +21,7 @@ use RuntimeException;
 class Loader
 {
     /**
-     * @param class-string $class
+     * @param class-string<SpiLoadableInterface> $class
      * @phan-suppress PhanTypeNonVarPassByRef
      */
     private static function getFactory(string $class, string $type): mixed

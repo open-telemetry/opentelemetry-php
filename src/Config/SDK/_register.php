@@ -16,6 +16,7 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricReaderPeriodic;
 use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorB3;
 use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorB3Multi;
 use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorBaggage;
+use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorCloudTrace;
 use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorComposite;
 use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorJaeger;
 use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\TextMapPropagatorTraceContext;
@@ -34,6 +35,7 @@ ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3Multi::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorBaggage::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorComposite::class);
+ServiceLoader::register(ComponentProvider::class, TextMapPropagatorCloudTrace::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorJaeger::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorTraceContext::class);
 
