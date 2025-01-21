@@ -2,8 +2,6 @@
 
 ## 1.x -> 2.x
 
-### API
-
 ### SDK
 
 #### SDK\Registry removed
