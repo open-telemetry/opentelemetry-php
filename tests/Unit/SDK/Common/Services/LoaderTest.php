@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\SDK\Common\Services;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Services;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
