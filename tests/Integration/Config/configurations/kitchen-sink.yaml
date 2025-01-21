@@ -695,7 +695,7 @@ resource:
         - process.command_args
   # Configure resource schema URL.
   # If omitted or null, no schema URL is used.
-  schema_url: https://opentelemetry.io/schemas/1.27.0
+  schema_url: https://opentelemetry.io/schemas/1.16.0
 # Configure instrumentation.
 instrumentation:
   # Configure general SemConv options that may apply to multiple languages and instrumentations.
