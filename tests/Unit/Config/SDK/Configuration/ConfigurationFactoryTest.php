@@ -64,6 +64,7 @@ final class ConfigurationFactoryTest extends TestCase
                     $node
                         ->children()
                             ->scalarNode('string_key')->end()
+                            ->scalarNode('env_string_key')->end()
                             ->scalarNode('other_string_key')->end()
                             ->scalarNode('another_string_key')->end()
                             ->scalarNode('string_key_with_quoted_hex_value')->end()
@@ -76,7 +77,6 @@ final class ConfigurationFactoryTest extends TestCase
                             ->scalarNode('string_key_with_default')->end()
                             ->variableNode('undefined_key')->end()
                             ->variableNode('${STRING_VALUE}')->end()
-                            ->scalarNode('env_key')->end()
                         ->end()
                     ;
 
@@ -99,6 +99,7 @@ final class ConfigurationFactoryTest extends TestCase
         $parsed = $factory->process([
             Yaml::parse(<<<'YAML'
                 string_key: ${STRING_VALUE}                           # Valid reference to STRING_VALUE
+                env_string_key: ${env:STRING_VALUE}                   # Valid reference to STRING_VALUE
                 other_string_key: "${STRING_VALUE}"                   # Valid reference to STRING_VALUE inside double quotes
                 another_string_key: "${BOOl_VALUE}"                   # Valid reference to BOOl_VALUE inside double quotes
                 string_key_with_quoted_hex_value: "${HEX_VALUE}"      # Valid reference to HEX_VALUE inside double quotes
@@ -111,13 +112,13 @@ final class ConfigurationFactoryTest extends TestCase
                 string_key_with_default: ${UNDEFINED_KEY:-fallback}   # UNDEFINED_KEY is not defined but a default value is included
                 undefined_key: ${UNDEFINED_KEY}                       # Invalid reference, UNDEFINED_KEY is not defined and is replaced with ""
                 ${STRING_VALUE}: value                                # Invalid reference, substitution is not valid in mapping keys and reference is ignored
-                env_key: ${env:STRING_VALUE}                          # Valid reference to STRING_VALUE, using `env:` prefix
                 YAML),
         ]);
 
         $this->assertSame(
             Yaml::parse(<<<'YAML'
                 string_key: value                              # Interpreted as type string, tag URI tag:yaml.org,2002:str
+                env_string_key: value                          # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 other_string_key: "value"                      # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 another_string_key: "true"                     # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 string_key_with_quoted_hex_value: "0xdeadbeef" # Interpreted as type string, tag URI tag:yaml.org,2002:str
@@ -131,7 +132,6 @@ final class ConfigurationFactoryTest extends TestCase
                 # undefined_key removed as null is treated as unset
                 undefined_key:                                 # Interpreted as type null, tag URI tag:yaml.org,2002:null
                 ${STRING_VALUE}: value                         # Interpreted as type string, tag URI tag:yaml.org,2002:str
-                env_key: value                                 # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 YAML),
             self::getPropertiesFromPlugin($parsed),
         );
