@@ -113,4 +113,8 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
         return $success;
     }
+
+    public function onEnding(ReadWriteSpanInterface $span): void
+    {
+    }
 }

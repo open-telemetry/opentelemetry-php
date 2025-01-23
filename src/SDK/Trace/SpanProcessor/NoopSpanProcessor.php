@@ -44,4 +44,8 @@ class NoopSpanProcessor implements SpanProcessorInterface
     {
         return $this->forceFlush();
     }
+
+    public function onEnding(ReadWriteSpanInterface $span): void
+    {
+    } //@codeCoverageIgnore
 }
