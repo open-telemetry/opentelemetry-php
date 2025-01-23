@@ -174,4 +174,16 @@ class SpanExporterFactoryTest extends TestCase
             ],
         ];
     }
+
+    public function test_type(): void
+    {
+        $factory = new SpanExporterFactory();
+        $this->assertSame('otlp', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new SpanExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

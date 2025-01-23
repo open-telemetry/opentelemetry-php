@@ -17,4 +17,16 @@ class ConsoleSpanExporterFactoryTest extends TestCase
         $exporter = (new ConsoleSpanExporterFactory())->create();
         $this->assertInstanceOf(SpanExporterInterface::class, $exporter);
     }
+
+    public function test_type(): void
+    {
+        $factory = new ConsoleSpanExporterFactory();
+        $this->assertSame('console', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new ConsoleSpanExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

@@ -115,9 +115,9 @@ final class PsrUtils
     public static function compression($compression): array
     {
         if (is_array($compression)) {
-            return $compression;
+            return array_filter($compression, fn ($value): bool => $value !== 'none');
         }
-        if (!$compression) {
+        if ($compression === 'none' || !$compression) {
             return [];
         }
         if (!str_contains((string) $compression, ',')) {

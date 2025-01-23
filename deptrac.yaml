@@ -131,6 +131,7 @@ deptrac:
       SDK:
           - +API
           - ConfigSDK
+          - Extension
           - SemConv
           - PsrHttp
           - HttpPlug

@@ -229,4 +229,16 @@ class MetricExporterFactoryTest extends TestCase
             ],
         ];
     }
+
+    public function test_type(): void
+    {
+        $factory = new MetricExporterFactory();
+        $this->assertSame('otlp', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new MetricExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

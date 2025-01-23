@@ -13,4 +13,14 @@ class InMemoryExporterFactory implements MetricExporterFactoryInterface
     {
         return new InMemoryExporter();
     }
+
+    public function type(): string
+    {
+        return 'memory';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

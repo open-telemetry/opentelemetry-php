@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 /**
  * @implements ComponentProvider<TextMapPropagatorInterface>
  */
-#[PackageDependency('open-telemetry/extension-propagator-jaeger', '^0.0.2')]
+#[PackageDependency('open-telemetry/extension-propagator-jaeger', '^0.0.3')]
 final class TextMapPropagatorJaeger implements ComponentProvider
 {
     /**

@@ -24,10 +24,7 @@
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\Extension\\Propagator\\Jaeger\\": "."
-        },
-        "files": [
-            "_register.php"
-        ]
+        }
     },
     "extra": {
         "branch-alias": {

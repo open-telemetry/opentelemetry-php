@@ -16,4 +16,14 @@ class StdoutSpanExporterFactory implements SpanExporterFactoryInterface
 
         return new SpanExporter($transport);
     }
+
+    public function type(): string
+    {
+        return 'otlp/stdout';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

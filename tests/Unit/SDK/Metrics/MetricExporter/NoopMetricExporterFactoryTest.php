@@ -17,4 +17,16 @@ class NoopMetricExporterFactoryTest extends TestCase
         $exporter = (new NoopMetricExporterFactory())->create();
         $this->assertInstanceOf(MetricExporterInterface::class, $exporter);
     }
+
+    public function test_type(): void
+    {
+        $factory = new NoopMetricExporterFactory();
+        $this->assertSame('none', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new NoopMetricExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

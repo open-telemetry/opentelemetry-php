@@ -19,4 +19,16 @@ class GrpcTransportFactoryTest extends TestCase
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
+
+    public function test_type(): void
+    {
+        $factory = new GrpcTransportFactory();
+        $this->assertSame('grpc', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new GrpcTransportFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

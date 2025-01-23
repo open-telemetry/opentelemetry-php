@@ -13,4 +13,14 @@ class ConsoleMetricExporterFactory implements MetricExporterFactoryInterface
     {
         return new ConsoleMetricExporter();
     }
+
+    public function type(): string
+    {
+        return 'console';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

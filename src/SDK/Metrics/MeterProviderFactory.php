@@ -9,13 +9,13 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
@@ -42,7 +42,7 @@ class MeterProviderFactory
         $exporterName = $exporters[0];
 
         try {
-            $factory = Registry::metricExporterFactory($exporterName);
+            $factory = Loader::metricExporterFactory($exporterName);
             $exporter = $factory->create();
         } catch (\Throwable $t) {
             self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));

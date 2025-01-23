@@ -7,7 +7,7 @@ namespace OpenTelemetry\Example;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
-use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
@@ -16,7 +16,7 @@ use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-$transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/logs', 'application/json');
+$transport = (new PsrTransportFactory())->create('http://collector:4318/v1/logs', 'application/json');
 $exporter = new LogsExporter($transport);
 
 $loggerProvider = new LoggerProvider(
