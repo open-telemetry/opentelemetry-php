@@ -125,5 +125,11 @@ class BaggageTest extends TestCase
         );
     }
 
+    public function test_empty_name_disallowed(): void
+    {
+        $baggage = Baggage::getBuilder()->set('', 'bar')->build();
+        $this->assertTrue($baggage->isEmpty());
+    }
+
     // endregion
 }
