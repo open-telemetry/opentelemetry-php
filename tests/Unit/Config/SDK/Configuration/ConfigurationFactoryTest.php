@@ -76,6 +76,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->scalarNode('string_key_with_default')->end()
                             ->variableNode('undefined_key')->end()
                             ->variableNode('${STRING_VALUE}')->end()
+                            ->scalarNode('env_key')->end()
                         ->end()
                     ;
 
@@ -110,6 +111,7 @@ final class ConfigurationFactoryTest extends TestCase
                 string_key_with_default: ${UNDEFINED_KEY:-fallback}   # UNDEFINED_KEY is not defined but a default value is included
                 undefined_key: ${UNDEFINED_KEY}                       # Invalid reference, UNDEFINED_KEY is not defined and is replaced with ""
                 ${STRING_VALUE}: value                                # Invalid reference, substitution is not valid in mapping keys and reference is ignored
+                env_key: ${env:STRING_VALUE}                          # Valid reference to STRING_VALUE, using `env:` prefix
                 YAML),
         ]);
 
@@ -129,6 +131,7 @@ final class ConfigurationFactoryTest extends TestCase
                 # undefined_key removed as null is treated as unset
                 undefined_key:                                 # Interpreted as type null, tag URI tag:yaml.org,2002:null
                 ${STRING_VALUE}: value                         # Interpreted as type string, tag URI tag:yaml.org,2002:str
+                env_key: value                                 # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 YAML),
             self::getPropertiesFromPlugin($parsed),
         );
@@ -144,6 +147,24 @@ final class ConfigurationFactoryTest extends TestCase
             'resource' => [
                 'attributes' => [
                     'service.name' => '${OTEL_SERVICE_NAME}',
+                ],
+            ],
+        ]]);
+
+        $this->assertInstanceOf(ComponentPlugin::class, $parsed);
+        $this->assertSame('example-service', self::getPropertiesFromPlugin($parsed)['resource']['attributes']['service.name']);
+    }
+
+    #[BackupGlobals(true)]
+    #[CoversNothing]
+    public function test_env_substitution_with_env_prefix(): void
+    {
+        $_SERVER['OTEL_SERVICE_NAME'] = 'example-service';
+        $parsed = self::factory()->process([[
+            'file_format' => '0.1',
+            'resource' => [
+                'attributes' => [
+                    'service.name' => '${env:OTEL_SERVICE_NAME}',
                 ],
             ],
         ]]);
