@@ -77,6 +77,7 @@ final class ConfigurationFactoryTest extends TestCase
                             ->scalarNode('string_key_with_default')->end()
                             ->variableNode('undefined_key')->end()
                             ->variableNode('${STRING_VALUE}')->end()
+                            ->scalarNode('recursive_key')->end()
                         ->end()
                     ;
 
@@ -91,6 +92,8 @@ final class ConfigurationFactoryTest extends TestCase
                     'FLOAT_VALUE' => '1.1',
                     'HEX_VALUE' => '0xdeadbeef',
                     'INVALID_MAP_VALUE' => "value\nkey:value",
+                    'DO_NOT_REPLACE_ME' => 'Never use this value', // An unused environment variable
+                    'REPLACE_ME' => '${DO_NOT_REPLACE_ME}', // A valid replacement text, used verbatim, not replaced with "Never use this value"
                 ]),
             ]),
         );
@@ -112,6 +115,7 @@ final class ConfigurationFactoryTest extends TestCase
                 string_key_with_default: ${UNDEFINED_KEY:-fallback}   # UNDEFINED_KEY is not defined but a default value is included
                 undefined_key: ${UNDEFINED_KEY}                       # Invalid reference, UNDEFINED_KEY is not defined and is replaced with ""
                 ${STRING_VALUE}: value                                # Invalid reference, substitution is not valid in mapping keys and reference is ignored
+                recursive_key: ${REPLACE_ME}                          # Valid reference to REPLACE_ME
                 YAML),
         ]);
 
@@ -132,6 +136,7 @@ final class ConfigurationFactoryTest extends TestCase
                 # undefined_key removed as null is treated as unset
                 undefined_key:                                 # Interpreted as type null, tag URI tag:yaml.org,2002:null
                 ${STRING_VALUE}: value                         # Interpreted as type string, tag URI tag:yaml.org,2002:str
+                recursive_key: ${DO_NOT_REPLACE_ME}            # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 YAML),
             self::getPropertiesFromPlugin($parsed),
         );
@@ -186,6 +191,29 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->assertInstanceOf(ComponentPlugin::class, $parsed);
         $this->assertSame(2048, self::getPropertiesFromPlugin($parsed)['attribute_limits']['attribute_value_length_limit']);
+    }
+
+    /**
+     * It MUST NOT be possible to inject environment variable by environment variables.
+     * For example, see references to DO_NOT_REPLACE_ME environment variable
+     */
+    #[BackupGlobals(true)]
+    #[CoversNothing]
+    public function test_env_substitution_recursive_does_not_inject_environment_variables(): void
+    {
+        $_SERVER['DO_NOT_REPLACE_ME'] = 'Never use this value';
+        $_SERVER['REPLACE_ME'] = '${DO_NOT_REPLACE_ME}';
+        $parsed = self::factory()->process([[
+            'file_format' => '0.1',
+            'resource' => [
+                'attributes' => [
+                    'service.name' => '${REPLACE_ME}',
+                ],
+            ],
+        ]]);
+
+        $this->assertInstanceOf(ComponentPlugin::class, $parsed);
+        $this->assertSame('${DO_NOT_REPLACE_ME}', self::getPropertiesFromPlugin($parsed)['resource']['attributes']['service.name']);
     }
 
     /**

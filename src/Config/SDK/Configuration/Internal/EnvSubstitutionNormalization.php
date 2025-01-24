@@ -50,8 +50,7 @@ final class EnvSubstitutionNormalization implements Normalization
                 default => FILTER_DEFAULT,
             };
             $node->beforeNormalization()->ifString()->then(fn (string $v) => $this->replaceEnvVariables($v, $filter))->end();
-        }
-        if ($node instanceof VariableNodeDefinition) {
+        } elseif ($node instanceof VariableNodeDefinition) {
             $node->beforeNormalization()->always($this->replaceEnvVariablesRecursive(...))->end();
         }
 
