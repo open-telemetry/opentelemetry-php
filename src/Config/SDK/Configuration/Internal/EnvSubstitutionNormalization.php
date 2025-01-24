@@ -50,8 +50,7 @@ final class EnvSubstitutionNormalization implements Normalization
                 default => FILTER_DEFAULT,
             };
             $node->beforeNormalization()->ifString()->then(fn (string $v) => $this->replaceEnvVariables($v, $filter))->end();
-        }
-        if ($node instanceof VariableNodeDefinition) {
+        } elseif ($node instanceof VariableNodeDefinition) {
             $node->beforeNormalization()->always($this->replaceEnvVariablesRecursive(...))->end();
         }
 
@@ -65,7 +64,7 @@ final class EnvSubstitutionNormalization implements Normalization
     private function replaceEnvVariables(string $value, int $filter = FILTER_DEFAULT): mixed
     {
         $replaced = preg_replace_callback(
-            '/\$\{(?<ENV_NAME>[a-zA-Z_]\w*)(?::-(?<DEFAULT_VALUE>[^\n]*))?}/',
+            '/\$\{(?:env:)?(?<ENV_NAME>[a-zA-Z_]\w*)(?::-(?<DEFAULT_VALUE>[^\n]*))?}/',
             fn (array $matches): string => $this->envReader->read($matches['ENV_NAME']) ?? $matches['DEFAULT_VALUE'] ?? '',
             $value,
             -1,
