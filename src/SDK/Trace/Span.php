@@ -138,6 +138,10 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     /** @inheritDoc */
     public function setAttributes(iterable $attributes): self
     {
+        if ($this->hasEnded) {
+            return $this;
+        }
+
         foreach ($attributes as $key => $value) {
             $this->attributesBuilder[$key] = $value;
         }
@@ -244,7 +248,10 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         return $this;
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc
+     * @psalm-suppress NoInterfaceProperties
+     **/
     public function end(?int $endEpochNanos = null): void
     {
         if ($this->hasEnded) {
@@ -252,12 +259,14 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         }
 
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
-        $this->hasEnded = true;
-        $this->spanProcessor->onEnding($this);
-
-        $this->checkForDroppedElements();
+        $span = clone $this;
+        $this->hasEnded = true; // prevent further modifications to the span by async code
+        $this->spanProcessor->onEnding($span);
+        $span->hasEnded = true;
+        $span->end();
 
         $this->spanProcessor->onEnd($this);
+        $this->checkForDroppedElements();
     }
 
     /** @inheritDoc */

@@ -3,5 +3,8 @@
         "vimeo/psalm": "^5.24",
         "psalm/plugin-mockery": "^1",
         "psalm/plugin-phpunit": "^0.18.4"
+    },
+    "replace": {
+        "amphp/amp": "*"
     }
 }

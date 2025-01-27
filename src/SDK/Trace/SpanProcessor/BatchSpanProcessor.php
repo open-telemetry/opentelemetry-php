@@ -143,7 +143,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     {
     }
 
-    public function onEnding(ReadWriteSpanInterface $span): void
+    public function onEnding(ReadWriteSpanInterface &$span): void
     {
     }
 
