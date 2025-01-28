@@ -11,7 +11,7 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
@@ -33,7 +33,7 @@ interface TraceAttributes
     public const ARTIFACT_ATTESTATION_FILENAME = 'artifact.attestation.filename';
 
     /**
-     * The full [hash value (see glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf), of the built attestation. Some envelopes in the software attestation space also refer to this as the [digest](https://github.com/in-toto/attestation/blob/main/spec/README.md#in-toto-attestation-framework-spec).
+     * The full [hash value (see glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf), of the built attestation. Some envelopes in the [software attestation space](https://github.com/in-toto/attestation/tree/main/spec) also refer to this as the **digest**.
      */
     public const ARTIFACT_ATTESTATION_HASH = 'artifact.attestation.hash';
 
@@ -262,6 +262,11 @@ interface TraceAttributes
     public const AWS_EKS_CLUSTER_ARN = 'aws.eks.cluster.arn';
 
     /**
+     * The AWS extended request ID as returned in the response header `x-amz-id-2`.
+     */
+    public const AWS_EXTENDED_REQUEST_ID = 'aws.extended_request_id';
+
+    /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
      *
      * This may be different from `cloud.resource_id` if an alias is involved.
@@ -295,7 +300,7 @@ interface TraceAttributes
     public const AWS_LOG_STREAM_NAMES = 'aws.log.stream.names';
 
     /**
-     * The AWS request ID as returned in the response headers `x-amz-request-id` or `x-amz-requestid`.
+     * The AWS request ID as returned in the response headers `x-amzn-requestid`, `x-amzn-request-id` or `x-amz-request-id`.
      */
     public const AWS_REQUEST_ID = 'aws.request_id';
 
@@ -380,6 +385,43 @@ interface TraceAttributes
     public const AZ_SERVICE_REQUEST_ID = 'az.service_request_id';
 
     /**
+     * The unique identifier of the client instance.
+     */
+    public const AZURE_CLIENT_ID = 'azure.client.id';
+
+    /**
+     * Cosmos client connection mode.
+     */
+    public const AZURE_COSMOSDB_CONNECTION_MODE = 'azure.cosmosdb.connection.mode';
+
+    /**
+     * Account or request [consistency level](https://learn.microsoft.com/azure/cosmos-db/consistency-levels).
+     */
+    public const AZURE_COSMOSDB_CONSISTENCY_LEVEL = 'azure.cosmosdb.consistency.level';
+
+    /**
+     * List of regions contacted during operation in the order that they were contacted. If there is more than one region listed, it indicates that the operation was performed on multiple regions i.e. cross-regional call.
+     *
+     * Region name matches the format of `displayName` in [Azure Location API](https://learn.microsoft.com/rest/api/subscription/subscriptions/list-locations?view=rest-subscription-2021-10-01&tabs=HTTP#location)
+     */
+    public const AZURE_COSMOSDB_OPERATION_CONTACTED_REGIONS = 'azure.cosmosdb.operation.contacted_regions';
+
+    /**
+     * The number of request units consumed by the operation.
+     */
+    public const AZURE_COSMOSDB_OPERATION_REQUEST_CHARGE = 'azure.cosmosdb.operation.request_charge';
+
+    /**
+     * Request payload size in bytes.
+     */
+    public const AZURE_COSMOSDB_REQUEST_BODY_SIZE = 'azure.cosmosdb.request.body.size';
+
+    /**
+     * Cosmos DB sub status code.
+     */
+    public const AZURE_COSMOSDB_RESPONSE_SUB_STATUS_CODE = 'azure.cosmosdb.response.sub_status_code';
+
+    /**
      * Array of brand name and version separated by a space
      * This value is intended to be taken from the [UA client hints API](https://wicg.github.io/ua-client-hints/#interface) (`navigator.userAgentData.brands`).
      */
@@ -405,9 +447,44 @@ interface TraceAttributes
     public const BROWSER_PLATFORM = 'browser.platform';
 
     /**
+     * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL = 'cassandra.consistency.level';
+
+    /**
+     * The data center of the coordinating node for a query.
+     */
+    public const CASSANDRA_COORDINATOR_DC = 'cassandra.coordinator.dc';
+
+    /**
+     * The ID of the coordinating node for a query.
+     */
+    public const CASSANDRA_COORDINATOR_ID = 'cassandra.coordinator.id';
+
+    /**
+     * The fetch size used for paging, i.e. how many rows will be returned at once.
+     */
+    public const CASSANDRA_PAGE_SIZE = 'cassandra.page.size';
+
+    /**
+     * Whether or not the query is idempotent.
+     */
+    public const CASSANDRA_QUERY_IDEMPOTENT = 'cassandra.query.idempotent';
+
+    /**
+     * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
+     */
+    public const CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'cassandra.speculative_execution.count';
+
+    /**
      * The human readable name of the pipeline within a CI/CD system.
      */
     public const CICD_PIPELINE_NAME = 'cicd.pipeline.name';
+
+    /**
+     * The result of a pipeline run.
+     */
+    public const CICD_PIPELINE_RESULT = 'cicd.pipeline.result';
 
     /**
      * The unique identifier of a pipeline run within a CI/CD system.
@@ -415,7 +492,12 @@ interface TraceAttributes
     public const CICD_PIPELINE_RUN_ID = 'cicd.pipeline.run.id';
 
     /**
-     * The human readable name of a task within a pipeline. Task here most closely aligns with a [computing process](https://en.wikipedia.org/wiki/Pipeline_(computing)) in a pipeline. Other terms for tasks include commands, steps, and procedures.
+     * The pipeline run goes through these states during its lifecycle.
+     */
+    public const CICD_PIPELINE_RUN_STATE = 'cicd.pipeline.run.state';
+
+    /**
+     * The human readable name of a task within a pipeline. Task here most closely aligns with a [computing process](https://wikipedia.org/wiki/Pipeline_(computing)) in a pipeline. Other terms for tasks include commands, steps, and procedures.
      */
     public const CICD_PIPELINE_TASK_NAME = 'cicd.pipeline.task.name';
 
@@ -425,7 +507,7 @@ interface TraceAttributes
     public const CICD_PIPELINE_TASK_RUN_ID = 'cicd.pipeline.task.run.id';
 
     /**
-     * The [URL](https://en.wikipedia.org/wiki/URL) of the pipeline run providing the complete address in order to locate and identify the pipeline run.
+     * The [URL](https://wikipedia.org/wiki/URL) of the pipeline run providing the complete address in order to locate and identify the pipeline run.
      */
     public const CICD_PIPELINE_TASK_RUN_URL_FULL = 'cicd.pipeline.task.run.url.full';
 
@@ -433,6 +515,16 @@ interface TraceAttributes
      * The type of the task within a pipeline.
      */
     public const CICD_PIPELINE_TASK_TYPE = 'cicd.pipeline.task.type';
+
+    /**
+     * The name of a component of the CICD system.
+     */
+    public const CICD_SYSTEM_COMPONENT = 'cicd.system.component';
+
+    /**
+     * The state of a CICD worker / agent.
+     */
+    public const CICD_WORKER_STATE = 'cicd.worker.state';
 
     /**
      * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -526,27 +618,53 @@ interface TraceAttributes
     public const CLOUDEVENTS_EVENT_TYPE = 'cloudevents.event_type';
 
     /**
-     * The column number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
+     * Deprecated, use `code.column.number`
+     *
+     * @deprecated Replaced by `code.column.number`
      */
     public const CODE_COLUMN = 'code.column';
 
     /**
+     * The column number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`.
+     */
+    public const CODE_COLUMN_NUMBER = 'code.column.number';
+
+    /**
      * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
+     */
+    public const CODE_FILE_PATH = 'code.file.path';
+
+    /**
+     * Deprecated, use `code.file.path` instead
      */
     public const CODE_FILEPATH = 'code.filepath';
 
     /**
-     * The method or function name, or equivalent (usually rightmost part of the code unit's name).
+     * Deprecated, use `code.function.name` instead
+     *
+     * @deprecated Replaced by `code.function.name`
      */
     public const CODE_FUNCTION = 'code.function';
 
     /**
-     * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
+     * The method or function name, or equivalent (usually rightmost part of the code unit's name).
+     */
+    public const CODE_FUNCTION_NAME = 'code.function.name';
+
+    /**
+     * The line number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`.
+     */
+    public const CODE_LINE_NUMBER = 'code.line.number';
+
+    /**
+     * Deprecated, use `code.line.number` instead
+     *
+     * @deprecated Replaced by `code.line.number`
      */
     public const CODE_LINENO = 'code.lineno';
 
     /**
-     * The "namespace" within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
+     * The "namespace" within which `code.function.name` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function.name` form a unique identifier for the code unit.
      */
     public const CODE_NAMESPACE = 'code.namespace';
 
@@ -652,32 +770,44 @@ interface TraceAttributes
     public const CPU_MODE = 'cpu.mode';
 
     /**
-     * The consistency level of the query. Based on consistency values from [CQL](https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/dml/dmlConfigConsistency.html).
+     * Deprecated, use `cassandra.consistency.level` instead.
+     *
+     * @deprecated Replaced by `cassandra.consistency.level`.
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL = 'db.cassandra.consistency_level';
 
     /**
-     * The data center of the coordinating node for a query.
+     * Deprecated, use `cassandra.coordinator.dc` instead.
+     *
+     * @deprecated Replaced by `cassandra.coordinator.dc`.
      */
     public const DB_CASSANDRA_COORDINATOR_DC = 'db.cassandra.coordinator.dc';
 
     /**
-     * The ID of the coordinating node for a query.
+     * Deprecated, use `cassandra.coordinator.id` instead.
+     *
+     * @deprecated Replaced by `cassandra.coordinator.id`.
      */
     public const DB_CASSANDRA_COORDINATOR_ID = 'db.cassandra.coordinator.id';
 
     /**
-     * Whether or not the query is idempotent.
+     * Deprecated, use `cassandra.query.idempotent` instead.
+     *
+     * @deprecated Replaced by `cassandra.query.idempotent`.
      */
     public const DB_CASSANDRA_IDEMPOTENCE = 'db.cassandra.idempotence';
 
     /**
-     * The fetch size used for paging, i.e. how many rows will be returned at once.
+     * Deprecated, use `cassandra.page.size` instead.
+     *
+     * @deprecated Replaced by `cassandra.page.size`.
      */
     public const DB_CASSANDRA_PAGE_SIZE = 'db.cassandra.page_size';
 
     /**
-     * The number of times a query was speculatively executed. Not set or `0` if the query was not executed speculatively.
+     * Deprecated, use `cassandra.speculative_execution.count` instead.
+     *
+     * @deprecated Replaced by `cassandra.speculative_execution.count`.
      */
     public const DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'db.cassandra.speculative_execution_count';
 
@@ -715,9 +845,12 @@ interface TraceAttributes
     /**
      * The name of a collection (table, container) within the database.
      * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
-     * If the collection name is parsed from the query text, it SHOULD be the first collection name found in the query and it SHOULD match the value provided in the query text including any schema and database name prefix.
-     * For batch operations, if the individual operations are known to have the same collection name then that collection name SHOULD be used, otherwise `db.collection.name` SHOULD NOT be captured.
-     * This attribute has stability level RELEASE CANDIDATE.
+     *
+     * The collection name SHOULD NOT be extracted from `db.query.text`,
+     * unless the query format is known to only ever have a single collection name present.
+     *
+     * For batch operations, if the individual operations are known to have the same collection name
+     * then that collection name SHOULD be used.
      */
     public const DB_COLLECTION_NAME = 'db.collection.name';
 
@@ -729,14 +862,25 @@ interface TraceAttributes
     public const DB_CONNECTION_STRING = 'db.connection_string';
 
     /**
-     * Unique Cosmos client instance id.
+     * Deprecated, use `azure.client.id` instead.
+     *
+     * @deprecated Replaced by `azure.client.id`.
      */
     public const DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
 
     /**
-     * Cosmos client connection mode.
+     * Deprecated, use `azure.cosmosdb.connection.mode` instead.
+     *
+     * @deprecated Replaced by `azure.cosmosdb.connection.mode`.
      */
     public const DB_COSMOSDB_CONNECTION_MODE = 'db.cosmosdb.connection_mode';
+
+    /**
+     * Deprecated, use `cosmosdb.consistency.level` instead.
+     *
+     * @deprecated Replaced by `azure.cosmosdb.consistency.level`.
+     */
+    public const DB_COSMOSDB_CONSISTENCY_LEVEL = 'db.cosmosdb.consistency_level';
 
     /**
      * Deprecated, use `db.collection.name` instead.
@@ -746,17 +890,30 @@ interface TraceAttributes
     public const DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container';
 
     /**
-     * Cosmos DB Operation Type.
+     * Deprecated, no replacement at this time.
+     *
+     * @deprecated No replacement at this time.
      */
     public const DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
 
     /**
-     * RU consumed for that operation
+     * Deprecated, use `azure.cosmosdb.operation.contacted_regions` instead.
+     *
+     * @deprecated Replaced by `azure.cosmosdb.operation.contacted_regions`.
+     */
+    public const DB_COSMOSDB_REGIONS_CONTACTED = 'db.cosmosdb.regions_contacted';
+
+    /**
+     * Deprecated, use `azure.cosmosdb.operation.request_charge` instead.
+     *
+     * @deprecated Replaced by `azure.cosmosdb.operation.request_charge`.
      */
     public const DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge';
 
     /**
-     * Request payload size in bytes
+     * Deprecated, use `azure.cosmosdb.request.body.size` instead.
+     *
+     * @deprecated Replaced by `azure.cosmosdb.request.body.size`.
      */
     public const DB_COSMOSDB_REQUEST_CONTENT_LENGTH = 'db.cosmosdb.request_content_length';
 
@@ -768,7 +925,9 @@ interface TraceAttributes
     public const DB_COSMOSDB_STATUS_CODE = 'db.cosmosdb.status_code';
 
     /**
-     * Cosmos DB sub status code.
+     * Deprecated, use `azure.cosmosdb.response.sub_status_code` instead.
+     *
+     * @deprecated Replaced by `azure.cosmosdb.response.sub_status_code`.
      */
     public const DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code';
 
@@ -780,14 +939,16 @@ interface TraceAttributes
     public const DB_ELASTICSEARCH_CLUSTER_NAME = 'db.elasticsearch.cluster.name';
 
     /**
-     * Represents the human-readable identifier of the node/instance to which a request was routed.
+     * Deprecated, use `elasticsearch.node.name` instead.
+     *
+     * @deprecated Replaced by `elasticsearch.node.name`.
      */
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
     /**
-     * A dynamic value in the url path.
+     * Deprecated, use `db.operation.parameter` instead.
      *
-     * Many Elasticsearch url paths allow dynamic values. These SHOULD be recorded in span attributes in the format `db.elasticsearch.path_parts.<key>`, where `<key>` is the url path part name. The implementation SHOULD reference the [elasticsearch schema](https://raw.githubusercontent.com/elastic/elasticsearch-specification/main/output/schema/schema.json) in order to map the path part values to their names.
+     * @deprecated Replaced by `db.operation.parameter`.
      */
     public const DB_ELASTICSEARCH_PATH_PARTS = 'db.elasticsearch.path_parts';
 
@@ -832,7 +993,6 @@ interface TraceAttributes
      * If a database system has multiple namespace components, they SHOULD be concatenated (potentially using database system specific conventions) from most general to most specific namespace component, and more specific namespaces SHOULD NOT be captured without the more general namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
      * Semantic conventions for individual database systems SHOULD document what `db.namespace` means in the context of that system.
      * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
-     * This attribute has stability level RELEASE CANDIDATE.
      */
     public const DB_NAMESPACE = 'db.namespace';
 
@@ -846,28 +1006,47 @@ interface TraceAttributes
     /**
      * The number of queries included in a batch operation.
      * Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` SHOULD never be `1`.
-     * This attribute has stability level RELEASE CANDIDATE.
      */
     public const DB_OPERATION_BATCH_SIZE = 'db.operation.batch.size';
 
     /**
      * The name of the operation or command being executed.
      *
-     * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
-     * If the operation name is parsed from the query text, it SHOULD be the first operation name found in the query.
-     * For batch operations, if the individual operations are known to have the same operation name then that operation name SHOULD be used prepended by `BATCH `, otherwise `db.operation.name` SHOULD be `BATCH` or some other database system specific term if more applicable.
-     * This attribute has stability level RELEASE CANDIDATE.
+     * It is RECOMMENDED to capture the value as provided by the application
+     * without attempting to do any case normalization.
+     *
+     * The operation name SHOULD NOT be extracted from `db.query.text`,
+     * unless the query format is known to only ever have a single operation name present.
+     *
+     * For batch operations, if the individual operations are known to have the same operation name
+     * then that operation name SHOULD be used prepended by `BATCH `,
+     * otherwise `db.operation.name` SHOULD be `BATCH` or some other database
+     * system specific term if more applicable.
      */
     public const DB_OPERATION_NAME = 'db.operation.name';
 
     /**
+     * A database operation parameter, with `<key>` being the parameter name, and the attribute value being a string representation of the parameter value.
+     *
+     * If a parameter has no name and instead is referenced only by index, then `<key>` SHOULD be the 0-based index.
+     * If `db.query.text` is also captured, then `db.operation.parameter.<key>` SHOULD match up with the parameterized placeholders present in `db.query.text`.
+     */
+    public const DB_OPERATION_PARAMETER = 'db.operation.parameter';
+
+    /**
      * A query parameter used in `db.query.text`, with `<key>` being the parameter name, and the attribute value being a string representation of the parameter value.
      *
-     * Query parameters should only be captured when `db.query.text` is parameterized with placeholders.
-     * If a parameter has no name and instead is referenced only by index, then `<key>` SHOULD be the 0-based index.
-     * This attribute has stability level RELEASE CANDIDATE.
+     * @deprecated Replaced by `db.operation.parameter`.
      */
     public const DB_QUERY_PARAMETER = 'db.query.parameter';
+
+    /**
+     * Low cardinality representation of a database query text.
+     *
+     * `db.query.summary` provides static summary of the query text. It describes a class of database queries and is useful as a grouping key, especially when analyzing telemetry for database calls involving complex queries.
+     * Summary may be available to the instrumentation through instrumentation hooks or other means. If it is not available, instrumentations that support query parsing SHOULD generate a summary following [Generating query summary](../../docs/database/database-spans.md#generating-a-summary-of-the-query-text) section.
+     */
+    public const DB_QUERY_SUMMARY = 'db.query.summary';
 
     /**
      * The database query being executed.
@@ -875,7 +1054,6 @@ interface TraceAttributes
      * For sanitization see [Sanitization of `db.query.text`](../../docs/database/database-spans.md#sanitization-of-dbquerytext).
      * For batch operations, if the individual operations are known to have the same query text then that query text SHOULD be used, otherwise all of the individual query texts SHOULD be concatenated with separator `; ` or some other database system specific separator if more applicable.
      * Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
-     * This attribute has stability level RELEASE CANDIDATE.
      */
     public const DB_QUERY_TEXT = 'db.query.text';
 
@@ -887,10 +1065,14 @@ interface TraceAttributes
     public const DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
 
     /**
+     * Number of rows returned by the operation.
+     */
+    public const DB_RESPONSE_RETURNED_ROWS = 'db.response.returned_rows';
+
+    /**
      * Database response status code.
      * The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
      * Semantic conventions for individual database systems SHOULD document what `db.response.status_code` means in the context of that system.
-     * This attribute has stability level RELEASE CANDIDATE.
      */
     public const DB_RESPONSE_STATUS_CODE = 'db.response.status_code';
 
@@ -909,11 +1091,17 @@ interface TraceAttributes
     public const DB_STATEMENT = 'db.statement';
 
     /**
-     * The database management system (DBMS) product as identified by the client instrumentation.
-     * The actual DBMS may differ from the one identified by the client. For example, when using PostgreSQL client libraries to connect to a CockroachDB, the `db.system` is set to `postgresql` based on the instrumentation's best knowledge.
-     * This attribute has stability level RELEASE CANDIDATE.
+     * Deprecated, use `db.system.name` instead.
+     *
+     * @deprecated Replaced by `db.system.name`.
      */
     public const DB_SYSTEM = 'db.system';
+
+    /**
+     * The database management system (DBMS) product as identified by the client instrumentation.
+     * The actual DBMS may differ from the one identified by the client. For example, when using PostgreSQL client libraries to connect to a CockroachDB, the `db.system.name` is set to `postgresql` based on the instrumentation's best knowledge.
+     */
+    public const DB_SYSTEM_NAME = 'db.system.name';
 
     /**
      * Deprecated, no replacement at this time.
@@ -1008,6 +1196,11 @@ interface TraceAttributes
     public const DNS_QUESTION_NAME = 'dns.question.name';
 
     /**
+     * Represents the human-readable identifier of the node/instance to which a request was routed.
+     */
+    public const ELASTICSEARCH_NODE_NAME = 'elasticsearch.node.name';
+
+    /**
      * Deprecated, use `user.id` instead.
      *
      * @deprecated Replaced by `user.id` attribute.
@@ -1056,29 +1249,14 @@ interface TraceAttributes
     /**
      * Identifies the class / type of event.
      *
-     * Event names are subject to the same rules as [attribute names](/docs/general/attribute-naming.md). Notably, event names are namespaced to avoid collisions and provide a clean separation of semantics for events in separate domains like browser, mobile, and kubernetes.
+     * @deprecated Replaced by EventName top-level field on the LogRecord
      */
     public const EVENT_NAME = 'event.name';
 
     /**
-     * SHOULD be set to true if the exception event is recorded at a point where it is known that the exception is escaping the scope of the span.
+     * Indicates that the exception is escaping the scope of the span.
      *
-     * An exception is considered to have escaped (or left) the scope of a span,
-     * if that span is ended while the exception is still logically "in flight".
-     * This may be actually "in flight" in some languages (e.g. if the exception
-     * is passed to a Context manager's `__exit__` method in Python) but will
-     * usually be caught at the point of recording the exception in most languages.
-     *
-     * It is usually not possible to determine at the point where an exception is thrown
-     * whether it will escape the scope of a span.
-     * However, it is trivial to know that an exception
-     * will escape, if one checks for an active exception just before ending the span,
-     * as done in the [example for recording span exceptions](https://opentelemetry.io/docs/specs/semconv/exceptions/exceptions-spans/#recording-an-exception).
-     *
-     * It follows that an exception may still escape the scope of the span
-     * even if the `exception.escaped` attribute was not set or set to false,
-     * since the event might have been recorded at a time where it was not
-     * clear whether the exception will escape.
+     * @deprecated It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.
      */
     public const EXCEPTION_ESCAPED = 'exception.escaped';
 
@@ -1173,7 +1351,7 @@ interface TraceAttributes
      * This is the name of the function as configured/deployed on the FaaS
      * platform and is usually different from the name of the callback
      * function (which may be stored in the
-     * [`code.namespace`/`code.function`](/docs/general/attributes.md#source-code-attributes)
+     * [`code.namespace`/`code.function.name`](/docs/general/attributes.md#source-code-attributes)
      * span attributes).
      *
      * For some cloud providers, the above definition is ambiguous. The following
@@ -1214,28 +1392,49 @@ interface TraceAttributes
     public const FAAS_VERSION = 'faas.version';
 
     /**
-     * The unique identifier of the feature flag.
+     * The unique identifier for the flag evaluation context. For example, the targeting key.
+     */
+    public const FEATURE_FLAG_CONTEXT_ID = 'feature_flag.context.id';
+
+    /**
+     * A message explaining the nature of an error occurring during flag evaluation.
+     */
+    public const FEATURE_FLAG_EVALUATION_ERROR_MESSAGE = 'feature_flag.evaluation.error.message';
+
+    /**
+     * The reason code which shows how a feature flag value was determined.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON = 'feature_flag.evaluation.reason';
+
+    /**
+     * The lookup key of the feature flag.
      */
     public const FEATURE_FLAG_KEY = 'feature_flag.key';
 
     /**
-     * The name of the service provider that performs the flag evaluation.
+     * Identifies the feature flag provider.
      */
     public const FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
 
     /**
-     * SHOULD be a semantic identifier for a value. If one is unavailable, a stringified version of the value can be used.
+     * The identifier of the [flag set](https://openfeature.dev/specification/glossary/#flag-set) to which the feature flag belongs.
+     */
+    public const FEATURE_FLAG_SET_ID = 'feature_flag.set.id';
+
+    /**
+     * A semantic identifier for an evaluated flag value.
      *
      * A semantic identifier, commonly referred to as a variant, provides a means
      * for referring to a value without including the value itself. This can
      * provide additional context for understanding the meaning behind a value.
      * For example, the variant `red` maybe be used for the value `#c05543`.
-     *
-     * A stringified version of the value can be used in situations where a
-     * semantic identifier is unavailable. String representation of the value
-     * should be determined by the implementer.
      */
     public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
+
+    /**
+     * The version of the ruleset used during the evaluation. This may be any stable value which uniquely identifies the ruleset.
+     */
+    public const FEATURE_FLAG_VERSION = 'feature_flag.version';
 
     /**
      * Time when the file was last accessed, in ISO 8601 format.
@@ -1381,12 +1580,14 @@ interface TraceAttributes
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT = 'gen_ai.openai.request.response_format';
 
     /**
-     * Requests with same seed value more likely to return same result.
+     * Deprecated, use `gen_ai.request.seed`.
+     *
+     * @deprecated Replaced by `gen_ai.request.seed` attribute.
      */
     public const GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed';
 
     /**
-     * The service tier requested. May be a specific tier, detault, or auto.
+     * The service tier requested. May be a specific tier, default, or auto.
      */
     public const GEN_AI_OPENAI_REQUEST_SERVICE_TIER = 'gen_ai.openai.request.service_tier';
 
@@ -1394,6 +1595,11 @@ interface TraceAttributes
      * The service tier used for the response.
      */
     public const GEN_AI_OPENAI_RESPONSE_SERVICE_TIER = 'gen_ai.openai.response.service_tier';
+
+    /**
+     * A fingerprint to track any eventual change in the Generative AI environment.
+     */
+    public const GEN_AI_OPENAI_RESPONSE_SYSTEM_FINGERPRINT = 'gen_ai.openai.response.system_fingerprint';
 
     /**
      * The name of the operation being performed.
@@ -1407,6 +1613,12 @@ interface TraceAttributes
      * @deprecated Removed, no replacement at this time.
      */
     public const GEN_AI_PROMPT = 'gen_ai.prompt';
+
+    /**
+     * The encoding formats requested in an embeddings operation, if specified.
+     * In some GenAI systems the encoding formats are called embedding types. Also, some GenAI systems only accept a single format per request.
+     */
+    public const GEN_AI_REQUEST_ENCODING_FORMATS = 'gen_ai.request.encoding_formats';
 
     /**
      * The frequency penalty setting for the GenAI request.
@@ -1427,6 +1639,11 @@ interface TraceAttributes
      * The presence penalty setting for the GenAI request.
      */
     public const GEN_AI_REQUEST_PRESENCE_PENALTY = 'gen_ai.request.presence_penalty';
+
+    /**
+     * Requests with same seed value more likely to return same result.
+     */
+    public const GEN_AI_REQUEST_SEED = 'gen_ai.request.seed';
 
     /**
      * List of sequences that the model will use to stop generating further tokens.
@@ -1469,8 +1686,10 @@ interface TraceAttributes
      * by `gen_ai.request.model` and `gen_ai.response.model` attributes.
      *
      * The actual GenAI product may differ from the one identified by the client.
-     * For example, when using OpenAI client libraries to communicate with Mistral, the `gen_ai.system`
-     * is set to `openai` based on the instrumentation's best knowledge.
+     * Multiple systems, including Azure OpenAI and Gemini, are accessible by OpenAI client
+     * libraries. In such cases, the `gen_ai.system` is set to `openai` based on the
+     * instrumentation's best knowledge, instead of the actual system. The `server.address`
+     * attribute may help identify the actual system in use for `openai`.
      *
      * For custom model, a custom friendly name SHOULD be used.
      * If none of these options apply, the `gen_ai.system` SHOULD be set to `_OTHER`.
@@ -1505,6 +1724,41 @@ interface TraceAttributes
      * @deprecated Replaced by `gen_ai.usage.input_tokens` attribute.
      */
     public const GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens';
+
+    /**
+     * Two-letter code representing continent’s name.
+     */
+    public const GEO_CONTINENT_CODE = 'geo.continent.code';
+
+    /**
+     * Two-letter ISO Country Code ([ISO 3166-1 alpha2](https://wikipedia.org/wiki/ISO_3166-1#Codes)).
+     */
+    public const GEO_COUNTRY_ISO_CODE = 'geo.country.iso_code';
+
+    /**
+     * Locality name. Represents the name of a city, town, village, or similar populated place.
+     */
+    public const GEO_LOCALITY_NAME = 'geo.locality.name';
+
+    /**
+     * Latitude of the geo location in [WGS84](https://wikipedia.org/wiki/World_Geodetic_System#WGS84).
+     */
+    public const GEO_LOCATION_LAT = 'geo.location.lat';
+
+    /**
+     * Longitude of the geo location in [WGS84](https://wikipedia.org/wiki/World_Geodetic_System#WGS84).
+     */
+    public const GEO_LOCATION_LON = 'geo.location.lon';
+
+    /**
+     * Postal code associated with the location. Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+     */
+    public const GEO_POSTAL_CODE = 'geo.postal_code';
+
+    /**
+     * Region ISO code ([ISO 3166-2](https://wikipedia.org/wiki/ISO_3166-2)).
+     */
+    public const GEO_REGION_ISO_CODE = 'geo.region.iso_code';
 
     /**
      * The type of memory.
@@ -1948,6 +2202,14 @@ interface TraceAttributes
      * The name of the namespace that the pod is running in.
      */
     public const K8S_NAMESPACE_NAME = 'k8s.namespace.name';
+
+    /**
+     * The phase of the K8s namespace.
+     *
+     * This attribute aligns with the `phase` field of the
+     * [K8s NamespaceStatus](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#namespacestatus-v1-core)
+     */
+    public const K8S_NAMESPACE_PHASE = 'k8s.namespace.phase';
 
     /**
      * The name of the Node.
@@ -2481,6 +2743,12 @@ interface TraceAttributes
     public const NETWORK_CARRIER_NAME = 'network.carrier.name';
 
     /**
+     * The state of network connection
+     * Connection states are defined as part of the [rfc9293](https://datatracker.ietf.org/doc/html/rfc9293#section-3.3.2)
+     */
+    public const NETWORK_CONNECTION_STATE = 'network.connection.state';
+
+    /**
      * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
      */
     public const NETWORK_CONNECTION_SUBTYPE = 'network.connection.subtype';
@@ -2489,6 +2757,11 @@ interface TraceAttributes
      * The internet connection type.
      */
     public const NETWORK_CONNECTION_TYPE = 'network.connection.type';
+
+    /**
+     * The network interface name.
+     */
+    public const NETWORK_INTERFACE_NAME = 'network.interface.name';
 
     /**
      * The network IO operation direction.
@@ -2516,7 +2789,7 @@ interface TraceAttributes
     public const NETWORK_PEER_PORT = 'network.peer.port';
 
     /**
-     * [OSI application layer](https://osi-model.com/application-layer/) or non-OSI equivalent.
+     * [OSI application layer](https://wikipedia.org/wiki/Application_layer) or non-OSI equivalent.
      * The value SHOULD be normalized to lowercase.
      */
     public const NETWORK_PROTOCOL_NAME = 'network.protocol.name';
@@ -2528,7 +2801,7 @@ interface TraceAttributes
     public const NETWORK_PROTOCOL_VERSION = 'network.protocol.version';
 
     /**
-     * [OSI transport layer](https://osi-model.com/transport-layer/) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
+     * [OSI transport layer](https://wikipedia.org/wiki/Transport_layer) or [inter-process communication method](https://wikipedia.org/wiki/Inter-process_communication).
      *
      * The value SHOULD be normalized to lowercase.
      *
@@ -2539,7 +2812,7 @@ interface TraceAttributes
     public const NETWORK_TRANSPORT = 'network.transport';
 
     /**
-     * [OSI network layer](https://osi-model.com/network-layer/) or non-OSI equivalent.
+     * [OSI network layer](https://wikipedia.org/wiki/Network_layer) or non-OSI equivalent.
      * The value SHOULD be normalized to lowercase.
      */
     public const NETWORK_TYPE = 'network.type';
@@ -2688,6 +2961,13 @@ interface TraceAttributes
     /**
      * Profiling specific build ID for executables. See the OTel specification for Profiles for more information.
      */
+    public const PROCESS_EXECUTABLE_BUILD_ID_HTLHASH = 'process.executable.build_id.htlhash';
+
+    /**
+     * "Deprecated, use `process.executable.build_id.htlhash` instead."
+     *
+     * @deprecated Replaced by `process.executable.build_id.htlhash`
+     */
     public const PROCESS_EXECUTABLE_BUILD_ID_PROFILING = 'process.executable.build_id.profiling';
 
     /**
@@ -2719,6 +2999,12 @@ interface TraceAttributes
      * Whether the process is connected to an interactive shell.
      */
     public const PROCESS_INTERACTIVE = 'process.interactive';
+
+    /**
+     * The control group associated with the process.
+     * Control groups (cgroups) are a kernel feature used to organize and manage process resources. This attribute provides the path(s) to the cgroup(s) associated with the process, which should match the contents of the [/proc/[PID]/cgroup](https://man7.org/linux/man-pages/man7/cgroups.7.html) file.
+     */
+    public const PROCESS_LINUX_CGROUP = 'process.linux.cgroup';
 
     /**
      * The username of the user that owns the process.
@@ -2890,7 +3176,7 @@ interface TraceAttributes
 
     /**
      * The name of the (logical) method being called, must be equal to the $method part in the span name.
-     * This is the logical name of the method from the RPC interface perspective, which can be different from the name of any implementing method/function. The `code.function` attribute may be used to store the latter (e.g., method actually executing the call on the server side, RPC client stub method on the client side).
+     * This is the logical name of the method from the RPC interface perspective, which can be different from the name of any implementing method/function. The `code.function.name` attribute may be used to store the latter (e.g., method actually executing the call on the server side, RPC client stub method on the client side).
      */
     public const RPC_METHOD = 'rpc.method';
 
@@ -2904,6 +3190,48 @@ interface TraceAttributes
      * A string identifying the remoting system. See below for a list of well-known identifiers.
      */
     public const RPC_SYSTEM = 'rpc.system';
+
+    /**
+     * A categorization value keyword used by the entity using the rule for detection of this event
+     */
+    public const SECURITY_RULE_CATEGORY = 'security_rule.category';
+
+    /**
+     * The description of the rule generating the event.
+     */
+    public const SECURITY_RULE_DESCRIPTION = 'security_rule.description';
+
+    /**
+     * Name of the license under which the rule used to generate this event is made available.
+     */
+    public const SECURITY_RULE_LICENSE = 'security_rule.license';
+
+    /**
+     * The name of the rule or signature generating the event.
+     */
+    public const SECURITY_RULE_NAME = 'security_rule.name';
+
+    /**
+     * Reference URL to additional information about the rule used to generate this event.
+     *
+     * The URL can point to the vendor’s documentation about the rule. If that’s not available, it can also be a link to a more general page describing this type of alert.
+     */
+    public const SECURITY_RULE_REFERENCE = 'security_rule.reference';
+
+    /**
+     * Name of the ruleset, policy, group, or parent category in which the rule used to generate this event is a member.
+     */
+    public const SECURITY_RULE_RULESET_NAME = 'security_rule.ruleset.name';
+
+    /**
+     * A rule ID that is unique within the scope of a set or group of agents, observers, or other entities using the rule for detection of this event.
+     */
+    public const SECURITY_RULE_UUID = 'security_rule.uuid';
+
+    /**
+     * The version / revision of the rule being used for analysis.
+     */
+    public const SECURITY_RULE_VERSION = 'security_rule.version';
 
     /**
      * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -2932,7 +3260,7 @@ interface TraceAttributes
      *
      * UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
      * needed. Similar to what can be seen in the man page for the
-     * [`/etc/machine-id`](https://www.freedesktop.org/software/systemd/man/machine-id.html) file, the underlying
+     * [`/etc/machine-id`](https://www.freedesktop.org/software/systemd/man/latest/machine-id.html) file, the underlying
      * data, such as pod name and namespace should be treated as confidential, being the user's choice to expose it
      * or not via another resource attribute.
      *
@@ -3042,7 +3370,9 @@ interface TraceAttributes
     public const SYSTEM_MEMORY_STATE = 'system.memory.state';
 
     /**
-     * A stateless protocol MUST NOT set this attribute
+     * Deprecated, use `network.connection.state` instead.
+     *
+     * @deprecated Removed, report network connection state with `network.connection.state` attribute
      */
     public const SYSTEM_NETWORK_STATE = 'system.network.state';
 
@@ -3109,7 +3439,7 @@ interface TraceAttributes
     public const TELEMETRY_SDK_VERSION = 'telemetry.sdk.version';
 
     /**
-     * The fully qualified human readable name of the [test case](https://en.wikipedia.org/wiki/Test_case).
+     * The fully qualified human readable name of the [test case](https://wikipedia.org/wiki/Test_case).
      */
     public const TEST_CASE_NAME = 'test.case.name';
 
@@ -3119,7 +3449,7 @@ interface TraceAttributes
     public const TEST_CASE_RESULT_STATUS = 'test.case.result.status';
 
     /**
-     * The human readable name of a [test suite](https://en.wikipedia.org/wiki/Test_suite).
+     * The human readable name of a [test suite](https://wikipedia.org/wiki/Test_suite).
      */
     public const TEST_SUITE_NAME = 'test.suite.name';
 
@@ -3308,9 +3638,29 @@ interface TraceAttributes
 
     /**
      * Absolute URL describing a network resource according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986)
-     * For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment is not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
-     * `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`. In such case username and password SHOULD be redacted and attribute's value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
-     * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed). Sensitive content provided in `url.full` SHOULD be scrubbed when instrumentations can identify it.
+     * For network calls, URL usually has `scheme://host[:port][path][?query][#fragment]` format, where the fragment
+     * is not transmitted over HTTP, but if it is known, it SHOULD be included nevertheless.
+     *
+     * `url.full` MUST NOT contain credentials passed via URL in form of `https://username:password@www.example.com/`.
+     * In such case username and password SHOULD be redacted and attribute's value SHOULD be `https://REDACTED:REDACTED@www.example.com/`.
+     *
+     * `url.full` SHOULD capture the absolute URL when it is available (or can be reconstructed).
+     *
+     * Sensitive content provided in `url.full` SHOULD be scrubbed when instrumentations can identify it.
+     *
+     *
+     * Query string values for the following keys SHOULD be redacted by default and replaced by the
+     * value `REDACTED`:
+     *
+     * - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+     * - [`Signature`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+     * - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
+     * - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
+     *
+     * This list is subject to change over time.
+     *
+     * When a query string value is redacted, the query string key SHOULD still be preserved, e.g.
+     * `https://www.example.com/path?color=blue&sig=REDACTED`.
      */
     public const URL_FULL = 'url.full';
 
@@ -3338,6 +3688,19 @@ interface TraceAttributes
      * The [URI query](https://www.rfc-editor.org/rfc/rfc3986#section-3.4) component
      *
      * Sensitive content provided in `url.query` SHOULD be scrubbed when instrumentations can identify it.
+     *
+     *
+     * Query string values for the following keys SHOULD be redacted by default and replaced by the value `REDACTED`:
+     *
+     * - [`AWSAccessKeyId`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+     * - [`Signature`](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html#RESTAuthenticationQueryStringAuth)
+     * - [`sig`](https://learn.microsoft.com/azure/storage/common/storage-sas-overview#sas-token)
+     * - [`X-Goog-Signature`](https://cloud.google.com/storage/docs/access-control/signed-urls)
+     *
+     * This list is subject to change over time.
+     *
+     * When a query string value is redacted, the query string key SHOULD still be preserved, e.g.
+     * `q=OpenTelemetry&sig=REDACTED`.
      */
     public const URL_QUERY = 'url.query';
 
@@ -3417,6 +3780,13 @@ interface TraceAttributes
     public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
+     * Specifies the category of synthetic traffic, such as tests or bots.
+     *
+     * This attribute MAY be derived from the contents of the `user_agent.original` attribute. Components that populate the attribute are responsible for determining what they consider to be synthetic bot or test traffic. This attribute can either be set for self-identification purposes, or on telemetry detected to be generated as a result of a synthetic request. This attribute is useful for distinguishing between genuine client traffic and synthetic traffic generated by bots or tests.
+     */
+    public const USER_AGENT_SYNTHETIC_TYPE = 'user_agent.synthetic.type';
+
+    /**
      * Version of the user-agent extracted from original. Usually refers to the browser's version
      *
      * [Example](https://www.whatsmyua.info) of extracting browser's version from original string. In the case of using a user-agent for non-browser products, such as microservices with multiple names/versions inside the `user_agent.original`, the most significant version SHOULD be selected. In such a scenario it should align with `user_agent.name`
@@ -3435,44 +3805,156 @@ interface TraceAttributes
     public const V8JS_HEAP_SPACE_NAME = 'v8js.heap.space.name';
 
     /**
-     * The ID of the change (pull request/merge request) if applicable. This is usually a unique (within repository) identifier generated by the VCS system.
+     * The ID of the change (pull request/merge request/changelist) if applicable. This is usually a unique (within repository) identifier generated by the VCS system.
      */
-    public const VCS_REPOSITORY_CHANGE_ID = 'vcs.repository.change.id';
+    public const VCS_CHANGE_ID = 'vcs.change.id';
 
     /**
-     * The human readable title of the change (pull request/merge request). This title is often a brief summary of the change and may get merged in to a ref as the commit summary.
+     * The state of the change (pull request/merge request/changelist).
      */
-    public const VCS_REPOSITORY_CHANGE_TITLE = 'vcs.repository.change.title';
+    public const VCS_CHANGE_STATE = 'vcs.change.state';
+
+    /**
+     * The human readable title of the change (pull request/merge request/changelist). This title is often a brief summary of the change and may get merged in to a ref as the commit summary.
+     */
+    public const VCS_CHANGE_TITLE = 'vcs.change.title';
+
+    /**
+     * The type of line change being measured on a branch or change.
+     */
+    public const VCS_LINE_CHANGE_TYPE = 'vcs.line_change.type';
 
     /**
      * The name of the [reference](https://git-scm.com/docs/gitglossary#def_ref) such as **branch** or **tag** in the repository.
+     *
+     * `base` refers to the starting point of a change. For example, `main`
+     * would be the base reference of type branch if you've created a new
+     * reference of type branch from it and created new commits.
      */
-    public const VCS_REPOSITORY_REF_NAME = 'vcs.repository.ref.name';
+    public const VCS_REF_BASE_NAME = 'vcs.ref.base.name';
 
     /**
      * The revision, literally [revised version](https://www.merriam-webster.com/dictionary/revision), The revision most often refers to a commit object in Git, or a revision number in SVN.
      *
-     * The revision can be a full [hash value (see glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf),
+     * `base` refers to the starting point of a change. For example, `main`
+     * would be the base reference of type branch if you've created a new
+     * reference of type branch from it and created new commits. The
+     * revision can be a full [hash value (see
+     * glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf),
      * of the recorded change to a ref within a repository pointing to a
      * commit [commit](https://git-scm.com/docs/git-commit) object. It does
-     * not necessarily have to be a hash; it can simply define a
-     * [revision number](https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html)
+     * not necessarily have to be a hash; it can simply define a [revision
+     * number](https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html)
      * which is an integer that is monotonically increasing. In cases where
-     * it is identical to the `ref.name`, it SHOULD still be included. It is
-     * up to the implementer to decide which value to set as the revision
-     * based on the VCS system and situational context.
+     * it is identical to the `ref.base.name`, it SHOULD still be included.
+     * It is up to the implementer to decide which value to set as the
+     * revision based on the VCS system and situational context.
      */
-    public const VCS_REPOSITORY_REF_REVISION = 'vcs.repository.ref.revision';
+    public const VCS_REF_BASE_REVISION = 'vcs.ref.base.revision';
+
+    /**
+     * The type of the [reference](https://git-scm.com/docs/gitglossary#def_ref) in the repository.
+     *
+     * `base` refers to the starting point of a change. For example, `main`
+     * would be the base reference of type branch if you've created a new
+     * reference of type branch from it and created new commits.
+     */
+    public const VCS_REF_BASE_TYPE = 'vcs.ref.base.type';
+
+    /**
+     * The name of the [reference](https://git-scm.com/docs/gitglossary#def_ref) such as **branch** or **tag** in the repository.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.
+     */
+    public const VCS_REF_HEAD_NAME = 'vcs.ref.head.name';
+
+    /**
+     * The revision, literally [revised version](https://www.merriam-webster.com/dictionary/revision), The revision most often refers to a commit object in Git, or a revision number in SVN.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.The revision can be a full [hash value (see
+     * glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf),
+     * of the recorded change to a ref within a repository pointing to a
+     * commit [commit](https://git-scm.com/docs/git-commit) object. It does
+     * not necessarily have to be a hash; it can simply define a [revision
+     * number](https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html)
+     * which is an integer that is monotonically increasing. In cases where
+     * it is identical to the `ref.head.name`, it SHOULD still be included.
+     * It is up to the implementer to decide which value to set as the
+     * revision based on the VCS system and situational context.
+     */
+    public const VCS_REF_HEAD_REVISION = 'vcs.ref.head.revision';
+
+    /**
+     * The type of the [reference](https://git-scm.com/docs/gitglossary#def_ref) in the repository.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.
+     */
+    public const VCS_REF_HEAD_TYPE = 'vcs.ref.head.type';
 
     /**
      * The type of the [reference](https://git-scm.com/docs/gitglossary#def_ref) in the repository.
      */
+    public const VCS_REF_TYPE = 'vcs.ref.type';
+
+    /**
+     * Deprecated, use `vcs.change.id` instead.
+     *
+     * @deprecated Deprecated, use `vcs.change.id` instead.
+     */
+    public const VCS_REPOSITORY_CHANGE_ID = 'vcs.repository.change.id';
+
+    /**
+     * Deprecated, use `vcs.change.title` instead.
+     *
+     * @deprecated Deprecated, use `vcs.change.title` instead.
+     */
+    public const VCS_REPOSITORY_CHANGE_TITLE = 'vcs.repository.change.title';
+
+    /**
+     * The human readable name of the repository. It SHOULD NOT include any additional identifier like Group/SubGroup in GitLab or organization in GitHub.
+     *
+     * Due to it only being the name, it can clash with forks of the same
+     * repository if collecting telemetry across multiple orgs or groups in
+     * the same backends.
+     */
+    public const VCS_REPOSITORY_NAME = 'vcs.repository.name';
+
+    /**
+     * Deprecated, use `vcs.ref.head.name` instead.
+     *
+     * @deprecated Deprecated, use `vcs.ref.head.name` instead.
+     */
+    public const VCS_REPOSITORY_REF_NAME = 'vcs.repository.ref.name';
+
+    /**
+     * Deprecated, use `vcs.ref.head.revision` instead.
+     *
+     * @deprecated Deprecated, use `vcs.ref.head.revision` instead.
+     */
+    public const VCS_REPOSITORY_REF_REVISION = 'vcs.repository.ref.revision';
+
+    /**
+     * Deprecated, use `vcs.ref.head.type` instead.
+     *
+     * @deprecated Deprecated, use `vcs.ref.head.type` instead.
+     */
     public const VCS_REPOSITORY_REF_TYPE = 'vcs.repository.ref.type';
 
     /**
-     * The [URL](https://en.wikipedia.org/wiki/URL) of the repository providing the complete address in order to locate and identify the repository.
+     * The [canonical URL](https://support.google.com/webmasters/answer/10347851?hl=en#:~:text=A%20canonical%20URL%20is%20the,Google%20chooses%20one%20as%20canonical.) of the repository providing the complete HTTP(S) address in order to locate and identify the repository through a browser.
+     *
+     * In Git Version Control Systems, the canonical URL SHOULD NOT include
+     * the `.git` extension.
      */
     public const VCS_REPOSITORY_URL_FULL = 'vcs.repository.url.full';
+
+    /**
+     * The type of revision comparison.
+     */
+    public const VCS_REVISION_DELTA_DIRECTION = 'vcs.revision_delta.direction';
 
     /**
      * Additional description of the web engine (e.g. detailed version and edition information).
