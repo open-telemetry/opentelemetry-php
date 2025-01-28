@@ -264,7 +264,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         $this->spanProcessor->onEnding($span);
         $span->hasEnded = true;
 
-        $this->spanProcessor->onEnd($this);
+        $this->spanProcessor->onEnd($span);
         $span->checkForDroppedElements();
     }
 

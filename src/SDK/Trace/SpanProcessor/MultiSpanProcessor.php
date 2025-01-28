@@ -77,7 +77,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
         return $result;
     }
 
-    public function onEnding(ReadWriteSpanInterface &$span): void
+    public function onEnding(ReadWriteSpanInterface $span): void
     {
         foreach ($this->processors as $processor) {
             $processor->onEnding($span);

@@ -19,7 +19,7 @@ interface SpanProcessorInterface
      * @experimental
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.41.0/specification/trace/sdk.md#onending
      */
-    public function onEnding(ReadWriteSpanInterface &$span): void;
+    public function onEnding(ReadWriteSpanInterface $span): void;
 
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/sdk.md#onendspan

@@ -14,7 +14,7 @@ use OpenTelemetry\Context\ContextInterface;
 $tracerProvider = (new TracerProviderBuilder())
     ->addSpanProcessor(new class implements SpanProcessorInterface {
 
-        public function onEnding(ReadWriteSpanInterface &$span): void {
+        public function onEnding(ReadWriteSpanInterface $span): void {
             $span->end();
         }
 
