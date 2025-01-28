@@ -98,7 +98,7 @@ final class Meter implements MeterInterface, Configurable
                 $r->dormant = true;
             }
         }
-        foreach ($this->instruments->writers[self::instrumentationScopeId($this->instrumentationScope)] as [$instrument, $stalenessHandler, $r]) {
+        foreach ($this->instruments->writers[self::instrumentationScopeId($this->instrumentationScope)] ?? [] as [$instrument, $stalenessHandler, $r]) {
             if ($this->config->isEnabled() && $r->dormant) {
                 $this->metricFactory->createSynchronousWriter(
                     $this->registry,
