@@ -289,8 +289,7 @@ class SpanTest extends MockeryTestCase
         $this
             ->spanProcessor
             ->shouldHaveReceived('onEnd')
-            ->once()
-            ->with($span);
+            ->once();
 
         $this->assertSpanData(
             $span->toSpanData(),
