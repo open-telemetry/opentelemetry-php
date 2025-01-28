@@ -35,7 +35,7 @@ class LoggerTest extends TestCase
             {
             }
 
-            public function onEmit(ReadWriteLogRecord &$record, ?ContextInterface $context = null): void
+            public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
             {
                 $record->setAttributes(['baz' => 'bat']);
                 $this->exporter->export([$record]);

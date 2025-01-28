@@ -22,7 +22,7 @@ class MultiLogRecordProcessor implements LogRecordProcessorInterface
         }
     }
 
-    public function onEmit(ReadWriteLogRecord &$record, ?ContextInterface $context = null): void
+    public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
         foreach ($this->processors as $processor) {
             $processor->onEmit($record, $context);
