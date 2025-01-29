@@ -17,4 +17,16 @@ class InMemorySpanExporterFactoryTest extends TestCase
         $exporter = (new InMemorySpanExporterFactory())->create();
         $this->assertInstanceOf(SpanExporterInterface::class, $exporter);
     }
+
+    public function test_type(): void
+    {
+        $factory = new InMemorySpanExporterFactory();
+        $this->assertSame('memory', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new InMemorySpanExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

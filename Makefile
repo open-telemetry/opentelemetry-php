@@ -22,6 +22,8 @@ update: ## Update dependencies
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer update
 update-lowest: ## Update dependencies to lowest supported versions
 	$(DC_RUN_PHP) env XDEBUG_MODE=off composer update --prefer-lowest
+dump: ## Dump autoload
+	$(DC_RUN_PHP) env XDEBUG_MODE=off composer dump-autoload
 test: test-unit test-integration ## Run unit and integration tests
 test-unit: ## Run unit tests
 	$(DC_RUN_PHP) env XDEBUG_MODE=coverage vendor/bin/phpunit --testsuite unit --colors=always

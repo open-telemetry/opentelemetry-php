@@ -17,4 +17,15 @@ class InMemoryExporterFactoryTest extends TestCase
         $factory = new InMemoryExporterFactory();
         $this->assertInstanceOf(LogRecordExporterInterface::class, $factory->create());
     }
+    public function test_type(): void
+    {
+        $factory = new InMemoryExporterFactory();
+        $this->assertSame('memory', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new InMemoryExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

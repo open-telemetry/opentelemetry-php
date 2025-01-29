@@ -44,8 +44,13 @@
         "open-telemetry/exporter-otlp": "1.0.x-dev",
         "open-telemetry/exporter-zipkin": "1.0.x-dev",
         "open-telemetry/extension-propagator-b3": "1.0.x-dev",
+<<<<<<< HEAD
         "open-telemetry/extension-propagator-cloudtrace": "1.0.x-dev",
         "open-telemetry/extension-propagator-jaeger": "0.0.2",
+=======
+        "open-telemetry/extension-propagator-cloudtrace": "0.0.4",
+        "open-telemetry/extension-propagator-jaeger": "0.0.3",
+>>>>>>> 2.x
         "open-telemetry/gen-otlp-protobuf": "1.0.x-dev",
         "open-telemetry/sdk": "1.0.x-dev",
         "open-telemetry/sdk-configuration": "0.1.x-dev",
@@ -61,17 +66,13 @@
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
+            "src/API/_register.php",
             "src/API/Trace/functions.php",
+            "src/Config/SDK/_register.php",
             "src/Contrib/Otlp/_register.php",
             "src/Contrib/Grpc/_register.php",
             "src/Contrib/Zipkin/_register.php",
-            "src/Extension/Propagator/B3/_register.php",
-            "src/Extension/Propagator/CloudTrace/_register.php",
-            "src/Extension/Propagator/Jaeger/_register.php",
-            "src/SDK/Logs/Exporter/_register.php",
-            "src/SDK/Metrics/MetricExporter/_register.php",
-            "src/SDK/Propagation/_register.php",
-            "src/SDK/Trace/SpanExporter/_register.php",
+            "src/SDK/_register.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
             "src/SDK/Common/Util/functions.php",
             "src/SDK/_autoload.php"
@@ -82,7 +83,11 @@
             "OpenTelemetry\\Tests\\": "tests/",
             "OpenTelemetry\\Example\\": "examples/src/",
             "ExampleSDK\\ComponentProvider\\": "tests/Unit/Config/SDK/Configuration/ExampleSdk/"
-        }
+        },
+        "files": [
+            "examples/src/_register.php",
+            "tests/_register.php"
+        ]
     },
     "require-dev": {
         "ext-grpc": "*",
@@ -126,58 +131,18 @@
             "target-directory": "vendor-bin",
             "forward-command": true
         },
-        "spi": {
-            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
-
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpFile",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpGrpc",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpHttp",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
-
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpFile",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpGrpc",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpHttp",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
-
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpFile",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpGrpc",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpHttp",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
-
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
-
-                "OpenTelemetry\\Example\\ExampleConfigProvider",
-
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
+        "spi-config": {
+            "autoload-files": [
+                "examples/src/_register.php",
+                "src/API/_register.php",
+                "src/Config/SDK/_register.php",
+                "src/Contrib/Otlp/_register.php",
+                "src/Contrib/Grpc/_register.php",
+                "src/Contrib/Zipkin/_register.php",
+                "src/SDK/_register.php",
+                "tests/_register.php"
             ],
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
-              "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
-            ],
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
-                "OpenTelemetry\\Example\\ExampleInstrumentation"
-            ]
+            "prune-autoload-files": true
         }
     }
 }

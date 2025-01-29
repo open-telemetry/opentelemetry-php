@@ -16,4 +16,14 @@ class StdoutMetricExporterFactory implements MetricExporterFactoryInterface
 
         return new MetricExporter($transport);
     }
+
+    public function type(): string
+    {
+        return 'otlp/stdout';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

@@ -15,9 +15,9 @@ use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -55,7 +55,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
             'lowmemory' => null,
         };
 
-        return new MetricExporter(Registry::transportFactory($protocol)->create(
+        return new MetricExporter(Loader::transportFactory($protocol)->create(
             endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::METRICS, $protocol),
             contentType: Protocols::contentType($protocol),
             headers: $headers,

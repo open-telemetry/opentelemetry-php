@@ -6,12 +6,12 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
+use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 
-$transport = (new OtlpHttpTransportFactory())->create('http://collector:4318/v1/traces', 'application/x-protobuf');
+$transport = (new PsrTransportFactory())->create('http://collector:4318/v1/traces', 'application/x-protobuf');
 $exporter = new SpanExporter($transport);
 
 echo 'Starting OTLP example';
