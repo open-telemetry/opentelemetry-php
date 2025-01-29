@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
 
     /**
      * ec2

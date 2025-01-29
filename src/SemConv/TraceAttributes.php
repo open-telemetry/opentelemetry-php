@@ -11,7 +11,7 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
@@ -1044,14 +1044,14 @@ interface TraceAttributes
      * Low cardinality representation of a database query text.
      *
      * `db.query.summary` provides static summary of the query text. It describes a class of database queries and is useful as a grouping key, especially when analyzing telemetry for database calls involving complex queries.
-     * Summary may be available to the instrumentation through instrumentation hooks or other means. If it is not available, instrumentations that support query parsing SHOULD generate a summary following [Generating query summary](../../docs/database/database-spans.md#generating-a-summary-of-the-query-text) section.
+     * Summary may be available to the instrumentation through instrumentation hooks or other means. If it is not available, instrumentations that support query parsing SHOULD generate a summary following [Generating query summary](../database/database-spans.md#generating-a-summary-of-the-query-text) section.
      */
     public const DB_QUERY_SUMMARY = 'db.query.summary';
 
     /**
      * The database query being executed.
      *
-     * For sanitization see [Sanitization of `db.query.text`](../../docs/database/database-spans.md#sanitization-of-dbquerytext).
+     * For sanitization see [Sanitization of `db.query.text`](../database/database-spans.md#sanitization-of-dbquerytext).
      * For batch operations, if the individual operations are known to have the same query text then that query text SHOULD be used, otherwise all of the individual query texts SHOULD be concatenated with separator `; ` or some other database system specific separator if more applicable.
      * Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
      */
@@ -2189,6 +2189,16 @@ interface TraceAttributes
     public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
 
     /**
+     * The name of the horizontal pod autoscaler.
+     */
+    public const K8S_HPA_NAME = 'k8s.hpa.name';
+
+    /**
+     * The UID of the horizontal pod autoscaler.
+     */
+    public const K8S_HPA_UID = 'k8s.hpa.uid';
+
+    /**
      * The name of the Job.
      */
     public const K8S_JOB_NAME = 'k8s.job.name';
@@ -2257,6 +2267,26 @@ interface TraceAttributes
      * The UID of the ReplicaSet.
      */
     public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+
+    /**
+     * The name of the replication controller.
+     */
+    public const K8S_REPLICATIONCONTROLLER_NAME = 'k8s.replicationcontroller.name';
+
+    /**
+     * The UID of the replication controller.
+     */
+    public const K8S_REPLICATIONCONTROLLER_UID = 'k8s.replicationcontroller.uid';
+
+    /**
+     * The name of the resource quota.
+     */
+    public const K8S_RESOURCEQUOTA_NAME = 'k8s.resourcequota.name';
+
+    /**
+     * The UID of the resource quota.
+     */
+    public const K8S_RESOURCEQUOTA_UID = 'k8s.resourcequota.uid';
 
     /**
      * The name of the StatefulSet.

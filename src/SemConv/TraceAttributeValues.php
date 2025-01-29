@@ -11,7 +11,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
     /**
      * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
      *
