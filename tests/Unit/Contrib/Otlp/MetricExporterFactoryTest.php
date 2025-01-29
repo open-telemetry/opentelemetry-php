@@ -58,7 +58,7 @@ class MetricExporterFactoryTest extends TestCase
 
         $this->assertInstanceOf(AggregationTemporalitySelectorInterface::class, $exporter);
         $metric = $this->createMock(MetricMetadataInterface::class);
-        $metric->method('temporality')->willReturn(null);
+        $metric->method('temporality')->willReturn(Temporality::DELTA);
         $this->assertSame($expected, $exporter->temporality($metric));
     }
 
@@ -85,11 +85,11 @@ class MetricExporterFactoryTest extends TestCase
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'lowmemory',
                 ],
-                null,
+                Temporality::DELTA,
             ],
             'CuMuLaTiVe (mixed case)' => [
                 [
-                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'CuMuLaTiVe',
                 ],
                 Temporality::CUMULATIVE,
             ],
