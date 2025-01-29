@@ -15,9 +15,9 @@ interface MetricStreamInterface
     /**
      * Returns the internal temporality of this stream.
      *
-     * @return string|Temporality internal temporality
+     * @return Temporality internal temporality
      */
-    public function temporality();
+    public function temporality(): Temporality;
 
     /**
      * Returns the last metric timestamp.
@@ -36,10 +36,10 @@ interface MetricStreamInterface
     /**
      * Registers a new reader with the given temporality.
      *
-     * @param string|Temporality $temporality temporality to use
+     * @param Temporality $temporality temporality to use
      * @return int reader id
      */
-    public function register($temporality): int;
+    public function register(Temporality $temporality): int;
 
     /**
      * Unregisters the given reader.

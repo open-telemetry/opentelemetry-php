@@ -9,9 +9,9 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 interface MetricMetadataInterface
 {
     /**
-     * @return string|InstrumentType
+     * @return InstrumentType
      */
-    public function instrumentType();
+    public function instrumentType(): InstrumentType;
 
     public function name(): string;
 
@@ -22,7 +22,7 @@ interface MetricMetadataInterface
     /**
      * Returns the underlying temporality of this metric.
      *
-     * @return string|Temporality internal temporality
+     * @return Temporality internal temporality
      */
-    public function temporality();
+    public function temporality(): Temporality;
 }

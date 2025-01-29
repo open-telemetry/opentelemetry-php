@@ -184,7 +184,7 @@ final class ExportingReaderTest extends TestCase
         $source = $this->createMock(MetricSourceInterface::class);
         $source->method('collect')->willReturn($this->createMock(Metric::class));
         $provider->method('create')->willReturn($source);
-        $exporter->method('temporality')->willReturn('foo');
+        $exporter->method('temporality')->willReturn(Temporality::CUMULATIVE);
         $exporter->expects($this->once())->method('export')->willReturn(true);
         $exporter->expects($this->once())->method('shutdown')->willReturn(true);
 

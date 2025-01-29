@@ -44,7 +44,7 @@ interface AggregationInterface
      * @param array<AttributesInterface> $attributes
      * @psalm-param array<T> $summaries
      * @param array<list<Exemplar>> $exemplars
-     * @param string|Temporality $temporality
+     * @param Temporality $temporality
      */
     public function toData(
         array $attributes,
@@ -52,6 +52,6 @@ interface AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality,
+        Temporality $temporality,
     ): DataInterface;
 }

@@ -43,7 +43,7 @@ class MetricExporterFactoryTest extends TestCase
     }
 
     #[DataProvider('temporalityProvider')]
-    public function test_create_with_temporality(array $env, ?string $expected): void
+    public function test_create_with_temporality(array $env, ?Temporality $expected): void
     {
         // @phpstan-ignore-next-line
         $this->transportFactory->method('create')->willReturn($this->transport);
@@ -57,7 +57,9 @@ class MetricExporterFactoryTest extends TestCase
         $exporter = $factory->create();
 
         $this->assertInstanceOf(AggregationTemporalitySelectorInterface::class, $exporter);
-        $this->assertSame($expected, $exporter->temporality($this->createMock(MetricMetadataInterface::class)));
+        $metric = $this->createMock(MetricMetadataInterface::class);
+        $metric->method('temporality')->willReturn(Temporality::DELTA);
+        $this->assertSame($expected, $exporter->temporality($metric));
     }
 
     public static function temporalityProvider(): array
@@ -83,11 +85,11 @@ class MetricExporterFactoryTest extends TestCase
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'lowmemory',
                 ],
-                null,
+                Temporality::DELTA,
             ],
             'CuMuLaTiVe (mixed case)' => [
                 [
-                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'CuMuLaTiVe',
                 ],
                 Temporality::CUMULATIVE,
             ],

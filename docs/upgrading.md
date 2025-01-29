@@ -25,3 +25,7 @@ Various component factory interfaces (eg `TextMapPropagatorFactoryInterface`, `T
 updated to include `priority()` and `type()` methods. These are used in conjunction with SPI ServiceLoader to associate
 a type (eg `otlp`) with a factory, and to allow SDK-provided factories to be replaced by user-provided factories (by
 providing a higher priority for the same type).
+
+#### Metrics: InstrumentType, Temporality, advisory
+Methods which previously accepted `Temporality|string`, or `InstrumentType|string` no longer accept strings.
+`$advisory` is now a required parameter for `OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface`.

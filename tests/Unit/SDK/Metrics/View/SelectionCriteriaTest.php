@@ -94,6 +94,10 @@ final class SelectionCriteriaTest extends TestCase
 
     public function test_instrument_type_criteria_wildcard(): void
     {
+        $this->assertTrue((new InstrumentTypeCriteria([InstrumentType::COUNTER, InstrumentType::HISTOGRAM]))->accepts(
+            new Instrument(InstrumentType::COUNTER, 'name', null, null),
+            new InstrumentationScope('scopeName', null, null, Attributes::create([])),
+        ));
         $this->assertTrue((new InstrumentTypeCriteria(InstrumentType::COUNTER))->accepts(
             new Instrument(InstrumentType::COUNTER, 'name', null, null),
             new InstrumentationScope('scopeName', null, null, Attributes::create([])),

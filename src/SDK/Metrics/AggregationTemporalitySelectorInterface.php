@@ -14,8 +14,8 @@ interface AggregationTemporalitySelectorInterface
      * It is recommended to return {@see MetricMetadataInterface::temporality()}
      * if the exporter does not require a specific temporality.
      *
-     * @return string|Temporality|null temporality to use, or null to signal
+     * @return ?Temporality temporality to use, or null to signal
      *         that the given metric should not be exported by this exporter
      */
-    public function temporality(MetricMetadataInterface $metric);
+    public function temporality(MetricMetadataInterface $metric): ?Temporality;
 }
