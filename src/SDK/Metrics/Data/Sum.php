@@ -11,7 +11,7 @@ final class Sum implements DataInterface
      */
     public function __construct(
         public readonly iterable $dataPoints,
-        public readonly string|Temporality $temporality,
+        public readonly Temporality $temporality,
         public readonly bool $monotonic,
     ) {
     }

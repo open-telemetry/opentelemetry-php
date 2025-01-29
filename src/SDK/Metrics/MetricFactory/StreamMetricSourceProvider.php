@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricCollectorInterface;
@@ -55,7 +56,7 @@ final class StreamMetricSourceProvider implements MetricSourceProviderInterface,
         return $this->view->description;
     }
 
-    public function temporality()
+    public function temporality(): Temporality
     {
         return $this->stream->temporality();
     }
