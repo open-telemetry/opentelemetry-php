@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
-use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\Contrib\Zipkin;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
+use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -19,31 +20,30 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 /**
  * @implements ComponentProvider<SpanExporterInterface>
  */
-#[PackageDependency('open-telemetry/exporter-zipkin', '^1.0')]
-final class SpanExporterZipkin implements ComponentProvider
+#[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
+final class SpanExporterOtlpFile implements ComponentProvider
 {
     /**
      * @param array{
-     *     endpoint: string,
-     *     timeout: int<0, max>,
+     *     output_stream: string,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
-        return new Zipkin\Exporter(Loader::transportFactory('http')->create(
-            endpoint: $properties['endpoint'],
-            contentType: 'application/json',
-            timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
+        $endpoint = OutputStreamParser::parse($properties['output_stream']);
+
+        return new SpanExporter(Loader::transportFactory('stream')->create(
+            endpoint: $endpoint,
+            contentType: ContentTypes::NDJSON,
         ));
     }
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('zipkin');
+        $node = $builder->arrayNode('otlp_file');
         $node
             ->children()
-                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
+                ->scalarNode('output_stream')->defaultValue('stdout')->validate()->always(Validation::ensureString())->end()->end()
             ->end()
         ;
 

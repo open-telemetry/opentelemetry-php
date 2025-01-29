@@ -50,7 +50,8 @@
         "open-telemetry/sdk": "1.0.x-dev",
         "open-telemetry/sdk-configuration": "0.1.x-dev",
         "open-telemetry/sdk-contrib": "1.0.x-dev",
-        "open-telemetry/sem-conv": "1.0.x-dev"
+        "open-telemetry/sem-conv": "1.0.x-dev",
+        "open-telemetry/transport-grpc": "1.0.x-dev"
     },
     "autoload": {
         "psr-4": {
