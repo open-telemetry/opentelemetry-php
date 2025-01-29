@@ -12,9 +12,9 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -41,7 +41,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
             'lowmemory' => null,
         };
 
-        return new MetricExporter(Registry::transportFactory('stream')->create(
+        return new MetricExporter(Loader::transportFactory('stream')->create(
             endpoint: $endpoint,
             contentType: ContentTypes::NDJSON,
         ), $temporality);

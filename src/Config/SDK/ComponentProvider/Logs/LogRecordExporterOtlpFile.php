@@ -12,8 +12,8 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
-use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -32,7 +32,7 @@ final class LogRecordExporterOtlpFile implements ComponentProvider
     {
         $endpoint = OutputStreamParser::parse($properties['output_stream']);
 
-        return new LogsExporter(Registry::transportFactory('stream')->create(
+        return new LogsExporter(Loader::transportFactory('stream')->create(
             endpoint: $endpoint,
             contentType: ContentTypes::NDJSON,
         ));

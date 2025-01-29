@@ -12,7 +12,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -32,7 +32,7 @@ final class SpanExporterOtlpFile implements ComponentProvider
     {
         $endpoint = OutputStreamParser::parse($properties['output_stream']);
 
-        return new SpanExporter(Registry::transportFactory('stream')->create(
+        return new SpanExporter(Loader::transportFactory('stream')->create(
             endpoint: $endpoint,
             contentType: ContentTypes::NDJSON,
         ));

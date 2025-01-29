@@ -13,8 +13,8 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
-use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -41,7 +41,7 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
     {
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
-        return new LogsExporter(Registry::transportFactory('http')->create(
+        return new LogsExporter(Loader::transportFactory('http')->create(
             endpoint: $properties['endpoint'],
             contentType: match ($properties['encoding']) {
                 'protobuf' => ContentTypes::PROTOBUF,

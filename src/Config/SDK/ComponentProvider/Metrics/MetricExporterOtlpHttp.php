@@ -13,9 +13,9 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -50,7 +50,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
             'lowmemory' => null,
         };
 
-        return new MetricExporter(Registry::transportFactory('http')->create(
+        return new MetricExporter(Loader::transportFactory('http')->create(
             endpoint: $properties['endpoint'],
             contentType: match ($properties['encoding']) {
                 'protobuf' => ContentTypes::PROTOBUF,

@@ -13,7 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -41,7 +41,7 @@ final class SpanExporterOtlpHttp implements ComponentProvider
     {
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
-        return new SpanExporter(Registry::transportFactory('http')->create(
+        return new SpanExporter(Loader::transportFactory('http')->create(
             endpoint: $properties['endpoint'],
             contentType: match ($properties['encoding']) {
                 'protobuf' => ContentTypes::PROTOBUF,
