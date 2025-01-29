@@ -19,7 +19,7 @@ class SimpleLogRecordProcessor implements LogRecordProcessorInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
      */
-    public function onEmit(ReadWriteLogRecord &$record, ?ContextInterface $context = null): void
+    public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
         $this->exporter->export([$record]);
     }
