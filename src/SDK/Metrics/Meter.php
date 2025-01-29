@@ -294,7 +294,7 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @return array{Instrument, ReferenceCounterInterface, RegisteredInstrument}
      */
-    private function createSynchronousWriter(string|InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = []): array
+    private function createSynchronousWriter(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = []): array
     {
         $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
 
@@ -340,7 +340,7 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @return array{Instrument, ReferenceCounterInterface, RegisteredInstrument}
      */
-    private function createAsynchronousObserver(string|InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory): array
+    private function createAsynchronousObserver(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory): array
     {
         $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
 

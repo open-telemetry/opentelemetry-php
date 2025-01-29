@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
@@ -39,7 +40,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     {
     }
 
-    public function defaultAggregation($instrumentType, array $advisory = []): ?AggregationInterface
+    public function defaultAggregation(InstrumentType $instrumentType, array $advisory = []): ?AggregationInterface
     {
         if ($this->exporter instanceof DefaultAggregationProviderInterface) {
             /** @phan-suppress-next-line PhanParamTooMany @phpstan-ignore-next-line */

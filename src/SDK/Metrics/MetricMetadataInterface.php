@@ -9,9 +9,9 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 interface MetricMetadataInterface
 {
     /**
-     * @return string|InstrumentType
+     * @return InstrumentType
      */
-    public function instrumentType();
+    public function instrumentType(): InstrumentType;
 
     public function name(): string;
 
