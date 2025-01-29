@@ -420,7 +420,6 @@ final class Meter implements MeterInterface, Configurable
                             $view->unit,
                             $view->description,
                             $view->attributeKeys,
-                            /** @phan-suppress-next-line PhanParamTooMany @phpstan-ignore-next-line */
                             $metricRegistry->defaultAggregation($instrument->type, $instrument->advisory),
                         ),
                         new RegistryRegistration($metricRegistry, $stalenessHandler),

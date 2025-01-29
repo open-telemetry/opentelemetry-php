@@ -43,7 +43,6 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     public function defaultAggregation(InstrumentType $instrumentType, array $advisory = []): ?AggregationInterface
     {
         if ($this->exporter instanceof DefaultAggregationProviderInterface) {
-            /** @phan-suppress-next-line PhanParamTooMany @phpstan-ignore-next-line */
             return $this->exporter->defaultAggregation($instrumentType, $advisory);
         }
 
