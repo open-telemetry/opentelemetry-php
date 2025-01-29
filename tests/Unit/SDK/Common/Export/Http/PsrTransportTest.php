@@ -203,4 +203,14 @@ final class PsrTransportTest extends TestCase
 
         $this->assertFalse($transport->forceFlush());
     }
+
+    public function test_type(): void
+    {
+        $this->assertSame('http', $this->factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $this->assertSame(0, $this->factory->priority());
+    }
 }

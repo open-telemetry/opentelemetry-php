@@ -39,10 +39,7 @@
         },
         "files": [
             "Common/Util/functions.php",
-            "Logs/Exporter/_register.php",
-            "Metrics/MetricExporter/_register.php",
-            "Propagation/_register.php",
-            "Trace/SpanExporter/_register.php",
+            "_register.php",
             "Common/Dev/Compatibility/_load.php",
             "_autoload.php"
         ]
@@ -57,10 +54,11 @@
             "dev-main": "1.0.x-dev",
             "dev-2.x": "2.x-dev"
         },
-        "spi": {
-            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
-                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
-            ]
+        "spi-config": {
+            "autoload-files": [
+                "_register.php"
+            ],
+            "prune-autoload-files": true
         }
     }
 }

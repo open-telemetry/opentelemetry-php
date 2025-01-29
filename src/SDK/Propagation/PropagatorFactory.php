@@ -9,8 +9,9 @@ use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 
 class PropagatorFactory
 {
@@ -42,10 +43,16 @@ class PropagatorFactory
 
     private function buildPropagator(string $name): TextMapPropagatorInterface
     {
-        try {
-            return Registry::textMapPropagator($name);
-        } catch (\RuntimeException $e) {
-            self::logWarning($e->getMessage());
+        switch ($name) {
+            case KnownValues::VALUE_NOOP:
+            case KnownValues::VALUE_NONE:
+                return NoopTextMapPropagator::getInstance();
+            default:
+                try {
+                    return Loader::textMapPropagator($name);
+                } catch (\RuntimeException $e) {
+                    self::logWarning($e->getMessage());
+                }
         }
 
         return NoopTextMapPropagator::getInstance();
