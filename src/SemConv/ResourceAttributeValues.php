@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
 
     /**
      * ec2
@@ -203,6 +203,20 @@ interface ResourceAttributeValues
     public const CLOUD_PLATFORM_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
 
     /**
+     * Compute on Oracle Cloud Infrastructure (OCI)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_ORACLE_CLOUD_COMPUTE = 'oracle_cloud_compute';
+
+    /**
+     * Kubernetes Engine (OKE) on Oracle Cloud Infrastructure (OCI)
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_ORACLE_CLOUD_OKE = 'oracle_cloud_oke';
+
+    /**
      * Tencent Cloud Cloud Virtual Machine (CVM)
      *
      * @see ResourceAttributes::CLOUD_PLATFORM
@@ -264,6 +278,13 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_IBM_CLOUD = 'ibm_cloud';
+
+    /**
+     * Oracle Cloud Infrastructure (OCI)
+     *
+     * @see ResourceAttributes::CLOUD_PROVIDER
+     */
+    public const CLOUD_PROVIDER_ORACLE_CLOUD = 'oracle_cloud';
 
     /**
      * Tencent Cloud

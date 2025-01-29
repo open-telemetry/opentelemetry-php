@@ -11,7 +11,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
     /**
      * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
      *
@@ -118,6 +118,195 @@ interface TraceAttributeValues
     public const AWS_ECS_LAUNCHTYPE_FARGATE = 'fargate';
 
     /**
+     * Gateway (HTTP) connection.
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONNECTION_MODE
+     */
+    public const AZURE_COSMOSDB_CONNECTION_MODE_GATEWAY = 'gateway';
+
+    /**
+     * Direct connection.
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONNECTION_MODE
+     */
+    public const AZURE_COSMOSDB_CONNECTION_MODE_DIRECT = 'direct';
+
+    /**
+     * strong
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const AZURE_COSMOSDB_CONSISTENCY_LEVEL_STRONG = 'Strong';
+
+    /**
+     * bounded_staleness
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const AZURE_COSMOSDB_CONSISTENCY_LEVEL_BOUNDED_STALENESS = 'BoundedStaleness';
+
+    /**
+     * session
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const AZURE_COSMOSDB_CONSISTENCY_LEVEL_SESSION = 'Session';
+
+    /**
+     * eventual
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const AZURE_COSMOSDB_CONSISTENCY_LEVEL_EVENTUAL = 'Eventual';
+
+    /**
+     * consistent_prefix
+     *
+     * @see TraceAttributes::AZURE_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const AZURE_COSMOSDB_CONSISTENCY_LEVEL_CONSISTENT_PREFIX = 'ConsistentPrefix';
+
+    /**
+     * all
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_ALL = 'all';
+
+    /**
+     * each_quorum
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_EACH_QUORUM = 'each_quorum';
+
+    /**
+     * quorum
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_QUORUM = 'quorum';
+
+    /**
+     * local_quorum
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_LOCAL_QUORUM = 'local_quorum';
+
+    /**
+     * one
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_ONE = 'one';
+
+    /**
+     * two
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_TWO = 'two';
+
+    /**
+     * three
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_THREE = 'three';
+
+    /**
+     * local_one
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_LOCAL_ONE = 'local_one';
+
+    /**
+     * any
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_ANY = 'any';
+
+    /**
+     * serial
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_SERIAL = 'serial';
+
+    /**
+     * local_serial
+     *
+     * @see TraceAttributes::CASSANDRA_CONSISTENCY_LEVEL
+     */
+    public const CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
+
+    /**
+     * The pipeline run finished successfully.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RESULT
+     */
+    public const CICD_PIPELINE_RESULT_SUCCESS = 'success';
+
+    /**
+     * The pipeline run did not finish successfully, eg. due to a compile error or a failing test. Such failures are usually detected by non-zero exit codes of the tools executed in the pipeline run.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RESULT
+     */
+    public const CICD_PIPELINE_RESULT_FAILURE = 'failure';
+
+    /**
+     * The pipeline run failed due to an error in the CICD system, eg. due to the worker being killed.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RESULT
+     */
+    public const CICD_PIPELINE_RESULT_ERROR = 'error';
+
+    /**
+     * A timeout caused the pipeline run to be interrupted.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RESULT
+     */
+    public const CICD_PIPELINE_RESULT_TIMEOUT = 'timeout';
+
+    /**
+     * The pipeline run was cancelled, eg. by a user manually cancelling the pipeline run.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RESULT
+     */
+    public const CICD_PIPELINE_RESULT_CANCELLATION = 'cancellation';
+
+    /**
+     * The pipeline run was skipped, eg. due to a precondition not being met.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RESULT
+     */
+    public const CICD_PIPELINE_RESULT_SKIP = 'skip';
+
+    /**
+     * The run pending state spans from the event triggering the pipeline run until the execution of the run starts (eg. time spent in a queue, provisioning agents, creating run resources).
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RUN_STATE
+     */
+    public const CICD_PIPELINE_RUN_STATE_PENDING = 'pending';
+
+    /**
+     * The executing state spans the execution of any run tasks (eg. build, test).
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RUN_STATE
+     */
+    public const CICD_PIPELINE_RUN_STATE_EXECUTING = 'executing';
+
+    /**
+     * The finalizing state spans from when the run has finished executing (eg. cleanup of run resources).
+     *
+     * @see TraceAttributes::CICD_PIPELINE_RUN_STATE
+     */
+    public const CICD_PIPELINE_RUN_STATE_FINALIZING = 'finalizing';
+
+    /**
      * build
      *
      * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE
@@ -137,6 +326,27 @@ interface TraceAttributeValues
      * @see TraceAttributes::CICD_PIPELINE_TASK_TYPE
      */
     public const CICD_PIPELINE_TASK_TYPE_DEPLOY = 'deploy';
+
+    /**
+     * The worker is not performing work for the CICD system. It is available to the CICD system to perform work on (online / idle).
+     *
+     * @see TraceAttributes::CICD_WORKER_STATE
+     */
+    public const CICD_WORKER_STATE_AVAILABLE = 'available';
+
+    /**
+     * The worker is performing work for the CICD system.
+     *
+     * @see TraceAttributes::CICD_WORKER_STATE
+     */
+    public const CICD_WORKER_STATE_BUSY = 'busy';
+
+    /**
+     * The worker is not available to the CICD system (disconnected / down).
+     *
+     * @see TraceAttributes::CICD_WORKER_STATE
+     */
+    public const CICD_WORKER_STATE_OFFLINE = 'offline';
 
     /**
      * Alibaba Cloud Elastic Compute Service
@@ -314,6 +524,20 @@ interface TraceAttributeValues
     public const CLOUD_PLATFORM_IBM_CLOUD_OPENSHIFT = 'ibm_cloud_openshift';
 
     /**
+     * Compute on Oracle Cloud Infrastructure (OCI)
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_ORACLE_CLOUD_COMPUTE = 'oracle_cloud_compute';
+
+    /**
+     * Kubernetes Engine (OKE) on Oracle Cloud Infrastructure (OCI)
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_ORACLE_CLOUD_OKE = 'oracle_cloud_oke';
+
+    /**
      * Tencent Cloud Cloud Virtual Machine (CVM)
      *
      * @see TraceAttributes::CLOUD_PLATFORM
@@ -375,6 +599,13 @@ interface TraceAttributeValues
      * @see TraceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_IBM_CLOUD = 'ibm_cloud';
+
+    /**
+     * Oracle Cloud Infrastructure (OCI)
+     *
+     * @see TraceAttributes::CLOUD_PROVIDER
+     */
+    public const CLOUD_PROVIDER_ORACLE_CLOUD = 'oracle_cloud';
 
     /**
      * Tencent Cloud
@@ -566,7 +797,7 @@ interface TraceAttributeValues
     public const DB_CLIENT_CONNECTIONS_STATE_USED = 'used';
 
     /**
-     * Gateway (HTTP) connections mode
+     * Gateway (HTTP) connection.
      *
      * @see TraceAttributes::DB_COSMOSDB_CONNECTION_MODE
      */
@@ -578,6 +809,41 @@ interface TraceAttributeValues
      * @see TraceAttributes::DB_COSMOSDB_CONNECTION_MODE
      */
     public const DB_COSMOSDB_CONNECTION_MODE_DIRECT = 'direct';
+
+    /**
+     * strong
+     *
+     * @see TraceAttributes::DB_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const DB_COSMOSDB_CONSISTENCY_LEVEL_STRONG = 'Strong';
+
+    /**
+     * bounded_staleness
+     *
+     * @see TraceAttributes::DB_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const DB_COSMOSDB_CONSISTENCY_LEVEL_BOUNDED_STALENESS = 'BoundedStaleness';
+
+    /**
+     * session
+     *
+     * @see TraceAttributes::DB_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const DB_COSMOSDB_CONSISTENCY_LEVEL_SESSION = 'Session';
+
+    /**
+     * eventual
+     *
+     * @see TraceAttributes::DB_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const DB_COSMOSDB_CONSISTENCY_LEVEL_EVENTUAL = 'Eventual';
+
+    /**
+     * consistent_prefix
+     *
+     * @see TraceAttributes::DB_COSMOSDB_CONSISTENCY_LEVEL
+     */
+    public const DB_COSMOSDB_CONSISTENCY_LEVEL_CONSISTENT_PREFIX = 'ConsistentPrefix';
 
     /**
      * batch
@@ -1068,6 +1334,293 @@ interface TraceAttributeValues
     public const DB_SYSTEM_VERTICA = 'vertica';
 
     /**
+     * Some other SQL database. Fallback only.
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_OTHER_SQL = 'other_sql';
+
+    /**
+     * [Adabas (Adaptable Database System)](https://documentation.softwareag.com/?pf=adabas)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_SOFTWAREAG_ADABAS = 'softwareag.adabas';
+
+    /**
+     * [Actian Ingres](https://www.actian.com/databases/ingres/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_ACTIAN_INGRES = 'actian.ingres';
+
+    /**
+     * [Amazon DynamoDB](https://aws.amazon.com/pm/dynamodb/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_AWS_DYNAMODB = 'aws.dynamodb';
+
+    /**
+     * [Amazon Redshift](https://aws.amazon.com/redshift/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_AWS_REDSHIFT = 'aws.redshift';
+
+    /**
+     * [Azure Cosmos DB](https://learn.microsoft.com/azure/cosmos-db)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_AZURE_COSMOSDB = 'azure.cosmosdb';
+
+    /**
+     * [InterSystems Caché](https://www.intersystems.com/products/cache/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_INTERSYSTEMS_CACHE = 'intersystems.cache';
+
+    /**
+     * [Apache Cassandra](https://cassandra.apache.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_CASSANDRA = 'cassandra';
+
+    /**
+     * [ClickHouse](https://clickhouse.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_CLICKHOUSE = 'clickhouse';
+
+    /**
+     * [CockroachDB](https://www.cockroachlabs.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_COCKROACHDB = 'cockroachdb';
+
+    /**
+     * [Couchbase](https://www.couchbase.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_COUCHBASE = 'couchbase';
+
+    /**
+     * [Apache CouchDB](https://couchdb.apache.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_COUCHDB = 'couchdb';
+
+    /**
+     * [Apache Derby](https://db.apache.org/derby/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_DERBY = 'derby';
+
+    /**
+     * [Elasticsearch](https://www.elastic.co/elasticsearch)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_ELASTICSEARCH = 'elasticsearch';
+
+    /**
+     * [Firebird](https://www.firebirdsql.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_FIREBIRDSQL = 'firebirdsql';
+
+    /**
+     * [Google Cloud Spanner](https://cloud.google.com/spanner)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_GCP_SPANNER = 'gcp.spanner';
+
+    /**
+     * [Apache Geode](https://geode.apache.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_GEODE = 'geode';
+
+    /**
+     * [H2 Database](https://h2database.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_H2DATABASE = 'h2database';
+
+    /**
+     * [Apache HBase](https://hbase.apache.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_HBASE = 'hbase';
+
+    /**
+     * [Apache Hive](https://hive.apache.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_HIVE = 'hive';
+
+    /**
+     * [HyperSQL Database](https://hsqldb.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_HSQLDB = 'hsqldb';
+
+    /**
+     * [IBM Db2](https://www.ibm.com/db2)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_IBM_DB2 = 'ibm.db2';
+
+    /**
+     * [IBM Informix](https://www.ibm.com/products/informix)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_IBM_INFORMIX = 'ibm.informix';
+
+    /**
+     * [IBM Netezza](https://www.ibm.com/products/netezza)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_IBM_NETEZZA = 'ibm.netezza';
+
+    /**
+     * [InfluxDB](https://www.influxdata.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_INFLUXDB = 'influxdb';
+
+    /**
+     * [Instant](https://www.instantdb.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_INSTANTDB = 'instantdb';
+
+    /**
+     * [MariaDB](https://mariadb.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_MARIADB = 'mariadb';
+
+    /**
+     * [Memcached](https://memcached.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_MEMCACHED = 'memcached';
+
+    /**
+     * [MongoDB](https://www.mongodb.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_MONGODB = 'mongodb';
+
+    /**
+     * [Microsoft SQL Server](https://www.microsoft.com/sql-server)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_MICROSOFT_SQL_SERVER = 'microsoft.sql_server';
+
+    /**
+     * [MySQL](https://www.mysql.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_MYSQL = 'mysql';
+
+    /**
+     * [Neo4j](https://neo4j.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_NEO4J = 'neo4j';
+
+    /**
+     * [OpenSearch](https://opensearch.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_OPENSEARCH = 'opensearch';
+
+    /**
+     * [Oracle Database](https://www.oracle.com/database/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_ORACLE_DB = 'oracle.db';
+
+    /**
+     * [PostgreSQL](https://www.postgresql.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_POSTGRESQL = 'postgresql';
+
+    /**
+     * [Redis](https://redis.io/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_REDIS = 'redis';
+
+    /**
+     * [SAP HANA](https://www.sap.com/products/technology-platform/hana/what-is-sap-hana.html)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_SAP_HANA = 'sap.hana';
+
+    /**
+     * [SAP MaxDB](https://maxdb.sap.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_SAP_MAXDB = 'sap.maxdb';
+
+    /**
+     * [SQLite](https://www.sqlite.org/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_SQLITE = 'sqlite';
+
+    /**
+     * [Teradata](https://www.teradata.com/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_TERADATA = 'teradata';
+
+    /**
+     * [Trino](https://trino.io/)
+     *
+     * @see TraceAttributes::DB_SYSTEM_NAME
+     */
+    public const DB_SYSTEM_NAME_TRINO = 'trino';
+
+    /**
      * failed
      *
      * @see TraceAttributes::DEPLOYMENT_STATUS
@@ -1194,6 +1747,69 @@ interface TraceAttributeValues
     public const FAAS_TRIGGER_OTHER = 'other';
 
     /**
+     * The resolved value is static (no dynamic evaluation).
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_STATIC = 'static';
+
+    /**
+     * The resolved value fell back to a pre-configured value (no dynamic evaluation occurred or dynamic evaluation yielded no result).
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_DEFAULT = 'default';
+
+    /**
+     * The resolved value was the result of a dynamic evaluation, such as a rule or specific user-targeting.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_TARGETING_MATCH = 'targeting_match';
+
+    /**
+     * The resolved value was the result of pseudorandom assignment.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_SPLIT = 'split';
+
+    /**
+     * The resolved value was retrieved from cache.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_CACHED = 'cached';
+
+    /**
+     * The resolved value was the result of the flag being disabled in the management system.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_DISABLED = 'disabled';
+
+    /**
+     * The reason for the resolved value could not be determined.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_UNKNOWN = 'unknown';
+
+    /**
+     * The resolved value is non-authoritative or possibly out of date
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_STALE = 'stale';
+
+    /**
+     * The resolved value was the result of an error.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_EVALUATION_REASON
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_ERROR = 'error';
+
+    /**
      * Text response format
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
@@ -1243,6 +1859,13 @@ interface TraceAttributeValues
     public const GEN_AI_OPERATION_NAME_TEXT_COMPLETION = 'text_completion';
 
     /**
+     * Embeddings operation such as [OpenAI Create embeddings API](https://platform.openai.com/docs/api-reference/embeddings/create)
+     *
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME
+     */
+    public const GEN_AI_OPERATION_NAME_EMBEDDINGS = 'embeddings';
+
+    /**
      * OpenAI
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
@@ -1255,6 +1878,13 @@ interface TraceAttributeValues
      * @see TraceAttributes::GEN_AI_SYSTEM
      */
     public const GEN_AI_SYSTEM_VERTEX_AI = 'vertex_ai';
+
+    /**
+     * Gemini
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_GEMINI = 'gemini';
 
     /**
      * Anthropic
@@ -1278,6 +1908,62 @@ interface TraceAttributeValues
     public const GEN_AI_SYSTEM_AZ_AI_INFERENCE = 'az.ai.inference';
 
     /**
+     * Azure OpenAI
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_AZ_AI_OPENAI = 'az.ai.openai';
+
+    /**
+     * IBM Watsonx AI
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_IBM_WATSONX_AI = 'ibm.watsonx.ai';
+
+    /**
+     * AWS Bedrock
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_AWS_BEDROCK = 'aws.bedrock';
+
+    /**
+     * Perplexity
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_PERPLEXITY = 'perplexity';
+
+    /**
+     * xAI
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_XAI = 'xai';
+
+    /**
+     * DeepSeek
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_DEEPSEEK = 'deepseek';
+
+    /**
+     * Groq
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_GROQ = 'groq';
+
+    /**
+     * Mistral AI
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_MISTRAL_AI = 'mistral_ai';
+
+    /**
      * Input tokens (prompt, input, etc.)
      *
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
@@ -1290,6 +1976,55 @@ interface TraceAttributeValues
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
      */
     public const GEN_AI_TOKEN_TYPE_COMPLETION = 'output';
+
+    /**
+     * Africa
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_AF = 'AF';
+
+    /**
+     * Antarctica
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_AN = 'AN';
+
+    /**
+     * Asia
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_AS = 'AS';
+
+    /**
+     * Europe
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_EU = 'EU';
+
+    /**
+     * North America
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_NA = 'NA';
+
+    /**
+     * Oceania
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_OC = 'OC';
+
+    /**
+     * South America
+     *
+     * @see TraceAttributes::GEO_CONTINENT_CODE
+     */
+    public const GEO_CONTINENT_CODE_SA = 'SA';
 
     /**
      * Memory allocated from the heap that is reserved for stack space, whether or not it is currently in-use.
@@ -1600,42 +2335,56 @@ interface TraceAttributeValues
     public const JVM_THREAD_STATE_TERMINATED = 'terminated';
 
     /**
-     * A [persistentVolumeClaim](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
+     * Active namespace phase as described by [K8s API](https://pkg.go.dev/k8s.io/api@v0.31.3/core/v1#NamespacePhase)
+     *
+     * @see TraceAttributes::K8S_NAMESPACE_PHASE
+     */
+    public const K8S_NAMESPACE_PHASE_ACTIVE = 'active';
+
+    /**
+     * Terminating namespace phase as described by [K8s API](https://pkg.go.dev/k8s.io/api@v0.31.3/core/v1#NamespacePhase)
+     *
+     * @see TraceAttributes::K8S_NAMESPACE_PHASE
+     */
+    public const K8S_NAMESPACE_PHASE_TERMINATING = 'terminating';
+
+    /**
+     * A [persistentVolumeClaim](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
     public const K8S_VOLUME_TYPE_PERSISTENT_VOLUME_CLAIM = 'persistentVolumeClaim';
 
     /**
-     * A [configMap](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
+     * A [configMap](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#configmap) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
     public const K8S_VOLUME_TYPE_CONFIG_MAP = 'configMap';
 
     /**
-     * A [downwardAPI](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
+     * A [downwardAPI](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#downwardapi) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
     public const K8S_VOLUME_TYPE_DOWNWARD_API = 'downwardAPI';
 
     /**
-     * An [emptyDir](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
+     * An [emptyDir](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#emptydir) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
     public const K8S_VOLUME_TYPE_EMPTY_DIR = 'emptyDir';
 
     /**
-     * A [secret](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#secret) volume
+     * A [secret](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#secret) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
     public const K8S_VOLUME_TYPE_SECRET = 'secret';
 
     /**
-     * A [local](https://v1-29.docs.kubernetes.io/docs/concepts/storage/volumes/#local) volume
+     * A [local](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#local) volume
      *
      * @see TraceAttributes::K8S_VOLUME_TYPE
      */
@@ -1936,6 +2685,83 @@ interface TraceAttributeValues
      * @see TraceAttributes::NET_TRANSPORT
      */
     public const NET_TRANSPORT_OTHER = 'other';
+
+    /**
+     * closed
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_CLOSED = 'closed';
+
+    /**
+     * close_wait
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_CLOSE_WAIT = 'close_wait';
+
+    /**
+     * closing
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_CLOSING = 'closing';
+
+    /**
+     * established
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_ESTABLISHED = 'established';
+
+    /**
+     * fin_wait_1
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_FIN_WAIT_1 = 'fin_wait_1';
+
+    /**
+     * fin_wait_2
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_FIN_WAIT_2 = 'fin_wait_2';
+
+    /**
+     * last_ack
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_LAST_ACK = 'last_ack';
+
+    /**
+     * listen
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_LISTEN = 'listen';
+
+    /**
+     * syn_received
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_SYN_RECEIVED = 'syn_received';
+
+    /**
+     * syn_sent
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_SYN_SENT = 'syn_sent';
+
+    /**
+     * time_wait
+     *
+     * @see TraceAttributes::NETWORK_CONNECTION_STATE
+     */
+    public const NETWORK_CONNECTION_STATE_TIME_WAIT = 'time_wait';
 
     /**
      * GPRS
@@ -3157,6 +3983,20 @@ interface TraceAttributeValues
     public const TLS_PROTOCOL_NAME_TLS = 'tls';
 
     /**
+     * Bot source.
+     *
+     * @see TraceAttributes::USER_AGENT_SYNTHETIC_TYPE
+     */
+    public const USER_AGENT_SYNTHETIC_TYPE_BOT = 'bot';
+
+    /**
+     * Synthetic test source.
+     *
+     * @see TraceAttributes::USER_AGENT_SYNTHETIC_TYPE
+     */
+    public const USER_AGENT_SYNTHETIC_TYPE_TEST = 'test';
+
+    /**
      * Major (Mark Sweep Compact).
      *
      * @see TraceAttributes::V8JS_GC_TYPE
@@ -3220,6 +4060,90 @@ interface TraceAttributeValues
     public const V8JS_HEAP_SPACE_NAME_LARGE_OBJECT_SPACE = 'large_object_space';
 
     /**
+     * Open means the change is currently active and under review. It hasn't been merged into the target branch yet, and it's still possible to make changes or add comments.
+     *
+     * @see TraceAttributes::VCS_CHANGE_STATE
+     */
+    public const VCS_CHANGE_STATE_OPEN = 'open';
+
+    /**
+     * WIP (work-in-progress, draft) means the change is still in progress and not yet ready for a full review. It might still undergo significant changes.
+     *
+     * @see TraceAttributes::VCS_CHANGE_STATE
+     */
+    public const VCS_CHANGE_STATE_WIP = 'wip';
+
+    /**
+     * Closed means the merge request has been closed without merging. This can happen for various reasons, such as the changes being deemed unnecessary, the issue being resolved in another way, or the author deciding to withdraw the request.
+     *
+     * @see TraceAttributes::VCS_CHANGE_STATE
+     */
+    public const VCS_CHANGE_STATE_CLOSED = 'closed';
+
+    /**
+     * Merged indicates that the change has been successfully integrated into the target codebase.
+     *
+     * @see TraceAttributes::VCS_CHANGE_STATE
+     */
+    public const VCS_CHANGE_STATE_MERGED = 'merged';
+
+    /**
+     * How many lines were added.
+     *
+     * @see TraceAttributes::VCS_LINE_CHANGE_TYPE
+     */
+    public const VCS_LINE_CHANGE_TYPE_ADDED = 'added';
+
+    /**
+     * How many lines were removed.
+     *
+     * @see TraceAttributes::VCS_LINE_CHANGE_TYPE
+     */
+    public const VCS_LINE_CHANGE_TYPE_REMOVED = 'removed';
+
+    /**
+     * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
+     *
+     * @see TraceAttributes::VCS_REF_BASE_TYPE
+     */
+    public const VCS_REF_BASE_TYPE_BRANCH = 'branch';
+
+    /**
+     * [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
+     *
+     * @see TraceAttributes::VCS_REF_BASE_TYPE
+     */
+    public const VCS_REF_BASE_TYPE_TAG = 'tag';
+
+    /**
+     * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
+     *
+     * @see TraceAttributes::VCS_REF_HEAD_TYPE
+     */
+    public const VCS_REF_HEAD_TYPE_BRANCH = 'branch';
+
+    /**
+     * [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
+     *
+     * @see TraceAttributes::VCS_REF_HEAD_TYPE
+     */
+    public const VCS_REF_HEAD_TYPE_TAG = 'tag';
+
+    /**
+     * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
+     *
+     * @see TraceAttributes::VCS_REF_TYPE
+     */
+    public const VCS_REF_TYPE_BRANCH = 'branch';
+
+    /**
+     * [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
+     *
+     * @see TraceAttributes::VCS_REF_TYPE
+     */
+    public const VCS_REF_TYPE_TAG = 'tag';
+
+    /**
      * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
      *
      * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE
@@ -3232,5 +4156,19 @@ interface TraceAttributeValues
      * @see TraceAttributes::VCS_REPOSITORY_REF_TYPE
      */
     public const VCS_REPOSITORY_REF_TYPE_TAG = 'tag';
+
+    /**
+     * How many revisions the change is behind the target ref.
+     *
+     * @see TraceAttributes::VCS_REVISION_DELTA_DIRECTION
+     */
+    public const VCS_REVISION_DELTA_DIRECTION_BEHIND = 'behind';
+
+    /**
+     * How many revisions the change is ahead of the target ref.
+     *
+     * @see TraceAttributes::VCS_REVISION_DELTA_DIRECTION
+     */
+    public const VCS_REVISION_DELTA_DIRECTION_AHEAD = 'ahead';
 
 }
