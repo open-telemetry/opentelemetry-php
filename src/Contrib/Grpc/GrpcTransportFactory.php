@@ -81,6 +81,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             $opts,
             $method,
             $headers,
+            (int)($timeout * 1000),
         );
     }
 
@@ -116,7 +117,6 @@ final class GrpcTransportFactory implements TransportFactoryInterface
                             'method' => null,
                         ],
                     ],
-                    'timeout' => sprintf('%0.6fs', $timeout),
                     'retryPolicy' => [
                         'maxAttempts' => $maxRetries,
                         'initialBackoff' => sprintf('%0.3fs', $retryDelay / 1000),
