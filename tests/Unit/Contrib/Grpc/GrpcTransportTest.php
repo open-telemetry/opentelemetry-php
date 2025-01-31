@@ -18,7 +18,7 @@ final class GrpcTransportTest extends TestCase
 
     public function setUp(): void
     {
-        $this->transport = new GrpcTransport('http://localhost:4317', [], '/method', []);
+        $this->transport = new GrpcTransport('http://localhost:4317', [], '/method', [], 123);
     }
 
     public function test_grpc_transport_supports_only_protobuf(): void
