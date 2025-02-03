@@ -81,7 +81,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             $opts,
             $method,
             $headers,
-            (int)($timeout * 1000),
+            (int) ($timeout * 1000),
         );
     }
 

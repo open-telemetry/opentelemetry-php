@@ -9,6 +9,7 @@ interface ClockInterface
     public const NANOS_PER_SECOND = 1_000_000_000;
     public const NANOS_PER_MILLISECOND = 1_000_000;
     public const NANOS_PER_MICROSECOND = 1_000;
+    public const MICROS_PER_MILLISECOND = 1_000;
     public const MILLIS_PER_SECOND = 1_000;
 
     /**
