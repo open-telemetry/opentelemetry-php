@@ -1,3 +1,178 @@
+# Contributing to OpenTelemetry PHP
+
+## Introduction
+
+Welcome to the OpenTelemetry PHPrepository! 🎉
+
+Thank you for considering contributing to this project. Whether you're fixing a bug, adding new features, improving documentation, or reporting an issue, we appreciate your help in making OpenTelemetry better. 
+
+This repository is part of the OpenTelemetry ecosystem, which provides observability tooling for distributed systems. Your contributions help enhance the PHP ecosystem for OpenTelemetry users worldwide.
+
+If you have any questions, feel free to ask in the community channels. We’re happy to help! 😊
+
+## Pre-requisites
+
+Before getting started, ensure you have the following installed:
+
+- **PHP** (8.1 or higher) – [Install PHP](https://www.php.net/downloads)
+- **Composer** – [Install Composer](https://getcomposer.org/)
+- **Docker & Docker Compose** – [Install Docker](https://docs.docker.com/engine/install/)
+- **Make** (for running development tasks)
+
+Additional Notes:
+- Windows users may need [Git Bash](https://gitforwindows.org/) for better compatibility.
+- Consider using [phpenv](https://github.com/phpenv/phpenv) for managing multiple PHP versions.
+
+## Workflow
+
+We follow a structured workflow to ensure smooth collaboration:
+
+### Branch Naming Convention
+- **Feature branches**: `feature/<short-description>`
+- **Bugfix branches**: `fix/<short-description>`
+- **Documentation updates**: `docs/<short-description>`
+
+### Commit Message Format
+- Use descriptive commit messages (e.g., `fix(tracing): resolve issue with span context`)
+- Follow [Conventional Commits](https://www.conventionalcommits.org/) where possible.
+
+### Pull Request Guidelines
+- Fork the repository and create a new branch.
+- Follow the coding guidelines before submitting your PR.
+- Ensure tests pass locally before pushing.
+- Link relevant issues in the PR description.
+
+
+## Local Run/Build
+
+To set up your local development environment:
+
+```bash
+# Clone the repository
+git clone https://github.com/open-telemetry/opentelemetry-php.git
+cd opentelemetry-php
+
+# Install dependencies
+make install
+```
+
+To update dependencies:
+
+```bash
+make update
+```
+
+To run checks:
+
+```bash
+make all-checks
+```
+
+
+## Testing
+
+We use various tools for testing and static analysis:
+
+```bash
+# Run all tests
+make test
+
+# Run static analysis
+make phan
+make psalm
+make phpstan
+
+# Run style checks
+make style
+```
+
+To run tests against different PHP versions:
+
+```bash
+PHP_VERSION=8.3 make test
+```
+
+## Contributing Rules
+
+- Follow [Clean Code PHP](https://github.com/jupeter/clean-code-php) principles.
+- Ensure new features have appropriate test coverage.
+- Run `make style` before submitting a PR.
+- Include clear and concise documentation updates if needed.
+
+Check for issues labeled [`good first issue`](https://github.com/open-telemetry/opentelemetry-php/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start contributing.
+
+
+## Further Help
+
+Need help? Join our community:
+
+Most of our communication is done on CNCF Slack in the channel:
+ 
+- **Slack**: [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V)
+- **GitHub Discussions**: [OpenTelemetry PHP Discussions](https://github.com/open-telemetry/opentelemetry-php/discussions)
+- **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-php-contrib/issues)
+
+
+## Troubleshooting Guide
+
+### Common Issues & Fixes
+
+#### 1. Missing PHP dependencies
+**Error:** `Class 'SomeClass' not found`
+
+**Fix:** Run:
+```bash
+make install
+```
+
+#### 2. Linting Errors
+**Error:** `Files not formatted correctly`
+
+**Fix:** Run:
+```bash
+make style
+```
+
+#### 3. Tests Failing Due to Missing Dependencies
+**Error:** `Dependency missing`
+
+**Fix:**
+```bash
+make update
+make test
+```
+
+
+## Additional Information
+
+### Code Coverage
+We use [Codecov](https://about.codecov.io/) to track test coverage. You can generate a local coverage report using:
+
+```bash
+make test-coverage
+```
+
+### Generating API Documentation
+To generate API docs:
+```bash
+make phpdoc
+```
+
+To preview locally:
+```bash
+make phpdoc-preview
+```
+
+### Dependency Validation
+We use [Deptrac](https://github.com/qossmic/deptrac) for dependency validation:
+```bash
+make deptrac
+```
+
+Thank you for contributing! 🚀
+
+
+
 ## Maintainers
 [@open-telemetry/php-maintainers](https://github.com/orgs/open-telemetry/teams/php-maintainers)
 
@@ -34,10 +209,6 @@ Find more information about the member role in the [community repository](https:
 
 Find more about emeritus roles in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager)
 
-## Communication
-
-Most of our communication is done on CNCF Slack in the channel [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V).
-To sign up, create a CNCF Slack account [here](http://slack.cncf.io/)
 
 Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.
 A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
