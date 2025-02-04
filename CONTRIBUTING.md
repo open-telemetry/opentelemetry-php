@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome to the OpenTelemetry PHPrepository! 🎉
+Welcome to the OpenTelemetry PHP repository! 🎉
 
 Thank you for considering contributing to this project. Whether you're fixing a bug, adding new features, improving documentation, or reporting an issue, we appreciate your help in making OpenTelemetry better. 
 
