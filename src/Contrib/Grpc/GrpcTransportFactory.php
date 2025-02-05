@@ -12,6 +12,7 @@ use function in_array;
 use InvalidArgumentException;
 use function json_encode;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -62,7 +63,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException(sprintf('Endpoint path is not a valid GRPC method "%s"', $method));
         }
 
-        $opts = self::createOpts($compression, $timeout, $maxRetries, $retryDelay);
+        $opts = self::createOpts($compression, $maxRetries, $retryDelay);
         /** @psalm-suppress PossiblyNullArgument */
         $opts['credentials'] = $scheme === 'http'
             ? ChannelCredentials::createInsecure()
@@ -81,13 +82,12 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             $opts,
             $method,
             $headers,
-            (int) ($timeout * 1000),
+            (int) ($timeout * ClockInterface::MILLIS_PER_SECOND),
         );
     }
 
     private static function createOpts(
         $compression,
-        float $timeout,
         int $maxRetries,
         int $retryDelay,
     ): array {
@@ -119,8 +119,8 @@ final class GrpcTransportFactory implements TransportFactoryInterface
                     ],
                     'retryPolicy' => [
                         'maxAttempts' => $maxRetries,
-                        'initialBackoff' => sprintf('%0.3fs', $retryDelay / 1000),
-                        'maxBackoff' => sprintf('%0.3fs', ($retryDelay << $maxRetries - 1) / 1000),
+                        'initialBackoff' => sprintf('%0.3fs', $retryDelay / ClockInterface::MILLIS_PER_SECOND),
+                        'maxBackoff' => sprintf('%0.3fs', ($retryDelay << $maxRetries - 1) / ClockInterface::MILLIS_PER_SECOND),
                         'backoffMultiplier' => 2,
                         'retryableStatusCodes' => [
                             // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-response
