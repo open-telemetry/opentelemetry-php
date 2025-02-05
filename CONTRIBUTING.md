@@ -71,19 +71,11 @@ make all-checks
 
 ## Testing
 
-We use various tools for testing and static analysis:
+To ensure your changes meet our project's standards, simply run:
 
 ```bash
-# Run all tests
-make test
+make all
 
-# Run static analysis
-make phan
-make psalm
-make phpstan
-
-# Run style checks
-make style
 ```
 
 To run tests against different PHP versions:
@@ -110,7 +102,7 @@ Most of our communication is done on CNCF Slack in the channel:
  
 - **Slack**: [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V)
 - **GitHub Discussions**: [OpenTelemetry PHP Discussions](https://github.com/open-telemetry/opentelemetry-php/discussions)
-- **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-php-contrib/issues)
+- **Issues**: If you encounter a bug, [open an issue](https://github.com/open-telemetry/opentelemetry-php/issues)
 
 
 ## Troubleshooting Guide
