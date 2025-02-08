@@ -24,7 +24,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
 {
     use LogsMessagesTrait;
 
-    public const MILLIS_PER_SECOND = 1_000;
+    private const MILLIS_PER_SECOND = 1_000;
 
     /**
      * @psalm-param "application/x-protobuf" $contentType
