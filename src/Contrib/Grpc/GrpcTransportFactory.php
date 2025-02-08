@@ -12,7 +12,6 @@ use function in_array;
 use InvalidArgumentException;
 use function json_encode;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -24,6 +23,8 @@ use function substr_count;
 final class GrpcTransportFactory implements TransportFactoryInterface
 {
     use LogsMessagesTrait;
+
+    public const MILLIS_PER_SECOND = 1_000;
 
     /**
      * @psalm-param "application/x-protobuf" $contentType
@@ -82,7 +83,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             $opts,
             $method,
             $headers,
-            (int) ($timeout * ClockInterface::MILLIS_PER_SECOND),
+            (int) ($timeout * self::MILLIS_PER_SECOND),
         );
     }
 
@@ -119,8 +120,8 @@ final class GrpcTransportFactory implements TransportFactoryInterface
                     ],
                     'retryPolicy' => [
                         'maxAttempts' => $maxRetries,
-                        'initialBackoff' => sprintf('%0.3fs', $retryDelay / ClockInterface::MILLIS_PER_SECOND),
-                        'maxBackoff' => sprintf('%0.3fs', ($retryDelay << $maxRetries - 1) / ClockInterface::MILLIS_PER_SECOND),
+                        'initialBackoff' => sprintf('%0.3fs', $retryDelay / self::MILLIS_PER_SECOND),
+                        'maxBackoff' => sprintf('%0.3fs', ($retryDelay << $maxRetries - 1) / self::MILLIS_PER_SECOND),
                         'backoffMultiplier' => 2,
                         'retryableStatusCodes' => [
                             // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-response
