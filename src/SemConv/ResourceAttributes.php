@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.28.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
@@ -639,6 +639,16 @@ interface ResourceAttributes
     public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
 
     /**
+     * The name of the horizontal pod autoscaler.
+     */
+    public const K8S_HPA_NAME = 'k8s.hpa.name';
+
+    /**
+     * The UID of the horizontal pod autoscaler.
+     */
+    public const K8S_HPA_UID = 'k8s.hpa.uid';
+
+    /**
      * The name of the Job.
      */
     public const K8S_JOB_NAME = 'k8s.job.name';
@@ -692,6 +702,26 @@ interface ResourceAttributes
      * The UID of the ReplicaSet.
      */
     public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+
+    /**
+     * The name of the replication controller.
+     */
+    public const K8S_REPLICATIONCONTROLLER_NAME = 'k8s.replicationcontroller.name';
+
+    /**
+     * The UID of the replication controller.
+     */
+    public const K8S_REPLICATIONCONTROLLER_UID = 'k8s.replicationcontroller.uid';
+
+    /**
+     * The name of the resource quota.
+     */
+    public const K8S_RESOURCEQUOTA_NAME = 'k8s.resourcequota.name';
+
+    /**
+     * The UID of the resource quota.
+     */
+    public const K8S_RESOURCEQUOTA_UID = 'k8s.resourcequota.uid';
 
     /**
      * The name of the StatefulSet.

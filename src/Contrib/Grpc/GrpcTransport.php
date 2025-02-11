@@ -18,7 +18,6 @@ use const Grpc\OP_SEND_INITIAL_METADATA;
 use const Grpc\OP_SEND_MESSAGE;
 use const Grpc\STATUS_OK;
 use Grpc\Timeval;
-use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -36,10 +35,11 @@ use Throwable;
  */
 final class GrpcTransport implements TransportInterface
 {
+    private const MICROS_PER_MILLISECOND = 1_000;
     private readonly array $metadata;
     private readonly Channel $channel;
     private bool $closed = false;
-    private Timeval $exportTimeout;
+    private readonly Timeval $exportTimeout;
 
     public function __construct(
         string $endpoint,
@@ -50,7 +50,7 @@ final class GrpcTransport implements TransportInterface
     ) {
         $this->channel = new Channel($endpoint, $opts);
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
-        $this->exportTimeout = new Timeval($timeoutMillis * ClockInterface::MICROS_PER_MILLISECOND);
+        $this->exportTimeout = new Timeval($timeoutMillis * self::MICROS_PER_MILLISECOND);
     }
 
     public function contentType(): string
