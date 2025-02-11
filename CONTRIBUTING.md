@@ -23,26 +23,6 @@ Additional Notes:
 - Windows users may need [Git Bash](https://gitforwindows.org/) for better compatibility.
 - Consider using [phpenv](https://github.com/phpenv/phpenv) for managing multiple PHP versions.
 
-## Workflow
-
-We follow a structured workflow to ensure smooth collaboration:
-
-### Branch Naming Convention
-- **Feature branches**: `feature/<short-description>`
-- **Bugfix branches**: `fix/<short-description>`
-- **Documentation updates**: `docs/<short-description>`
-
-### Commit Message Format
-- Use descriptive commit messages (e.g., `fix(tracing): resolve issue with span context`)
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) where possible.
-
-### Pull Request Guidelines
-- Fork the repository and create a new branch.
-- Follow the coding guidelines before submitting your PR.
-- Ensure tests pass locally before pushing.
-- Link relevant issues in the PR description.
-
-
 ## Local Run/Build
 
 To set up your local development environment:
