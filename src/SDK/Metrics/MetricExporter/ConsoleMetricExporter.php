@@ -18,13 +18,13 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
-    public function __construct(private readonly Temporality|string|null $temporality = null)
+    public function __construct(private readonly ?Temporality $temporality = null)
     {
     }
     /**
      * @inheritDoc
      */
-    public function temporality(MetricMetadataInterface $metric): Temporality|string|null
+    public function temporality(MetricMetadataInterface $metric): ?Temporality
     {
         return $this->temporality ?? $metric->temporality();
     }

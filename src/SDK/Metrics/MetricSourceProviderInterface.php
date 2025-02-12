@@ -8,8 +8,5 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 interface MetricSourceProviderInterface
 {
-    /**
-     * @param string|Temporality $temporality
-     */
-    public function create($temporality): MetricSourceInterface;
+    public function create(Temporality $temporality): MetricSourceInterface;
 }

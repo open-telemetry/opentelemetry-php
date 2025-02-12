@@ -15,11 +15,11 @@ final class InstrumentTypeCriteria implements SelectionCriteriaInterface
     private readonly array $instrumentTypes;
 
     /**
-     * @param string|InstrumentType|string[]|InstrumentType[] $instrumentType
+     * @param InstrumentType|InstrumentType[] $instrumentType
      */
-    public function __construct($instrumentType)
+    public function __construct(array|InstrumentType $instrumentType)
     {
-        $this->instrumentTypes = (array) $instrumentType;
+        $this->instrumentTypes = is_array($instrumentType) ? $instrumentType : [$instrumentType];
     }
 
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
