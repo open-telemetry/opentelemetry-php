@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
-use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
@@ -26,7 +25,6 @@ class SdkTest extends TestCase
     private MeterProviderInterface $meterProvider;
     private TracerProviderInterface $tracerProvider;
     private LoggerProviderInterface $loggerProvider;
-    private EventLoggerProviderInterface $eventLoggerProvider;
 
     public function setUp(): void
     {
@@ -34,7 +32,6 @@ class SdkTest extends TestCase
         $this->meterProvider = $this->createMock(MeterProviderInterface::class);
         $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
         $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
     }
 
     public function tearDown(): void
@@ -90,11 +87,10 @@ class SdkTest extends TestCase
 
     public function test_getters(): void
     {
-        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator);
+        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->propagator);
         $this->assertSame($this->propagator, $sdk->getPropagator());
         $this->assertSame($this->meterProvider, $sdk->getMeterProvider());
         $this->assertSame($this->tracerProvider, $sdk->getTracerProvider());
         $this->assertSame($this->loggerProvider, $sdk->getLoggerProvider());
-        $this->assertSame($this->eventLoggerProvider, $sdk->getEventLoggerProvider());
     }
 }

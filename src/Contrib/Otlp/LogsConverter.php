@@ -28,6 +28,7 @@ class LogsConverter
     /**
      * @param iterable<ReadableLogRecord> $logs
      * @psalm-suppress InvalidArgument
+     * @todo logs event_id from proto 1.5.0
      */
     public function convert(iterable $logs): ExportLogsServiceRequest
     {
@@ -78,6 +79,10 @@ class LogsConverter
     private function convertLogRecord(ReadableLogRecord $record): LogRecord
     {
         $pLogRecord = new LogRecord();
+        $eventName = $record->getEventName();
+        if ($eventName !== null) {
+            $pLogRecord->setEventName($eventName);
+        }
         $pLogRecord->setBody(AttributesConverter::convertAnyValue($record->getBody()));
         $pLogRecord->setTimeUnixNano($record->getTimestamp() ?? 0);
         $pLogRecord->setObservedTimeUnixNano($record->getObservedTimestamp() ?? 0);

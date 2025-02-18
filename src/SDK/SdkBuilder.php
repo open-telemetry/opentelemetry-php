@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Instrumentation\Configurator;
-use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
-use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -24,7 +22,6 @@ class SdkBuilder
     private ?TracerProviderInterface $tracerProvider = null;
     private ?MeterProviderInterface $meterProvider = null;
     private ?LoggerProviderInterface $loggerProvider = null;
-    private ?EventLoggerProviderInterface $eventLoggerProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
     private bool $autoShutdown = false;
 
@@ -59,16 +56,6 @@ class SdkBuilder
         return $this;
     }
 
-    /**
-     * @deprecated
-     */
-    public function setEventLoggerProvider(EventLoggerProviderInterface $eventLoggerProvider): self
-    {
-        $this->eventLoggerProvider = $eventLoggerProvider;
-
-        return $this;
-    }
-
     public function setPropagator(TextMapPropagatorInterface $propagator): self
     {
         $this->propagator = $propagator;
@@ -81,7 +68,6 @@ class SdkBuilder
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
         $meterProvider = $this->meterProvider ?? new NoopMeterProvider();
         $loggerProvider = $this->loggerProvider ?? new NoopLoggerProvider();
-        $eventLoggerProvider = $this->eventLoggerProvider ?? new NoopEventLoggerProvider();
         if ($this->autoShutdown) {
             // rector rule disabled in config, because ShutdownHandler::register() does not keep a strong reference to $this
             ShutdownHandler::register($tracerProvider->shutdown(...));
@@ -93,7 +79,6 @@ class SdkBuilder
             $tracerProvider,
             $meterProvider,
             $loggerProvider,
-            $eventLoggerProvider,
             $this->propagator ?? NoopTextMapPropagator::getInstance(),
         );
     }
@@ -109,7 +94,6 @@ class SdkBuilder
             ->withTracerProvider($sdk->getTracerProvider())
             ->withMeterProvider($sdk->getMeterProvider())
             ->withLoggerProvider($sdk->getLoggerProvider())
-            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
             ->storeInContext();
 
         return Context::storage()->attach($context);
