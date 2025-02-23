@@ -44,8 +44,7 @@ to the opentelemetry-php project.
 After you open the pull request, the CI will run all the
 associated [github actions](https://github.com/open-telemetry/opentelemetry-php/actions/workflows/php.yml).
 
-To ensure your PR doesn't emit a failure with GitHub actions, it's recommended that you run important the CI tests
-locally with the following command:
+To ensure your PR doesn't emit a failure with GitHub actions, it's recommended that you run the important CI tests locally with the following command:
 
 ```bash
 make all # composer update, then run all checks
