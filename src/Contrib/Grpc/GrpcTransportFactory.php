@@ -51,7 +51,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         }
         /** @phpstan-ignore-next-line */
         if ($contentType !== ContentTypes::PROTOBUF) {
-            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, ContentTypes::PROTOBUF));
+            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", gRPC transport supports only %s', $contentType, ContentTypes::PROTOBUF));
         }
 
         $scheme = $parts['scheme'];
@@ -61,7 +61,10 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException(sprintf('Endpoint contains not supported scheme "%s"', $scheme));
         }
         if (substr_count($parts['path'], '/') !== 2) {
-            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid GRPC method "%s"', $method));
+            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid gRPC method "%s"', $method));
+        }
+        if ($maxRetries < 2) {
+            throw new InvalidArgumentException(sprintf('Max retries must be at least 2 when using gRPC; "%d" given', $maxRetries));
         }
 
         $opts = self::createOpts($compression, $maxRetries, $retryDelay);
