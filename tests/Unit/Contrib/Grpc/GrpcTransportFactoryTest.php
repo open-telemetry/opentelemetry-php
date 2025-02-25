@@ -20,24 +20,14 @@ class GrpcTransportFactoryTest extends TestCase
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
 
-    public function test_when_max_retries_is_two_then_transport_is_created(): void
+    public function test_when_max_retries_is_zero_transport_is_created(): void
     {
         $factory = new GrpcTransportFactory();
         $transport = $factory->create(
             endpoint: 'http://localhost/service/method',
-            maxRetries: 2,
+            maxRetries: 0,
         );
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
-    }
-
-    public function test_when_max_retries_is_less_than_two_then_exception_is_thrown(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $factory = new GrpcTransportFactory();
-        $factory->create(
-            endpoint: 'http://localhost/service/method',
-            maxRetries: 1,
-        );
     }
 }
