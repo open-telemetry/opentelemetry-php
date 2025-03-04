@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
+use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use function bin2hex;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -65,9 +66,10 @@ class SpanConverterTest extends TestCase
     public function test_span_context_is_remote_flags(): void
     {
         $span = (new SpanData())
-            ->setContext(SpanContext::createFromRemoteParent('0000000000000001', '00000001'))
-            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000002'), Attributes::create([]))
-            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000003', TraceFlags::SAMPLED), Attributes::create([]));
+            ->setParentContext(SpanContext::createFromRemoteParent('0000000000000001', '00000001'))
+            ->setContext(SpanContext::create('0000000000000001', '00000002'))
+            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000003'), Attributes::create([]))
+            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000004', TraceFlags::SAMPLED), Attributes::create([]));
 
         $converter = new SpanConverter();
         /** @psalm-suppress InvalidArgument */
@@ -217,6 +219,7 @@ class SpanConverterTest extends TestCase
                             'start_time_unix_nano' => $start_time,
                             'end_time_unix_nano' => $end_time,
                             'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
+                            'flags' => SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK,
                             'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
                             'attributes' => [
                                 new KeyValue([
