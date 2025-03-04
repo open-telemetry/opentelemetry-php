@@ -51,7 +51,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
         }
         /** @phpstan-ignore-next-line */
         if ($contentType !== ContentTypes::PROTOBUF) {
-            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", grpc transport supports only %s', $contentType, ContentTypes::PROTOBUF));
+            throw new InvalidArgumentException(sprintf('Unsupported content type "%s", gRPC transport supports only %s', $contentType, ContentTypes::PROTOBUF));
         }
 
         $scheme = $parts['scheme'];
@@ -61,7 +61,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             throw new InvalidArgumentException(sprintf('Endpoint contains not supported scheme "%s"', $scheme));
         }
         if (substr_count($parts['path'], '/') !== 2) {
-            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid GRPC method "%s"', $method));
+            throw new InvalidArgumentException(sprintf('Endpoint path is not a valid gRPC method "%s"', $method));
         }
 
         $opts = self::createOpts($compression, $maxRetries, $retryDelay);
@@ -107,9 +107,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
                 break;
             }
         }
-
-        // https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto
-        $opts['grpc.service_config'] = json_encode([
+        $serviceConfig = [
             'methodConfig' => [
                 [
                     'name' => [
@@ -118,25 +116,31 @@ final class GrpcTransportFactory implements TransportFactoryInterface
                             'method' => null,
                         ],
                     ],
-                    'retryPolicy' => [
-                        'maxAttempts' => $maxRetries,
-                        'initialBackoff' => sprintf('%0.3fs', $retryDelay / self::MILLIS_PER_SECOND),
-                        'maxBackoff' => sprintf('%0.3fs', ($retryDelay << $maxRetries - 1) / self::MILLIS_PER_SECOND),
-                        'backoffMultiplier' => 2,
-                        'retryableStatusCodes' => [
-                            // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-response
-                            'CANCELLED',
-                            'DEADLINE_EXCEEDED',
-                            'RESOURCE_EXHAUSTED',
-                            'ABORTED',
-                            'OUT_OF_RANGE',
-                            'UNAVAILABLE',
-                            'DATA_LOSS',
-                        ],
-                    ],
                 ],
             ],
-        ]);
+        ];
+
+        if ($maxRetries > 0) {
+            $serviceConfig['methodConfig'][0]['retryPolicy'] = [
+                'maxAttempts' => $maxRetries + 1, // maxAttempts includes first attempt
+                'initialBackoff' => sprintf('%0.3fs', $retryDelay / self::MILLIS_PER_SECOND),
+                'maxBackoff' => sprintf('%0.3fs', ($retryDelay << $maxRetries - 1) / self::MILLIS_PER_SECOND),
+                'backoffMultiplier' => 2,
+                'retryableStatusCodes' => [
+                    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md#otlpgrpc-response
+                    'CANCELLED',
+                    'DEADLINE_EXCEEDED',
+                    'RESOURCE_EXHAUSTED',
+                    'ABORTED',
+                    'OUT_OF_RANGE',
+                    'UNAVAILABLE',
+                    'DATA_LOSS',
+                ],
+            ];
+        }
+
+        // https://github.com/grpc/grpc-proto/blob/master/grpc/service_config/service_config.proto
+        $opts['grpc.service_config'] = json_encode($serviceConfig);
 
         return $opts;
     }
