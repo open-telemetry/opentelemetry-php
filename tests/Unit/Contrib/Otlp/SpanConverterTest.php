@@ -17,6 +17,7 @@ use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\ScopeSpans;
 use Opentelemetry\Proto\Trace\V1\Span as ProtoSpan;
+use Opentelemetry\Proto\Trace\V1\Span\Link as ProtoSpanLink;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
 use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -85,6 +86,11 @@ class SpanConverterTest extends TestCase
             return $converter->convert([$spanData])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         };
 
+        $getLink = static function (ProtoSpan $protoSpan, int $linkIndex): ProtoSpanLink {
+            /** @psalm-suppress InvalidArgument */
+            return $protoSpan->getLinks()[$linkIndex];
+        };
+
         // Span with remote parent
         $convertedSpan = $convertSpanData(
             (new SpanData())
@@ -94,9 +100,9 @@ class SpanConverterTest extends TestCase
                 ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000004', TraceFlags::SAMPLED), Attributes::create([]))
         );
         $this->assertTrue($isRemote($convertedSpan->getFlags()));
-        $this->assertTrue($isRemote($convertedSpan->getLinks()[0]->getFlags()));
-        $this->assertTrue($isRemote($convertedSpan->getLinks()[1]->getFlags()));
-        $this->assertTrue($isFlagSet($convertedSpan->getLinks()[1]->getFlags(), TraceFlags::SAMPLED));
+        $this->assertTrue($isRemote($getLink($convertedSpan, 0)->getFlags()));
+        $this->assertTrue($isRemote($getLink($convertedSpan, 1)->getFlags()));
+        $this->assertTrue($isFlagSet($getLink($convertedSpan, 1)->getFlags(), TraceFlags::SAMPLED));
 
         // Span without parent
         $convertedSpan = $convertSpanData((new SpanData())->setContext(SpanContext::create('0000000000000001', '00000001')));
