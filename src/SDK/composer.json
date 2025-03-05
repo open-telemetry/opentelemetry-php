@@ -64,6 +64,9 @@
             "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig"
+            ],
+            "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
+                "OpenTelemetry\\SDK\\Common\\Adapter\\DotEnv\\VlucasPhpdotenvResolver"
             ]
         }
     }
