@@ -30,7 +30,7 @@ final class VlucasPhpdotenvResolver implements ResolverInterface
 
         try {
             $env ??= array_filter(
-                Dotenv::createArrayBacked([getcwd()])->safeLoad(),
+                Dotenv::createArrayBacked([InstalledVersions::getRootPackage()['install_path']])->safeLoad(),
                 // Discard any environment variables that do not start with OTEL_
                 fn (string $name) => str_starts_with($name, 'OTEL_'),
                 ARRAY_FILTER_USE_KEY,
