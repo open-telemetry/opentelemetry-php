@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use function bin2hex;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -19,6 +18,7 @@ use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\ScopeSpans;
 use Opentelemetry\Proto\Trace\V1\Span as ProtoSpan;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
+use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -74,11 +74,13 @@ class SpanConverterTest extends TestCase
             if (!$isFlagSet($flags, V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK)) {
                 return null;
             }
+
             return $isFlagSet($flags, V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK);
         };
 
         $convertSpanData = static function (SpanData $spanData): ProtoSpan {
             $converter = new SpanConverter();
+
             /** @psalm-suppress InvalidArgument */
             return $converter->convert([$spanData])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         };
