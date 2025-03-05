@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Adapter\DotEnv;
 
+use Composer\InstalledVersions;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
-use function getcwd;
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\SDK\Common\Configuration\Resolver\ResolverInterface;
 use function str_starts_with;
