@@ -16,7 +16,10 @@ use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\ScopeSpans;
+use Opentelemetry\Proto\Trace\V1\Span as ProtoSpan;
+use Opentelemetry\Proto\Trace\V1\Span\Link as ProtoSpanLink;
 use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
+use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -64,18 +67,54 @@ class SpanConverterTest extends TestCase
 
     public function test_span_context_is_remote_flags(): void
     {
-        $span = (new SpanData())
-            ->setContext(SpanContext::createFromRemoteParent('0000000000000001', '00000001'))
-            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000002'), Attributes::create([]))
-            ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000003', TraceFlags::SAMPLED), Attributes::create([]));
+        $isFlagSet = static function (int $flags, int $mask): bool {
+            return ($flags & $mask) !== 0;
+        };
 
-        $converter = new SpanConverter();
-        /** @psalm-suppress InvalidArgument */
-        $row = $converter->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
+        $isRemote = static function (int $flags) use ($isFlagSet): ?bool {
+            if (!$isFlagSet($flags, V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK)) {
+                return null;
+            }
 
-        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK, $row->getFlags());
-        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK, $row->getLinks()[0]->getFlags());
-        $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK | V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK | TraceFlags::SAMPLED, $row->getLinks()[1]->getFlags());
+            return $isFlagSet($flags, V1\SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK);
+        };
+
+        $convertSpanData = static function (SpanData $spanData): ProtoSpan {
+            $converter = new SpanConverter();
+
+            /** @psalm-suppress InvalidArgument */
+            return $converter->convert([$spanData])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
+        };
+
+        $getLink = static function (ProtoSpan $protoSpan, int $linkIndex): ProtoSpanLink {
+            /** @psalm-suppress InvalidArgument */
+            return $protoSpan->getLinks()[$linkIndex];
+        };
+
+        // Span with remote parent
+        $convertedSpan = $convertSpanData(
+            (new SpanData())
+                ->setParentContext(SpanContext::createFromRemoteParent('0000000000000001', '00000001'))
+                ->setContext(SpanContext::create('0000000000000001', '00000002'))
+                ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000003'), Attributes::create([]))
+                ->addLink(SpanContext::createFromRemoteParent('0000000000000001', '00000004', TraceFlags::SAMPLED), Attributes::create([]))
+        );
+        $this->assertTrue($isRemote($convertedSpan->getFlags()));
+        $this->assertTrue($isRemote($getLink($convertedSpan, 0)->getFlags()));
+        $this->assertTrue($isRemote($getLink($convertedSpan, 1)->getFlags()));
+        $this->assertTrue($isFlagSet($getLink($convertedSpan, 1)->getFlags(), TraceFlags::SAMPLED));
+
+        // Span without parent
+        $convertedSpan = $convertSpanData((new SpanData())->setContext(SpanContext::create('0000000000000001', '00000001')));
+        $this->assertFalse($isRemote($convertedSpan->getFlags()));
+
+        // Span with local parent
+        $convertedSpan = $convertSpanData(
+            (new SpanData())
+                ->setParentContext(SpanContext::create('0000000000000001', '00000001'))
+                ->setContext(SpanContext::create('0000000000000001', '00000002'))
+        );
+        $this->assertFalse($isRemote($convertedSpan->getFlags()));
     }
 
     #[DataProvider('attributeAreCoercedCorrectlyDataProvider')]
@@ -217,6 +256,7 @@ class SpanConverterTest extends TestCase
                             'start_time_unix_nano' => $start_time,
                             'end_time_unix_nano' => $end_time,
                             'kind' => V1\Span\SpanKind::SPAN_KIND_INTERNAL,
+                            'flags' => SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK,
                             'status' => new V1\Status([ 'code' => V1\Status\StatusCode::STATUS_CODE_OK ]),
                             'attributes' => [
                                 new KeyValue([
