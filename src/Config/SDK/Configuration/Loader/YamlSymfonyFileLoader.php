@@ -32,7 +32,7 @@ final class YamlSymfonyFileLoader extends FileLoader
         $this->configuration->addResource(new FileResource($path));
 
         try {
-            $content = Yaml::parseFile($resource, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+            $content = Yaml::parseFile($path, Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
         } catch (ParseException $e) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: %s', $path, $e->getMessage()), 0, $e);
         }
