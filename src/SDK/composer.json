@@ -60,6 +60,9 @@
         "spi": {
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
                 "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            ],
+            "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
+                "OpenTelemetry\\SDK\\Common\\Adapter\\DotEnv\\VlucasPhpdotenvResolver"
             ]
         }
     }
