@@ -61,8 +61,8 @@
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
                 "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ],
-            "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
-                "OpenTelemetry\\SDK\\Common\\Adapter\\DotEnv\\VlucasPhpdotenvResolver"
+            "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
+                "OpenTelemetry\\SDK\\Common\\Adapter\\EnvSource\\VlucasPhpdotenvProvider"
             ]
         }
     }
