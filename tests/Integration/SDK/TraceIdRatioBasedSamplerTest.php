@@ -51,7 +51,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $sampler = new TraceIdRatioBasedSampler(0.99);
         $decision = $sampler->shouldSample(
             Context::getRoot(),
-            '4bf92f3577b34da6afffffffffffffff',
+            '4bf92f3577b34da6a000000000000000',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL,
             Attributes::create([]),
@@ -65,7 +65,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         $sampler = new TraceIdRatioBasedSampler(0.01);
         $decision = $sampler->shouldSample(
             Context::getRoot(),
-            '4bf92f3577b34da6a000000000000000',
+            '4bf92f3577b34da6afffffffffffffff',
             'test.opentelemetry.io',
             API\SpanKind::KIND_INTERNAL,
             Attributes::create([]),
