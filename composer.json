@@ -194,7 +194,8 @@
                 "OpenTelemetry\\Example\\ExampleInstrumentation"
             ],
             "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
-                "OpenTelemetry\\SDK\\Common\\Adapter\\EnvSource\\VlucasPhpdotenvProvider"
+                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",
+                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\VlucasPhpdotenvProvider"
             ]
         }
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Adapter\EnvSource;
+namespace OpenTelemetry\Config\SDK\Configuration\Environment\Adapter;
 
 use Composer\InstalledVersions;
 use Dotenv\Dotenv;
