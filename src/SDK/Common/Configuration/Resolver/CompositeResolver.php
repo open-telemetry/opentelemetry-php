@@ -19,9 +19,9 @@ class CompositeResolver
     {
         static $instance;
         $instance ??= new self([
+            ...ServiceLoader::load(ResolverInterface::class),
             new EnvironmentResolver(),
             new PhpIniResolver(),
-            ...ServiceLoader::load(ResolverInterface::class),
         ]);
 
         return $instance;
