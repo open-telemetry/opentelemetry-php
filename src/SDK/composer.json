@@ -65,9 +65,8 @@
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig"
             ],
-            "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
-                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",
-                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\VlucasPhpdotenvProvider"
+            "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
+                "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\SdkConfigurationResolver"
             ]
         }
     }

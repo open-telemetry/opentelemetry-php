@@ -193,6 +193,9 @@
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
                 "OpenTelemetry\\Example\\ExampleInstrumentation"
             ],
+            "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
+                "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\SdkConfigurationResolver"
+            ],
             "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
                 "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",
                 "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\VlucasPhpdotenvProvider"
