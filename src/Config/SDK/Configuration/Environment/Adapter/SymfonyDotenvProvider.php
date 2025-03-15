@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Environment\Adapter;
 
+use function array_diff_key;
 use Composer\InstalledVersions;
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
@@ -11,7 +12,6 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceProvider;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\PathException;
-use function array_diff_key;
 
 #[PackageDependency('symfony/dotenv', '^5.4 || ^6.4 || ^7.0')]
 final class SymfonyDotenvProvider implements EnvSourceProvider
