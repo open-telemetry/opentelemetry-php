@@ -107,8 +107,14 @@ deptrac:
                 regex: ^Ramsey\\Uuid\\*
       -   name: NyholmPsr7Server
           collectors:
-              - type: className
-                regex: ^Nyholm\\Psr7Server\\*
+            - type: className
+              regex: ^Nyholm\\Psr7Server\\*
+      -   name: DotenvProvider
+          collectors:
+            - type: className
+              regex: ^Symfony\\Component\\Dotenv\\*
+            - type: className
+              regex: ^Dotenv\\*
 
     ruleset:
       Context:
@@ -124,6 +130,7 @@ deptrac:
           - Context
           - Contrib
           - Extension
+          - DotenvProvider
       API:
           - Context
           - PsrLog
