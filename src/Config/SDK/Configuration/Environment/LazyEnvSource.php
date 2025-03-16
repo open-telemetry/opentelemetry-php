@@ -6,9 +6,6 @@ namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 
 use Closure;
 
-/**
- * @internal
- */
 final class LazyEnvSource implements EnvSource
 {
     /**
