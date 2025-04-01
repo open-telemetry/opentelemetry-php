@@ -131,7 +131,7 @@ jobs:
     - name: Run PHPUnit (unit tests)
       id: unit
       continue-on-error: ${{ matrix.experimental }}
-      run: php -dzend.assertions=1 vendor/bin/phpunit -vv --coverage-text --coverage-clover=coverage.clover --testsuite unit
+      run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit --debug
 
     - name: Run PHPUnit (integration tests)
       id: integration
