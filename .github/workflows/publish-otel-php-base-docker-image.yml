@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push ${{ matrix.php-version }} to ghcr.io
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         if: github.ref != 'refs/heads/main'
         with:
           push: false
@@ -45,7 +45,7 @@ jobs:
           tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
 
       - name: Build and push ${{ matrix.php-version }} to ghcr.io
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         if: github.ref == 'refs/heads/main'
         with:
           push: true
