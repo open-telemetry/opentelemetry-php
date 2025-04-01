@@ -6,6 +6,9 @@ on:
   push:
     paths:
       - docker/Dockerfile
+  pull_request:
+    paths:
+      - docker/Dockerfile
 jobs:
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
