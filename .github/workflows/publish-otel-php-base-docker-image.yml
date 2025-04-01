@@ -3,6 +3,9 @@ on:
   schedule:
     - cron: "0 0 * * 0"
   workflow_dispatch:
+  push:
+    paths:
+      - docker/Dockerfile
 jobs:
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
