@@ -6,9 +6,11 @@ on:
   push:
     paths:
       - docker/Dockerfile
+      - .github/workflows/publish-otel-php-base-docker-image.yml
   pull_request:
     paths:
       - docker/Dockerfile
+      - .github/workflows/publish-otel-php-base-docker-image.yml
 jobs:
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
@@ -19,6 +21,7 @@ jobs:
     permissions:
       packages: write
       contents: read
+    timeout-minutes: 500
     steps:
 
       - name: check out the repo
