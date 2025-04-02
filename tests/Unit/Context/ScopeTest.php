@@ -82,6 +82,8 @@ class ScopeTest extends TestCase
 
     public function test_inactive_scope_detach(): void
     {
+        //@see https://bugs.xdebug.org/view.php?id=2332
+        $this->markTestSkipped('skipping: segfault in xdebug 3.4.2');
         $scope1 = Context::getCurrent()->activate();
 
         $fiber = new Fiber(static fn () => @$scope1->detach());
