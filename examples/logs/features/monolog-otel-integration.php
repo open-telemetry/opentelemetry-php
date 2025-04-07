@@ -9,7 +9,6 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\LogRecord as MonologLogRecord;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Logs\Bridge;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
@@ -37,7 +36,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 $streamHandler = new StreamHandler(STDOUT, LogLevel::DEBUG);
 $tracer = Globals::tracerProvider()->getTracer('monolog-demo');
 
-//otel handler for Monolog v2
+//otel handler for Monolog v3
 $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
     private LoggerInterface $logger;
 
