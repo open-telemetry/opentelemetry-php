@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Attribute;
 
+use JsonSerializable;
 use function array_key_exists;
 use IteratorAggregate;
 use Traversable;
@@ -11,7 +12,7 @@ use Traversable;
 /**
  * @psalm-suppress MissingTemplateParam
  */
-final class Attributes implements AttributesInterface, IteratorAggregate
+final class Attributes implements AttributesInterface, IteratorAggregate, JsonSerializable
 {
     /**
      * @internal
@@ -46,6 +47,11 @@ final class Attributes implements AttributesInterface, IteratorAggregate
     public function count(): int
     {
         return \count($this->attributes);
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->attributes;
     }
 
     public function getIterator(): Traversable
