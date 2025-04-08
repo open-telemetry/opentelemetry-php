@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Attribute;
 
-use JsonSerializable;
 use function array_key_exists;
 use IteratorAggregate;
+use JsonSerializable;
 use Traversable;
 
 /**
