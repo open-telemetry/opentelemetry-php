@@ -16,12 +16,15 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
@@ -42,6 +45,7 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -193,6 +197,16 @@ final class OpenTelemetrySdk implements ComponentProvider
             $spanProcessors[] = $processor->create($context);
         }
 
+        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::tracer($disabled);
+
+        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
+            $configurator = $configurator->with(
+                static fn (TracerConfig $config) => $config->setDisabled($tracer['config']['disabled']),
+                name: $tracer['name'],
+            );
+        }
+
         // <editor-fold desc="tracer_provider">
 
         $tracerProvider = new TracerProvider(
@@ -223,6 +237,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
                 linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
             ),
+            configurator: $configurator,
         );
 
         // </editor-fold>
@@ -281,6 +296,15 @@ final class OpenTelemetrySdk implements ComponentProvider
             $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
         }
 
+        $disabled = $properties['meter_provider']['meter_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::meter($disabled);
+        foreach ($properties['meter_provider']['meter_configurator/development']['meters'] ?? [] as $meter) {
+            $configurator = $configurator->with(
+                static fn (MeterConfig $config) => $config->setDisabled($meter['config']['disabled']),
+                name: $meter['name'],
+            );
+        }
+
         /** @psalm-suppress InvalidArgument TODO update metric reader interface */
         $meterProvider = new MeterProvider(
             contextStorage: null,
@@ -292,6 +316,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             viewRegistry: $viewRegistry,
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
+            configurator: $configurator,
         );
 
         // </editor-fold>
@@ -303,11 +328,21 @@ final class OpenTelemetrySdk implements ComponentProvider
             $logRecordProcessors[] = $processor->create($context);
         }
 
+        $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::logger($disabled);
+        foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] ?? [] as $logger) {
+            $configurator = $configurator->with(
+                static fn (LoggerConfig $config) => $config->setDisabled($logger['config']['disabled']),
+                name: $logger['name'],
+            );
+        }
+
         // TODO Allow injecting log record attributes factory
         $loggerProvider = new LoggerProvider(
             processor: new MultiLogRecordProcessor($logRecordProcessors),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             resource: $resource,
+            configurator: $configurator,
         );
         $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
 

@@ -139,6 +139,7 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterMemory",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpFile",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpGrpc",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpHttp",
