@@ -160,11 +160,22 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Environment",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\OperatingSystem",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\ProcessRuntime",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Sdk",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\SdkProvided",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
+
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
 
                 "OpenTelemetry\\Example\\ExampleConfigProvider",
 
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Container",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",

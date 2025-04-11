@@ -35,6 +35,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\SdkBuilder;
@@ -336,7 +337,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->validate()->ifNotInArray(['0.4'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
-                ->append($this->getResourceConfig($builder))
+                ->append($this->getResourceConfig($registry, $builder))
                 ->append($this->getAttributeLimitsConfig($builder))
                 ->append($this->getPropagatorConfig($registry, $builder))
                 ->append($this->getTracerProviderConfig($registry, $builder))
@@ -347,7 +348,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $node;
     }
 
-    private function getResourceConfig(NodeBuilder $builder): ArrayNodeDefinition
+    private function getResourceConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('resource');
         $node
@@ -384,11 +385,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->end()
                             ->end()
                         ->end()
-                        ->arrayNode('detectors')
-                            //TODO
-                            ->ignoreExtraKeys(false)
-                            //->variablePrototype()
-                        ->end()
+                        ->append($registry->componentList('detectors', ResourceDetectorInterface::class))
                     ->end()
                 ->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
