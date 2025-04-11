@@ -37,6 +37,6 @@ final class ConfigurationTest extends TestCase
     public static function openTelemetryConfigurationDataProvider(): iterable
     {
         yield 'kitchen-sink' => [__DIR__ . '/configurations/kitchen-sink.yaml'];
-        //yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
+        yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
     }
 }

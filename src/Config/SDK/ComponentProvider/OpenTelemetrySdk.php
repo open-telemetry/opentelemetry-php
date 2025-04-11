@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\CompositePropagator;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
@@ -34,7 +33,6 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
-use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -79,8 +77,8 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         attribute_count_limit: int<0, max>,
      *     },
      *     propagator: array{
-     *         composite: ?ComponentPlugin<TextMapPropagatorInterface>,
-     *         composite_list: string,
+     *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
+     *         composite_list: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
      *     tracer_provider: array{
      *         limits: array{
@@ -170,11 +168,11 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
         foreach ($properties['propagator']['composite_list'] as $plugin) {
             $propagator = $plugin->create($context);
-            if (!array_filter($propagators, fn($item) => $item == $propagator)) {
+            if (!array_filter($propagators, fn ($item) => $item == $propagator)) {
                 $propagators[] = $propagator;
             }
         }
-        if (empty($propagators)) {
+        if ($propagators === []) {
             $propagators[] = NoopTextMapPropagator::getInstance();
         }
         $propagator = new MultiTextMapPropagator($propagators);
@@ -561,7 +559,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
-                ->arrayNode("logger_configurator/development")
+                ->arrayNode('logger_configurator/development')
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('default_config')
