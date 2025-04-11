@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\Config\SDK\ComponentProvider\Propagator\CompositePropagator;
 use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -32,6 +34,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
+use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\SdkBuilder;
@@ -53,19 +56,31 @@ final class OpenTelemetrySdk implements ComponentProvider
 {
     /**
      * @param array{
-     *     file_format: '0.3',
+     *     file_format: '0.4',
      *     disabled: bool,
      *     resource: array{
      *         attributes: array,
      *         attributes_list: ?string,
      *         detectors: array,
      *         schema_url: ?string,
+     *         "detection/development": ?array{
+     *             attributes: array{
+     *                 included: list<string>,
+     *                 excluded: list<string>,
+     *             },
+     *             detectors: array{
+     *                 array{},
+     *             },
+     *         }
      *     },
      *     attribute_limits: array{
      *         attribute_value_length_limit: ?int<0, max>,
      *         attribute_count_limit: int<0, max>,
      *     },
-     *     propagator: ?ComponentPlugin<TextMapPropagatorInterface>,
+     *     propagator: array{
+     *         composite: ?ComponentPlugin<TextMapPropagatorInterface>,
+     *         composite_list: string,
+     *     },
      *     tracer_provider: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
@@ -77,12 +92,24 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         },
      *         sampler: ?ComponentPlugin<SamplerInterface>,
      *         processors: list<ComponentPlugin<SpanProcessorInterface>>,
+     *         "tracer_configurator/development": ?array{
+     *              default_config: array{
+     *                  disabled: bool,
+     *              },
+     *              tracers: list<array{
+     *                  name: string,
+     *                  config: array{
+     *                      disabled: bool,
+     *                  }
+     *              }>
+     *           }
      *     },
      *     meter_provider: array{
      *         views: list<array{
      *             stream: array{
      *                 name: ?string,
      *                 description: ?string,
+     *                 aggregation_cardinality_limit: ?int<0, max>,
      *                 attribute_keys: array{
      *                     included: list<string>,
      *                     excluded: list<string>,
@@ -99,6 +126,18 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             },
      *         }>,
      *         readers: list<ComponentPlugin<MetricReaderInterface>>,
+     *         exemplar_filter: 'trace_based'|'always_on'|'always_off',
+     *         "meter_configurator/development": ?array{
+     *             default_config: array{
+     *                 disabled: bool,
+     *             },
+     *             meters: list<array{
+     *                 name: string,
+     *                 config: array{
+     *                     disabled: bool,
+     *                 }
+     *             }>
+     *          },
      *     },
      *     logger_provider: array{
      *         limits: array{
@@ -106,6 +145,17 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             attribute_count_limit: ?int<0, max>,
      *         },
      *         processors: list<ComponentPlugin<LogRecordProcessorInterface>>,
+     *         "logger_configurator/development": ?array{
+     *            default_config: array{
+     *                disabled: bool,
+     *            },
+     *            loggers: list<array{
+     *                name: string,
+     *                config: array{
+     *                    disabled: bool,
+     *                }
+     *            }>
+     *         },
      *     },
      * } $properties
      */
@@ -113,7 +163,20 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $sdkBuilder = new SdkBuilder();
 
-        $propagator = $properties['propagator']?->create($context) ?? NoopTextMapPropagator::getInstance();
+        $propagators = [];
+        foreach ($properties['propagator']['composite'] as $plugin) {
+            $propagators[] = $plugin->create($context);
+        }
+        foreach ($properties['propagator']['composite_list'] as $plugin) {
+            $propagator = $plugin->create($context);
+            if (!array_filter($propagators, fn($item) => $item == $propagator)) {
+                $propagators[] = $propagator;
+            }
+        }
+        if (empty($propagators)) {
+            $propagators[] = NoopTextMapPropagator::getInstance();
+        }
+        $propagator = new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
         if ($properties['disabled']) {
@@ -270,12 +333,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->isRequired()
                     ->example('0.1')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['0.3'])->thenInvalid('unsupported version')->end()
+                    ->validate()->ifNotInArray(['0.4'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
                 ->append($this->getResourceConfig($builder))
                 ->append($this->getAttributeLimitsConfig($builder))
-                ->append($registry->component('propagator', TextMapPropagatorInterface::class))
+                ->append($this->getPropagatorConfig($registry, $builder))
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
@@ -307,6 +370,27 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->variablePrototype()->end()
                 ->end()
                 ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->arrayNode('detection/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('attributes')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('included')
+                                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                ->end()
+                                ->arrayNode('excluded')
+                                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('detectors')
+                            //TODO
+                            ->ignoreExtraKeys(false)
+                            //->variablePrototype()
+                        ->end()
+                    ->end()
+                ->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
 
@@ -345,6 +429,30 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
                 ->append($registry->componentList('processors', SpanProcessorInterface::class))
+                ->arrayNode('tracer_configurator/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default_config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disabled')->defaultFalse()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('tracers')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->arrayNode('config')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->booleanNode('disabled')->defaultFalse()->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
@@ -373,6 +481,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->children()
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->integerNode('aggregation_cardinality_limit')->defaultValue(2000)->end()
                                     ->arrayNode('attribute_keys')
                                         ->children()
                                             ->arrayNode('included')
@@ -411,6 +520,30 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->componentList('readers', MetricReaderInterface::class))
+                ->arrayNode('meter_configurator/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default_config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disabled')->defaultFalse()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('meters')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->arrayNode('config')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->booleanNode('disabled')->defaultFalse()->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
@@ -431,8 +564,54 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
+                ->arrayNode("logger_configurator/development")
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default_config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disabled')->defaultFalse()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('loggers')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->arrayNode('config')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->booleanNode('disabled')->defaultFalse()->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
+
+        return $node;
+    }
+
+    private function getPropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        $node = $builder->arrayNode('propagator');
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
+                ->append($registry->componentNames('composite_list', TextMapPropagatorInterface::class))
+                /*->scalarNode('composite_list')
+                    ->defaultNull()
+                    ->info('Comma-separated list of propagator component names. Appends to "composite".')
+                    ->validate()
+                        ->always(function($v) {
+                            return array_map('trim', explode(',', $v));
+                        })
+                    ->end()
+                ->end()(*/
+            ->end();
 
         return $node;
     }

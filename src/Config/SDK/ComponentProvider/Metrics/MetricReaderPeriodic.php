@@ -44,6 +44,10 @@ final class MetricReaderPeriodic implements ComponentProvider
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
                 ->arrayNode('producers') //@todo
                     ->variablePrototype()->end()
+                ->end()
+                ->arrayNode('cardinality_limits') //@todo
+                    ->variablePrototype()->end()
+                ->end()
             ->end()
         ;
 
