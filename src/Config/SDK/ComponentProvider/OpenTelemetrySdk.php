@@ -36,9 +36,9 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
+use OpenTelemetry\SDK\Resource\Detectors\Composite;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -185,12 +185,66 @@ final class OpenTelemetrySdk implements ComponentProvider
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
-        $attributes = array_column($properties['resource']['attributes'], 'value', 'name') + MapParser::parse($properties['resource']['attributes_list']);
-        $resource = ResourceInfoFactory::defaultResource()
-            ->merge(ResourceInfo::create(
-                attributes: Attributes::create($attributes),
-                schemaUrl: $properties['resource']['schema_url'],
-            ));
+
+        //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
+        $schemaUrl = $properties['resource']['schema_url'];
+        $detectors = [];
+        foreach ($properties['resource']['detection/development']['detectors'] ?? [] as $plugin) {
+            /**
+             * @psalm-suppress InvalidMethodCall
+             * @phpstan-ignore-next-line
+             **/
+            $detectors[] = $plugin->create($context);
+        }
+        /** @psalm-suppress PossiblyInvalidArgument */
+        $composite = new Composite($detectors);
+        $resource = $composite->getResource();
+        $included = $properties['resource']['detection/development']['attributes']['included'] ?? [];
+        $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
+        if ($included || $excluded) {
+            $a = $resource->getAttributes()->toArray();
+            if ($included) {
+                $a = array_filter($a, static function ($k) use ($included) {
+                    foreach ($included as $pattern) {
+                        if (fnmatch($pattern, $k)) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }, ARRAY_FILTER_USE_KEY);
+            }
+            if ($excluded) {
+                $a = array_filter($a, static function ($k) use ($excluded) {
+                    foreach ($excluded as $pattern) {
+                        if (fnmatch($pattern, $k)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }, ARRAY_FILTER_USE_KEY);
+            }
+            $resource = ResourceInfo::create(Attributes::create($a), $resource->getSchemaUrl());
+        }
+        $attributes = MapParser::parse($properties['resource']['attributes_list']);
+        foreach ($properties['resource']['attributes'] as $attr) {
+            $type = $attr['type'] ?? 'string';
+            $attributes[$attr['name']] = match ($type) {
+                'int' => (int) $attr['value'],
+                'double' => (float) $attr['value'],
+                'bool' => (bool) $attr['value'],
+                'string_array' => array_map('trim', $attr['value']),
+                'bool_array' => array_map('boolval', array_map('trim', $attr['value'])),
+                'int_array' => array_map('intval', array_map('trim', $attr['value'])),
+                'double_array' => array_map('floatval', array_map('trim', $attr['value'])),
+                default => (string) $attr['value'],
+            };
+        }
+        $resource = $resource->merge(ResourceInfo::create(
+            attributes: Attributes::create($attributes),
+            schemaUrl: $schemaUrl,
+        ));
 
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
@@ -211,7 +265,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $tracerProvider = new TracerProvider(
             spanProcessors: $spanProcessors,
-            sampler: $properties['tracer_provider']['sampler']?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
+            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
             resource: $resource,
             spanLimits: new SpanLimits(
                 attributesFactory: Attributes::factory(
@@ -392,16 +446,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
                             ->variableNode('value')->isRequired()->end()
-                            // @todo use type to validate and/or cast attributes
                             ->enumNode('type')->defaultNull()
                                 ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
                             ->end()
                         ->end()
                     ->end()
-                ->end()
-                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->arrayNode('detectors')
-                    ->variablePrototype()->end()
                 ->end()
                 ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('detection/development')

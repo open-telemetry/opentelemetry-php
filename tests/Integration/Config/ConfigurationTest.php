@@ -6,9 +6,11 @@ namespace OpenTelemetry\Tests\Integration\Config;
 
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
 #[CoversNothing]
@@ -66,5 +68,67 @@ final class ConfigurationTest extends TestCase
         $this->assertTrue($meter_a->createCounter('cnt')->isEnabled(), 'enabled by configurator');
         $this->assertFalse($meter_b->createCounter('cnt')->isEnabled(), 'disabled by configurator');
         $this->assertFalse($meter_c->createCounter('cnt')->isEnabled(), 'default disabled');
+    }
+
+    public function test_resource(): void
+    {
+        $expectedKeys = [
+            'host.name',
+            'host.arch',
+            'os.type',
+            'os.description',
+            'os.name',
+            'os.version',
+            'process.pid',
+            'process.executable.path',
+            'process.command',
+            'process.owner',
+            'service.name',
+            'service.namespace',
+            'service.version',
+            'string_key',
+            'int_key',
+            'bool_key',
+            'double_key',
+            'string_array_key',
+            'int_array_key',
+            'bool_array_key',
+            'double_array_key',
+        ];
+
+        $removedKeys = [
+            'process.command_args',
+        ];
+
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource.yaml')->create()->build();
+        $tracer = $sdk->getTracerProvider()->getTracer('test');
+
+        $tracerReflection = new \ReflectionClass($tracer);
+        $sharedStateProperty = $tracerReflection->getProperty('tracerSharedState');
+        $sharedStateProperty->setAccessible(true);
+        $sharedState = $sharedStateProperty->getValue($tracer);
+
+        $stateReflection = new \ReflectionClass($sharedState);
+        $resourceProperty = $stateReflection->getProperty('resource');
+        $resourceProperty->setAccessible(true);
+        $resource = $resourceProperty->getValue($sharedState);
+
+        $this->assertInstanceOf(ResourceInfo::class, $resource);
+        $this->assertSame('https://opentelemetry.io/schemas/1.30.0', $resource->getSchemaUrl());
+        $attributes = $resource->getAttributes()->toArray();
+
+        foreach ($expectedKeys as $k) {
+            $this->assertArrayHasKey($k, $attributes);
+        }
+
+        foreach ($removedKeys as $k) {
+            $this->assertArrayNotHasKey($k, $attributes);
+        }
+    }
+
+    #[DoesNotPerformAssertions]
+    public function test_minimal(): void
+    {
+        Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml')->create()->build();
     }
 }

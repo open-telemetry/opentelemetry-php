@@ -9,6 +9,7 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -22,7 +23,7 @@ final class Container implements ComponentProvider
         return new class() implements ResourceDetectorInterface {
             public function getResource(): ResourceInfo
             {
-                return ResourceInfo::emptyResource();
+                return ResourceInfoFactory::emptyResource();
             }
         };
     }
