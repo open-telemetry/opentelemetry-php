@@ -10,11 +10,12 @@ use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/in-memory.md
  */
-final class InMemoryExporter implements MetricExporterInterface, AggregationTemporalitySelectorInterface
+final class InMemoryExporter implements MetricExporterInterface, AggregationTemporalitySelectorInterface, PushMetricExporterInterface
 {
     private bool $closed = false;
 
@@ -68,6 +69,11 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
 
         $this->closed = true;
 
+        return true;
+    }
+
+    public function forceFlush(): bool
+    {
         return true;
     }
 }
