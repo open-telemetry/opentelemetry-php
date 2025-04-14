@@ -18,4 +18,16 @@ class ConsoleExporterFactoryTest extends TestCase
 
         $this->assertInstanceOf(ConsoleExporter::class, $factory->create());
     }
+
+    public function test_type(): void
+    {
+        $factory = new ConsoleExporterFactory();
+        $this->assertSame('console', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new ConsoleExporterFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

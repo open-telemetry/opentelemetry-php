@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Attribute\LogRecordAttributeValidator;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
@@ -20,7 +21,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 class ReadableLogRecord extends LogRecord
 {
-    protected AttributesInterface $convertedAttributes;
+    protected AttributesBuilderInterface $attributesBuilder;
     protected SpanContextInterface $spanContext;
 
     public function __construct(
@@ -39,12 +40,10 @@ class ReadableLogRecord extends LogRecord
         $this->severityText = $logRecord->severityText;
         $this->eventName = $logRecord->eventName;
 
-        //convert attributes now so that excess data is not sent to processors
-        $this->convertedAttributes = $this->loggerSharedState
+        $this->attributesBuilder = $this->loggerSharedState
             ->getLogRecordLimits()
             ->getAttributeFactory()
-            ->builder($logRecord->attributes, new LogRecordAttributeValidator())
-            ->build();
+            ->builder($logRecord->attributes, new LogRecordAttributeValidator());
     }
 
     public function getInstrumentationScope(): InstrumentationScopeInterface
@@ -102,6 +101,6 @@ class ReadableLogRecord extends LogRecord
 
     public function getAttributes(): AttributesInterface
     {
-        return $this->convertedAttributes;
+        return $this->attributesBuilder->build();
     }
 }

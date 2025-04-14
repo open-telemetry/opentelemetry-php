@@ -84,21 +84,17 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vendor
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+        key: ${{ runner.os }}-${{ matrix.php-version }}-composer-${{ hashFiles('**/composer.json') }}
     - name: Cache test tools
       id: test-tools-cache
       uses: actions/cache@v4
       with:
         path: vendor-bin
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+        key: ${{ runner.os }}-${{ matrix.php-version }}-tools-${{ hashFiles('**/composer.json') }}
 
     - name: Install dependencies
       id: composer
-      if: steps.composer-cache.outputs.cache-hit != 'true'
+      if: steps.composer-cache.outputs.cache-hit != 'true' || steps.test-tools-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
 
     - name: Check Style
@@ -142,7 +138,7 @@ jobs:
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.clover

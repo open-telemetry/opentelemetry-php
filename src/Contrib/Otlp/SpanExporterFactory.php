@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
@@ -48,8 +48,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         $compression = $this->getCompression();
         $timeout = $this->getTimeout();
 
-        $factoryClass = Registry::transportFactory($protocol);
-        $factory = $this->transportFactory ?: new $factoryClass();
+        $factory = $this->transportFactory ?? Loader::transportFactory($protocol);
 
         return $factory->create($endpoint, $contentType, $headers, $compression, $timeout);
     }
@@ -90,5 +89,15 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
             Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_TIMEOUT);
 
         return $value/1000;
+    }
+
+    public function type(): string
+    {
+        return 'otlp';
+    }
+
+    public function priority(): int
+    {
+        return 0;
     }
 }

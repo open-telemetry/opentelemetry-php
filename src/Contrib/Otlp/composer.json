@@ -21,7 +21,8 @@
     "php-http/discovery": "^1.14",
     "open-telemetry/gen-otlp-protobuf": "^1.5",
     "open-telemetry/api": "^1.0|^2.0",
-    "open-telemetry/sdk": "^1.0|^2.0"
+    "open-telemetry/sdk": "^1.0|^2.0",
+    "tbachert/spi": "^1.0.1"
   },
   "suggest": {
   },
@@ -37,6 +38,10 @@
     "branch-alias": {
       "dev-main": "1.0.x-dev",
       "dev-2.x": "2.x-dev"
+    },
+    "spi-config": {
+      "autoload-files": true,
+      "prune-autoload-files": true
     }
   }
 }

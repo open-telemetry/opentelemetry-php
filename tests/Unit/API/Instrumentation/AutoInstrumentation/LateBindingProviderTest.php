@@ -28,6 +28,7 @@ use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -148,5 +149,15 @@ class LateBindingProviderTest extends TestCase
         $instrumentation->getPropagator()->fields();
         /** @phpstan-ignore-next-line */
         $propagator->fields()->shouldHaveBeenCalledOnce();
+    }
+
+    public function test_late_binding_meter_observable_instruments(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $meterProvider = new LateBindingMeterProvider(static fn () => new NoopMeterProvider());
+        $meterProvider->getMeter('test')->createObservableCounter('test');
+        $meterProvider->getMeter('test')->createObservableGauge('test');
+        $meterProvider->getMeter('test')->createObservableUpDownCounter('test');
     }
 }

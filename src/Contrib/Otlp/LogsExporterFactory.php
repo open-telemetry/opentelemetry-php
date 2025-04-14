@@ -10,9 +10,9 @@ use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
-use OpenTelemetry\SDK\Registry;
 
 class LogsExporterFactory implements LogRecordExporterFactoryInterface
 {
@@ -34,6 +34,16 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
         return new LogsExporter($this->buildTransport($protocol));
     }
 
+    public function type(): string
+    {
+        return 'otlp';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
+
     /**
      * @psalm-suppress UndefinedClass
      */
@@ -45,8 +55,7 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
         $compression = $this->getCompression();
         $timeout = $this->getTimeout();
 
-        $factoryClass = Registry::transportFactory($protocol);
-        $factory = $this->transportFactory ?: new $factoryClass();
+        $factory = $this->transportFactory ?? Loader::transportFactory($protocol);
 
         return $factory->create(
             $endpoint,

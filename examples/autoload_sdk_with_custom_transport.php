@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=otlp');
 putenv('OTEL_EXPORTER_OTLP_PROTOCOL=grpc');
@@ -45,9 +48,19 @@ $factory = new class() implements \OpenTelemetry\SDK\Common\Export\TransportFact
             }
         };
     }
+
+    public function type(): string
+    {
+        return 'grpc';
+    }
+
+    public function priority(): int
+    {
+        return 100;
+    }
 };
 
-\OpenTelemetry\SDK\Registry::registerTransportFactory('grpc', $factory, true);
+ServiceLoader::register(TransportFactoryInterface::class, $factory::class);
 
 $instrumentation = new \OpenTelemetry\API\Instrumentation\CachedInstrumentation('demo');
 

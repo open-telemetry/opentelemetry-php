@@ -2,26 +2,33 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Services;
 
+use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
-use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\ResourceDetectorFactoryInterface;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
-#[CoversClass(Registry::class)]
-class FactoryRegistryTest extends TestCase
+#[CoversClass(Loader::class)]
+class LoaderTest extends TestCase
 {
+    use TestState;
+
     #[DataProvider('transportProtocolsProvider')]
     public function test_default_transport_factories(string $name): void
     {
-        $factory = Registry::transportFactory($name);
+        $factory = Loader::transportFactory($name);
         $this->assertInstanceOf(TransportFactoryInterface::class, $factory);
     }
 
@@ -40,7 +47,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('spanExporterProvider')]
     public function test_default_span_exporter_factories(string $name): void
     {
-        $factory = Registry::spanExporterFactory($name);
+        $factory = Loader::spanExporterFactory($name);
         $this->assertInstanceOf(SpanExporterFactoryInterface::class, $factory);
     }
 
@@ -57,7 +64,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('metricExporterProvider')]
     public function test_default_metric_exporter_factories(string $name): void
     {
-        $factory = Registry::metricExporterFactory($name);
+        $factory = Loader::metricExporterFactory($name);
         $this->assertInstanceOf(MetricExporterFactoryInterface::class, $factory);
     }
 
@@ -73,7 +80,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('logRecordExporterProvider')]
     public function test_default_log_record_exporter_factories(string $name): void
     {
-        $factory = Registry::logRecordExporterFactory($name);
+        $factory = Loader::logRecordExporterFactory($name);
         $this->assertInstanceOf(LogRecordExporterFactoryInterface::class, $factory);
     }
 
@@ -88,7 +95,7 @@ class FactoryRegistryTest extends TestCase
     #[DataProvider('textMapPropagator')]
     public function test_default_text_map_propagator(string $name): void
     {
-        $propagator = Registry::textMapPropagator($name);
+        $propagator = Loader::textMapPropagator($name);
         $this->assertInstanceOf(TextMapPropagatorInterface::class, $propagator);
     }
 
@@ -106,39 +113,56 @@ class FactoryRegistryTest extends TestCase
         ];
     }
 
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_transport_factory($factory): void
+    public function test_retrieve_from_spi(): void
     {
-        $this->expectException(TypeError::class);
-        Registry::registerTransportFactory('http', $factory, true);
+        $this->assertFileExists(dirname(__DIR__, 5) . '/vendor/composer/GeneratedServiceProviderData.php');
+        $this->assertInstanceOf(ResourceDetectorInterface::class, Loader::resourceDetector('test'));
     }
 
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_span_exporter_factory($factory): void
+    public function test_add_to_spi(): void
     {
-        $this->expectException(TypeError::class);
-        Registry::registerSpanExporterFactory('foo', $factory, true);
+        $factory = new class() implements ResourceDetectorFactoryInterface {
+            public function create(): ResourceDetectorInterface
+            {
+                return new class() implements ResourceDetectorInterface {
+                    public function getResource(): ResourceInfo
+                    {
+                        return ResourceInfo::create(Attributes::create(['foo-resource' => 'foo']));
+                    }
+                };
+            }
+            public function type(): string
+            {
+                return 'foo';
+            }
+            public function priority(): int
+            {
+                return 99;
+            }
+        };
+        ServiceLoader::register(ResourceDetectorFactoryInterface::class, $factory::class);
+
+        $detector = Loader::resourceDetector('foo');
+        $this->assertInstanceOf(ResourceDetectorInterface::class, $detector);
+        $this->assertTrue($detector->getResource()->getAttributes()->has('foo-resource'));
+        $this->assertSame('foo', $detector->getResource()->getAttributes()->get('foo-resource'));
     }
 
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_metric_exporter_factory($factory): void
+    public function test_get_all_resource_detectors(): void
     {
-        $this->expectException(TypeError::class);
-        Registry::registerMetricExporterFactory('foo', $factory, true);
+        $detectors = Loader::resourceDetectors();
+        $this->assertNotEmpty($detectors);
     }
 
-    #[DataProvider('invalidFactoryProvider')]
-    public function test_register_invalid_log_record_exporter_factory($factory): void
+    public function test_missing_propagator(): void
     {
-        $this->expectException(TypeError::class);
-        Registry::registerLogRecordExporterFactory('foo', $factory, true);
+        $this->expectException(\RuntimeException::class);
+        Loader::textMapPropagator('missing');
     }
 
-    public static function invalidFactoryProvider(): array
+    public function test_missing_detector(): void
     {
-        return [
-            [new \stdClass()],
-            ['\stdClass'],
-        ];
+        $this->expectException(\RuntimeException::class);
+        Loader::resourceDetector('missing');
     }
 }

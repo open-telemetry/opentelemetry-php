@@ -149,7 +149,7 @@ final class SpanConverter
         $pSpan = new Span();
         $pSpan->setTraceId($this->serializer->serializeTraceId($span->getContext()->getTraceIdBinary()));
         $pSpan->setSpanId($this->serializer->serializeSpanId($span->getContext()->getSpanIdBinary()));
-        $pSpan->setFlags(self::traceFlags($span->getContext()));
+        $pSpan->setFlags(self::buildFlagsForSpan($span->getContext(), parentSpanContext: $span->getParentContext()));
         $pSpan->setTraceState((string) $span->getContext()->getTraceState());
         if ($span->getParentContext()->isValid()) {
             $pSpan->setParentSpanId($this->serializer->serializeSpanId($span->getParentContext()->getSpanIdBinary()));
@@ -174,7 +174,7 @@ final class SpanConverter
             $pSpan->getLinks()[] = $pLink = new Link();
             $pLink->setTraceId($this->serializer->serializeTraceId($link->getSpanContext()->getTraceIdBinary()));
             $pLink->setSpanId($this->serializer->serializeSpanId($link->getSpanContext()->getSpanIdBinary()));
-            $pLink->setFlags(self::traceFlags($link->getSpanContext()));
+            $pLink->setFlags(self::buildFlagsForLink($link->getSpanContext()));
             $pLink->setTraceState((string) $link->getSpanContext()->getTraceState());
             $this->setAttributes($pLink, $link->getAttributes());
         }
@@ -188,13 +188,45 @@ final class SpanConverter
         return $pSpan;
     }
 
-    private static function traceFlags(SpanContextInterface $spanContext): int
+    private static function addRemoteFlags(SpanContextInterface $spanContext, int $baseFlags): int
     {
-        $flags = $spanContext->getTraceFlags();
+        $flags = $baseFlags;
         $flags |= SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK;
         if ($spanContext->isRemote()) {
             $flags |= SpanFlags::SPAN_FLAGS_CONTEXT_IS_REMOTE_MASK;
         }
+
+        return $flags;
+    }
+
+    private static function buildFlagsForSpan(SpanContextInterface $spanContext, SpanContextInterface $parentSpanContext): int
+    {
+        $flags = $spanContext->getTraceFlags();
+
+        /**
+         * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/opentelemetry/proto/trace/v1/trace.proto#L122
+         *
+         * Bits 8 and 9 represent the 3 states of whether a span's parent is remote.
+         *                                                         ^^^^^^
+         * That is why we pass parent span's context.
+         */
+        $flags = self::addRemoteFlags($parentSpanContext, $flags);
+
+        return $flags;
+    }
+
+    private static function buildFlagsForLink(SpanContextInterface $linkSpanContext): int
+    {
+        $flags = $linkSpanContext->getTraceFlags();
+
+        /**
+         * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.5.0/opentelemetry/proto/trace/v1/trace.proto#L279
+         *
+         * Bits 8 and 9 represent the 3 states of whether the link is remote.
+         *                                                    ^^^^
+         * That is why we pass link span's context.
+         */
+        $flags = self::addRemoteFlags($linkSpanContext, $flags);
 
         return $flags;
     }

@@ -10,10 +10,10 @@ use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
-use OpenTelemetry\SDK\Registry;
 
 class MetricExporterFactory implements MetricExporterFactoryInterface
 {
@@ -36,6 +36,16 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         return new MetricExporter($this->buildTransport($protocol), $temporality);
     }
 
+    public function type(): string
+    {
+        return 'otlp';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
+
     /**
      * @psalm-suppress UndefinedClass
      */
@@ -51,8 +61,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         $compression = $this->getCompression();
         $timeout = $this->getTimeout();
 
-        $factoryClass = Registry::transportFactory($protocol);
-        $factory = $this->transportFactory ?: new $factoryClass();
+        $factory = $this->transportFactory ?? Loader::transportFactory($protocol);
 
         return $factory->create(
             $endpoint,
@@ -63,10 +72,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         );
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private function getTemporality(): string|Temporality|null
+    private function getTemporality(): ?Temporality
     {
         $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
 

@@ -18,4 +18,16 @@ class StreamTransportFactoryTest extends TestCase
         $this->expectOutputString('payload');
         $transport->send('payload')->await();
     }
+
+    public function test_type(): void
+    {
+        $factory = new StreamTransportFactory();
+        $this->assertSame('stream', $factory->type());
+    }
+
+    public function test_priority(): void
+    {
+        $factory = new StreamTransportFactory();
+        $this->assertSame(0, $factory->priority());
+    }
 }

@@ -35,18 +35,22 @@ use Throwable;
  */
 final class GrpcTransport implements TransportInterface
 {
+    private const MICROS_PER_MILLISECOND = 1_000;
     private readonly array $metadata;
     private readonly Channel $channel;
     private bool $closed = false;
+    private readonly Timeval $exportTimeout;
 
     public function __construct(
         string $endpoint,
         array $opts,
         private readonly string $method,
         array $headers = [],
+        int $timeoutMillis = 500,
     ) {
         $this->channel = new Channel($endpoint, $opts);
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
+        $this->exportTimeout = new Timeval($timeoutMillis * self::MICROS_PER_MILLISECOND);
     }
 
     public function contentType(): string
@@ -60,7 +64,7 @@ final class GrpcTransport implements TransportInterface
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
         }
 
-        $call = new Call($this->channel, $this->method, Timeval::infFuture());
+        $call = new Call($this->channel, $this->method, $this->exportTimeout);
 
         $cancellation ??= new NullCancellation();
         $cancellationId = $cancellation->subscribe(static fn (Throwable $e) => $call->cancel());

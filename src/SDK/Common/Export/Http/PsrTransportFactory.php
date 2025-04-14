@@ -74,4 +74,14 @@ final class PsrTransportFactory implements TransportFactoryInterface
             Psr17FactoryDiscovery::findStreamFactory(),
         );
     }
+
+    public function type(): string
+    {
+        return 'http';
+    }
+
+    public function priority(): int
+    {
+        return 0;
+    }
 }

@@ -2,32 +2,30 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
+namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
-use OpenTelemetry\API\Signals;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
-use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\Contrib\Otlp\Protocols;
-use OpenTelemetry\Contrib\Otlp\SpanExporter;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
+use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
-use OpenTelemetry\SDK\Registry;
-use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SDK\Common\Services\Loader;
+use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * @implements ComponentProvider<SpanExporterInterface>
+ * @implements ComponentProvider<LogRecordExporterInterface>
  */
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
-final class SpanExporterOtlp implements ComponentProvider
+final class LogRecordExporterOtlpHttp implements ComponentProvider
 {
     /**
      * @param array{
-     *     protocol: 'http/protobuf'|'http/json'|'grpc',
      *     endpoint: string,
      *     certificate: ?string,
      *     client_key: ?string,
@@ -36,21 +34,22 @@ final class SpanExporterOtlp implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
      *     timeout: int<0, max>,
-     *     insecure: ?bool,
+     *     encoding: 'protobuf'|'json',
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SpanExporterInterface
+    public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
-        $protocol = $properties['protocol'];
-
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
-        return new SpanExporter(Registry::transportFactory($protocol)->create(
-            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::TRACE, $protocol),
-            contentType: Protocols::contentType($protocol),
+        return new LogsExporter(Loader::transportFactory('http')->create(
+            endpoint: $properties['endpoint'],
+            contentType: match ($properties['encoding']) {
+                'protobuf' => ContentTypes::PROTOBUF,
+                'json' => ContentTypes::JSON,
+            },
             headers: $headers,
             compression: $properties['compression'],
-            timeout: $properties['timeout'],
+            timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
             cacert: $properties['certificate'],
             cert: $properties['client_certificate'],
             key: $properties['client_certificate'],
@@ -59,11 +58,11 @@ final class SpanExporterOtlp implements ComponentProvider
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('otlp');
+        $node = $builder->arrayNode('otlp_http');
         $node
             ->children()
-                ->enumNode('protocol')->isRequired()->values(['http/protobuf', 'http/json', 'grpc'])->end()
-                ->scalarNode('endpoint')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
+                ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
+                ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/logs')->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
@@ -77,8 +76,7 @@ final class SpanExporterOtlp implements ComponentProvider
                 ->end()
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10)->end()
-                ->booleanNode('insecure')->defaultNull()->end()
+                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
             ->end()
         ;
 
