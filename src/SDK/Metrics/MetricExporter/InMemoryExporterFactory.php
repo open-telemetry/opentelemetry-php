@@ -12,6 +12,6 @@ class InMemoryExporterFactory implements MetricExporterFactoryInterface
 {
     public function create(): MetricExporterInterface
     {
-        return new InMemoryExporter(InMemoryStorageManager::getStorageForMetrics());
+        return new InMemoryExporter(InMemoryStorageManager::metrics());
     }
 }

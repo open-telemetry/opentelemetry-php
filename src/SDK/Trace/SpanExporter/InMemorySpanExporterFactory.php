@@ -11,6 +11,6 @@ class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
 {
     public function create(): SpanExporterInterface
     {
-        return new InMemoryExporter(InMemoryStorageManager::getStorageForSpans());
+        return new InMemoryExporter(InMemoryStorageManager::spans());
     }
 }

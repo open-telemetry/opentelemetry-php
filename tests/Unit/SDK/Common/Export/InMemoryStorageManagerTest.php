@@ -29,8 +29,8 @@ class InMemoryStorageManagerTest extends TestCase
 
     public function test_get_storage_for_metrics_returns_same_instance(): void
     {
-        $storageFirstCall = InMemoryStorageManager::getStorageForMetrics();
-        $storageSecondCall = InMemoryStorageManager::getStorageForMetrics();
+        $storageFirstCall = InMemoryStorageManager::metrics();
+        $storageSecondCall = InMemoryStorageManager::metrics();
         $this->assertSame($storageFirstCall, $storageSecondCall);
     }
 

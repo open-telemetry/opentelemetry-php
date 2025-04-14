@@ -12,19 +12,19 @@ class InMemoryStorageManager
     private static ArrayObject $metrics;
     private static ArrayObject $logs;
 
-    public static function getStorageForMetrics(): ArrayObject
+    public static function metrics(): ArrayObject
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$metrics ??= new ArrayObject();
     }
 
-    public static function getStorageForLogs(): ArrayObject
+    public static function logs(): ArrayObject
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$logs ??= new ArrayObject();
     }
 
-    public static function getStorageForSpans(): ArrayObject
+    public static function spans(): ArrayObject
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$spans ??= new ArrayObject();

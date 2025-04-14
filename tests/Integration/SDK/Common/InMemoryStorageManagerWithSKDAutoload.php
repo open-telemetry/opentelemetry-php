@@ -28,7 +28,6 @@ class InMemoryStorageManagerWithSKDAutoload extends TestCase
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         LoggerHolder::set($this->logger);
-        Globals::reset();
     }
 
     public function test_in_memory_storage_manager_for_metrics_with_sdk_autoload_enabled(): void
@@ -50,7 +49,7 @@ class InMemoryStorageManagerWithSKDAutoload extends TestCase
             $meterProvider->forceFlush();
         }
 
-        $storage = InMemoryStorageManager::getStorageForMetrics();
+        $storage = InMemoryStorageManager::metrics();
         $this->assertEquals(1, $storage->count());
         $this->assertEquals('test_value', $storage[0]->name);
         $this->assertEquals(6, $storage[0]->data->dataPoints[0]->value);
@@ -69,7 +68,7 @@ class InMemoryStorageManagerWithSKDAutoload extends TestCase
             $loggerProvider->forceFlush();
         }
 
-        $storage = InMemoryStorageManager::getStorageForLogs();
+        $storage = InMemoryStorageManager::logs();
         $this->assertEquals(1, $storage->count());
         $this->assertEquals('some body', $storage[0]->getBody());
     }
@@ -88,7 +87,7 @@ class InMemoryStorageManagerWithSKDAutoload extends TestCase
             $tracerProvider->forceFlush();
         }
 
-        $storage = InMemoryStorageManager::getStorageForSpans();
+        $storage = InMemoryStorageManager::spans();
         $this->assertEquals(2, $storage->count());
         $this->assertEquals('test_span_1', $storage[0]->getName());
         $this->assertEquals('test_span_2', $storage[1]->getName());

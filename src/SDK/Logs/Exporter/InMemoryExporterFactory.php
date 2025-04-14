@@ -12,6 +12,6 @@ class InMemoryExporterFactory implements LogRecordExporterFactoryInterface
 {
     public function create(): LogRecordExporterInterface
     {
-        return new InMemoryExporter(InMemoryStorageManager::getStorageForLogs());
+        return new InMemoryExporter(InMemoryStorageManager::logs());
     }
 }
