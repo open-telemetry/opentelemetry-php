@@ -81,7 +81,7 @@ final class Meter implements MeterInterface, Configurable
         $this->config = $configurator->resolve($this->instrumentationScope);
 
         $startTimestamp = $this->clock->now();
-        foreach ($this->instruments->observers[self::instrumentationScopeId($this->instrumentationScope)] as [$instrument, $stalenessHandler, $r]) {
+        foreach ($this->instruments->observers[self::instrumentationScopeId($this->instrumentationScope)] ?? [] as [$instrument, $stalenessHandler, $r]) {
             if ($this->config->isEnabled() && $r->dormant) {
                 $this->metricFactory->createAsynchronousObserver(
                     $this->registry,
@@ -98,7 +98,7 @@ final class Meter implements MeterInterface, Configurable
                 $r->dormant = true;
             }
         }
-        foreach ($this->instruments->writers[self::instrumentationScopeId($this->instrumentationScope)] as [$instrument, $stalenessHandler, $r]) {
+        foreach ($this->instruments->writers[self::instrumentationScopeId($this->instrumentationScope)] ?? [] as [$instrument, $stalenessHandler, $r]) {
             if ($this->config->isEnabled() && $r->dormant) {
                 $this->metricFactory->createSynchronousWriter(
                     $this->registry,

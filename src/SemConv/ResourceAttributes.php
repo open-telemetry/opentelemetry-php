@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.27.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
@@ -388,7 +388,7 @@ interface ResourceAttributes
      * This is the name of the function as configured/deployed on the FaaS
      * platform and is usually different from the name of the callback
      * function (which may be stored in the
-     * [`code.namespace`/`code.function`](/docs/general/attributes.md#source-code-attributes)
+     * [`code.namespace`/`code.function.name`](/docs/general/attributes.md#source-code-attributes)
      * span attributes).
      *
      * For some cloud providers, the above definition is ambiguous. The following
@@ -639,6 +639,16 @@ interface ResourceAttributes
     public const K8S_DEPLOYMENT_UID = 'k8s.deployment.uid';
 
     /**
+     * The name of the horizontal pod autoscaler.
+     */
+    public const K8S_HPA_NAME = 'k8s.hpa.name';
+
+    /**
+     * The UID of the horizontal pod autoscaler.
+     */
+    public const K8S_HPA_UID = 'k8s.hpa.uid';
+
+    /**
      * The name of the Job.
      */
     public const K8S_JOB_NAME = 'k8s.job.name';
@@ -692,6 +702,26 @@ interface ResourceAttributes
      * The UID of the ReplicaSet.
      */
     public const K8S_REPLICASET_UID = 'k8s.replicaset.uid';
+
+    /**
+     * The name of the replication controller.
+     */
+    public const K8S_REPLICATIONCONTROLLER_NAME = 'k8s.replicationcontroller.name';
+
+    /**
+     * The UID of the replication controller.
+     */
+    public const K8S_REPLICATIONCONTROLLER_UID = 'k8s.replicationcontroller.uid';
+
+    /**
+     * The name of the resource quota.
+     */
+    public const K8S_RESOURCEQUOTA_NAME = 'k8s.resourcequota.name';
+
+    /**
+     * The UID of the resource quota.
+     */
+    public const K8S_RESOURCEQUOTA_UID = 'k8s.resourcequota.uid';
 
     /**
      * The name of the StatefulSet.
@@ -779,6 +809,12 @@ interface ResourceAttributes
     public const PROCESS_EXECUTABLE_PATH = 'process.executable.path';
 
     /**
+     * The control group associated with the process.
+     * Control groups (cgroups) are a kernel feature used to organize and manage process resources. This attribute provides the path(s) to the cgroup(s) associated with the process, which should match the contents of the [/proc/[PID]/cgroup](https://man7.org/linux/man-pages/man7/cgroups.7.html) file.
+     */
+    public const PROCESS_LINUX_CGROUP = 'process.linux.cgroup';
+
+    /**
      * The username of the user that owns the process.
      */
     public const PROCESS_OWNER = 'process.owner';
@@ -823,7 +859,7 @@ interface ResourceAttributes
      *
      * UUIDs are typically recommended, as only an opaque value for the purposes of identifying a service instance is
      * needed. Similar to what can be seen in the man page for the
-     * [`/etc/machine-id`](https://www.freedesktop.org/software/systemd/man/machine-id.html) file, the underlying
+     * [`/etc/machine-id`](https://www.freedesktop.org/software/systemd/man/latest/machine-id.html) file, the underlying
      * data, such as pod name and namespace should be treated as confidential, being the user's choice to expose it
      * or not via another resource attribute.
      *

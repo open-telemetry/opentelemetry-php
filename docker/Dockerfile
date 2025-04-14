@@ -1,5 +1,12 @@
 ARG PHP_VERSION=8.0
-FROM php:${PHP_VERSION}-cli-alpine
+
+FROM php:8.0.30-cli-alpine AS php-8.0-cli-alpine
+FROM php:8.1.32-cli-alpine AS php-8.1-cli-alpine
+FROM php:8.2.28-cli-alpine AS php-8.2-cli-alpine
+FROM php:8.3.19-cli-alpine AS php-8.3-cli-alpine
+FROM php:8.4.5-cli-alpine AS php-8.4-cli-alpine
+
+FROM php-${PHP_VERSION}-cli-alpine
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 

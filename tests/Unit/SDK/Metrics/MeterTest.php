@@ -9,13 +9,17 @@ use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\Meter;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\MeterProviderBuilder;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricFactoryInterface;
+use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
@@ -24,6 +28,7 @@ use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Meter::class)]
@@ -371,6 +376,16 @@ final class MeterTest extends TestCase
         $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory, $viewRegistry, [$metricReader]);
         $meter = $meterProvider->getMeter('test');
         $meter->createCounter('name');
+    }
+
+    #[DoesNotPerformAssertions]
+    public function test_update_configurator_with_no_writers(): void
+    {
+        $mp = (new MeterProviderBuilder())
+            ->addReader(new ExportingReader(new InMemoryExporter()))
+            ->build();
+        $mp->getMeter('test')->createObservableCounter('c')->observe(static fn () => null);
+        $mp->updateConfigurator(Configurator::meter());
     }
 
     /**

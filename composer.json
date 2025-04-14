@@ -94,7 +94,7 @@
         "guzzlehttp/psr7": "^2.1",
         "mikey179/vfsstream": "^1.6.11",
         "mockery/mockery": "^1.5.1",
-        "monolog/monolog": "^2.3",
+        "monolog/monolog": "^3.0",
         "nyholm/psr7": "^1.4",
         "open-telemetry/dev-tools": "dev-main",
         "php-http/mock-client": "^1.5",
