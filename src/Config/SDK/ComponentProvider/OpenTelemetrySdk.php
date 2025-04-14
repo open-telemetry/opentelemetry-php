@@ -188,6 +188,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
         $schemaUrl = $properties['resource']['schema_url'];
+        /** @var ResourceDetectorInterface[] $detectors */
         $detectors = [];
         foreach ($properties['resource']['detection/development']['detectors'] ?? [] as $plugin) {
             /**
@@ -202,9 +203,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         $included = $properties['resource']['detection/development']['attributes']['included'] ?? [];
         $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
         if ($included || $excluded) {
-            $a = $resource->getAttributes()->toArray();
+            $attrs = $resource->getAttributes()->toArray();
             if ($included) {
-                $a = array_filter($a, static function ($k) use ($included) {
+                $attrs = array_filter($attrs, static function ($k) use ($included) {
                     foreach ($included as $pattern) {
                         if (fnmatch($pattern, $k)) {
                             return true;
@@ -215,7 +216,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 }, ARRAY_FILTER_USE_KEY);
             }
             if ($excluded) {
-                $a = array_filter($a, static function ($k) use ($excluded) {
+                $attrs = array_filter($attrs, static function ($k) use ($excluded) {
                     foreach ($excluded as $pattern) {
                         if (fnmatch($pattern, $k)) {
                             return false;
@@ -225,7 +226,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     return true;
                 }, ARRAY_FILTER_USE_KEY);
             }
-            $resource = ResourceInfo::create(Attributes::create($a), $resource->getSchemaUrl());
+            $resource = ResourceInfo::create(Attributes::create($attrs), $resource->getSchemaUrl());
         }
         $attributes = MapParser::parse($properties['resource']['attributes_list']);
         foreach ($properties['resource']['attributes'] as $attr) {
@@ -681,15 +682,6 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->children()
                 ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
                 ->append($registry->componentNames('composite_list', TextMapPropagatorInterface::class))
-                /*->scalarNode('composite_list')
-                    ->defaultNull()
-                    ->info('Comma-separated list of propagator component names. Appends to "composite".')
-                    ->validate()
-                        ->always(function($v) {
-                            return array_map('trim', explode(',', $v));
-                        })
-                    ->end()
-                ->end()(*/
             ->end();
 
         return $node;

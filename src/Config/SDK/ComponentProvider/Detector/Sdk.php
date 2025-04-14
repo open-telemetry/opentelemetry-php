@@ -7,6 +7,7 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Detector;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\SDK\Resource\Detectors\Sdk as SdkDetector;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -21,7 +22,7 @@ final class Sdk implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
-        return new \OpenTelemetry\SDK\Resource\Detectors\Sdk();
+        return new SdkDetector();
     }
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
