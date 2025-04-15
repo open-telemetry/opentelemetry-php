@@ -162,7 +162,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Environment",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\OperatingSystem",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
