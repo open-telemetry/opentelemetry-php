@@ -150,11 +150,7 @@ final class ConfigurationTest extends TestCase
 
         $attributes = $resource->getAttributes()->toArray();
 
-        foreach ($expectedKeys as $k) {
-            $this->assertArrayHasKey($k, $attributes);
-        }
-        /** @psalm-suppress PossiblyInvalidArgument */
-        $this->assertCount(4, $attributes);
+        $this->assertEqualsCanonicalizing($expectedKeys, array_keys($attributes));
     }
 
     #[DoesNotPerformAssertions]
