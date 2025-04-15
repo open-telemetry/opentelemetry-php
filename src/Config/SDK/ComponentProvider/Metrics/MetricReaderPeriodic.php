@@ -52,10 +52,10 @@ final class MetricReaderPeriodic implements ComponentProvider
                 ->integerNode('interval')->min(0)->defaultValue(5000)->end()
                 ->integerNode('timeout')->min(0)->defaultValue(30000)->end()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
-                ->arrayNode('producers') //TODO not implemented in metrics API
+                ->arrayNode('producers') //TODO not implemented in metrics SDK
                     ->variablePrototype()->end()
                 ->end()
-                ->arrayNode('cardinality_limits') //TODO not implemented in metrics API
+                ->arrayNode('cardinality_limits') //TODO not implemented in metrics SDK
                     ->variablePrototype()->end()
                 ->end()
             ->end()

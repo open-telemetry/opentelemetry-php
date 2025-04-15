@@ -207,7 +207,11 @@ final class OpenTelemetrySdk implements ComponentProvider
             if ($included) {
                 $attrs = array_filter($attrs, static function ($k) use ($included) {
                     foreach ($included as $pattern) {
-                        if (fnmatch($pattern, $k)) {
+                        $regex = '/^' . strtr(preg_quote($pattern, '/'), [
+                                '\?' => '.',
+                                '\*' => '.*',
+                            ]) . '$/';
+                        if (preg_match($regex, $k)) {
                             return true;
                         }
                     }
@@ -218,7 +222,11 @@ final class OpenTelemetrySdk implements ComponentProvider
             if ($excluded) {
                 $attrs = array_filter($attrs, static function ($k) use ($excluded) {
                     foreach ($excluded as $pattern) {
-                        if (fnmatch($pattern, $k)) {
+                        $regex = '/^' . strtr(preg_quote($pattern, '/'), [
+                                '\?' => '.',
+                                '\*' => '.*',
+                            ]) . '$/';
+                        if (preg_match($regex, $k)) {
                             return false;
                         }
                     }

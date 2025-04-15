@@ -126,6 +126,37 @@ final class ConfigurationTest extends TestCase
         }
     }
 
+    public function test_resource_include_exclude(): void
+    {
+        $expectedKeys = [
+            'process.pid',
+            'process.executable.path',
+            'process.owner',
+            'host.arch',
+        ];
+
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource-include-exclude.yaml')->create()->build();
+        $tracer = $sdk->getTracerProvider()->getTracer('test');
+
+        $tracerReflection = new \ReflectionClass($tracer);
+        $sharedStateProperty = $tracerReflection->getProperty('tracerSharedState');
+        $sharedStateProperty->setAccessible(true);
+        $sharedState = $sharedStateProperty->getValue($tracer);
+
+        $stateReflection = new \ReflectionClass($sharedState);
+        $resourceProperty = $stateReflection->getProperty('resource');
+        $resourceProperty->setAccessible(true);
+        $resource = $resourceProperty->getValue($sharedState);
+
+        $attributes = $resource->getAttributes()->toArray();
+
+        foreach ($expectedKeys as $k) {
+            $this->assertArrayHasKey($k, $attributes);
+        }
+        /** @psalm-suppress PossiblyInvalidArgument */
+        $this->assertCount(4, $attributes);
+    }
+
     #[DoesNotPerformAssertions]
     public function test_minimal(): void
     {
