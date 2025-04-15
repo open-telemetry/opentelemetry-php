@@ -182,9 +182,6 @@ final class OpenTelemetrySdk implements ComponentProvider
                 $propagators[] = $propagator;
             }
         }
-        if ($propagators === []) {
-            $propagators[] = NoopTextMapPropagator::getInstance();
-        }
         $propagator = new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
