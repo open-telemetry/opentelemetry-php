@@ -656,8 +656,9 @@ final class OpenTelemetrySdk implements ComponentProvider
                     foreach ($value['composite'] as $item) {
                         $existing[] = key($item);
                     }
-                    foreach ($value['composite_list'] ?? [] as $name) {
-                        if (!in_array($name, $existing)) {
+                    foreach (explode(',', $value['composite_list'] ?? '') as $name) {
+                        $name = trim($name);
+                        if ($name && !in_array($name, $existing)) {
                             $value['composite'][][$name] = null;
                         }
                     }

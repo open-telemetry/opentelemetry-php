@@ -459,7 +459,7 @@ meter_provider:
         meter_version: 1.0.0
         # Configure meter schema url selection criteria.
         # If omitted or null, all meter schema URLs match.
-        meter_schema_url: https://opentelemetry.io/schemas/1.16.0
+        meter_schema_url: https://opentelemetry.io/schemas/1.30.0
       # Configure view stream.
       stream:
         # Configure metric name of the resulting stream(s).
@@ -556,7 +556,7 @@ propagator:
   # The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
   # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
-  composite_list: [tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray]
+  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:
