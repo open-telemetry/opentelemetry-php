@@ -132,7 +132,8 @@ final class ConfigurationTest extends TestCase
             'process.pid',
             'process.executable.path',
             'process.owner',
-            'host.arch',
+            'telemetry.sdk.language',
+            'telemetry.sdk.name',
         ];
 
         $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource-include-exclude.yaml')->create()->build();

@@ -8,10 +8,10 @@ resource:
     attributes:
       included:
         - process.*
-        - host.*
+        - telemetry.sdk.*
       excluded:
         - process.command*
-        - host.n?me
+        - telemetry.sdk.?ersion
     detectors:
       - host:
       - os:
