@@ -26,14 +26,14 @@ final class MetricReaderPeriodic implements ComponentProvider
      *     exporter: ComponentPlugin<MetricExporterInterface>,
      *     producers: array,
      *     cardinality_limits: array{
-     *         default: int<0, max>,
-     *         counter: int<0, max>,
-     *         gauge: int<0, max>,
-     *         histogram: int<0, max>,
-     *         observable_counter: int<0, max>,
-     *         observable_gauge: int<0, max>,
-     *         observable_up_down_counter: int<0, max>,
-     *         up_down_counter: int<0, max>,
+     *         default: ?int<1, max>,
+     *         counter: ?int<1, max>,
+     *         gauge: ?int<1, max>,
+     *         histogram: ?int<1, max>,
+     *         observable_counter: ?int<1, max>,
+     *         observable_gauge: ?int<1, max>,
+     *         observable_up_down_counter: ?int<1, max>,
+     *         up_down_counter: ?int<1, max>,
      *     },
      * } $properties
      */
