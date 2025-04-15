@@ -12,6 +12,7 @@ use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
@@ -87,7 +88,6 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     },
      *     propagator: array{
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
-     *         composite_list: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
      *     tracer_provider: array{
      *         limits: array{
@@ -175,13 +175,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         foreach ($properties['propagator']['composite'] as $plugin) {
             $propagators[] = $plugin->create($context);
         }
-        foreach ($properties['propagator']['composite_list'] as $plugin) {
-            $propagator = $plugin->create($context);
-            if (!array_filter($propagators, fn ($item) => $item == $propagator)) {
-                $propagators[] = $propagator;
-            }
-        }
-        $propagator = new MultiTextMapPropagator($propagators);
+        $propagator = ($propagators === []) ? NoopTextMapPropagator::getInstance() : new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
         if ($properties['disabled']) {
@@ -655,11 +649,34 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('propagator');
         $node
+            ->beforeNormalization()
+                ->ifArray()
+                ->then(static function (array $value): array {
+                    $existing = [];
+                    foreach ($value['composite'] as $item) {
+                        $existing[] = key($item);
+                    }
+                    foreach ($value['composite_list'] ?? [] as $name) {
+                        if (!in_array($name, $existing)) {
+                            $value['composite'][][$name] = null;
+                        }
+                    }
+
+                    unset($value['composite_list']);
+
+                    return $value;
+                })
+            ->end();
+
+        $node
             ->addDefaultsIfNotSet()
             ->children()
                 ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
-                ->append($registry->componentNames('composite_list', TextMapPropagatorInterface::class))
-            ->end();
+//                ->arrayNode('composite_list')
+//                    ->scalarPrototype()->end()
+//                ->end()
+            ->end()
+        ;
 
         return $node;
     }
