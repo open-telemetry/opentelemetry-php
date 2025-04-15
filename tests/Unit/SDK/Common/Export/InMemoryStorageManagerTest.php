@@ -21,9 +21,9 @@ class InMemoryStorageManagerTest extends TestCase
     public static function getStorageName(): array
     {
         return [
-            ['getStorageForMetrics'],
-            ['getStorageForLogs'],
-            ['getStorageForSpans'],
+            ['metrics'],
+            ['logs'],
+            ['spans'],
         ];
     }
 
