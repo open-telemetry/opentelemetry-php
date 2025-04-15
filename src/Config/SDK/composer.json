@@ -61,12 +61,14 @@
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterMemory",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpFile",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpGrpc",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpHttp",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterMemory",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpFile",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpGrpc",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpHttp",
