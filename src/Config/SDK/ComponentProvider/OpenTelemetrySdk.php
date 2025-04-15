@@ -225,8 +225,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         $configurator = Configurator::tracer($disabled);
 
         foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
+            $disabled = $tracer['config']['disabled'];
             $configurator = $configurator->with(
-                static fn (TracerConfig $config) => $config->setDisabled($tracer['config']['disabled']),
+                static fn (TracerConfig $config) => $config->setDisabled($disabled),
                 name: $tracer['name'],
             );
         }
@@ -323,8 +324,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         $disabled = $properties['meter_provider']['meter_configurator/development']['default_config']['disabled'] ?? false;
         $configurator = Configurator::meter($disabled);
         foreach ($properties['meter_provider']['meter_configurator/development']['meters'] ?? [] as $meter) {
+            $disabled = $meter['config']['disabled'];
             $configurator = $configurator->with(
-                static fn (MeterConfig $config) => $config->setDisabled($meter['config']['disabled']),
+                static fn (MeterConfig $config) => $config->setDisabled($disabled),
                 name: $meter['name'],
             );
         }
@@ -355,8 +357,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
         $configurator = Configurator::logger($disabled);
         foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] ?? [] as $logger) {
+            $disabled = $logger['config']['disabled'];
             $configurator = $configurator->with(
-                static fn (LoggerConfig $config) => $config->setDisabled($logger['config']['disabled']),
+                static fn (LoggerConfig $config) => $config->setDisabled($disabled),
                 name: $logger['name'],
             );
         }
