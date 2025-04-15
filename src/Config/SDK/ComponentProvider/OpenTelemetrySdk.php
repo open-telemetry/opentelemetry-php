@@ -10,11 +10,11 @@ use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Config\SDK\Parser\AttributesParser;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
@@ -62,7 +62,13 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     file_format: '0.4',
      *     disabled: bool,
      *     resource: array{
-     *         attributes: array,
+     *         attributes: array{
+     *             array{
+     *                 name: string,
+     *                 value: mixed,
+     *                 type: ?string,
+     *             },
+     *         },
      *         attributes_list: ?string,
      *         detectors: array,
      *         schema_url: ?string,
@@ -199,57 +205,16 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
         /** @psalm-suppress PossiblyInvalidArgument */
         $composite = new Composite($detectors);
-        $resource = $composite->getResource();
         $included = $properties['resource']['detection/development']['attributes']['included'] ?? [];
         $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
-        if ($included || $excluded) {
-            $attrs = $resource->getAttributes()->toArray();
-            if ($included) {
-                $attrs = array_filter($attrs, static function ($k) use ($included) {
-                    foreach ($included as $pattern) {
-                        $regex = '/^' . strtr(preg_quote($pattern, '/'), [
-                                '\?' => '.',
-                                '\*' => '.*',
-                            ]) . '$/';
-                        if (preg_match($regex, $k)) {
-                            return true;
-                        }
-                    }
 
-                    return false;
-                }, ARRAY_FILTER_USE_KEY);
-            }
-            if ($excluded) {
-                $attrs = array_filter($attrs, static function ($k) use ($excluded) {
-                    foreach ($excluded as $pattern) {
-                        $regex = '/^' . strtr(preg_quote($pattern, '/'), [
-                                '\?' => '.',
-                                '\*' => '.*',
-                            ]) . '$/';
-                        if (preg_match($regex, $k)) {
-                            return false;
-                        }
-                    }
+        $resource = $composite->getResource();
+        $attrs = AttributesParser::applyIncludeExclude($resource->getAttributes()->toArray(), $included, $excluded);
+        $resource = ResourceInfo::create(Attributes::create($attrs), $resource->getSchemaUrl());
 
-                    return true;
-                }, ARRAY_FILTER_USE_KEY);
-            }
-            $resource = ResourceInfo::create(Attributes::create($attrs), $resource->getSchemaUrl());
-        }
-        $attributes = MapParser::parse($properties['resource']['attributes_list']);
-        foreach ($properties['resource']['attributes'] as $attr) {
-            $type = $attr['type'] ?? 'string';
-            $attributes[$attr['name']] = match ($type) {
-                'int' => (int) $attr['value'],
-                'double' => (float) $attr['value'],
-                'bool' => (bool) $attr['value'],
-                'string_array' => array_map('trim', $attr['value']),
-                'bool_array' => array_map('boolval', array_map('trim', $attr['value'])),
-                'int_array' => array_map('intval', array_map('trim', $attr['value'])),
-                'double_array' => array_map('floatval', array_map('trim', $attr['value'])),
-                default => (string) $attr['value'],
-            };
-        }
+        $attributes = AttributesParser::parseAttributesList($properties['resource']['attributes_list']);
+        $attributes = array_merge($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
+
         $resource = $resource->merge(ResourceInfo::create(
             attributes: Attributes::create($attributes),
             schemaUrl: $schemaUrl,
