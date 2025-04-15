@@ -32,9 +32,9 @@ class AttributesParser
         return $attributes;
     }
 
-    public static function applyIncludeExclude(array $attributes, array $included, array $excluded): array
+    public static function applyIncludeExclude(array $attributes, ?array $included, ?array $excluded): array
     {
-        if ($included) {
+        if ($included !== null) {
             $attributes = array_filter($attributes, static function ($k) use ($included) {
                 foreach ($included as $pattern) {
                     $regex = '/^' . strtr(preg_quote($pattern, '/'), [

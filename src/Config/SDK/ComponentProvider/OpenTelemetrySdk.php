@@ -205,7 +205,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
         /** @psalm-suppress PossiblyInvalidArgument */
         $composite = new Composite($detectors);
-        $included = $properties['resource']['detection/development']['attributes']['included'] ?? [];
+        $included = $properties['resource']['detection/development']['attributes']['included'] ?? null;
         $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
 
         $resource = $composite->getResource();
@@ -434,6 +434,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->addDefaultsIfNotSet()
                             ->children()
                                 ->arrayNode('included')
+                                    ->beforeNormalization()
+                                        ->ifTrue(fn ($v) => $v === null || $v === [])
+                                        ->then(fn ($v) => $v === [] ? [] : null)
+                                    ->end()
+                                    ->defaultNull()
                                     ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                 ->end()
                                 ->arrayNode('excluded')

@@ -76,4 +76,33 @@ class AttributesParserTest extends TestCase
          */
         $this->assertEquals($expected, AttributesParser::parseAttributes($input));
     }
+
+    public function test_empty_included(): void
+    {
+        $attributes = [
+            'foo.key1' => 'value1',
+        ];
+        $included = [];
+        $excluded = [];
+        $expected = [];
+
+        $this->assertEquals($expected, AttributesParser::applyIncludeExclude($attributes, $included, $excluded));
+    }
+
+    /**
+     * "If omitted, all attributes are included"
+     */
+    public function test_null_included(): void
+    {
+        $attributes = [
+            'foo.key1' => 'value1',
+        ];
+        $included = null;
+        $excluded = [];
+        $expected = [
+            'foo.key1' => 'value1',
+        ];
+
+        $this->assertEquals($expected, AttributesParser::applyIncludeExclude($attributes, $included, $excluded));
+    }
 }
