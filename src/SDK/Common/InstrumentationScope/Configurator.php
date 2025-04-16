@@ -72,27 +72,27 @@ final class Configurator
      * Create a default Configurator for a LoggerConfig
      * @return Configurator<LoggerConfig>
      */
-    public static function logger(bool $disabled = false): self
+    public static function logger(): self
     {
-        return (new Configurator(static fn () => new LoggerConfig($disabled)));
+        return (new Configurator(static fn () => new LoggerConfig()));
     }
 
     /**
      * Create a default Configurator for a MeterConfig
      * @return Configurator<MeterConfig>
      */
-    public static function meter(bool $disabled = false): self
+    public static function meter(): self
     {
-        return (new Configurator(static fn () => new MeterConfig($disabled)));
+        return (new Configurator(static fn () => new MeterConfig()));
     }
 
     /**
      * Create a default Configurator for a TracerConfig
      * @return Configurator<TracerConfig>
      */
-    public static function tracer(bool $disabled = false): self
+    public static function tracer(): self
     {
-        return (new Configurator(static fn () => new TracerConfig($disabled)));
+        return (new Configurator(static fn () => new TracerConfig()));
     }
 
     private static function namePattern(?string $name): ?string

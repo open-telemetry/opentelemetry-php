@@ -6,9 +6,7 @@ namespace OpenTelemetry\SDK\Common\InstrumentationScope;
 
 trait ConfigTrait
 {
-    public function __construct(private bool $disabled = false)
-    {
-    }
+    private bool $disabled = false;
 
     public function setDisabled(bool $disabled): void
     {

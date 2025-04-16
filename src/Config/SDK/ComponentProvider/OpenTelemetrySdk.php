@@ -216,7 +216,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
 
         $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
-        $configurator = Configurator::tracer($disabled);
+        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
         foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
             $disabled = $tracer['config']['disabled'];
@@ -316,7 +316,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
 
         $disabled = $properties['meter_provider']['meter_configurator/development']['default_config']['disabled'] ?? false;
-        $configurator = Configurator::meter($disabled);
+        $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
         foreach ($properties['meter_provider']['meter_configurator/development']['meters'] ?? [] as $meter) {
             $disabled = $meter['config']['disabled'];
             $configurator = $configurator->with(
@@ -349,7 +349,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
 
         $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
-        $configurator = Configurator::logger($disabled);
+        $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
         foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] ?? [] as $logger) {
             $disabled = $logger['config']['disabled'];
             $configurator = $configurator->with(
