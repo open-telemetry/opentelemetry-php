@@ -4,26 +4,20 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
-use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanBuilder;
-use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
-use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
-use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
-use OpenTelemetry\SemConv\TraceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Group;
@@ -110,48 +104,5 @@ class TracerTest extends TestCase
         $tracerProvider = (new TracerProviderFactory())->create();
         $tracer = $tracerProvider->getTracer('foo');
         $this->assertInstanceOf(API\NoopTracer::class, $tracer);
-    }
-
-    public function test_general_identity_attributes_are_dropped_by_default(): void
-    {
-        Logging::disable();
-        $exporter = new InMemoryExporter();
-        $tracerProvider = new TracerProvider(new SimpleSpanProcessor($exporter));
-        $tracer = $tracerProvider->getTracer('test');
-        $tracer->spanBuilder('test')
-            ->setAttribute(TraceAttributes::USER_ID, 'username')
-            ->setAttribute(TraceAttributes::USER_ROLES, 'admin')
-            ->startSpan()
-            ->end();
-
-        $tracerProvider->shutdown();
-
-        /** @var AttributesInterface $attributes */
-        $attributes = $exporter->getSpans()[0]->getAttributes();
-        $this->assertCount(0, $attributes);
-        $this->assertSame(2, $attributes->getDroppedAttributesCount());
-    }
-
-    public function test_general_identity_attributes_are_retained_if_enabled(): void
-    {
-        $exporter = new InMemoryExporter();
-        $spanLimits = (new SpanLimitsBuilder())
-            ->retainGeneralIdentityAttributes()
-            ->build();
-        $tracerProvider = new TracerProvider(new SimpleSpanProcessor($exporter), null, null, $spanLimits);
-        $tracer = $tracerProvider->getTracer('test');
-        $tracer->spanBuilder('test')
-            ->setAttribute(TraceAttributes::ENDUSER_ID, 'username')
-            ->setAttribute(TraceAttributes::ENDUSER_ROLE, 'admin')
-            ->setAttribute(TraceAttributes::ENDUSER_SCOPE, 'read:message, write:files')
-            ->startSpan()
-            ->end();
-
-        $tracerProvider->shutdown();
-
-        /** @var AttributesInterface $attributes */
-        $attributes = $exporter->getSpans()[0]->getAttributes();
-        $this->assertCount(3, $attributes);
-        $this->assertSame(0, $attributes->getDroppedAttributesCount());
     }
 }
