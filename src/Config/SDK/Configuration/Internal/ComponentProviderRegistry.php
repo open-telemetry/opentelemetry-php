@@ -76,7 +76,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Confi
 
     public function componentList(string $name, string $type): ArrayNodeDefinition
     {
-        $node = $this->builder->arrayNode($name);
+        $node = $this->builder->arrayNode($name)->defaultValue([]);
         $this->applyToArrayNode($node->arrayPrototype(), $type);
 
         return $node;

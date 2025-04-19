@@ -40,7 +40,7 @@ final class SpanExporterOtlpFile implements ComponentProvider
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('otlp_file');
+        $node = $builder->arrayNode('otlp_file/development');
         $node
             ->children()
                 ->scalarNode('output_stream')->defaultValue('stdout')->validate()->always(Validation::ensureString())->end()->end()

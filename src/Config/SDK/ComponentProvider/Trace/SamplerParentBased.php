@@ -33,10 +33,10 @@ final class SamplerParentBased implements ComponentProvider
     {
         return new ParentBased(
             root: $properties['root']->create($context),
-            remoteParentSampler: $properties['remote_parent_sampled']?->create($context) ?? new AlwaysOnSampler(),
-            remoteParentNotSampler: $properties['remote_parent_not_sampled']?->create($context) ?? new AlwaysOffSampler(),
-            localParentSampler: $properties['local_parent_sampled']?->create($context) ?? new AlwaysOnSampler(),
-            localParentNotSampler: $properties['local_parent_not_sampled']?->create($context) ?? new AlwaysOffSampler(),
+            remoteParentSampler: ($properties['remote_parent_sampled'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
+            remoteParentNotSampler: ($properties['remote_parent_not_sampled'] ?? null)?->create($context) ?? new AlwaysOffSampler(),
+            localParentSampler: ($properties['local_parent_sampled'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
+            localParentNotSampler: ($properties['local_parent_not_sampled'] ?? null)?->create($context) ?? new AlwaysOffSampler(),
         );
     }
 
