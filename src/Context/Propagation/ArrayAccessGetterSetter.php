@@ -79,6 +79,29 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
     }
 
     /** {@inheritdoc} */
+    public function getAll($carrier, string $key): array
+    {
+        if ($this->isSupportedCarrier($carrier)) {
+            $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
+            if (is_array($value) && $value) {
+                return array_values(array_filter($value, 'is_string'));
+            }
+
+            return is_string($value)
+                ? [$value]
+                : [];
+        }
+
+        throw new InvalidArgumentException(
+            sprintf(
+                'Unsupported carrier type: %s. Unable to get value associated with key:%s',
+                get_debug_type($carrier),
+                $key
+            )
+        );
+    }
+
+    /** {@inheritdoc} */
     public function set(&$carrier, string $key, string $value): void
     {
         if ($key === '') {

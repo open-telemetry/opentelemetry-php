@@ -40,4 +40,20 @@ final class SanitizeCombinedHeadersPropagationGetter implements PropagationGette
             $value,
         );
     }
+
+    public function getAll($carrier, string $key): array
+    {
+        $value = $this->getter->getAll($carrier, $key);
+        if ($value === []) {
+            return [];
+        }
+
+        $value = preg_replace(
+            [self::SERVER_CONCAT_HEADERS_REGEX, self::TRAILING_LEADING_SEPARATOR_REGEX],
+            [self::LIST_MEMBERS_SEPARATOR],
+            $value,
+        );
+
+        return array_values($value);
+    }
 }
