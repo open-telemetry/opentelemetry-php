@@ -16,10 +16,10 @@ use Traversable;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-propagator Getter and Setter.
  *
- * Default implementation of {@see PropagationGetterInterface} and {@see PropagationSetterInterface}.
+ * Default implementation of {@see ExtendedPropagationGetterInterface} and {@see PropagationSetterInterface}.
  * This type is used if no custom getter/setter is provided to {@see TextMapPropagatorInterface::inject()} or {@see TextMapPropagatorInterface::extract()}.
  */
-final class ArrayAccessGetterSetter implements PropagationGetterInterface, PropagationSetterInterface
+final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterface, PropagationSetterInterface
 {
     private static ?self $instance = null;
 

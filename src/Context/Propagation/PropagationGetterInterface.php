@@ -22,13 +22,4 @@ interface PropagationGetterInterface
      * Gets the value of a given key from a carrier.
      */
     public function get($carrier, string $key) : ?string;
-
-    /**
-     * Gets all values of a given key from a carrier.
-     *
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/context/api-propagators.md#getall
-     *
-     * @return list<string>
-     */
-    public function getAll($carrier, string $key): array;
 }
