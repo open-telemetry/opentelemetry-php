@@ -88,7 +88,8 @@ class ResourceInfoFactory
 
     public static function mandatoryResource(): ResourceInfo
     {
-        return ResourceInfo::create(Attributes::create([
+        return ResourceInfo::create(Attributes::create(
+            [
             ResourceAttributes::SERVICE_NAME => 'unknown_service:php'],
         ));
     }
