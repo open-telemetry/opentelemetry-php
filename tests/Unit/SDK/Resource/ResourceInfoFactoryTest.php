@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -85,7 +86,7 @@ class ResourceInfoFactoryTest extends TestCase
     public function test_resource_service_name_default(): void
     {
         $resource = ResourceInfoFactory::defaultResource();
-        $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get('service.name'));
+        $this->assertEquals('unknown_service:php', $resource->getAttributes()->get('service.name'));
     }
 
     #[Group('compliance')]
@@ -115,9 +116,9 @@ class ResourceInfoFactoryTest extends TestCase
     #[Group('compliance')]
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
-        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=from-resource-attributes');
         $resource = ResourceInfoFactory::defaultResource();
-        $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+        $this->assertEquals('from-resource-attributes', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_resource_from_registry(): void
@@ -162,12 +163,17 @@ class ResourceInfoFactoryTest extends TestCase
         }
     }
 
-    public function test_default_with_none_detectors(): void
+    /**
+     * SDK detectors are always included in the default resource.
+     */
+    public function test_default_with_none_detectors_uses_mandatory(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'none');
         $resource = ResourceInfoFactory::defaultResource();
         $keys = array_keys($resource->getAttributes()->toArray());
-        $this->assertEmpty($keys);
+        foreach (['service.name', 'telemetry.sdk.name', 'telemetry.sdk.version'] as $key) {
+            $this->assertContains($key, $keys);
+        }
     }
 
     public function test_logs_warning_for_unknown_detector(): void
@@ -176,5 +182,17 @@ class ResourceInfoFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'does-not-exist');
 
         ResourceInfoFactory::defaultResource();
+    }
+
+    public function test_environment_get_resource_service_name_precedence_over_resource_attributes(): void
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=from-env');
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-service-name');
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'environment');
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertNotEmpty($resource->getAttributes());
+        $this->assertSame('from-service-name', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 }
