@@ -36,7 +36,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
-use OpenTelemetry\SDK\Resource\Detectors\Composite;
+use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\SdkBuilder;
@@ -193,8 +193,10 @@ final class OpenTelemetrySdk implements ComponentProvider
              **/
             $detectors[] = $plugin->create($context);
         }
+        $detectors[] = new Detectors\Sdk();
+        $detectors[] = new Detectors\Service();
         /** @psalm-suppress PossiblyInvalidArgument */
-        $composite = new Composite($detectors);
+        $composite = new Detectors\Composite($detectors);
         $included = $properties['resource']['detection/development']['attributes']['included'] ?? null;
         $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
 

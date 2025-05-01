@@ -2,31 +2,34 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Detector;
+namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector;
 
 use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
 use OpenTelemetry\Config\SDK\Configuration\Context;
-use OpenTelemetry\SDK\Resource\Detectors\SdkProvided as SdkProvidedDetector;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @implements ComponentProvider<ResourceDetectorInterface>
  */
-final class SdkProvided implements ComponentProvider
+final class Os implements ComponentProvider
 {
-    /**
-     * @param array{} $properties
-     */
     public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
-        return new SdkProvidedDetector();
+        return new class() implements ResourceDetectorInterface {
+            public function getResource(): ResourceInfo
+            {
+                return ResourceInfoFactory::emptyResource();
+            }
+        };
     }
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        return $builder->arrayNode('sdk_provided');
+        return $builder->arrayNode('os');
     }
 }

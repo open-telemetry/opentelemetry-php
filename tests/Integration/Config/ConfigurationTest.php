@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Integration\Config;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Sdk;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -101,19 +102,8 @@ final class ConfigurationTest extends TestCase
         ];
 
         $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource.yaml')->create()->build();
-        $tracer = $sdk->getTracerProvider()->getTracer('test');
+        $resource = $this->getResource($sdk);
 
-        $tracerReflection = new \ReflectionClass($tracer);
-        $sharedStateProperty = $tracerReflection->getProperty('tracerSharedState');
-        $sharedStateProperty->setAccessible(true);
-        $sharedState = $sharedStateProperty->getValue($tracer);
-
-        $stateReflection = new \ReflectionClass($sharedState);
-        $resourceProperty = $stateReflection->getProperty('resource');
-        $resourceProperty->setAccessible(true);
-        $resource = $resourceProperty->getValue($sharedState);
-
-        $this->assertInstanceOf(ResourceInfo::class, $resource);
         $this->assertSame('https://opentelemetry.io/schemas/1.30.0', $resource->getSchemaUrl());
         $attributes = $resource->getAttributes()->toArray();
 
@@ -132,11 +122,47 @@ final class ConfigurationTest extends TestCase
             'process.pid',
             'process.executable.path',
             'process.owner',
+            'process.runtime.name',
             'telemetry.sdk.language',
             'telemetry.sdk.name',
         ];
 
         $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource-include-exclude.yaml')->create()->build();
+        $resource = $this->getResource($sdk);
+
+        $attributes = $resource->getAttributes()->toArray();
+
+        $this->assertEqualsCanonicalizing($expectedKeys, array_keys($attributes));
+    }
+
+    public function test_resource_defaults(): void
+    {
+        $expectedKeys = [
+            'service.name',
+            'service.instance.id',
+            'telemetry.distro.name',
+            'telemetry.distro.version',
+            'telemetry.sdk.language',
+            'telemetry.sdk.name',
+            'telemetry.sdk.version',
+        ];
+
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource-default.yaml')->create()->build();
+        $resource = $this->getResource($sdk);
+
+        $attributes = $resource->getAttributes()->toArray();
+
+        $this->assertEqualsCanonicalizing($expectedKeys, array_keys($attributes));
+    }
+
+    #[DoesNotPerformAssertions]
+    public function test_minimal(): void
+    {
+        Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml')->create()->build();
+    }
+
+    private function getResource(Sdk $sdk): ResourceInfo
+    {
         $tracer = $sdk->getTracerProvider()->getTracer('test');
 
         $tracerReflection = new \ReflectionClass($tracer);
@@ -149,14 +175,6 @@ final class ConfigurationTest extends TestCase
         $resourceProperty->setAccessible(true);
         $resource = $resourceProperty->getValue($sharedState);
 
-        $attributes = $resource->getAttributes()->toArray();
-
-        $this->assertEqualsCanonicalizing($expectedKeys, array_keys($attributes));
-    }
-
-    #[DoesNotPerformAssertions]
-    public function test_minimal(): void
-    {
-        Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml')->create()->build();
+        return $resource;
     }
 }
