@@ -43,11 +43,10 @@ final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagat
 
     public function getAll($carrier, string $key): array
     {
-        if (! $this->getter instanceof ExtendedPropagationGetterInterface) {
-            return [];
-        }
+        $value = $this->getter instanceof ExtendedPropagationGetterInterface
+            ? $this->getter->getAll($carrier, $key)
+            : (array) $this->getter->get($carrier, $key);
 
-        $value = $this->getter->getAll($carrier, $key);
         if ($value === []) {
             return [];
         }

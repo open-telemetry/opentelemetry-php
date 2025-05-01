@@ -60,9 +60,9 @@ class SanitizeCombinedHeadersPropagationGetterTest extends MockeryTestCase
     {
         $carrier = ['a' => 'alpha'];
 
-        $this->propagationGetter->shouldNotReceive('getAll');
+        $this->propagationGetter->shouldReceive('get')->with($carrier, 'a')->andReturn('alpha');
         $getter = new SanitizeCombinedHeadersPropagationGetter($this->propagationGetter);
 
-        $this->assertSame([], $getter->getAll($carrier, 'a'));
+        $this->assertSame(['alpha'], $getter->getAll($carrier, 'a'));
     }
 }
