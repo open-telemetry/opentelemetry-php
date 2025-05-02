@@ -2,7 +2,7 @@ params:
   # excluded namespaces will not be generated
   # this behavior is fully controlled by jinja templates
   # TODO exclude more namespaces, eg: ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, browser, device, ...
-  excluded_namespaces: [cloudfoundry, dotnet, hw, nodejs, profile]
+  excluded_namespaces: [cloudfoundry, dotnet, hw, nodejs, profile, android, cpython, ios]
 
   # excluded attributes will be commented out in the generated code
   # this behavior is fully controlled by jinja templates

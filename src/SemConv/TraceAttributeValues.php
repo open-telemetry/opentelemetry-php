@@ -13,48 +13,6 @@ interface TraceAttributeValues
      */
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
     /**
-     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
-     *
-     * @see TraceAttributes::ANDROID_APP_STATE
-     */
-    public const ANDROID_APP_STATE_CREATED = 'created';
-
-    /**
-     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
-     *
-     * @see TraceAttributes::ANDROID_APP_STATE
-     */
-    public const ANDROID_APP_STATE_BACKGROUND = 'background';
-
-    /**
-     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
-     *
-     * @see TraceAttributes::ANDROID_APP_STATE
-     */
-    public const ANDROID_APP_STATE_FOREGROUND = 'foreground';
-
-    /**
-     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
-     *
-     * @see TraceAttributes::ANDROID_STATE
-     */
-    public const ANDROID_STATE_CREATED = 'created';
-
-    /**
-     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
-     *
-     * @see TraceAttributes::ANDROID_STATE
-     */
-    public const ANDROID_STATE_BACKGROUND = 'background';
-
-    /**
-     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
-     *
-     * @see TraceAttributes::ANDROID_STATE
-     */
-    public const ANDROID_STATE_FOREGROUND = 'foreground';
-
-    /**
      * Exception was handled by the exception handling middleware.
      *
      * @see TraceAttributes::ASPNETCORE_DIAGNOSTICS_EXCEPTION_RESULT
@@ -711,27 +669,6 @@ interface TraceAttributeValues
      * @see TraceAttributes::CPU_MODE
      */
     public const CPU_MODE_KERNEL = 'kernel';
-
-    /**
-     * Generation 0
-     *
-     * @see TraceAttributes::CPYTHON_GC_GENERATION
-     */
-    public const CPYTHON_GC_GENERATION_GENERATION_0 = '0';
-
-    /**
-     * Generation 1
-     *
-     * @see TraceAttributes::CPYTHON_GC_GENERATION
-     */
-    public const CPYTHON_GC_GENERATION_GENERATION_1 = '1';
-
-    /**
-     * Generation 2
-     *
-     * @see TraceAttributes::CPYTHON_GC_GENERATION
-     */
-    public const CPYTHON_GC_GENERATION_GENERATION_2 = '2';
 
     /**
      * all
@@ -2546,76 +2483,6 @@ interface TraceAttributeValues
      * @see TraceAttributes::HTTP_REQUEST_METHOD
      */
     public const HTTP_REQUEST_METHOD_OTHER = '_OTHER';
-
-    /**
-     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
-     *
-     * @see TraceAttributes::IOS_APP_STATE
-     */
-    public const IOS_APP_STATE_ACTIVE = 'active';
-
-    /**
-     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
-     *
-     * @see TraceAttributes::IOS_APP_STATE
-     */
-    public const IOS_APP_STATE_INACTIVE = 'inactive';
-
-    /**
-     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
-     *
-     * @see TraceAttributes::IOS_APP_STATE
-     */
-    public const IOS_APP_STATE_BACKGROUND = 'background';
-
-    /**
-     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
-     *
-     * @see TraceAttributes::IOS_APP_STATE
-     */
-    public const IOS_APP_STATE_FOREGROUND = 'foreground';
-
-    /**
-     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
-     *
-     * @see TraceAttributes::IOS_APP_STATE
-     */
-    public const IOS_APP_STATE_TERMINATE = 'terminate';
-
-    /**
-     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
-     *
-     * @see TraceAttributes::IOS_STATE
-     */
-    public const IOS_STATE_ACTIVE = 'active';
-
-    /**
-     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
-     *
-     * @see TraceAttributes::IOS_STATE
-     */
-    public const IOS_STATE_INACTIVE = 'inactive';
-
-    /**
-     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
-     *
-     * @see TraceAttributes::IOS_STATE
-     */
-    public const IOS_STATE_BACKGROUND = 'background';
-
-    /**
-     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
-     *
-     * @see TraceAttributes::IOS_STATE
-     */
-    public const IOS_STATE_FOREGROUND = 'foreground';
-
-    /**
-     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
-     *
-     * @see TraceAttributes::IOS_STATE
-     */
-    public const IOS_STATE_TERMINATE = 'terminate';
 
     /**
      * Heap memory.

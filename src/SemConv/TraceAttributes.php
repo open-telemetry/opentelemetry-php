@@ -14,26 +14,6 @@ interface TraceAttributes
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
 
     /**
-     * This attribute represents the state of the application.
-     *
-     * The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
-     */
-    public const ANDROID_APP_STATE = 'android.app.state';
-
-    /**
-     * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
-     */
-    public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
-
-    /**
-     * Deprecated. Use `android.app.state` instead.
-     * The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
-     *
-     * @deprecated {"note": "Renamed to `android.app.state`", "reason": "uncategorized"}
-     */
-    public const ANDROID_STATE = 'android.state';
-
-    /**
      * A unique identifier representing the installation of an application on a specific device
      *
      * Its value SHOULD persist across launches of the same application installation, including through application upgrades.
@@ -852,11 +832,6 @@ interface TraceAttributes
      * The mode of the CPU
      */
     public const CPU_MODE = 'cpu.mode';
-
-    /**
-     * Value of the garbage collector collection generation.
-     */
-    public const CPYTHON_GC_GENERATION = 'cpython.gc.generation';
 
     /**
      * Deprecated, use `cassandra.consistency.level` instead.
@@ -2369,21 +2344,6 @@ interface TraceAttributes
      * @deprecated {"note": "Replaced by `user_agent.original`.", "reason": "uncategorized"}
      */
     public const HTTP_USER_AGENT = 'http.user_agent';
-
-    /**
-     * This attribute represents the state of the application.
-     *
-     * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate), and from which the `OS terminology` column values are derived.
-     */
-    public const IOS_APP_STATE = 'ios.app.state';
-
-    /**
-     * Deprecated. use the `ios.app.state` instead.
-     * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate), and from which the `OS terminology` column values are derived.
-     *
-     * @deprecated {"note": "Renamed to `ios.app.state`", "reason": "uncategorized"}
-     */
-    public const IOS_STATE = 'ios.state';
 
     /**
      * Name of the buffer pool.
