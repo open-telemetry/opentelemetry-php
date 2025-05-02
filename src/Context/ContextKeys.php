@@ -22,4 +22,11 @@ final class ContextKeys
 
         return $instance ??= Context::createKey('opentelemetry-trace-baggage-key');
     }
+
+    public static function suppressInstrumentation(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey('opentelemetry-trace-suppress-instrumentation-key');
+    }
 }
