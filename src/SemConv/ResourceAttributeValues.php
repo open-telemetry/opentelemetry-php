@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
 
     /**
      * ec2
@@ -292,6 +292,118 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::CLOUD_PROVIDER
      */
     public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
+
+    /**
+     * Mission critical service.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_MISSION_CRITICAL = 'MISSION_CRITICAL';
+
+    /**
+     * High impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_HIGH = 'HIGH';
+
+    /**
+     * Medium impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_MEDIUM = 'MEDIUM';
+
+    /**
+     * Low impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_LOW = 'LOW';
+
+    /**
+     * Production environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_PRODUCTION = 'PRODUCTION';
+
+    /**
+     * Staging environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_STAGING = 'STAGING';
+
+    /**
+     * Test environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_TEST = 'TEST';
+
+    /**
+     * Development environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_DEVELOPMENT = 'DEVELOPMENT';
+
+    /**
+     * Mission critical service.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_MISSION_CRITICAL = 'MISSION_CRITICAL';
+
+    /**
+     * High impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_HIGH = 'HIGH';
+
+    /**
+     * Medium impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_MEDIUM = 'MEDIUM';
+
+    /**
+     * Low impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_LOW = 'LOW';
+
+    /**
+     * Production environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_PRODUCTION = 'PRODUCTION';
+
+    /**
+     * Staging environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_STAGING = 'STAGING';
+
+    /**
+     * Test environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_TEST = 'TEST';
+
+    /**
+     * Development environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_DEVELOPMENT = 'DEVELOPMENT';
 
     /**
      * AMD64
