@@ -44,4 +44,22 @@ class SpanSuppressionTest extends TestCase
         //suppression removed after detach
         $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
     }
+
+    public function test_merge_suppression(): void
+    {
+        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
+        $scope1 = SpanSuppression::suppressSpanKind([SpanKind::KIND_CLIENT])->activate();
+        $scope2 = SpanSuppression::suppressSpanKind([SpanKind::KIND_SERVER])->activate();
+
+        try {
+            $this->assertTrue(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
+            $this->assertTrue(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
+        } finally {
+            $scope1->detach();
+            $scope2->detach();
+        }
+        //suppression removed after detach
+        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
+        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
+    }
 }

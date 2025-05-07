@@ -25,16 +25,10 @@ class SpanSuppression implements ImplicitContextKeyedInterface
     {
         $new = new self(self::SUPPRESS_SPAN_KIND, $spanKinds);
 
-        // Automatically merge with any existing strategy in the current context
-        $current = self::current();
-        if ($current->suppressionType !== self::SUPPRESS_NONE) {
-            return $current->mergeWith($new);
-        }
-
-        return $new;
+        return self::current()->mergeWith($new);
     }
 
-    public static function shouldSuppress(?int $spanKind): bool
+    public static function shouldSuppress(int $spanKind): bool
     {
         return self::current()->shouldSuppressSpanKind($spanKind);
     }
@@ -57,13 +51,9 @@ class SpanSuppression implements ImplicitContextKeyedInterface
         return $instance;
     }
 
-    private function shouldSuppressSpanKind(?int $spanKind): bool
+    private function shouldSuppressSpanKind(int $spanKind): bool
     {
-        if ($this->suppressionType === self::SUPPRESS_NONE) {
-            return false;
-        }
-
-        if ($this->suppressionType === self::SUPPRESS_SPAN_KIND && $spanKind !== null) {
+        if ($this->suppressionType === self::SUPPRESS_SPAN_KIND) {
             return in_array($spanKind, $this->suppressedSpanKinds, true);
         }
 
@@ -94,10 +84,6 @@ class SpanSuppression implements ImplicitContextKeyedInterface
             return $other;
         }
 
-        if ($other->suppressionType === self::SUPPRESS_NONE) {
-            return $this;
-        }
-
         if ($this->suppressionType === self::SUPPRESS_SPAN_KIND &&
             $other->suppressionType === self::SUPPRESS_SPAN_KIND) {
             return new self(
@@ -106,7 +92,6 @@ class SpanSuppression implements ImplicitContextKeyedInterface
             );
         }
 
-        // Default case
         return $this;
     }
 }
