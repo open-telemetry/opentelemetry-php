@@ -127,4 +127,16 @@ class ScopeTest extends TestCase
         $this->assertNotNull($scope);
         $this->assertArrayNotHasKey('key', $scope);
     }
+
+    public function test_scope_is_gced_after_detach(): void
+    {
+        $storage = new ContextStorage();
+        $scope = $storage->attach($storage->current());
+
+        $ref = \WeakReference::create($scope);
+        $scope->detach();
+        unset($scope);
+
+        $this->assertNull($ref->get());
+    }
 }
