@@ -7,15 +7,10 @@ namespace OpenTelemetry\SDK\Logs;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 
-/**
- * Note that this logger class is deliberately NOT psr-3 compatible, per spec: "Note: this document defines a log
- * backend API. The API is not intended to be called by application developers directly."
- *
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/bridge-api.md
- */
 class Logger implements LoggerInterface
 {
     use LogsMessagesTrait;
@@ -33,6 +28,9 @@ class Logger implements LoggerInterface
         $this->config = $configurator ? $configurator->resolve($scope) : LoggerConfig::default();
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/logs/api.md#emit-a-logrecord
+     */
     public function emit(LogRecord $logRecord): void
     {
         //If a Logger is disabled, it MUST behave equivalently to No-op Logger.
@@ -52,12 +50,16 @@ class Logger implements LoggerInterface
         }
     }
 
-    public function isEnabled(): bool
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/logs/api.md#enabled
+     */
+    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null): bool
     {
         return $this->config->isEnabled();
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/logs/sdk.md#loggerconfigurator
      * @param Configurator<LoggerConfig> $configurator
      */
     public function updateConfig(Configurator $configurator): void
