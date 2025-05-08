@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
@@ -117,13 +116,10 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
 
     private static function readHeader($carrier, PropagationGetterInterface $getter, string $key): string
     {
-        // By convention, X-INSTANA-* headers are sent all-upper-case. For http and http/2, Node.js normalizes all headers to
-        // all-lower-case, that's why we first read via the lower case variant of the header name. For other protocols, no
-        // such normalization happens, so we also need to read via the original all-upper-case variant.
-        $header = $getter->get($carrier, strtolower($key)) ?: $getter->get($carrier, $key);
+        $header = $getter->get($carrier, $key) ?: '';
 
         // Return the header or an empty string if not found
-        return $header ?: '';
+        return $header;
     }
     private static function getSampledValue($carrier, PropagationGetterInterface $getter): ?int
     {
@@ -157,17 +153,9 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
             $spanId =  str_pad($spanId, 16, '0', STR_PAD_LEFT);
         }
 
-        if ((SpanContextValidator::isValidTraceId($traceId) && SpanContextValidator::isValidSpanId($spanId))) {
-            return SpanContext::createFromRemoteParent(
-                $traceId,
-                $spanId,
-                $level ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
-            );
-        }
-
         return SpanContext::createFromRemoteParent(
-            SpanContextValidator::INVALID_TRACE,
-            SpanContextValidator::INVALID_SPAN,
+            $traceId,
+            $spanId,
             $level ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
         );
 
