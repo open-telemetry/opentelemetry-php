@@ -12,25 +12,21 @@ use OpenTelemetry\Context\ScopeInterface;
 
 class SpanSuppression implements ImplicitContextKeyedInterface
 {
-    private const SUPPRESS_NONE = 0;
-    private const SUPPRESS_SPAN_KIND = 1;
-
     private function __construct(
-        private readonly int $suppressionType,
         private readonly array $suppressedSpanKinds = [],
     ) {
     }
 
-    public static function suppressSpanKind(array $spanKinds): self
+    public static function suppressSpanKind(int $spanKind): self
     {
-        $new = new self(self::SUPPRESS_SPAN_KIND, $spanKinds);
+        $new = new self([$spanKind]);
 
         return self::current()->mergeWith($new);
     }
 
-    public static function shouldSuppress(int $spanKind): bool
+    public static function shouldSuppress(int $spanKind, ?ContextInterface $context = null): bool
     {
-        return self::current()->shouldSuppressSpanKind($spanKind);
+        return self::current($context)->shouldSuppressSpanKind($spanKind);
     }
 
     public function activate(): ScopeInterface
@@ -43,28 +39,25 @@ class SpanSuppression implements ImplicitContextKeyedInterface
         return $context->with(self::contextKey(), $this);
     }
 
-    private static function suppressNone(): self
+    private static function default(): self
     {
         static $instance;
-        $instance ??= new self(self::SUPPRESS_NONE);
+        $instance ??= new self();
 
         return $instance;
     }
 
     private function shouldSuppressSpanKind(int $spanKind): bool
     {
-        if ($this->suppressionType === self::SUPPRESS_SPAN_KIND) {
-            return in_array($spanKind, $this->suppressedSpanKinds, true);
-        }
-
-        return false;
+        return in_array($spanKind, $this->suppressedSpanKinds, true);
     }
 
-    private static function current(): self
+    private static function current(?ContextInterface $context = null): self
     {
-        $current = Context::getCurrent()->get(self::contextKey());
+        $context ??= Context::getCurrent();
+        $current = $context->get(self::contextKey());
         if ($current === null) {
-            return self::suppressNone();
+            return self::default();
         }
 
         return $current;
@@ -80,18 +73,8 @@ class SpanSuppression implements ImplicitContextKeyedInterface
 
     private function mergeWith(self $other): self
     {
-        if ($this->suppressionType === self::SUPPRESS_NONE) {
-            return $other;
-        }
-
-        if ($this->suppressionType === self::SUPPRESS_SPAN_KIND &&
-            $other->suppressionType === self::SUPPRESS_SPAN_KIND) {
-            return new self(
-                self::SUPPRESS_SPAN_KIND,
-                array_unique(array_merge($this->suppressedSpanKinds, $other->suppressedSpanKinds))
-            );
-        }
-
-        return $this;
+        return new self(
+            array_unique(array_merge($this->suppressedSpanKinds, $other->suppressedSpanKinds))
+        );
     }
 }

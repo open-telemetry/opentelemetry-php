@@ -28,27 +28,24 @@ function check(): void
 echo "\nInitial state:\n";
 check();
 
-$scopes[] = SpanSuppression::suppressSpanKind([SpanKind::KIND_SERVER])->activate();
+$scopes[] = SpanSuppression::suppressSpanKind(SpanKind::KIND_SERVER)->activate();
 
 // add suppression of SERVER spans
 echo "\nWith SERVER suppression:\n";
 
 check();
 
-$scopes[] = SpanSuppression::suppressSpanKind([
-    SpanKind::KIND_CLIENT,
-    SpanKind::KIND_CONSUMER,
-])->activate();
+$scopes[] = SpanSuppression::suppressSpanKind(SpanKind::KIND_CLIENT)->activate();
 
-// add suppression of CLIENT and CONSUMER spans, which should be additive
-echo "\nWith CLIENT+CONSUMER suppression added:\n";
+// add suppression of CLIENT spans, which should be additive
+echo "\nWith CLIENT suppression added:\n";
 
 check();
 
 //detach active suppression, leaving SERVER
 array_pop($scopes)->detach();
 
-echo "\nWith CLIENT+CONSUMER suppression detached:\n";
+echo "\nWith CLIENT suppression detached:\n";
 
 check();
 
