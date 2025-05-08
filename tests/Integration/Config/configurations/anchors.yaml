@@ -1,12 +1,12 @@
 # anchors.yaml demonstrates anchor substitution to reuse OTLP exporter configuration across signals.
 
-file_format: "0.3"
+file_format: "0.4"
 exporters:
     otlp: &otlp-exporter
         encoding: protobuf
-        certificate: /app/cert.pem
-        client_key: /app/cert.pem
-        client_certificate: /app/cert.pem
+        certificate_file: /app/cert.pem
+        client_key_file: /app/cert.pem
+        client_certificate_file: /app/cert.pem
         headers:
             - name: api-key
               value: "str 1234"
