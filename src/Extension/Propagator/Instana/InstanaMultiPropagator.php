@@ -145,7 +145,7 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
         if ($spanId && strlen($spanId) < 16) {
             $spanId =  str_pad($spanId, 16, '0', STR_PAD_LEFT);
         }
-       // $isSampled = ($sampled === TraceFlags::SAMPLED);
+        // $isSampled = ($sampled === TraceFlags::SAMPLED);
 
         if ($traceId && $spanId && SpanContextValidator::isValidTraceId($traceId) && SpanContextValidator::isValidSpanId($spanId)) {
             return SpanContext::createFromRemoteParent(
@@ -153,12 +153,13 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
                 $spanId,
                 $level ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
             );
-        } else {
-            return SpanContext::createFromRemoteParent(
-                SpanContextValidator::INVALID_TRACE,
-                SpanContextValidator::INVALID_SPAN,
-                $level ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
-            );
         }
+
+        return SpanContext::createFromRemoteParent(
+            SpanContextValidator::INVALID_TRACE,
+            SpanContextValidator::INVALID_SPAN,
+            $level ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
+        );
+
     }
 }
