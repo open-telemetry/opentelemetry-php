@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config;
 
+use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -159,6 +160,23 @@ final class ConfigurationTest extends TestCase
     public function test_minimal(): void
     {
         Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml')->create()->build();
+    }
+
+    public function test_duplicate_propagators(): void
+    {
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/propagators-duplicate.yaml')->create()->build();
+        $propagator = $sdk->getPropagator();
+        $propagatorReflection = new \ReflectionClass($propagator);
+        $propagatorsProperty = $propagatorReflection->getProperty('propagators');
+        $propagatorsProperty->setAccessible(true);
+        $propagators = $propagatorsProperty->getValue($propagator);
+        $this->assertIsArray($propagators);
+        $this->assertCount(1, $propagators, 'duplicate was removed');
+        $this->assertInstanceOf(TraceContextPropagator::class, $propagators[0]);
+
+        $this->assertCount(2, $propagator->fields());
+        $this->assertContains('traceparent', $propagator->fields());
+        $this->assertContains('tracestate', $propagator->fields());
     }
 
     private function getResource(Sdk $sdk): ResourceInfo

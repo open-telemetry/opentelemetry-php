@@ -651,13 +651,14 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->ifArray()
                 ->then(static function (array $value): array {
                     $existing = [];
-                    foreach ($value['composite'] as $item) {
+                    foreach ($value['composite'] ?? [] as $item) {
                         $existing[] = key($item);
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);
-                        if ($name && !in_array($name, $existing)) {
+                        if ($name !== '' && !in_array($name, $existing)) {
                             $value['composite'][][$name] = null;
+                            $existing[] = $name;
                         }
                     }
 
