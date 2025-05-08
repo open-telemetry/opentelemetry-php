@@ -257,6 +257,22 @@ class InstanaMultiPropagatorTest extends TestCase
         ];
     }
 
+    public function test_extract_context_with_sampled_no_trace_and_span_headers(): void
+    {
+        $carrier = [
+            'X-INSTANA-L' => '1',
+        ];
+
+        $this->assertEquals(
+            SpanContext::createFromRemoteParent(
+                '00000000000000000000000000000000',
+                '0000000000000000',
+                TraceFlags::SAMPLED
+            ),
+            $this->getSpanContext($this->instanaMultiPropagator->extract($carrier))
+        );
+    }
+
     public function test_extract_context_with_no_trace_and_span_headers(): void
     {
         $carrier = [
@@ -272,6 +288,7 @@ class InstanaMultiPropagatorTest extends TestCase
             $this->getSpanContext($this->instanaMultiPropagator->extract($carrier))
         );
     }
+
     public function test_extract_and_inject(): void
     {
         $extractCarrier = [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Extension\Propagator\Instana;
 
+use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -96,15 +97,25 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
 
+        $traceId = self::readHeader($carrier, $getter, self::INSTANA_TRACE_ID_HEADER);
+        $spanId = self::readHeader($carrier, $getter, self::INSTANA_SPAN_ID_HEADER);
+        $level = self::getSampledValue($carrier, $getter);
+
         $spanContext = self::extractImpl($carrier, $getter);
-        if (!$spanContext->isValid()) {
+
+        if (($traceId === '' &&  $spanId === '') && !$level == '') {
+            return (new NonRecordingSpan($spanContext))
+                ->storeInContext($context);
+
+        } elseif (!$spanContext->isValid()) {
             return $context;
         }
 
         return $context->withContextValue(Span::wrap($spanContext));
+
     }
 
-    private static function readHeader($carrier, PropagationGetterInterface $getter, string $key): ?string
+    private static function readHeader($carrier, PropagationGetterInterface $getter, string $key): string
     {
         // By convention, X-INSTANA-* headers are sent all-upper-case. For http and http/2, Node.js normalizes all headers to
         // all-lower-case, that's why we first read via the lower case variant of the header name. For other protocols, no
@@ -145,9 +156,8 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
         if ($spanId && strlen($spanId) < 16) {
             $spanId =  str_pad($spanId, 16, '0', STR_PAD_LEFT);
         }
-        // $isSampled = ($sampled === TraceFlags::SAMPLED);
 
-        if ($traceId && $spanId && SpanContextValidator::isValidTraceId($traceId) && SpanContextValidator::isValidSpanId($spanId)) {
+        if ((SpanContextValidator::isValidTraceId($traceId) || SpanContextValidator::isValidSpanId($spanId))) {
             return SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
