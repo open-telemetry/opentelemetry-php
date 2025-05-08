@@ -161,6 +161,17 @@ class InstanaMultiPropagatorTest extends TestCase
         );
     }
 
+    public function test_extract_context_with_no_span_headers(): void
+    {
+
+        $this->assertInvalid(
+            [
+                $this->TRACE_ID => self::X_INSTANA_T,
+                $this->SAMPLED => self::IS_SAMPLED,
+            ]
+        );
+    }
+
     #[DataProvider('sampledValueProvider')]
     public function test_extract_sampled_context($sampledValue): void
     {

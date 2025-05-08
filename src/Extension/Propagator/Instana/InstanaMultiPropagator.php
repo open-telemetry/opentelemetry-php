@@ -157,7 +157,7 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
             $spanId =  str_pad($spanId, 16, '0', STR_PAD_LEFT);
         }
 
-        if ((SpanContextValidator::isValidTraceId($traceId) || SpanContextValidator::isValidSpanId($spanId))) {
+        if ((SpanContextValidator::isValidTraceId($traceId) && SpanContextValidator::isValidSpanId($spanId))) {
             return SpanContext::createFromRemoteParent(
                 $traceId,
                 $spanId,
