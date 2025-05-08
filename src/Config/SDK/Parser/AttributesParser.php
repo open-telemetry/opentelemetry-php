@@ -24,9 +24,15 @@ class AttributesParser
      */
     public static function parseAttributes(array $input): array
     {
-        $attributes = [];
-        foreach ($input as $attr) {
-            $attributes[$attr['name']] = $attr['value'];
+        $attributes = array_column($input, 'value', 'name');
+        foreach ($attributes as $name => $value) {
+            if (is_array($value)) {
+                $attributes[$name] = array_values(array_filter($value, fn ($v) => $v !== null));
+            } else {
+                if ($value === null) {
+                    unset($attributes[$name]);
+                }
+            }
         }
 
         return $attributes;

@@ -57,6 +57,8 @@ class AttributesParserTest extends TestCase
             ['name' => 'bool_array_key', 'value' => [true, false], 'type' => 'bool_array'],
             ['name' => 'int_array_key', 'value' => [1, 2], 'type' => 'int_array'],
             ['name' => 'double_array_key', 'value' => [1.1, 2.2], 'type' => 'double_array'],
+            ['name' => 'array_with_nulls', 'value' => [1, null, 2], 'type' => 'int_array'],
+            ['name' => 'null', 'value' => null],
         ];
         $expected = [
             'service.name' => 'unknown_service',
@@ -68,6 +70,7 @@ class AttributesParserTest extends TestCase
             'bool_array_key' => [true, false],
             'int_array_key' => [1, 2],
             'double_array_key' => [1.1, 2.2],
+            'array_with_nulls' => [1,2],
         ];
 
         /**
