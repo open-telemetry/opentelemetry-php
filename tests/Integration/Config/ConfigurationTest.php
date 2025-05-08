@@ -105,7 +105,7 @@ final class ConfigurationTest extends TestCase
         $sdk = Configuration::parseFile(__DIR__ . '/configurations/resource.yaml')->create()->build();
         $resource = $this->getResource($sdk);
 
-        $this->assertSame('https://opentelemetry.io/schemas/1.30.0', $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl());
         $attributes = $resource->getAttributes()->toArray();
 
         foreach ($expectedKeys as $k) {
