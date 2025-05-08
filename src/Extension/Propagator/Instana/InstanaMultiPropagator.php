@@ -103,7 +103,7 @@ final class InstanaMultiPropagator implements TextMapPropagatorInterface
 
         $spanContext = self::extractImpl($carrier, $getter);
 
-        if (($traceId === '' &&  $spanId === '') && !$level == '') {
+        if (($traceId === '' &&  $spanId === '') && $level !== null) {
             return (new NonRecordingSpan($spanContext))
                 ->storeInContext($context);
 
