@@ -28,10 +28,8 @@ class AttributesParser
         foreach ($attributes as $name => $value) {
             if (is_array($value)) {
                 $attributes[$name] = array_values(array_filter($value, fn ($v) => $v !== null));
-            } else {
-                if ($value === null) {
-                    unset($attributes[$name]);
-                }
+            } elseif ($value === null) {
+                unset($attributes[$name]);
             }
         }
 
