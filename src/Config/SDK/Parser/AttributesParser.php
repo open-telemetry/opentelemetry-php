@@ -6,6 +6,9 @@ namespace OpenTelemetry\Config\SDK\Parser;
 
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 
+/**
+ * @internal
+ */
 class AttributesParser
 {
     public static function parseAttributesList(?string $list): array

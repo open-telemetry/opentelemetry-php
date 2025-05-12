@@ -77,9 +77,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *                 included: list<string>,
      *                 excluded: list<string>,
      *             },
-     *             detectors: array{
-     *                 array{},
-     *             },
+     *             detectors: list<ComponentPlugin<ResourceDetectorInterface>>,
      *         }
      *     },
      *     attribute_limits: array{
