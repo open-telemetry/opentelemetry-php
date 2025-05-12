@@ -187,12 +187,14 @@ final class OpenTelemetrySdk implements ComponentProvider
         foreach ($properties['resource']['detection/development']['detectors'] ?? [] as $plugin) {
             /**
              * @psalm-suppress InvalidMethodCall
-             * @phpstan-ignore-next-line
              **/
             $detectors[] = $plugin->create($context);
         }
-        $detectors[] = new Detectors\Sdk();
-        $detectors[] = new Detectors\Service();
+        $mandatory = (new Detectors\Composite([
+            new Detectors\Sdk(),
+            new Detectors\Service(),
+        ]))->getResource();
+
         /** @psalm-suppress PossiblyInvalidArgument */
         $composite = new Detectors\Composite($detectors);
         $included = $properties['resource']['detection/development']['attributes']['included'] ?? null;
@@ -205,10 +207,12 @@ final class OpenTelemetrySdk implements ComponentProvider
         $attributes = AttributesParser::parseAttributesList($properties['resource']['attributes_list']);
         $attributes = array_merge($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
 
-        $resource = $resource->merge(ResourceInfo::create(
-            attributes: Attributes::create($attributes),
-            schemaUrl: $schemaUrl,
-        ));
+        $resource = $resource
+            ->merge(ResourceInfo::create(
+                attributes: Attributes::create($attributes),
+                schemaUrl: $schemaUrl,
+            ))
+            ->merge($mandatory);
 
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
