@@ -9,11 +9,10 @@ use OpenTelemetry\API\Trace\SpanSuppression\Strategy\SpanKindSuppressionStrategy
 use OpenTelemetry\API\Trace\SpanSuppression\Strategy\StrategyTrait;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SpanKindSuppressionStrategy::class)]
-#[CoversTrait(StrategyTrait::class)]
+#[CoversClass(StrategyTrait::class)] //@todo CoversTrait
 class SpanKindSuppressionStrategyTest extends TestCase
 {
     public function test_should_suppress(): void
