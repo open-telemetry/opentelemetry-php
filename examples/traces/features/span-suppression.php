@@ -6,6 +6,12 @@ require_once DIRNAME(__DIR__, 3) . '/vendor/autoload.php';
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\SpanSuppression;
+use OpenTelemetry\API\Trace\SpanSuppression\Strategy\SpanKindSuppressionStrategy;
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 
 /**
  * Span suppression is a feature used by Instrumentation Libraries to eliminate redundant child spans. For example,
@@ -13,45 +19,36 @@ use OpenTelemetry\API\Trace\SpanSuppression;
  * span for each of the HTTP calls. This can lead to multiple nested CLIENT spans being created.
  */
 
-$scopes = [];
+SpanSuppression::setStrategies([SpanSuppression::SPAN_KIND]);
 
-function check(): void
-{
-    echo 'Should suppress SERVER span: ' . (SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER) ? 'Yes' : 'No') . PHP_EOL;
-    echo 'Should suppress CLIENT span: ' . (SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT) ? 'Yes' : 'No') . PHP_EOL;
-    echo 'Should suppress CONSUMER span: ' . (SpanSuppression::shouldSuppress(SpanKind::KIND_CONSUMER) ? 'Yes' : 'No') . PHP_EOL;
-    echo 'Should suppress PRODUCER span: ' . (SpanSuppression::shouldSuppress(SpanKind::KIND_PRODUCER) ? 'Yes' : 'No') . PHP_EOL;
-    echo 'Should suppress INTERNAL span: ' . (SpanSuppression::shouldSuppress(SpanKind::KIND_INTERNAL) ? 'Yes' : 'No') . PHP_EOL;
+$tracerProvider = new TracerProvider(
+    new SimpleSpanProcessor(
+        (new ConsoleSpanExporterFactory())->create()
+    ),
+    resource: ResourceInfoFactory::emptyResource(),
+);
+$tracer = $tracerProvider->getTracer('io.opentelemetry.contrib.php');
+
+$rootSpan = $tracer->spanBuilder('root')->setSpanKind(SpanKind::KIND_SERVER)->startSpan();
+$rootScope = $rootSpan->activate();
+
+$clientSpan = $tracer->spanBuilder('client-one')->setSpanKind(SpanKind::KIND_CLIENT)->startSpan();
+$clientScope = $clientSpan->activate();
+//suppress child CLIENT spans
+Context::storage()->attach(
+    SpanKindSuppressionStrategy::suppressSpanKind(SpanKind::KIND_CLIENT)
+        ->storeInContext(Context::getCurrent())
+);
+
+//CLIENT span should be suppressed
+if (!SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT)) {
+    $span = $tracer->spanBuilder('client-two')->setSpanKind(SpanKind::KIND_CLIENT)->startSpan();
+    $span->end();
 }
 
-// initially, no suppression
-echo "\nInitial state:\n";
-check();
+$clientSpan->end();
+Context::storage()->scope()?->detach(); //detach span suppression
+$clientScope->detach();
 
-$scopes[] = SpanSuppression::suppressSpanKind(SpanKind::KIND_SERVER)->activate();
-
-// add suppression of SERVER spans
-echo "\nWith SERVER suppression:\n";
-
-check();
-
-$scopes[] = SpanSuppression::suppressSpanKind(SpanKind::KIND_CLIENT)->activate();
-
-// add suppression of CLIENT spans, which should be additive
-echo "\nWith CLIENT suppression added:\n";
-
-check();
-
-//detach active suppression, leaving SERVER
-array_pop($scopes)->detach();
-
-echo "\nWith CLIENT suppression detached:\n";
-
-check();
-
-// detach active, leaving default (none) suppression
-array_pop($scopes)->detach();
-
-echo "\nWith SERVER suppression detached:\n";
-
-check();
+$rootSpan->end();
+$rootScope->detach();

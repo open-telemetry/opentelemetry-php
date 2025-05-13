@@ -4,77 +4,68 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-use OpenTelemetry\Context\Context;
+use OpenTelemetry\API\Trace\SpanSuppression\Strategy\SemConvSuppressionStrategy;
+use OpenTelemetry\API\Trace\SpanSuppression\Strategy\SpanKindSuppressionStrategy;
 use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\Context\ContextKeyInterface;
-use OpenTelemetry\Context\ImplicitContextKeyedInterface;
-use OpenTelemetry\Context\ScopeInterface;
 
-class SpanSuppression implements ImplicitContextKeyedInterface
+/**
+ * @experimental
+ */
+class SpanSuppression
 {
-    private function __construct(
-        private readonly array $suppressedSpanKinds = [],
-    ) {
+    public const NOOP = 'noop';
+    public const SPAN_KIND = 'span_kind';
+    public const SEM_CONV = 'sem_conv';
+
+    private static array $availableStrategies = [
+        self::NOOP,
+        self::SPAN_KIND,
+        self::SEM_CONV,
+    ];
+
+    private static array $strategies = [self::NOOP];
+
+    private function __construct()
+    {
     }
 
-    public static function suppressSpanKind(int $spanKind): self
+    public static function setStrategies(array $strategies): void
     {
-        $new = new self([$spanKind]);
-
-        return self::current()->mergeWith($new);
+        self::$strategies = [];
+        foreach ($strategies as $strategy) {
+            if (!in_array($strategy, self::$availableStrategies)) {
+                throw new \InvalidArgumentException("Unknown strategy: $strategy");
+            }
+        }
+        self::$strategies = $strategies;
     }
 
-    public static function shouldSuppress(int $spanKind, ?ContextInterface $context = null): bool
+    /**
+     * A span should be suppressed if any of the strategies return true.
+     */
+    public static function shouldSuppress(int $spanKind, array $attributes = [], ?ContextInterface $context = null): bool
     {
-        return self::current($context)->shouldSuppressSpanKind($spanKind);
-    }
+        foreach (self::$strategies as $strategy) {
+            switch ($strategy) {
+                case self::NOOP:
+                    break;
+                case self::SPAN_KIND:
+                    if (SpanKindSuppressionStrategy::current($context)->shouldSuppress($spanKind)) {
+                        return true;
+                    }
 
-    public function activate(): ScopeInterface
-    {
-        return Context::storage()->attach($this->storeInContext(Context::getCurrent()));
-    }
+                    break;
+                case self::SEM_CONV:
+                    if (SemConvSuppressionStrategy::current($context)->shouldSuppress($spanKind, $attributes, $context)) {
+                        return true;
+                    }
 
-    public function storeInContext(ContextInterface $context): ContextInterface
-    {
-        return $context->with(self::contextKey(), $this);
-    }
-
-    private static function default(): self
-    {
-        static $instance;
-        $instance ??= new self();
-
-        return $instance;
-    }
-
-    private function shouldSuppressSpanKind(int $spanKind): bool
-    {
-        return in_array($spanKind, $this->suppressedSpanKinds, true);
-    }
-
-    private static function current(?ContextInterface $context = null): self
-    {
-        $context ??= Context::getCurrent();
-        $current = $context->get(self::contextKey());
-        if ($current === null) {
-            return self::default();
+                    break;
+                default:
+                    throw new \InvalidArgumentException("Unknown strategy: $strategy");
+            }
         }
 
-        return $current;
-    }
-
-    private static function contextKey(): ContextKeyInterface
-    {
-        static $key;
-        $key ??= Context::createKey(self::class);
-
-        return $key;
-    }
-
-    private function mergeWith(self $other): self
-    {
-        return new self(
-            array_unique(array_merge($this->suppressedSpanKinds, $other->suppressedSpanKinds))
-        );
+        return false;
     }
 }

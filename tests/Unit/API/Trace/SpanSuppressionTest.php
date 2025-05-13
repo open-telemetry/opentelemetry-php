@@ -6,6 +6,7 @@ namespace Unit\API\Trace;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\SpanSuppression;
+use OpenTelemetry\API\Trace\SpanSuppression\Strategy\SpanKindSuppressionStrategy;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -14,6 +15,11 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SpanSuppression::class)]
 class SpanSuppressionTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        SpanSuppression::setStrategies([SpanSuppression::NOOP]);
+    }
+
     #[DataProvider('spanKindProvider')]
     public function test_should_not_suppress_by_default(int $kind): void
     {
@@ -33,14 +39,16 @@ class SpanSuppressionTest extends TestCase
 
     public function test_suppression(): void
     {
+        SpanSuppression::setStrategies([SpanSuppression::SPAN_KIND]);
+
         $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
         $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
 
-        $scope1 = SpanSuppression::suppressSpanKind(SpanKind::KIND_CLIENT)->activate();
+        $scope1 = SpanKindSuppressionStrategy::suppressSpanKind(SpanKind::KIND_CLIENT)->activate();
         $this->assertTrue(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
         $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
 
-        $scope2 = SpanSuppression::suppressSpanKind(SpanKind::KIND_SERVER)->activate();
+        $scope2 = SpanKindSuppressionStrategy::suppressSpanKind(SpanKind::KIND_SERVER)->activate();
 
         try {
             $this->assertTrue(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
@@ -55,16 +63,27 @@ class SpanSuppressionTest extends TestCase
         $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
     }
 
-    public function test_store_in_context(): void
+    public function test_suppression_stored_in_context(): void
     {
-        $suppression = SpanSuppression::suppressSpanKind(SpanKind::KIND_SERVER);
-        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER), 'suppression is not active');
+        SpanSuppression::setStrategies([SpanSuppression::SPAN_KIND]);
 
-        Context::storage()->attach($suppression->storeInContext(Context::getCurrent()));
-        $this->assertTrue(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER), 'suppression is active');
+        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
+        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
 
-        $scope = Context::storage()->scope();
-        $scope?->detach();
+        $suppression = SpanKindSuppressionStrategy::suppressSpanKind(SpanKind::KIND_CLIENT);
+
+        $context = $suppression->storeInContext(Context::getCurrent());
+        Context::storage()->attach($context);
+
+        try {
+            $this->assertTrue(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
+            $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
+        } finally {
+            $scope = Context::storage()->scope();
+            $scope?->detach();
+        }
+
+        $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_CLIENT));
         $this->assertFalse(SpanSuppression::shouldSuppress(SpanKind::KIND_SERVER));
     }
 }
