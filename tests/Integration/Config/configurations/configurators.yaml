@@ -1,0 +1,57 @@
+file_format: '0.4'
+
+propagators:
+  composite: [ tracecontext, baggage ]
+
+exporters:
+  console:
+
+tracer_provider:
+  sampler:
+    parent_based:
+      root:
+        always_on:
+  processors:
+    - batch:
+        exporter:
+          console:
+  tracer_configurator/development:
+    default_config:
+      disabled: true
+    tracers:
+      - name: A.*
+        config:
+          disabled: false
+      - name: B.*
+        config:
+          disabled: true
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  meter_configurator/development:
+    default_config:
+      disabled: true
+    meters:
+      - name: A.*
+        config:
+          disabled: false
+      - name: B.*
+        config:
+          disabled: true
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          console:
+  logger_configurator/development:
+    default_config:
+      disabled: true
+    loggers:
+      - name: A.*
+        config:
+          disabled: false
+      - name: B.*
+        config:
+          disabled: true

@@ -25,6 +25,16 @@ final class MetricReaderPeriodic implements ComponentProvider
      *     timeout: int<0, max>,
      *     exporter: ComponentPlugin<MetricExporterInterface>,
      *     producers: array,
+     *     cardinality_limits: array{
+     *         default: ?int<1, max>,
+     *         counter: ?int<1, max>,
+     *         gauge: ?int<1, max>,
+     *         histogram: ?int<1, max>,
+     *         observable_counter: ?int<1, max>,
+     *         observable_gauge: ?int<1, max>,
+     *         observable_up_down_counter: ?int<1, max>,
+     *         up_down_counter: ?int<1, max>,
+     *     },
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
@@ -42,8 +52,12 @@ final class MetricReaderPeriodic implements ComponentProvider
                 ->integerNode('interval')->min(0)->defaultValue(5000)->end()
                 ->integerNode('timeout')->min(0)->defaultValue(30000)->end()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
-                ->arrayNode('producers') //@todo
+                ->arrayNode('producers') //TODO not implemented in metrics SDK
                     ->variablePrototype()->end()
+                ->end()
+                ->arrayNode('cardinality_limits') //TODO not implemented in metrics SDK
+                    ->variablePrototype()->end()
+                ->end()
             ->end()
         ;
 

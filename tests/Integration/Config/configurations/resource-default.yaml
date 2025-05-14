@@ -1,0 +1,15 @@
+file_format: '0.4'
+
+resource:
+  schema_url: https://opentelemetry.io/schemas/1.32.0
+  detection/development:
+    detectors:
+
+tracer_provider:
+  processors:
+
+meter_provider:
+  readers:
+
+logger_provider:
+  processors:
