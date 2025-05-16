@@ -68,6 +68,7 @@ interface ComponentProviderRegistry
      * @param string $type type of the component plugin
      */
     public function componentMap(string $name, string $type): ArrayNodeDefinition;
+
     /**
      * Creates a node to specify a list of component plugin names.
      *

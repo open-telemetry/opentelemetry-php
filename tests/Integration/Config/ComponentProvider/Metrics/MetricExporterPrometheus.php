@@ -47,7 +47,7 @@ final class MetricExporterPrometheus implements ComponentProvider
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('prometheus');
+        $node = $builder->arrayNode('prometheus/development');
         $node
             ->children()
                 ->scalarNode('host')->isRequired()->validate()->always(Validation::ensureString())->end()->end()

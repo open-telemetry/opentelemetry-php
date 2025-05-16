@@ -11,21 +11,53 @@ interface TraceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
 
     /**
-     * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
+     * A unique identifier representing the installation of an application on a specific device
+     *
+     * Its value SHOULD persist across launches of the same application installation, including through application upgrades.
+     * It SHOULD change if the application is uninstalled or if all applications of the vendor are uninstalled.
+     * Additionally, users might be able to reset this value (e.g. by clearing application data).
+     * If an app is installed multiple times on the same device (e.g. in different accounts on Android), each `app.installation.id` SHOULD have a different value.
+     * If multiple OpenTelemetry SDKs are used within the same application, they SHOULD use the same value for `app.installation.id`.
+     * Hardware IDs (e.g. serial number, IMEI, MAC address) MUST NOT be used as the `app.installation.id`.
+     *
+     * For iOS, this value SHOULD be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/identifierforvendor).
+     *
+     * For Android, examples of `app.installation.id` implementations include:
+     *
+     * - [Firebase Installation ID](https://firebase.google.com/docs/projects/manage-installations).
+     * - A globally unique UUID which is persisted across sessions in your application.
+     * - [App set ID](https://developer.android.com/identity/app-set-id).
+     * - [`Settings.getString(Settings.Secure.ANDROID_ID)`](https://developer.android.com/reference/android/provider/Settings.Secure#ANDROID_ID).
+     *
+     * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
      */
-    public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
+    public const APP_INSTALLATION_ID = 'app.installation.id';
 
     /**
-     * Deprecated use the `device.app.lifecycle` event definition including `android.state` as a payload field instead.
-     *
-     * The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
-     *
-     * @deprecated Replaced by `device.app.lifecycle`.
+     * The x (horizontal) coordinate of a screen coordinate, in screen pixels.
      */
-    public const ANDROID_STATE = 'android.state';
+    public const APP_SCREEN_COORDINATE_X = 'app.screen.coordinate.x';
+
+    /**
+     * The y (vertical) component of a screen coordinate, in screen pixels.
+     */
+    public const APP_SCREEN_COORDINATE_Y = 'app.screen.coordinate.y';
+
+    /**
+     * An identifier that uniquely differentiates this widget from other widgets in the same application.
+     *
+     * A widget is an application component, typically an on-screen visual GUI element.
+     */
+    public const APP_WIDGET_ID = 'app.widget.id';
+
+    /**
+     * The name of an application widget.
+     * A widget is an application component, typically an on-screen visual GUI element.
+     */
+    public const APP_WIDGET_NAME = 'app.widget.name';
 
     /**
      * The provenance filename of the built attestation which directly relates to the build artifact filename. This filename SHOULD accompany the artifact at publish time. See the [SLSA Relationship](https://slsa.dev/spec/v1.0/distributing-provenance#relationship-between-artifacts-and-attestations) specification for more information.
@@ -497,6 +529,11 @@ interface TraceAttributes
     public const CICD_PIPELINE_RUN_STATE = 'cicd.pipeline.run.state';
 
     /**
+     * The [URL](https://wikipedia.org/wiki/URL) of the pipeline run, providing the complete address in order to locate and identify the pipeline run.
+     */
+    public const CICD_PIPELINE_RUN_URL_FULL = 'cicd.pipeline.run.url.full';
+
+    /**
      * The human readable name of a task within a pipeline. Task here most closely aligns with a [computing process](https://wikipedia.org/wiki/Pipeline_(computing)) in a pipeline. Other terms for tasks include commands, steps, and procedures.
      */
     public const CICD_PIPELINE_TASK_NAME = 'cicd.pipeline.task.name';
@@ -507,7 +544,7 @@ interface TraceAttributes
     public const CICD_PIPELINE_TASK_RUN_ID = 'cicd.pipeline.task.run.id';
 
     /**
-     * The [URL](https://wikipedia.org/wiki/URL) of the pipeline run providing the complete address in order to locate and identify the pipeline run.
+     * The [URL](https://wikipedia.org/wiki/URL) of the pipeline task run, providing the complete address in order to locate and identify the pipeline task run.
      */
     public const CICD_PIPELINE_TASK_RUN_URL_FULL = 'cicd.pipeline.task.run.url.full';
 
@@ -570,7 +607,7 @@ interface TraceAttributes
     public const CLOUD_REGION = 'cloud.region';
 
     /**
-     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://cloud.google.com/apis/design/resource_names#full_resource_name) on GCP)
+     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://google.aip.dev/122#full-resource-names) on GCP)
      *
      * On some cloud providers, it may not be possible to determine the full ID at startup,
      * so it may be necessary to set `cloud.resource_id` as a span attribute instead.
@@ -620,56 +657,76 @@ interface TraceAttributes
     /**
      * Deprecated, use `code.column.number`
      *
-     * @deprecated Replaced by `code.column.number`
+     * @deprecated {"note": "Replaced by `code.column.number`", "reason": "uncategorized"}
      */
     public const CODE_COLUMN = 'code.column';
 
     /**
-     * The column number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`.
+     * The column number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`. This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
      */
     public const CODE_COLUMN_NUMBER = 'code.column.number';
 
     /**
-     * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
+     * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
      */
     public const CODE_FILE_PATH = 'code.file.path';
 
     /**
      * Deprecated, use `code.file.path` instead
+     *
+     * @deprecated {"note": "Replaced by `code.file.path`", "reason": "uncategorized"}
      */
     public const CODE_FILEPATH = 'code.filepath';
 
     /**
      * Deprecated, use `code.function.name` instead
      *
-     * @deprecated Replaced by `code.function.name`
+     * @deprecated {"note": "Replaced by `code.function.name`", "reason": "uncategorized"}
      */
     public const CODE_FUNCTION = 'code.function';
 
     /**
-     * The method or function name, or equivalent (usually rightmost part of the code unit's name).
+     * The method or function fully-qualified name without arguments. The value should fit the natural representation of the language runtime, which is also likely the same used within `code.stacktrace` attribute value. This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+     *
+     * Values and format depends on each language runtime, thus it is impossible to provide an exhaustive list of examples.
+     * The values are usually the same (or prefixes of) the ones found in native stack trace representation stored in
+     * `code.stacktrace` without information on arguments.
+     *
+     * Examples:
+     *
+     * - Java method: `com.example.MyHttpService.serveRequest`
+     * - Java anonymous class method: `com.mycompany.Main$1.myMethod`
+     * - Java lambda method: `com.mycompany.Main$$Lambda/0x0000748ae4149c00.myMethod`
+     * - PHP function: `GuzzleHttp\Client::transfer`
+     * - Go function: `github.com/my/repo/pkg.foo.func5`
+     * - Elixir: `OpenTelemetry.Ctx.new`
+     * - Erlang: `opentelemetry_ctx:new`
+     * - Rust: `playground::my_module::my_cool_func`
+     * - C function: `fopen`
      */
     public const CODE_FUNCTION_NAME = 'code.function.name';
 
     /**
-     * The line number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`.
+     * The line number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`. This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
      */
     public const CODE_LINE_NUMBER = 'code.line.number';
 
     /**
      * Deprecated, use `code.line.number` instead
      *
-     * @deprecated Replaced by `code.line.number`
+     * @deprecated {"note": "Replaced by `code.line.number`", "reason": "uncategorized"}
      */
     public const CODE_LINENO = 'code.lineno';
 
     /**
-     * The "namespace" within which `code.function.name` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function.name` form a unique identifier for the code unit.
+     * Deprecated, namespace is now included into `code.function.name`
+     *
+     * @deprecated {"note": "Value should be included in `code.function.name` which is expected to be a fully-qualified name.", "reason": "uncategorized"}
      */
     public const CODE_NAMESPACE = 'code.namespace';
 
     /**
-     * A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+     * A stacktrace as a string in the natural representation for the language runtime. The representation is identical to [`exception.stacktrace`](/docs/exceptions/exceptions-spans.md#stacktrace-representation). This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Location'. This constraint is imposed to prevent redundancy and maintain data integrity.
      */
     public const CODE_STACKTRACE = 'code.stacktrace';
 
@@ -693,7 +750,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `cpu.mode` instead.
      *
-     * @deprecated Replaced by `cpu.mode`
+     * @deprecated {"note": "Replaced by `cpu.mode`", "reason": "uncategorized"}
      */
     public const CONTAINER_CPU_STATE = 'container.cpu.state';
 
@@ -744,13 +801,15 @@ interface TraceAttributes
 
     /**
      * Container labels, `<key>` being the label name, the value being the label value.
+     *
+     * For example, a docker container label `app` with value `nginx` SHOULD be recorded as the `container.label.app` attribute with value `"nginx"`.
      */
     public const CONTAINER_LABEL = 'container.label';
 
     /**
      * Deprecated, use `container.label` instead.
      *
-     * @deprecated Replaced by `container.label`.
+     * @deprecated {"note": "Replaced by `container.label`.", "reason": "uncategorized"}
      */
     public const CONTAINER_LABELS = 'container.labels';
 
@@ -765,6 +824,11 @@ interface TraceAttributes
     public const CONTAINER_RUNTIME = 'container.runtime';
 
     /**
+     * The logical CPU number [0..n-1]
+     */
+    public const CPU_LOGICAL_NUMBER = 'cpu.logical_number';
+
+    /**
      * The mode of the CPU
      */
     public const CPU_MODE = 'cpu.mode';
@@ -772,49 +836,49 @@ interface TraceAttributes
     /**
      * Deprecated, use `cassandra.consistency.level` instead.
      *
-     * @deprecated Replaced by `cassandra.consistency.level`.
+     * @deprecated {"note": "Replaced by `cassandra.consistency.level`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL = 'db.cassandra.consistency_level';
 
     /**
      * Deprecated, use `cassandra.coordinator.dc` instead.
      *
-     * @deprecated Replaced by `cassandra.coordinator.dc`.
+     * @deprecated {"note": "Replaced by `cassandra.coordinator.dc`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_COORDINATOR_DC = 'db.cassandra.coordinator.dc';
 
     /**
      * Deprecated, use `cassandra.coordinator.id` instead.
      *
-     * @deprecated Replaced by `cassandra.coordinator.id`.
+     * @deprecated {"note": "Replaced by `cassandra.coordinator.id`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_COORDINATOR_ID = 'db.cassandra.coordinator.id';
 
     /**
      * Deprecated, use `cassandra.query.idempotent` instead.
      *
-     * @deprecated Replaced by `cassandra.query.idempotent`.
+     * @deprecated {"note": "Replaced by `cassandra.query.idempotent`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_IDEMPOTENCE = 'db.cassandra.idempotence';
 
     /**
      * Deprecated, use `cassandra.page.size` instead.
      *
-     * @deprecated Replaced by `cassandra.page.size`.
+     * @deprecated {"note": "Replaced by `cassandra.page.size`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_PAGE_SIZE = 'db.cassandra.page_size';
 
     /**
      * Deprecated, use `cassandra.speculative_execution.count` instead.
      *
-     * @deprecated Replaced by `cassandra.speculative_execution.count`.
+     * @deprecated {"note": "Replaced by `cassandra.speculative_execution.count`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'db.cassandra.speculative_execution_count';
 
     /**
      * Deprecated, use `db.collection.name` instead.
      *
-     * @deprecated Replaced by `db.collection.name`.
+     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "uncategorized"}
      */
     public const DB_CASSANDRA_TABLE = 'db.cassandra.table';
 
@@ -831,166 +895,168 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.client.connection.pool.name` instead.
      *
-     * @deprecated Replaced by `db.client.connection.pool.name`.
+     * @deprecated {"note": "Replaced by `db.client.connection.pool.name`.", "reason": "uncategorized"}
      */
     public const DB_CLIENT_CONNECTIONS_POOL_NAME = 'db.client.connections.pool.name';
 
     /**
      * Deprecated, use `db.client.connection.state` instead.
      *
-     * @deprecated Replaced by `db.client.connection.state`.
+     * @deprecated {"note": "Replaced by `db.client.connection.state`.", "reason": "uncategorized"}
      */
     public const DB_CLIENT_CONNECTIONS_STATE = 'db.client.connections.state';
 
     /**
      * The name of a collection (table, container) within the database.
-     * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
+     * It is RECOMMENDED to capture the value as provided by the application
+     * without attempting to do any case normalization.
      *
      * The collection name SHOULD NOT be extracted from `db.query.text`,
-     * unless the query format is known to only ever have a single collection name present.
+     * when the database system supports query text with multiple collections
+     * in non-batch operations.
      *
-     * For batch operations, if the individual operations are known to have the same collection name
-     * then that collection name SHOULD be used.
+     * For batch operations, if the individual operations are known to have the same
+     * collection name then that collection name SHOULD be used.
      */
     public const DB_COLLECTION_NAME = 'db.collection.name';
 
     /**
      * Deprecated, use `server.address`, `server.port` attributes instead.
      *
-     * @deprecated Replaced by `server.address` and `server.port`.
+     * @deprecated {"note": "Replaced by `server.address` and `server.port`.", "reason": "uncategorized"}
      */
     public const DB_CONNECTION_STRING = 'db.connection_string';
 
     /**
      * Deprecated, use `azure.client.id` instead.
      *
-     * @deprecated Replaced by `azure.client.id`.
+     * @deprecated {"note": "Replaced by `azure.client.id`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
 
     /**
      * Deprecated, use `azure.cosmosdb.connection.mode` instead.
      *
-     * @deprecated Replaced by `azure.cosmosdb.connection.mode`.
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.connection.mode`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_CONNECTION_MODE = 'db.cosmosdb.connection_mode';
 
     /**
      * Deprecated, use `cosmosdb.consistency.level` instead.
      *
-     * @deprecated Replaced by `azure.cosmosdb.consistency.level`.
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.consistency.level`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_CONSISTENCY_LEVEL = 'db.cosmosdb.consistency_level';
 
     /**
      * Deprecated, use `db.collection.name` instead.
      *
-     * @deprecated Replaced by `db.collection.name`.
+     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated No replacement at this time.
+     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
 
     /**
      * Deprecated, use `azure.cosmosdb.operation.contacted_regions` instead.
      *
-     * @deprecated Replaced by `azure.cosmosdb.operation.contacted_regions`.
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.operation.contacted_regions`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_REGIONS_CONTACTED = 'db.cosmosdb.regions_contacted';
 
     /**
      * Deprecated, use `azure.cosmosdb.operation.request_charge` instead.
      *
-     * @deprecated Replaced by `azure.cosmosdb.operation.request_charge`.
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.operation.request_charge`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge';
 
     /**
      * Deprecated, use `azure.cosmosdb.request.body.size` instead.
      *
-     * @deprecated Replaced by `azure.cosmosdb.request.body.size`.
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.request.body.size`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_REQUEST_CONTENT_LENGTH = 'db.cosmosdb.request_content_length';
 
     /**
      * Deprecated, use `db.response.status_code` instead.
      *
-     * @deprecated Replaced by `db.response.status_code`.
+     * @deprecated {"note": "Replaced by `db.response.status_code`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_STATUS_CODE = 'db.cosmosdb.status_code';
 
     /**
      * Deprecated, use `azure.cosmosdb.response.sub_status_code` instead.
      *
-     * @deprecated Replaced by `azure.cosmosdb.response.sub_status_code`.
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.response.sub_status_code`.", "reason": "uncategorized"}
      */
     public const DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code';
 
     /**
      * Deprecated, use `db.namespace` instead.
      *
-     * @deprecated Replaced by `db.namespace`.
+     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "uncategorized"}
      */
     public const DB_ELASTICSEARCH_CLUSTER_NAME = 'db.elasticsearch.cluster.name';
 
     /**
      * Deprecated, use `elasticsearch.node.name` instead.
      *
-     * @deprecated Replaced by `elasticsearch.node.name`.
+     * @deprecated {"note": "Replaced by `elasticsearch.node.name`.", "reason": "uncategorized"}
      */
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
     /**
      * Deprecated, use `db.operation.parameter` instead.
      *
-     * @deprecated Replaced by `db.operation.parameter`.
+     * @deprecated {"note": "Replaced by `db.operation.parameter`.", "reason": "uncategorized"}
      */
     public const DB_ELASTICSEARCH_PATH_PARTS = 'db.elasticsearch.path_parts';
 
     /**
      * Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.
      *
-     * @deprecated Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.
+     * @deprecated {"note": "Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.", "reason": "uncategorized"}
      */
     public const DB_INSTANCE_ID = 'db.instance.id';
 
     /**
      * Removed, no replacement at this time.
      *
-     * @deprecated Removed as not used.
+     * @deprecated {"note": "Removed as not used.", "reason": "uncategorized"}
      */
     public const DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
 
     /**
      * Deprecated, use `db.collection.name` instead.
      *
-     * @deprecated Replaced by `db.collection.name`.
+     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "uncategorized"}
      */
     public const DB_MONGODB_COLLECTION = 'db.mongodb.collection';
 
     /**
      * Deprecated, SQL Server instance is now populated as a part of `db.namespace` attribute.
      *
-     * @deprecated Deprecated, no replacement at this time.
+     * @deprecated {"note": "Deprecated, no replacement at this time.", "reason": "uncategorized"}
      */
     public const DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name';
 
     /**
      * Deprecated, use `db.namespace` instead.
      *
-     * @deprecated Replaced by `db.namespace`.
+     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "uncategorized"}
      */
     public const DB_NAME = 'db.name';
 
     /**
      * The name of the database, fully qualified within the server address and port.
      *
-     * If a database system has multiple namespace components, they SHOULD be concatenated (potentially using database system specific conventions) from most general to most specific namespace component, and more specific namespaces SHOULD NOT be captured without the more general namespaces, to ensure that "startswith" queries for the more general namespaces will be valid.
+     * If a database system has multiple namespace components, they SHOULD be concatenated from the most general to the most specific namespace component, using `|` as a separator between the components. Any missing components (and their associated separators) SHOULD be omitted.
      * Semantic conventions for individual database systems SHOULD document what `db.namespace` means in the context of that system.
      * It is RECOMMENDED to capture the value as provided by the application without attempting to do any case normalization.
      */
@@ -999,7 +1065,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.operation.name` instead.
      *
-     * @deprecated Replaced by `db.operation.name`.
+     * @deprecated {"note": "Replaced by `db.operation.name`.", "reason": "uncategorized"}
      */
     public const DB_OPERATION = 'db.operation';
 
@@ -1016,7 +1082,11 @@ interface TraceAttributes
      * without attempting to do any case normalization.
      *
      * The operation name SHOULD NOT be extracted from `db.query.text`,
-     * unless the query format is known to only ever have a single operation name present.
+     * when the database system supports query text with multiple operations
+     * in non-batch operations.
+     *
+     * If spaces can occur in the operation name, multiple consecutive spaces
+     * SHOULD be normalized to a single space.
      *
      * For batch operations, if the individual operations are known to have the same operation name
      * then that operation name SHOULD be used prepended by `BATCH `,
@@ -1028,39 +1098,62 @@ interface TraceAttributes
     /**
      * A database operation parameter, with `<key>` being the parameter name, and the attribute value being a string representation of the parameter value.
      *
-     * If a parameter has no name and instead is referenced only by index, then `<key>` SHOULD be the 0-based index.
-     * If `db.query.text` is also captured, then `db.operation.parameter.<key>` SHOULD match up with the parameterized placeholders present in `db.query.text`.
+     * For example, a client-side maximum number of rows to read from the database
+     * MAY be recorded as the `db.operation.parameter.max_rows` attribute.
+     *
+     * `db.query.text` parameters SHOULD be captured using `db.query.parameter.<key>`
+     * instead of `db.operation.parameter.<key>`.
      */
     public const DB_OPERATION_PARAMETER = 'db.operation.parameter';
 
     /**
-     * A query parameter used in `db.query.text`, with `<key>` being the parameter name, and the attribute value being a string representation of the parameter value.
+     * A database query parameter, with `<key>` being the parameter name, and the attribute value being a string representation of the parameter value.
      *
-     * @deprecated Replaced by `db.operation.parameter`.
+     * If a query parameter has no name and instead is referenced only by index,
+     * then `<key>` SHOULD be the 0-based index.
+     *
+     * `db.query.parameter.<key>` SHOULD match
+     * up with the parameterized placeholders present in `db.query.text`.
+     *
+     * `db.query.parameter.<key>` SHOULD NOT be captured on batch operations.
+     *
+     * Examples:
+     *
+     * - For a query `SELECT * FROM users where username =  %s` with the parameter `"jdoe"`,
+     *   the attribute `db.query.parameter.0` SHOULD be set to `"jdoe"`.
+     * - For a query `"SELECT * FROM users WHERE username = %(username)s;` with parameter
+     *   `username = "jdoe"`, the attribute `db.query.parameter.username` SHOULD be set to `"jdoe"`.
      */
     public const DB_QUERY_PARAMETER = 'db.query.parameter';
 
     /**
-     * Low cardinality representation of a database query text.
+     * Low cardinality summary of a database query.
      *
-     * `db.query.summary` provides static summary of the query text. It describes a class of database queries and is useful as a grouping key, especially when analyzing telemetry for database calls involving complex queries.
-     * Summary may be available to the instrumentation through instrumentation hooks or other means. If it is not available, instrumentations that support query parsing SHOULD generate a summary following [Generating query summary](../database/database-spans.md#generating-a-summary-of-the-query-text) section.
+     * The query summary describes a class of database queries and is useful
+     * as a grouping key, especially when analyzing telemetry for database
+     * calls involving complex queries.
+     *
+     * Summary may be available to the instrumentation through
+     * instrumentation hooks or other means. If it is not available, instrumentations
+     * that support query parsing SHOULD generate a summary following
+     * [Generating query summary](/docs/database/database-spans.md#generating-a-summary-of-the-query)
+     * section.
      */
     public const DB_QUERY_SUMMARY = 'db.query.summary';
 
     /**
      * The database query being executed.
      *
-     * For sanitization see [Sanitization of `db.query.text`](../database/database-spans.md#sanitization-of-dbquerytext).
+     * For sanitization see [Sanitization of `db.query.text`](/docs/database/database-spans.md#sanitization-of-dbquerytext).
      * For batch operations, if the individual operations are known to have the same query text then that query text SHOULD be used, otherwise all of the individual query texts SHOULD be concatenated with separator `; ` or some other database system specific separator if more applicable.
-     * Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
+     * Parameterized query text SHOULD NOT be sanitized. Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
      */
     public const DB_QUERY_TEXT = 'db.query.text';
 
     /**
      * Deprecated, use `db.namespace` instead.
      *
-     * @deprecated Replaced by `db.namespace`.
+     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "uncategorized"}
      */
     public const DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
 
@@ -1077,23 +1170,33 @@ interface TraceAttributes
     public const DB_RESPONSE_STATUS_CODE = 'db.response.status_code';
 
     /**
-     * Deprecated, use `db.collection.name` instead.
+     * Deprecated, use `db.collection.name` instead, but only if not extracting the value from `db.query.text`.
      *
-     * @deprecated Replaced by `db.collection.name`.
+     * @deprecated {"note": "Replaced by `db.collection.name`, but only if not extracting the value from `db.query.text`.", "reason": "uncategorized"}
      */
     public const DB_SQL_TABLE = 'db.sql.table';
 
     /**
      * The database statement being executed.
      *
-     * @deprecated Replaced by `db.query.text`.
+     * @deprecated {"note": "Replaced by `db.query.text`.", "reason": "uncategorized"}
      */
     public const DB_STATEMENT = 'db.statement';
 
     /**
+     * The name of a stored procedure within the database.
+     * It is RECOMMENDED to capture the value as provided by the application
+     * without attempting to do any case normalization.
+     *
+     * For batch operations, if the individual operations are known to have the same
+     * stored procedure name then that stored procedure name SHOULD be used.
+     */
+    public const DB_STORED_PROCEDURE_NAME = 'db.stored_procedure.name';
+
+    /**
      * Deprecated, use `db.system.name` instead.
      *
-     * @deprecated Replaced by `db.system.name`.
+     * @deprecated {"note": "Replaced by `db.system.name`.", "reason": "uncategorized"}
      */
     public const DB_SYSTEM = 'db.system';
 
@@ -1106,14 +1209,14 @@ interface TraceAttributes
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated No replacement at this time.
+     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
      */
     public const DB_USER = 'db.user';
 
     /**
      * 'Deprecated, use `deployment.environment.name` instead.'
      *
-     * @deprecated Deprecated, use `deployment.environment.name` instead.
+     * @deprecated {"note": "Deprecated, use `deployment.environment.name` instead.", "reason": "uncategorized"}
      */
     public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
 
@@ -1159,7 +1262,16 @@ interface TraceAttributes
     /**
      * A unique identifier representing the device
      *
-     * The device identifier MUST only be defined using the values outlined below. This value is not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value MUST be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+     * Its value SHOULD be identical for all apps on a device and it SHOULD NOT change if an app is uninstalled and re-installed.
+     * However, it might be resettable by the user for all apps on a device.
+     * Hardware IDs (e.g. vendor-specific serial number, IMEI or MAC address) MAY be used as values.
+     *
+     * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+     *
+     * > [!WARNING]> This attribute may contain sensitive (PII) information. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply,
+     * > ensure you do your own due diligence.> Due to these reasons, this identifier is not recommended for consumer applications and will likely result in rejection from both Google Play and App Store.
+     * > However, it may be appropriate for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with appropriate compliance clearance.
+     * > Any instrumentation providing this identifier MUST implement it as an opt-in feature.> See [`app.installation.id`](/docs/attributes-registry/app.md#app-installation-id)>  for a more privacy-preserving alternative.
      */
     public const DEVICE_ID = 'device.id';
 
@@ -1201,25 +1313,47 @@ interface TraceAttributes
     public const ELASTICSEARCH_NODE_NAME = 'elasticsearch.node.name';
 
     /**
-     * Deprecated, use `user.id` instead.
+     * Unique identifier of an end user in the system. It maybe a username, email address, or other identifier.
+     * Unique identifier of an end user in the system.
      *
-     * @deprecated Replaced by `user.id` attribute.
+     * > [!Warning]
+     * > This field contains sensitive (PII) information.
      */
     public const ENDUSER_ID = 'enduser.id';
 
     /**
+     * Pseudonymous identifier of an end user. This identifier should be a random value that is not directly linked or associated with the end user's actual identity.
+     *
+     * Pseudonymous identifier of an end user.
+     *
+     * > [!Warning]
+     * > This field contains sensitive (linkable PII) information.
+     */
+    public const ENDUSER_PSEUDO_ID = 'enduser.pseudo.id';
+
+    /**
      * Deprecated, use `user.roles` instead.
      *
-     * @deprecated Replaced by `user.roles` attribute.
+     * @deprecated {"note": "Replaced by `user.roles` attribute.", "reason": "uncategorized"}
      */
     public const ENDUSER_ROLE = 'enduser.role';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated Removed.
+     * @deprecated {"note": "Removed.", "reason": "uncategorized"}
      */
     public const ENDUSER_SCOPE = 'enduser.scope';
+
+    /**
+     * A message providing more detail about an error in human-readable form.
+     * `error.message` should provide additional context and detail about an error.
+     * It is NOT RECOMMENDED to duplicate the value of `error.type` in `error.message`.
+     * It is also NOT RECOMMENDED to duplicate the value of `exception.message` in `error.message`.
+     *
+     * `error.message` is NOT RECOMMENDED for metrics or spans due to its unbounded cardinality and overlap with span status.
+     */
+    public const ERROR_MESSAGE = 'error.message';
 
     /**
      * Describes a class of error the operation ended with.
@@ -1249,14 +1383,14 @@ interface TraceAttributes
     /**
      * Identifies the class / type of event.
      *
-     * @deprecated Replaced by EventName top-level field on the LogRecord
+     * @deprecated {"note": "Replaced by EventName top-level field on the LogRecord", "reason": "uncategorized"}
      */
     public const EVENT_NAME = 'event.name';
 
     /**
      * Indicates that the exception is escaping the scope of the span.
      *
-     * @deprecated It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.
+     * @deprecated {"note": "It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.", "reason": "uncategorized"}
      */
     public const EXCEPTION_ESCAPED = 'exception.escaped';
 
@@ -1397,12 +1531,16 @@ interface TraceAttributes
     public const FEATURE_FLAG_CONTEXT_ID = 'feature_flag.context.id';
 
     /**
-     * A message explaining the nature of an error occurring during flag evaluation.
+     * Deprecated, use `error.message` instead.
+     *
+     * @deprecated {"note": "Replaced by `error.message`.", "reason": "uncategorized"}
      */
     public const FEATURE_FLAG_EVALUATION_ERROR_MESSAGE = 'feature_flag.evaluation.error.message';
 
     /**
-     * The reason code which shows how a feature flag value was determined.
+     * Deprecated, use `feature_flag.result.reason` instead.
+     *
+     * @deprecated {"note": "Replaced by `feature_flag.result.reason`.", "reason": "uncategorized"}
      */
     public const FEATURE_FLAG_EVALUATION_REASON = 'feature_flag.evaluation.reason';
 
@@ -1414,12 +1552,12 @@ interface TraceAttributes
     /**
      * Identifies the feature flag provider.
      */
-    public const FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider_name';
+    public const FEATURE_FLAG_PROVIDER_NAME = 'feature_flag.provider.name';
 
     /**
-     * The identifier of the [flag set](https://openfeature.dev/specification/glossary/#flag-set) to which the feature flag belongs.
+     * The reason code which shows how a feature flag value was determined.
      */
-    public const FEATURE_FLAG_SET_ID = 'feature_flag.set.id';
+    public const FEATURE_FLAG_RESULT_REASON = 'feature_flag.result.reason';
 
     /**
      * A semantic identifier for an evaluated flag value.
@@ -1428,6 +1566,18 @@ interface TraceAttributes
      * for referring to a value without including the value itself. This can
      * provide additional context for understanding the meaning behind a value.
      * For example, the variant `red` maybe be used for the value `#c05543`.
+     */
+    public const FEATURE_FLAG_RESULT_VARIANT = 'feature_flag.result.variant';
+
+    /**
+     * The identifier of the [flag set](https://openfeature.dev/specification/glossary/#flag-set) to which the feature flag belongs.
+     */
+    public const FEATURE_FLAG_SET_ID = 'feature_flag.set.id';
+
+    /**
+     * Deprecated, use `feature_flag.result.variant` instead.
+     *
+     * @deprecated {"note": "Replaced by `feature_flag.result.variant`.", "reason": "uncategorized"}
      */
     public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
@@ -1542,6 +1692,59 @@ interface TraceAttributes
     public const FILE_SYMBOLIC_LINK_TARGET_PATH = 'file.symbolic_link.target_path';
 
     /**
+     * The container within GCP where the AppHub application is defined.
+     */
+    public const GCP_APPHUB_APPLICATION_CONTAINER = 'gcp.apphub.application.container';
+
+    /**
+     * The name of the application as configured in AppHub.
+     */
+    public const GCP_APPHUB_APPLICATION_ID = 'gcp.apphub.application.id';
+
+    /**
+     * The GCP zone or region where the application is defined.
+     */
+    public const GCP_APPHUB_APPLICATION_LOCATION = 'gcp.apphub.application.location';
+
+    /**
+     * Criticality of a service indicates its importance to the business.
+     *
+     * [See AppHub type enum](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type)
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE = 'gcp.apphub.service.criticality_type';
+
+    /**
+     * Environment of a service is the stage of a software lifecycle.
+     *
+     * [See AppHub environment type](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1)
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE = 'gcp.apphub.service.environment_type';
+
+    /**
+     * The name of the service as configured in AppHub.
+     */
+    public const GCP_APPHUB_SERVICE_ID = 'gcp.apphub.service.id';
+
+    /**
+     * Criticality of a workload indicates its importance to the business.
+     *
+     * [See AppHub type enum](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type)
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE = 'gcp.apphub.workload.criticality_type';
+
+    /**
+     * Environment of a workload is the stage of a software lifecycle.
+     *
+     * [See AppHub environment type](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1)
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE = 'gcp.apphub.workload.environment_type';
+
+    /**
+     * The name of the workload as configured in AppHub.
+     */
+    public const GCP_APPHUB_WORKLOAD_ID = 'gcp.apphub.workload.id';
+
+    /**
      * Identifies the Google Cloud service for which the official client library is intended.
      * Intended to be a stable identifier for Google Cloud client libraries that is uniform across implementation languages. The value should be derived from the canonical service domain for the service; for example, 'foo.googleapis.com' should result in a value of 'foo'.
      */
@@ -1568,21 +1771,38 @@ interface TraceAttributes
     public const GCP_GCE_INSTANCE_NAME = 'gcp.gce.instance.name';
 
     /**
+     * Free-form description of the GenAI agent provided by the application.
+     */
+    public const GEN_AI_AGENT_DESCRIPTION = 'gen_ai.agent.description';
+
+    /**
+     * The unique identifier of the GenAI agent.
+     */
+    public const GEN_AI_AGENT_ID = 'gen_ai.agent.id';
+
+    /**
+     * Human-readable name of the GenAI agent provided by the application.
+     */
+    public const GEN_AI_AGENT_NAME = 'gen_ai.agent.name';
+
+    /**
      * Deprecated, use Event API to report completions contents.
      *
-     * @deprecated Removed, no replacement at this time.
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
      */
     public const GEN_AI_COMPLETION = 'gen_ai.completion';
 
     /**
-     * The response format that is requested.
+     * Deprecated, use `gen_ai.output.type`.
+     *
+     * @deprecated {"note": "Replaced by `gen_ai.output.type`.", "reason": "uncategorized"}
      */
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT = 'gen_ai.openai.request.response_format';
 
     /**
      * Deprecated, use `gen_ai.request.seed`.
      *
-     * @deprecated Replaced by `gen_ai.request.seed` attribute.
+     * @deprecated {"note": "Replaced by `gen_ai.request.seed` attribute.", "reason": "uncategorized"}
      */
     public const GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed';
 
@@ -1608,11 +1828,24 @@ interface TraceAttributes
     public const GEN_AI_OPERATION_NAME = 'gen_ai.operation.name';
 
     /**
+     * Represents the content type requested by the client.
+     * This attribute SHOULD be used when the client requests output of a specific type. The model may return zero or more outputs of this type.
+     * This attribute specifies the output modality and not the actual output format. For example, if an image is requested, the actual output could be a URL pointing to an image file.
+     * Additional output format details may be recorded in the future in the `gen_ai.output.{type}.*` attributes.
+     */
+    public const GEN_AI_OUTPUT_TYPE = 'gen_ai.output.type';
+
+    /**
      * Deprecated, use Event API to report prompt contents.
      *
-     * @deprecated Removed, no replacement at this time.
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
      */
     public const GEN_AI_PROMPT = 'gen_ai.prompt';
+
+    /**
+     * The target number of candidate completions to return.
+     */
+    public const GEN_AI_REQUEST_CHOICE_COUNT = 'gen_ai.request.choice.count';
 
     /**
      * The encoding formats requested in an embeddings operation, if specified.
@@ -1702,9 +1935,34 @@ interface TraceAttributes
     public const GEN_AI_TOKEN_TYPE = 'gen_ai.token.type';
 
     /**
+     * The tool call identifier.
+     */
+    public const GEN_AI_TOOL_CALL_ID = 'gen_ai.tool.call.id';
+
+    /**
+     * The tool description.
+     */
+    public const GEN_AI_TOOL_DESCRIPTION = 'gen_ai.tool.description';
+
+    /**
+     * Name of the tool utilized by the agent.
+     */
+    public const GEN_AI_TOOL_NAME = 'gen_ai.tool.name';
+
+    /**
+     * Type of the tool utilized by the agent
+     * Extension: A tool executed on the agent-side to directly call external APIs, bridging the gap between the agent and real-world systems.
+     * Agent-side operations involve actions that are performed by the agent on the server or within the agent's controlled environment.
+     * Function: A tool executed on the client-side, where the agent generates parameters for a predefined function, and the client executes the logic.
+     * Client-side operations are actions taken on the user's end or within the client application.
+     * Datastore: A tool used by the agent to access and query structured or unstructured external data for retrieval-augmented tasks or knowledge updates.
+     */
+    public const GEN_AI_TOOL_TYPE = 'gen_ai.tool.type';
+
+    /**
      * Deprecated, use `gen_ai.usage.output_tokens` instead.
      *
-     * @deprecated Replaced by `gen_ai.usage.output_tokens` attribute.
+     * @deprecated {"note": "Replaced by `gen_ai.usage.output_tokens` attribute.", "reason": "uncategorized"}
      */
     public const GEN_AI_USAGE_COMPLETION_TOKENS = 'gen_ai.usage.completion_tokens';
 
@@ -1721,7 +1979,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `gen_ai.usage.input_tokens` instead.
      *
-     * @deprecated Replaced by `gen_ai.usage.input_tokens` attribute.
+     * @deprecated {"note": "Replaced by `gen_ai.usage.input_tokens` attribute.", "reason": "uncategorized"}
      */
     public const GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens';
 
@@ -1880,7 +2138,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `client.address` instead.
      *
-     * @deprecated Replaced by `client.address`.
+     * @deprecated {"note": "Replaced by `client.address`.", "reason": "uncategorized"}
      */
     public const HTTP_CLIENT_IP = 'http.client_ip';
 
@@ -1892,21 +2150,21 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.protocol.name` instead.
      *
-     * @deprecated Replaced by `network.protocol.name`.
+     * @deprecated {"note": "Replaced by `network.protocol.name`.", "reason": "uncategorized"}
      */
     public const HTTP_FLAVOR = 'http.flavor';
 
     /**
      * Deprecated, use one of `server.address`, `client.address` or `http.request.header.host` instead, depending on the usage.
      *
-     * @deprecated Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.
+     * @deprecated {"note": "Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.", "reason": "uncategorized"}
      */
     public const HTTP_HOST = 'http.host';
 
     /**
      * Deprecated, use `http.request.method` instead.
      *
-     * @deprecated Replaced by `http.request.method`.
+     * @deprecated {"note": "Replaced by `http.request.method`.", "reason": "uncategorized"}
      */
     public const HTTP_METHOD = 'http.method';
 
@@ -1918,9 +2176,22 @@ interface TraceAttributes
     /**
      * HTTP request headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
      *
-     * Instrumentations SHOULD require an explicit configuration of which headers are to be captured. Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
-     * The `User-Agent` header is already captured in the `user_agent.original` attribute. Users MAY explicitly configure instrumentations to capture them even though it is not recommended.
-     * The attribute value MUST consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
+     * Instrumentations SHOULD require an explicit configuration of which headers are to be captured.
+     * Including all request headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     *
+     * The `User-Agent` header is already captured in the `user_agent.original` attribute.
+     * Users MAY explicitly configure instrumentations to capture them even though it is not recommended.
+     *
+     * The attribute value MUST consist of either multiple header values as an array of strings
+     * or a single-item array containing a possibly comma-concatenated string, depending on the way
+     * the HTTP library provides access to headers.
+     *
+     * Examples:
+     *
+     * - A header `Content-Type: application/json` SHOULD be recorded as the `http.request.header.content-type`
+     *   attribute with value `["application/json"]`.
+     * - A header `X-Forwarded-For: 1.2.3.4, 1.2.3.5` SHOULD be recorded as the `http.request.header.x-forwarded-for`
+     *   attribute with value `["1.2.3.4", "1.2.3.5"]` or `["1.2.3.4, 1.2.3.5"]` depending on the HTTP library.
      */
     public const HTTP_REQUEST_HEADER = 'http.request.header';
 
@@ -1963,14 +2234,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.request.header.<key>` instead.
      *
-     * @deprecated Replaced by `http.request.header.<key>`.
+     * @deprecated {"note": "Replaced by `http.request.header.<key>`.", "reason": "uncategorized"}
      */
     public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
 
     /**
      * Deprecated, use `http.request.body.size` instead.
      *
-     * @deprecated Replaced by `http.request.body.size`.
+     * @deprecated {"note": "Replaced by `http.request.body.size`.", "reason": "uncategorized"}
      */
     public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
 
@@ -1982,9 +2253,21 @@ interface TraceAttributes
     /**
      * HTTP response headers, `<key>` being the normalized HTTP Header name (lowercase), the value being the header values.
      *
-     * Instrumentations SHOULD require an explicit configuration of which headers are to be captured. Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     * Instrumentations SHOULD require an explicit configuration of which headers are to be captured.
+     * Including all response headers can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     *
      * Users MAY explicitly configure instrumentations to capture them even though it is not recommended.
-     * The attribute value MUST consist of either multiple header values as an array of strings or a single-item array containing a possibly comma-concatenated string, depending on the way the HTTP library provides access to headers.
+     *
+     * The attribute value MUST consist of either multiple header values as an array of strings
+     * or a single-item array containing a possibly comma-concatenated string, depending on the way
+     * the HTTP library provides access to headers.
+     *
+     * Examples:
+     *
+     * - A header `Content-Type: application/json` header SHOULD be recorded as the `http.request.response.content-type`
+     *   attribute with value `["application/json"]`.
+     * - A header `My-custom-header: abc, def` header SHOULD be recorded as the `http.response.header.my-custom-header`
+     *   attribute with value `["abc", "def"]` or `["abc, def"]` depending on the HTTP library.
      */
     public const HTTP_RESPONSE_HEADER = 'http.response.header';
 
@@ -2001,14 +2284,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `http.response.header.<key>` instead.
      *
-     * @deprecated Replaced by `http.response.header.<key>`.
+     * @deprecated {"note": "Replaced by `http.response.header.<key>`.", "reason": "uncategorized"}
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
 
     /**
      * Deprecated, use `http.response.body.size` instead.
      *
-     * @deprecated Replace by `http.response.body.size`.
+     * @deprecated {"note": "Replace by `http.response.body.size`.", "reason": "uncategorized"}
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
 
@@ -2023,53 +2306,44 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.scheme` instead.
      *
-     * @deprecated Replaced by `url.scheme` instead.
+     * @deprecated {"note": "Replaced by `url.scheme` instead.", "reason": "uncategorized"}
      */
     public const HTTP_SCHEME = 'http.scheme';
 
     /**
      * Deprecated, use `server.address` instead.
      *
-     * @deprecated Replaced by `server.address`.
+     * @deprecated {"note": "Replaced by `server.address`.", "reason": "uncategorized"}
      */
     public const HTTP_SERVER_NAME = 'http.server_name';
 
     /**
      * Deprecated, use `http.response.status_code` instead.
      *
-     * @deprecated Replaced by `http.response.status_code`.
+     * @deprecated {"note": "Replaced by `http.response.status_code`.", "reason": "uncategorized"}
      */
     public const HTTP_STATUS_CODE = 'http.status_code';
 
     /**
      * Deprecated, use `url.path` and `url.query` instead.
      *
-     * @deprecated Split to `url.path` and `url.query.
+     * @deprecated {"note": "Split to `url.path` and `url.query.", "reason": "uncategorized"}
      */
     public const HTTP_TARGET = 'http.target';
 
     /**
      * Deprecated, use `url.full` instead.
      *
-     * @deprecated Replaced by `url.full`.
+     * @deprecated {"note": "Replaced by `url.full`.", "reason": "uncategorized"}
      */
     public const HTTP_URL = 'http.url';
 
     /**
      * Deprecated, use `user_agent.original` instead.
      *
-     * @deprecated Replaced by `user_agent.original`.
+     * @deprecated {"note": "Replaced by `user_agent.original`.", "reason": "uncategorized"}
      */
     public const HTTP_USER_AGENT = 'http.user_agent';
-
-    /**
-     * Deprecated use the `device.app.lifecycle` event definition including `ios.state` as a payload field instead.
-     *
-     * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate#1656902), and from which the `OS terminology` column values are derived.
-     *
-     * @deprecated Moved to a payload field of `device.app.lifecycle`.
-     */
-    public const IOS_STATE = 'ios.state';
 
     /**
      * Name of the buffer pool.
@@ -2082,6 +2356,12 @@ interface TraceAttributes
      * Garbage collector action is generally obtained via [GarbageCollectionNotificationInfo#getGcAction()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcAction()).
      */
     public const JVM_GC_ACTION = 'jvm.gc.action';
+
+    /**
+     * Name of the garbage collector cause.
+     * Garbage collector cause is generally obtained via [GarbageCollectionNotificationInfo#getGcCause()](https://docs.oracle.com/en/java/javase/11/docs/api/jdk.management/com/sun/management/GarbageCollectionNotificationInfo.html#getGcCause()).
+     */
+    public const JVM_GC_CAUSE = 'jvm.gc.cause';
 
     /**
      * Name of the garbage collector.
@@ -2159,6 +2439,30 @@ interface TraceAttributes
     public const K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON = 'k8s.container.status.last_terminated_reason';
 
     /**
+     * The cronjob annotation placed on the CronJob, the `<key>` being the annotation name, the value being the annotation value.
+     *
+     * Examples:
+     *
+     * - An annotation `retries` with value `4` SHOULD be recorded as the
+     *   `k8s.cronjob.annotation.retries` attribute with value `"4"`.
+     * - An annotation `data` with empty string value SHOULD be recorded as
+     *   the `k8s.cronjob.annotation.data` attribute with value `""`.
+     */
+    public const K8S_CRONJOB_ANNOTATION = 'k8s.cronjob.annotation';
+
+    /**
+     * The label placed on the CronJob, the `<key>` being the label name, the value being the label value.
+     *
+     * Examples:
+     *
+     * - A label `type` with value `weekly` SHOULD be recorded as the
+     *   `k8s.cronjob.label.type` attribute with value `"weekly"`.
+     * - A label `automated` with empty string value SHOULD be recorded as
+     *   the `k8s.cronjob.label.automated` attribute with value `""`.
+     */
+    public const K8S_CRONJOB_LABEL = 'k8s.cronjob.label';
+
+    /**
      * The name of the CronJob.
      */
     public const K8S_CRONJOB_NAME = 'k8s.cronjob.name';
@@ -2169,6 +2473,20 @@ interface TraceAttributes
     public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
 
     /**
+     * The annotation key-value pairs placed on the DaemonSet.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_DAEMONSET_ANNOTATION = 'k8s.daemonset.annotation';
+
+    /**
+     * The label key-value pairs placed on the DaemonSet.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_DAEMONSET_LABEL = 'k8s.daemonset.label';
+
+    /**
      * The name of the DaemonSet.
      */
     public const K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
@@ -2177,6 +2495,20 @@ interface TraceAttributes
      * The UID of the DaemonSet.
      */
     public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
+
+    /**
+     * The annotation key-value pairs placed on the Deployment.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_DEPLOYMENT_ANNOTATION = 'k8s.deployment.annotation';
+
+    /**
+     * The label key-value pairs placed on the Deployment.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_DEPLOYMENT_LABEL = 'k8s.deployment.label';
 
     /**
      * The name of the Deployment.
@@ -2199,6 +2531,20 @@ interface TraceAttributes
     public const K8S_HPA_UID = 'k8s.hpa.uid';
 
     /**
+     * The annotation key-value pairs placed on the Job.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_JOB_ANNOTATION = 'k8s.job.annotation';
+
+    /**
+     * The label key-value pairs placed on the Job.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_JOB_LABEL = 'k8s.job.label';
+
+    /**
      * The name of the Job.
      */
     public const K8S_JOB_NAME = 'k8s.job.name';
@@ -2207,6 +2553,20 @@ interface TraceAttributes
      * The UID of the Job.
      */
     public const K8S_JOB_UID = 'k8s.job.uid';
+
+    /**
+     * The annotation key-value pairs placed on the Namespace.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_NAMESPACE_ANNOTATION = 'k8s.namespace.annotation';
+
+    /**
+     * The label key-value pairs placed on the Namespace.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_NAMESPACE_LABEL = 'k8s.namespace.label';
 
     /**
      * The name of the namespace that the pod is running in.
@@ -2222,6 +2582,30 @@ interface TraceAttributes
     public const K8S_NAMESPACE_PHASE = 'k8s.namespace.phase';
 
     /**
+     * The annotation placed on the Node, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     *
+     * Examples:
+     *
+     * - An annotation `node.alpha.kubernetes.io/ttl` with value `0` SHOULD be recorded as
+     *   the `k8s.node.annotation.node.alpha.kubernetes.io/ttl` attribute with value `"0"`.
+     * - An annotation `data` with empty string value SHOULD be recorded as
+     *   the `k8s.node.annotation.data` attribute with value `""`.
+     */
+    public const K8S_NODE_ANNOTATION = 'k8s.node.annotation';
+
+    /**
+     * The label placed on the Node, the `<key>` being the label name, the value being the label value, even if the value is empty.
+     *
+     * Examples:
+     *
+     * - A label `kubernetes.io/arch` with value `arm64` SHOULD be recorded
+     *   as the `k8s.node.label.kubernetes.io/arch` attribute with value `"arm64"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.node.label.data` attribute with value `""`.
+     */
+    public const K8S_NODE_LABEL = 'k8s.node.label';
+
+    /**
      * The name of the Node.
      */
     public const K8S_NODE_NAME = 'k8s.node.name';
@@ -2232,19 +2616,37 @@ interface TraceAttributes
     public const K8S_NODE_UID = 'k8s.node.uid';
 
     /**
-     * The annotation key-value pairs placed on the Pod, the `<key>` being the annotation name, the value being the annotation value.
+     * The annotation placed on the Pod, the `<key>` being the annotation name, the value being the annotation value.
+     *
+     * Examples:
+     *
+     * - An annotation `kubernetes.io/enforce-mountable-secrets` with value `true` SHOULD be recorded as
+     *   the `k8s.pod.annotation.kubernetes.io/enforce-mountable-secrets` attribute with value `"true"`.
+     * - An annotation `mycompany.io/arch` with value `x64` SHOULD be recorded as
+     *   the `k8s.pod.annotation.mycompany.io/arch` attribute with value `"x64"`.
+     * - An annotation `data` with empty string value SHOULD be recorded as
+     *   the `k8s.pod.annotation.data` attribute with value `""`.
      */
     public const K8S_POD_ANNOTATION = 'k8s.pod.annotation';
 
     /**
-     * The label key-value pairs placed on the Pod, the `<key>` being the label name, the value being the label value.
+     * The label placed on the Pod, the `<key>` being the label name, the value being the label value.
+     *
+     * Examples:
+     *
+     * - A label `app` with value `my-app` SHOULD be recorded as
+     *   the `k8s.pod.label.app` attribute with value `"my-app"`.
+     * - A label `mycompany.io/arch` with value `x64` SHOULD be recorded as
+     *   the `k8s.pod.label.mycompany.io/arch` attribute with value `"x64"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.pod.label.data` attribute with value `""`.
      */
     public const K8S_POD_LABEL = 'k8s.pod.label';
 
     /**
      * Deprecated, use `k8s.pod.label` instead.
      *
-     * @deprecated Replaced by `k8s.pod.label`.
+     * @deprecated {"note": "Replaced by `k8s.pod.label`.", "reason": "uncategorized"}
      */
     public const K8S_POD_LABELS = 'k8s.pod.labels';
 
@@ -2257,6 +2659,20 @@ interface TraceAttributes
      * The UID of the Pod.
      */
     public const K8S_POD_UID = 'k8s.pod.uid';
+
+    /**
+     * The annotation key-value pairs placed on the ReplicaSet.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_REPLICASET_ANNOTATION = 'k8s.replicaset.annotation';
+
+    /**
+     * The label key-value pairs placed on the ReplicaSet.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_REPLICASET_LABEL = 'k8s.replicaset.label';
 
     /**
      * The name of the ReplicaSet.
@@ -2287,6 +2703,20 @@ interface TraceAttributes
      * The UID of the resource quota.
      */
     public const K8S_RESOURCEQUOTA_UID = 'k8s.resourcequota.uid';
+
+    /**
+     * The annotation key-value pairs placed on the StatefulSet.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_STATEFULSET_ANNOTATION = 'k8s.statefulset.annotation';
+
+    /**
+     * The label key-value pairs placed on the StatefulSet.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_STATEFULSET_LABEL = 'k8s.statefulset.label';
 
     /**
      * The name of the StatefulSet.
@@ -2356,28 +2786,28 @@ interface TraceAttributes
     /**
      * Deprecated, use `rpc.message.compressed_size` instead.
      *
-     * @deprecated Replaced by `rpc.message.compressed_size`.
+     * @deprecated {"note": "Replaced by `rpc.message.compressed_size`.", "reason": "uncategorized"}
      */
     public const MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
 
     /**
      * Deprecated, use `rpc.message.id` instead.
      *
-     * @deprecated Replaced by `rpc.message.id`.
+     * @deprecated {"note": "Replaced by `rpc.message.id`.", "reason": "uncategorized"}
      */
     public const MESSAGE_ID = 'message.id';
 
     /**
      * Deprecated, use `rpc.message.type` instead.
      *
-     * @deprecated Replaced by `rpc.message.type`.
+     * @deprecated {"note": "Replaced by `rpc.message.type`.", "reason": "uncategorized"}
      */
     public const MESSAGE_TYPE = 'message.type';
 
     /**
      * Deprecated, use `rpc.message.uncompressed_size` instead.
      *
-     * @deprecated Replaced by `rpc.message.uncompressed_size`.
+     * @deprecated {"note": "Replaced by `rpc.message.uncompressed_size`.", "reason": "uncategorized"}
      */
     public const MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 
@@ -2436,21 +2866,21 @@ interface TraceAttributes
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated No replacement at this time.
+     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
      */
     public const MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = 'messaging.destination_publish.anonymous';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated No replacement at this time.
+     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
      */
     public const MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name';
 
     /**
      * Deprecated, use `messaging.consumer.group.name` instead.
      *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
+     * @deprecated {"note": "Replaced by `messaging.consumer.group.name`.", "reason": "uncategorized"}
      */
     public const MESSAGING_EVENTHUBS_CONSUMER_GROUP = 'messaging.eventhubs.consumer.group';
 
@@ -2482,14 +2912,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.consumer.group.name` instead.
      *
-     * @deprecated Replaced by `messaging.consumer.group.name`.
+     * @deprecated {"note": "Replaced by `messaging.consumer.group.name`.", "reason": "uncategorized"}
      */
     public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
 
     /**
      * Deprecated, use `messaging.destination.partition.id` instead.
      *
-     * @deprecated Replaced by `messaging.destination.partition.id`.
+     * @deprecated {"note": "Replaced by `messaging.destination.partition.id`.", "reason": "uncategorized"}
      */
     public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
 
@@ -2503,7 +2933,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.kafka.offset` instead.
      *
-     * @deprecated Replaced by `messaging.kafka.offset`.
+     * @deprecated {"note": "Replaced by `messaging.kafka.offset`.", "reason": "uncategorized"}
      */
     public const MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset';
 
@@ -2546,7 +2976,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.operation.type` instead.
      *
-     * @deprecated Replaced by `messaging.operation.type`.
+     * @deprecated {"note": "Replaced by `messaging.operation.type`.", "reason": "uncategorized"}
      */
     public const MESSAGING_OPERATION = 'messaging.operation';
 
@@ -2575,7 +3005,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.consumer.group.name` instead.
      *
-     * @deprecated Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.
+     * @deprecated {"note": "Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.", "reason": "uncategorized"}
      */
     public const MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_group';
 
@@ -2622,7 +3052,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.destination.subscription.name` instead.
      *
-     * @deprecated Replaced by `messaging.destination.subscription.name`.
+     * @deprecated {"note": "Replaced by `messaging.destination.subscription.name`.", "reason": "uncategorized"}
      */
     public const MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME = 'messaging.servicebus.destination.subscription_name';
 
@@ -2650,105 +3080,105 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.local.address`.
      *
-     * @deprecated Replaced by `network.local.address`.
+     * @deprecated {"note": "Replaced by `network.local.address`.", "reason": "uncategorized"}
      */
     public const NET_HOST_IP = 'net.host.ip';
 
     /**
      * Deprecated, use `server.address`.
      *
-     * @deprecated Replaced by `server.address`.
+     * @deprecated {"note": "Replaced by `server.address`.", "reason": "uncategorized"}
      */
     public const NET_HOST_NAME = 'net.host.name';
 
     /**
      * Deprecated, use `server.port`.
      *
-     * @deprecated Replaced by `server.port`.
+     * @deprecated {"note": "Replaced by `server.port`.", "reason": "uncategorized"}
      */
     public const NET_HOST_PORT = 'net.host.port';
 
     /**
      * Deprecated, use `network.peer.address`.
      *
-     * @deprecated Replaced by `network.peer.address`.
+     * @deprecated {"note": "Replaced by `network.peer.address`.", "reason": "uncategorized"}
      */
     public const NET_PEER_IP = 'net.peer.ip';
 
     /**
      * Deprecated, use `server.address` on client spans and `client.address` on server spans.
      *
-     * @deprecated Replaced by `server.address` on client spans and `client.address` on server spans.
+     * @deprecated {"note": "Replaced by `server.address` on client spans and `client.address` on server spans.", "reason": "uncategorized"}
      */
     public const NET_PEER_NAME = 'net.peer.name';
 
     /**
      * Deprecated, use `server.port` on client spans and `client.port` on server spans.
      *
-     * @deprecated Replaced by `server.port` on client spans and `client.port` on server spans.
+     * @deprecated {"note": "Replaced by `server.port` on client spans and `client.port` on server spans.", "reason": "uncategorized"}
      */
     public const NET_PEER_PORT = 'net.peer.port';
 
     /**
      * Deprecated, use `network.protocol.name`.
      *
-     * @deprecated Replaced by `network.protocol.name`.
+     * @deprecated {"note": "Replaced by `network.protocol.name`.", "reason": "uncategorized"}
      */
     public const NET_PROTOCOL_NAME = 'net.protocol.name';
 
     /**
      * Deprecated, use `network.protocol.version`.
      *
-     * @deprecated Replaced by `network.protocol.version`.
+     * @deprecated {"note": "Replaced by `network.protocol.version`.", "reason": "uncategorized"}
      */
     public const NET_PROTOCOL_VERSION = 'net.protocol.version';
 
     /**
      * Deprecated, use `network.transport` and `network.type`.
      *
-     * @deprecated Split to `network.transport` and `network.type`.
+     * @deprecated {"note": "Split to `network.transport` and `network.type`.", "reason": "uncategorized"}
      */
     public const NET_SOCK_FAMILY = 'net.sock.family';
 
     /**
      * Deprecated, use `network.local.address`.
      *
-     * @deprecated Replaced by `network.local.address`.
+     * @deprecated {"note": "Replaced by `network.local.address`.", "reason": "uncategorized"}
      */
     public const NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
 
     /**
      * Deprecated, use `network.local.port`.
      *
-     * @deprecated Replaced by `network.local.port`.
+     * @deprecated {"note": "Replaced by `network.local.port`.", "reason": "uncategorized"}
      */
     public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
 
     /**
      * Deprecated, use `network.peer.address`.
      *
-     * @deprecated Replaced by `network.peer.address`.
+     * @deprecated {"note": "Replaced by `network.peer.address`.", "reason": "uncategorized"}
      */
     public const NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated Removed.
+     * @deprecated {"note": "Removed.", "reason": "uncategorized"}
      */
     public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
 
     /**
      * Deprecated, use `network.peer.port`.
      *
-     * @deprecated Replaced by `network.peer.port`.
+     * @deprecated {"note": "Replaced by `network.peer.port`.", "reason": "uncategorized"}
      */
     public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
 
     /**
      * Deprecated, use `network.transport`.
      *
-     * @deprecated Replaced by `network.transport`.
+     * @deprecated {"note": "Replaced by `network.transport`.", "reason": "uncategorized"}
      */
     public const NET_TRANSPORT = 'net.transport';
 
@@ -2851,7 +3281,7 @@ interface TraceAttributes
      * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
      *
      * Follows [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md), and specifically the [Digest property](https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests).
-     * An example can be found in [Example Image Manifest](https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifest).
+     * An example can be found in [Example Image Manifest](https://github.com/opencontainers/image-spec/blob/main/manifest.md#example-image-manifest).
      */
     public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
@@ -2887,16 +3317,43 @@ interface TraceAttributes
     public const OS_VERSION = 'os.version';
 
     /**
+     * A name uniquely identifying the instance of the OpenTelemetry component within its containing SDK instance.
+     *
+     * Implementations SHOULD ensure a low cardinality for this attribute, even across application or SDK restarts.
+     * E.g. implementations MUST NOT use UUIDs as values for this attribute.
+     *
+     * Implementations MAY achieve these goals by following a `<otel.component.type>/<instance-counter>` pattern, e.g. `batching_span_processor/0`.
+     * Hereby `otel.component.type` refers to the corresponding attribute value of the component.
+     *
+     * The value of `instance-counter` MAY be automatically assigned by the component and uniqueness within the enclosing SDK instance MUST be guaranteed.
+     * For example, `<instance-counter>` MAY be implemented by using a monotonically increasing counter (starting with `0`), which is incremented every time an
+     * instance of the given component type is started.
+     *
+     * With this implementation, for example the first Batching Span Processor would have `batching_span_processor/0`
+     * as `otel.component.name`, the second one `batching_span_processor/1` and so on.
+     * These values will therefore be reused in the case of an application restart.
+     */
+    public const OTEL_COMPONENT_NAME = 'otel.component.name';
+
+    /**
+     * A name identifying the type of the OpenTelemetry component.
+     *
+     * If none of the standardized values apply, implementations SHOULD use the language-defined name of the type.
+     * E.g. for Java the fully qualified classname SHOULD be used in this case.
+     */
+    public const OTEL_COMPONENT_TYPE = 'otel.component.type';
+
+    /**
      * Deprecated. Use the `otel.scope.name` attribute
      *
-     * @deprecated Use the `otel.scope.name` attribute.
+     * @deprecated {"note": "Use the `otel.scope.name` attribute.", "reason": "uncategorized"}
      */
     public const OTEL_LIBRARY_NAME = 'otel.library.name';
 
     /**
      * Deprecated. Use the `otel.scope.version` attribute.
      *
-     * @deprecated Use the `otel.scope.version` attribute.
+     * @deprecated {"note": "Use the `otel.scope.version` attribute.", "reason": "uncategorized"}
      */
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
 
@@ -2911,6 +3368,11 @@ interface TraceAttributes
     public const OTEL_SCOPE_VERSION = 'otel.scope.version';
 
     /**
+     * The result value of the sampler for this span
+     */
+    public const OTEL_SPAN_SAMPLING_RESULT = 'otel.span.sampling_result';
+
+    /**
      * Name of the code, either "OK" or "ERROR". MUST NOT be set if the status code is UNSET.
      */
     public const OTEL_STATUS_CODE = 'otel.status_code';
@@ -2923,7 +3385,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.client.connection.state` instead.
      *
-     * @deprecated Replaced by `db.client.connection.state`.
+     * @deprecated {"note": "Replaced by `db.client.connection.state`.", "reason": "uncategorized"}
      */
     public const STATE = 'state';
 
@@ -2935,7 +3397,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.client.connection.pool.name` instead.
      *
-     * @deprecated Replaced by `db.client.connection.pool.name`.
+     * @deprecated {"note": "Replaced by `db.client.connection.pool.name`.", "reason": "uncategorized"}
      */
     public const POOL_NAME = 'pool.name';
 
@@ -2969,7 +3431,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `cpu.mode` instead.
      *
-     * @deprecated Replaced by `cpu.mode`
+     * @deprecated {"note": "Replaced by `cpu.mode`", "reason": "uncategorized"}
      */
     public const PROCESS_CPU_STATE = 'process.cpu.state';
 
@@ -2977,6 +3439,19 @@ interface TraceAttributes
      * The date and time the process was created, in ISO 8601 format.
      */
     public const PROCESS_CREATION_TIME = 'process.creation.time';
+
+    /**
+     * Process environment variables, <key> being the environment variable name, the value being the environment variable value.
+     *
+     * Examples:
+     *
+     * - an environment variable `USER` with value `"ubuntu"` SHOULD be recorded
+     *   as the `process.environment_variable.USER` attribute with value `"ubuntu"`.
+     * - an environment variable `PATH` with value `"/usr/local/bin:/usr/bin"`
+     *   SHOULD be recorded as the `process.environment_variable.PATH` attribute
+     *   with value `"/usr/local/bin:/usr/bin"`.
+     */
+    public const PROCESS_ENVIRONMENT_VARIABLE = 'process.environment_variable';
 
     /**
      * The GNU build ID as found in the `.note.gnu.build-id` ELF section (hex string).
@@ -2996,12 +3471,12 @@ interface TraceAttributes
     /**
      * "Deprecated, use `process.executable.build_id.htlhash` instead."
      *
-     * @deprecated Replaced by `process.executable.build_id.htlhash`
+     * @deprecated {"note": "Replaced by `process.executable.build_id.htlhash`", "reason": "uncategorized"}
      */
     public const PROCESS_EXECUTABLE_BUILD_ID_PROFILING = 'process.executable.build_id.profiling';
 
     /**
-     * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
+     * The name of the process executable. On Linux based systems, this SHOULD be set to the base name of the target of `/proc/[pid]/exe`. On Windows, this SHOULD be set to the base name of `GetProcessImageFileNameW`.
      */
     public const PROCESS_EXECUTABLE_NAME = 'process.executable.name';
 
@@ -3126,35 +3601,51 @@ interface TraceAttributes
     public const PROCESS_WORKING_DIRECTORY = 'process.working_directory';
 
     /**
-     * The [error codes](https://connect.build/docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
+     * The [error codes](https://connectrpc.com//docs/protocol/#error-codes) of the Connect request. Error codes are always string values.
      */
     public const RPC_CONNECT_RPC_ERROR_CODE = 'rpc.connect_rpc.error_code';
 
     /**
      * Connect request metadata, `<key>` being the normalized Connect Metadata key (lowercase), the value being the metadata values.
      *
-     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured. Including all request metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured.
+     * Including all request metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     *
+     * For example, a property `my-custom-key` with value `["1.2.3.4", "1.2.3.5"]` SHOULD be recorded as
+     * the `rpc.connect_rpc.request.metadata.my-custom-key` attribute with value `["1.2.3.4", "1.2.3.5"]`
      */
     public const RPC_CONNECT_RPC_REQUEST_METADATA = 'rpc.connect_rpc.request.metadata';
 
     /**
      * Connect response metadata, `<key>` being the normalized Connect Metadata key (lowercase), the value being the metadata values.
      *
-     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured. Including all response metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured.
+     * Including all response metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     *
+     * For example, a property `my-custom-key` with value `"attribute_value"` SHOULD be recorded as
+     * the `rpc.connect_rpc.response.metadata.my-custom-key` attribute with value `["attribute_value"]`
      */
     public const RPC_CONNECT_RPC_RESPONSE_METADATA = 'rpc.connect_rpc.response.metadata';
 
     /**
      * gRPC request metadata, `<key>` being the normalized gRPC Metadata key (lowercase), the value being the metadata values.
      *
-     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured. Including all request metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured.
+     * Including all request metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     *
+     * For example, a property `my-custom-key` with value `["1.2.3.4", "1.2.3.5"]` SHOULD be recorded as
+     * `rpc.grpc.request.metadata.my-custom-key` attribute with value `["1.2.3.4", "1.2.3.5"]`
      */
     public const RPC_GRPC_REQUEST_METADATA = 'rpc.grpc.request.metadata';
 
     /**
      * gRPC response metadata, `<key>` being the normalized gRPC Metadata key (lowercase), the value being the metadata values.
      *
-     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured. Including all response metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     * Instrumentations SHOULD require an explicit configuration of which metadata values are to be captured.
+     * Including all response metadata values can be a security risk - explicit configuration helps avoid leaking sensitive information.
+     *
+     * For example, a property `my-custom-key` with value `["attribute_value"]` SHOULD be recorded as
+     * the `rpc.grpc.response.metadata.my-custom-key` attribute with value `["attribute_value"]`
      */
     public const RPC_GRPC_RESPONSE_METADATA = 'rpc.grpc.response.metadata';
 
@@ -3358,14 +3849,14 @@ interface TraceAttributes
     public const SOURCE_PORT = 'source.port';
 
     /**
-     * The logical CPU number [0..n-1]
+     * Deprecated, use `cpu.logical_number` instead.
      */
     public const SYSTEM_CPU_LOGICAL_NUMBER = 'system.cpu.logical_number';
 
     /**
      * Deprecated, use `cpu.mode` instead.
      *
-     * @deprecated Replaced by `cpu.mode`
+     * @deprecated {"note": "Replaced by `cpu.mode`", "reason": "uncategorized"}
      */
     public const SYSTEM_CPU_STATE = 'system.cpu.state';
 
@@ -3402,7 +3893,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.connection.state` instead.
      *
-     * @deprecated Removed, report network connection state with `network.connection.state` attribute
+     * @deprecated {"note": "Removed, report network connection state with `network.connection.state` attribute", "reason": "uncategorized"}
      */
     public const SYSTEM_NETWORK_STATE = 'system.network.state';
 
@@ -3429,7 +3920,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `system.process.status` instead.
      *
-     * @deprecated Replaced by `system.process.status`.
+     * @deprecated {"note": "Replaced by `system.process.status`.", "reason": "uncategorized"}
      */
     public const SYSTEM_PROCESSES_STATUS = 'system.processes.status';
 
@@ -3553,7 +4044,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address` instead.
      *
-     * @deprecated Replaced by `server.address`.
+     * @deprecated {"note": "Replaced by `server.address`.", "reason": "uncategorized"}
      */
     public const TLS_CLIENT_SERVER_NAME = 'tls.client.server_name';
 
@@ -3583,12 +4074,12 @@ interface TraceAttributes
     public const TLS_NEXT_PROTOCOL = 'tls.next_protocol';
 
     /**
-     * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES)
+     * Normalized lowercase protocol name parsed from original string of the negotiated [SSL/TLS protocol version](https://docs.openssl.org/1.1.1/man3/SSL_get_version/#return-values)
      */
     public const TLS_PROTOCOL_NAME = 'tls.protocol.name';
 
     /**
-     * Numeric part of the version parsed from the original string of the negotiated [SSL/TLS protocol version](https://www.openssl.org/docs/man1.1.1/man3/SSL_get_version.html#RETURN-VALUES)
+     * Numeric part of the version parsed from the original string of the negotiated [SSL/TLS protocol version](https://docs.openssl.org/1.1.1/man3/SSL_get_version/#return-values)
      */
     public const TLS_PROTOCOL_VERSION = 'tls.protocol.version';
 
@@ -3737,7 +4228,7 @@ interface TraceAttributes
     /**
      * The highest registered url domain, stripped of the subdomain.
      *
-     * This value can be determined precisely with the [public suffix list](http://publicsuffix.org). For example, the registered domain for `foo.example.com` is `example.com`. Trying to approximate this by simply taking the last two labels will not work well for TLDs such as `co.uk`.
+     * This value can be determined precisely with the [public suffix list](https://publicsuffix.org/). For example, the registered domain for `foo.example.com` is `example.com`. Trying to approximate this by simply taking the last two labels will not work well for TLDs such as `co.uk`.
      */
     public const URL_REGISTERED_DOMAIN = 'url.registered_domain';
 
@@ -3761,7 +4252,7 @@ interface TraceAttributes
     /**
      * The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is `com`.
      *
-     * This value can be determined precisely with the [public suffix list](http://publicsuffix.org).
+     * This value can be determined precisely with the [public suffix list](https://publicsuffix.org/).
      */
     public const URL_TOP_LEVEL_DOMAIN = 'url.top_level_domain';
 
@@ -3810,6 +4301,19 @@ interface TraceAttributes
     public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
+     * Human readable operating system name.
+     * For mapping user agent strings to OS names, libraries such as [ua-parser](https://github.com/ua-parser) can be utilized.
+     */
+    public const USER_AGENT_OS_NAME = 'user_agent.os.name';
+
+    /**
+     * The version string of the operating system as defined in [Version Attributes](/docs/resource/README.md#version-attributes).
+     *
+     * For mapping user agent strings to OS versions, libraries such as [ua-parser](https://github.com/ua-parser) can be utilized.
+     */
+    public const USER_AGENT_OS_VERSION = 'user_agent.os.version';
+
+    /**
      * Specifies the category of synthetic traffic, such as tests or bots.
      *
      * This attribute MAY be derived from the contents of the `user_agent.original` attribute. Components that populate the attribute are responsible for determining what they consider to be synthetic bot or test traffic. This attribute can either be set for self-identification purposes, or on telemetry detected to be generated as a result of a synthetic request. This attribute is useful for distinguishing between genuine client traffic and synthetic traffic generated by bots or tests.
@@ -3853,6 +4357,16 @@ interface TraceAttributes
      * The type of line change being measured on a branch or change.
      */
     public const VCS_LINE_CHANGE_TYPE = 'vcs.line_change.type';
+
+    /**
+     * The group owner within the version control system.
+     */
+    public const VCS_OWNER_NAME = 'vcs.owner.name';
+
+    /**
+     * The name of the version control system provider.
+     */
+    public const VCS_PROVIDER_NAME = 'vcs.provider.name';
 
     /**
      * The name of the [reference](https://git-scm.com/docs/gitglossary#def_ref) such as **branch** or **tag** in the repository.
@@ -3932,14 +4446,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `vcs.change.id` instead.
      *
-     * @deprecated Deprecated, use `vcs.change.id` instead.
+     * @deprecated {"note": "Deprecated, use `vcs.change.id` instead.", "reason": "uncategorized"}
      */
     public const VCS_REPOSITORY_CHANGE_ID = 'vcs.repository.change.id';
 
     /**
      * Deprecated, use `vcs.change.title` instead.
      *
-     * @deprecated Deprecated, use `vcs.change.title` instead.
+     * @deprecated {"note": "Deprecated, use `vcs.change.title` instead.", "reason": "uncategorized"}
      */
     public const VCS_REPOSITORY_CHANGE_TITLE = 'vcs.repository.change.title';
 
@@ -3955,21 +4469,21 @@ interface TraceAttributes
     /**
      * Deprecated, use `vcs.ref.head.name` instead.
      *
-     * @deprecated Deprecated, use `vcs.ref.head.name` instead.
+     * @deprecated {"note": "Deprecated, use `vcs.ref.head.name` instead.", "reason": "uncategorized"}
      */
     public const VCS_REPOSITORY_REF_NAME = 'vcs.repository.ref.name';
 
     /**
      * Deprecated, use `vcs.ref.head.revision` instead.
      *
-     * @deprecated Deprecated, use `vcs.ref.head.revision` instead.
+     * @deprecated {"note": "Deprecated, use `vcs.ref.head.revision` instead.", "reason": "uncategorized"}
      */
     public const VCS_REPOSITORY_REF_REVISION = 'vcs.repository.ref.revision';
 
     /**
      * Deprecated, use `vcs.ref.head.type` instead.
      *
-     * @deprecated Deprecated, use `vcs.ref.head.type` instead.
+     * @deprecated {"note": "Deprecated, use `vcs.ref.head.type` instead.", "reason": "uncategorized"}
      */
     public const VCS_REPOSITORY_REF_TYPE = 'vcs.repository.ref.type';
 
