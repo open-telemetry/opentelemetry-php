@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\ContextInterface;
@@ -44,6 +46,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         private array $links,
         private int $totalRecordedLinks,
         private readonly int $startEpochNanos,
+        private readonly SpanSuppression $spanSuppression,
     ) {
         $this->status = StatusData::unset();
     }
@@ -73,6 +76,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         array $links,
         int $totalRecordedLinks,
         int $startEpochNanos,
+        SpanSuppression $spanSuppression = new NoopSuppression(),
     ): self {
         $span = new self(
             $name,
@@ -86,7 +90,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $attributesBuilder,
             $links,
             $totalRecordedLinks,
-            $startEpochNanos !== 0 ? $startEpochNanos : Clock::getDefault()->now()
+            $startEpochNanos !== 0 ? $startEpochNanos : Clock::getDefault()->now(),
+            $spanSuppression,
         );
 
         // Call onStart here to ensure the span is fully initialized.
@@ -109,6 +114,10 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         );
 
         return StackTraceFormatter::format($e);
+    }
+
+    public function storeInContext(ContextInterface $context): ContextInterface {
+        return $this->spanSuppression->suppress(parent::storeInContext($context));
     }
 
     /** @inheritDoc */

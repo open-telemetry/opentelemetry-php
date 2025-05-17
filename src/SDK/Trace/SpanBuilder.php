@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
 use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
@@ -32,6 +34,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         private readonly string $spanName,
         private readonly InstrumentationScopeInterface $instrumentationScope,
         private readonly TracerSharedState $tracerSharedState,
+        private readonly SpanSuppressor $spanSuppressor = new NoopSuppressor(),
     ) {
         $this->attributesBuilder = $this->tracerSharedState->getSpanLimits()->getAttributesFactory()->builder();
     }
@@ -125,6 +128,11 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $parentSpan = Span::fromContext($parentContext);
         $parentSpanContext = $parentSpan->getContext();
 
+        $spanSuppression = $this->spanSuppressor->resolveSuppression($this->spanKind, $this->attributesBuilder->build()->toArray());
+        if ($spanSuppression->isSuppressed($parentContext)) {
+            return Span::wrap($parentSpanContext);
+        }
+
         $spanId = $this->tracerSharedState->getIdGenerator()->generateSpanId();
 
         if (!$parentSpanContext->isValid()) {
@@ -155,6 +163,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         );
 
         if (!in_array($samplingDecision, [SamplingResult::RECORD_AND_SAMPLE, SamplingResult::RECORD_ONLY], true)) {
+            // TODO must suppress no-op spans too
             return Span::wrap($spanContext);
         }
 
@@ -176,7 +185,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $attributesBuilder,
             $this->links,
             $this->totalNumberOfLinksAdded,
-            $this->startEpochNanos
+            $this->startEpochNanos,
+            $spanSuppression,
         );
     }
 }

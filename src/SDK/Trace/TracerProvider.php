@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
 use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
@@ -33,6 +35,7 @@ final class TracerProvider implements TracerProviderInterface
         ?IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
         private ?Configurator $configurator = null,
+        private SpanSuppressionStrategy $spanSuppressionStrategy = new NoopSuppressionStrategy(),
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -77,6 +80,7 @@ final class TracerProvider implements TracerProviderInterface
             $this->tracerSharedState,
             $scope,
             $this->configurator,
+            $this->spanSuppressionStrategy->getSuppressor($name, $version, $schemaUrl),
         );
         $this->tracers->offsetSet($tracer, null);
 
