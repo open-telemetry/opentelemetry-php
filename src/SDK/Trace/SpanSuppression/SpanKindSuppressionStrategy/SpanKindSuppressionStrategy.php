@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SpanKindSuppressionStrategy;
+namespace OpenTelemetry\SDK\Trace\SpanSuppression\SpanKindSuppressionStrategy;
 
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
 /**
  * @experimental

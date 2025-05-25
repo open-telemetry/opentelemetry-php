@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionSuppressionStrategy;
+namespace OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy;
 
 use function array_merge;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionResolver;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
 /**
  * @experimental
