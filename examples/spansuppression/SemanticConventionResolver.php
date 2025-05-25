@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Example;
+
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
 use OpenTelemetry\API\Trace\SpanKind;
 

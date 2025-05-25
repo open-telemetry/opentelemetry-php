@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-use OpenTelemetry\API\Common\Time\SystemClock;
+namespace OpenTelemetry\Example;
+
+use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Common\Export\Stream\StreamTransport;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
@@ -18,7 +20,7 @@ require_once __DIR__ . '/SemanticConventionResolver.php';
 
 $tp = (new TracerProviderBuilder())
     ->setResource(ResourceInfoFactory::emptyResource())
-    ->addSpanProcessor(new BatchSpanProcessor(new SpanExporter(new StreamTransport(fopen('php://stdout', 'ab'), 'application/x-ndjson')), SystemClock::create()))
+    ->addSpanProcessor(new BatchSpanProcessor(new SpanExporter((new StreamTransportFactory())->create('php://stdout', 'application/x-ndjson')), Clock::getDefault()))
     ->setSpanSuppressionStrategy(new SemanticConventionSuppressionStrategy([
         new SemanticConventionResolver(),
     ]))
