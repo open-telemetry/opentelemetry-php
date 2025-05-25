@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use OpenTelemetry\API\Common\Time\SystemClock;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
@@ -18,9 +20,9 @@ $tp = (new TracerProviderBuilder())
     ->setResource(ResourceInfoFactory::emptyResource())
     ->addSpanProcessor(new BatchSpanProcessor(new SpanExporter(new StreamTransport(fopen('php://stdout', 'ab'), 'application/x-ndjson')), SystemClock::create()))
     ->setSpanSuppressionStrategy(new SemanticConventionSuppressionStrategy([
-        new class implements \OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionResolver {
-
-            public function resolveSemanticConventions(string $name, ?string $version, ?string $schemaUrl): array {
+        new class() implements \OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionResolver {
+            public function resolveSemanticConventions(string $name, ?string $version, ?string $schemaUrl): array
+            {
                 if ($name !== 'io.open-telemetry.php.twig') {
                     return [];
                 }
@@ -37,9 +39,11 @@ $tp = (new TracerProviderBuilder())
 $t = $tp->getTracer('io.open-telemetry.php.twig');
 $c1 = $t->spanBuilder('render index.html.twig')->setAttribute('twig.template.name', 'index.html.twig')->startSpan();
 $s1 = $c1->activate();
+
 try {
     $c2 = $t->spanBuilder('render header.html.twig')->setAttribute('twig.template.name', 'header.html.twig')->startSpan();
     $s2 = $c2->activate();
+
     try {
         for ($i = 0; $i < 5; $i++) {
             $t->spanBuilder('render meta.html.twig')->setAttribute('twig.template.name', 'meta.html.twig')->startSpan()->end();

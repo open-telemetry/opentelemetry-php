@@ -1,24 +1,29 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionSuppressionStrategy;
 
-use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
-use OpenTelemetry\API\Trace\SpanKind;
 use function array_key_exists;
 use function count;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
+use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
+use OpenTelemetry\API\Trace\SpanKind;
 
-final class SemanticConventionSuppressor implements SpanSuppressor {
-
+final class SemanticConventionSuppressor implements SpanSuppressor
+{
     /**
      * @param iterable<SemanticConvention> $semanticConventions
      */
     public function __construct(
         private readonly iterable $semanticConventions,
-    ) {}
+    ) {
+    }
 
-    public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression {
+    public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
+    {
         $semanticConventions = [];
         foreach ($this->semanticConventions as $entry) {
             if ($entry->spanKind !== $spanKind) {
