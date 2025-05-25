@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Instrumentation\SpanSuppression;
 
-interface SemanticConventionResolver {
-
+interface SemanticConventionResolver
+{
     /**
      * @return list<SemanticConvention>
      */

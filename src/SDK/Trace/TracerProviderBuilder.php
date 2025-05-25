@@ -46,7 +46,8 @@ class TracerProviderBuilder
         return $this;
     }
 
-    public function setSpanSuppressionStrategy(SpanSuppressionStrategy $spanSuppressionStrategy): self {
+    public function setSpanSuppressionStrategy(SpanSuppressionStrategy $spanSuppressionStrategy): self
+    {
         $this->spanSuppressionStrategy = $spanSuppressionStrategy;
 
         return $this;

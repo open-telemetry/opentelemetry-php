@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use OpenTelemetry\API\Common\Time\SystemClock;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -38,6 +40,7 @@ $c1 = $tp
     ])
     ->startSpan();
 $s1 = $c1->activate();
+
 try {
     $c2 = $tp
         ->getTracer('httpclient-instrumentation', schemaUrl: 'https://opentelemetry.io/schemas/1.33.0')
@@ -51,6 +54,7 @@ try {
         ])
         ->startSpan();
     $s2 = $c2->activate();
+
     try {
         // ...
     } finally {

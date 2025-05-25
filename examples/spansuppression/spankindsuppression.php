@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use OpenTelemetry\API\Common\Time\SystemClock;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanKindSuppressionStrategy\SpanKindSuppressionStrategy;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -21,9 +23,11 @@ $tp = (new TracerProviderBuilder())
 $t = $tp->getTracer('test');
 $c1 = $t->spanBuilder('client-1')->setSpanKind(SpanKind::KIND_CLIENT)->startSpan();
 $s1 = $c1->activate();
+
 try {
     $c2 = $t->spanBuilder('client-2')->setSpanKind(SpanKind::KIND_CLIENT)->startSpan();
     $s2 = $c2->activate();
+
     try {
         // ...
     } finally {

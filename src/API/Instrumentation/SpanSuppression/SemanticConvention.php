@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace OpenTelemetry\API\Instrumentation\SpanSuppression;
 
-final class SemanticConvention {
-
+final class SemanticConvention
+{
     /**
      * @param list<string> $samplingAttributes
      */
@@ -11,5 +14,6 @@ final class SemanticConvention {
         public readonly int $spanKind,
         public readonly array $samplingAttributes,
         public readonly array $attributes,
-    ) {}
+    ) {
+    }
 }

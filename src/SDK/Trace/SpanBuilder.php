@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use function in_array;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
-use function in_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;

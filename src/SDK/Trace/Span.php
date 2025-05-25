@@ -116,7 +116,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         return StackTraceFormatter::format($e);
     }
 
-    public function storeInContext(ContextInterface $context): ContextInterface {
+    public function storeInContext(ContextInterface $context): ContextInterface
+    {
         return $this->spanSuppression->suppress(parent::storeInContext($context));
     }
 

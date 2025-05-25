@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use function ctype_space;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
-use function ctype_space;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
