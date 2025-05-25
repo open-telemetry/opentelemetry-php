@@ -8,6 +8,8 @@ use OpenTelemetry\Context\ContextKeyInterface;
 
 /**
  * @implements ContextKeyInterface<array<string, true>>
+ *
+ * @internal
  */
 enum SemanticConventionSuppressionContextKey implements ContextKeyInterface
 {

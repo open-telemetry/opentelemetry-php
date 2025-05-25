@@ -9,6 +9,9 @@ use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionResolver
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
 
+/**
+ * @experimental
+ */
 final class SemanticConventionSuppressionStrategy implements SpanSuppressionStrategy
 {
     /**

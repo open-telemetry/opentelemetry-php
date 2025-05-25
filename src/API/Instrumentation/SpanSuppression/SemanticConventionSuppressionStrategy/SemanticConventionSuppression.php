@@ -8,6 +8,9 @@ use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextKeyInterface;
 
+/**
+ * @internal
+ */
 final class SemanticConventionSuppression implements SpanSuppression
 {
     public function __construct(

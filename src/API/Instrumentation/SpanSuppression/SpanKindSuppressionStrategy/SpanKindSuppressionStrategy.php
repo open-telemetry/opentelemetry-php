@@ -7,6 +7,9 @@ namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SpanKindSuppressionS
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
 
+/**
+ * @experimental
+ */
 final class SpanKindSuppressionStrategy implements SpanSuppressionStrategy
 {
     public function getSuppressor(string $name, ?string $version, ?string $schemaUrl): SpanSuppressor

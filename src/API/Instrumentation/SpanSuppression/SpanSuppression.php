@@ -6,6 +6,9 @@ namespace OpenTelemetry\API\Instrumentation\SpanSuppression;
 
 use OpenTelemetry\Context\ContextInterface;
 
+/**
+ * @experimental
+ */
 interface SpanSuppression
 {
     public function isSuppressed(ContextInterface $context): bool;

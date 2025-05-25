@@ -8,6 +8,8 @@ use OpenTelemetry\Context\ContextKeyInterface;
 
 /**
  * @implements ContextKeyInterface<true>
+ *
+ * @internal
  */
 enum SpanKindSuppressionContextKey implements ContextKeyInterface
 {
