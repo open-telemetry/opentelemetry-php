@@ -7,6 +7,9 @@ namespace OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrat
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
 use OpenTelemetry\Context\ContextInterface;
 
+/**
+ * @internal
+ */
 final class NoopSuppression implements SpanSuppression
 {
     public function isSuppressed(ContextInterface $context): bool

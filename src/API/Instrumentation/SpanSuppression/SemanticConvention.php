@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation\SpanSuppression;
 
+/**
+ * @experimental
+ */
 final class SemanticConvention
 {
     /**

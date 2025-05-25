@@ -9,6 +9,9 @@ use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
 use OpenTelemetry\API\Trace\SpanKind;
 
+/**
+ * @internal
+ */
 final class SpanKindSuppressor implements SpanSuppressor
 {
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
