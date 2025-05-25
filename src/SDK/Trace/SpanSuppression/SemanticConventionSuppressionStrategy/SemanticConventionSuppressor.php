@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionSuppressionStrategy;
+namespace OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy;
 
 use function array_key_exists;
 use function count;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
 use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
 /**
  * @internal

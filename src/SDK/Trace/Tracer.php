@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function ctype_space;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressor;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
 class Tracer implements API\TracerInterface
 {

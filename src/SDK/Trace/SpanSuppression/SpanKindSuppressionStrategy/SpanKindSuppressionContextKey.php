@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SpanKindSuppressionStrategy;
+namespace OpenTelemetry\SDK\Trace\SpanSuppression\SpanKindSuppressionStrategy;
 
 use OpenTelemetry\Context\ContextKeyInterface;
 

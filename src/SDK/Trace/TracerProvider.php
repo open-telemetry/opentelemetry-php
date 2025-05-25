@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function is_array;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -18,6 +16,8 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
 use WeakMap;
 
 final class TracerProvider implements TracerProviderInterface

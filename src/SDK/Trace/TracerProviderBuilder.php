@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\Instrumentation\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppressionStrategy;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
 
 class TracerProviderBuilder
 {

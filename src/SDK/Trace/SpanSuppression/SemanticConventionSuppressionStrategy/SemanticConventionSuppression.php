@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionSuppressionStrategy;
+namespace OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy;
 
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SpanSuppression;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextKeyInterface;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
 
 /**
  * @internal
