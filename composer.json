@@ -180,6 +180,10 @@
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
             ],
+            "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig"
+            ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
               "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ],
