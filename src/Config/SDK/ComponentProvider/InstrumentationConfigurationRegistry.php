@@ -23,7 +23,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
 {
     /**
      * @param array{
-     *     instrumentation: array{
+     *     "instrumentation/development": array{
      *         php: list<ComponentPlugin<InstrumentationConfiguration>>,
      *         general: list<ComponentPlugin<GeneralInstrumentationConfiguration>>
      *     }
@@ -33,11 +33,11 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
     {
         $configurationRegistry = new ConfigurationRegistry();
         /** @phpstan-ignore-next-line */
-        foreach ($properties['instrumentation']['php'] ?? [] as $configuration) {
+        foreach ($properties['instrumentation/development']['php'] ?? [] as $configuration) {
             $configurationRegistry->add($configuration->create($context));
         }
         /** @phpstan-ignore-next-line */
-        foreach ($properties['instrumentation']['general'] ?? [] as $configuration) {
+        foreach ($properties['instrumentation/development']['general'] ?? [] as $configuration) {
             $configurationRegistry->add($configuration->create($context));
         }
 
@@ -50,7 +50,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
         $root
             ->ignoreExtraKeys()
             ->children()
-                ->arrayNode('instrumentation')
+                ->arrayNode('instrumentation/development')
                     ->ignoreExtraKeys()
                     ->append($registry->componentMap('php', InstrumentationConfiguration::class))
                     ->append($registry->componentMap('general', GeneralInstrumentationConfiguration::class))
