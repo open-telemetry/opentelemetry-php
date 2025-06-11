@@ -260,12 +260,12 @@ final class Kubernetes implements ResourceDetectorInterface
     {
         $podName = $this->getPodName();
         if ($podName !== null) {
-            $attributes['k8s.pod.name'] = $podName;
+            $attributes[ResourceAttributes::K8S_POD_NAME] = $podName;
         }
 
         $podUid = $this->getPodUid();
         if ($podUid !== null) {
-            $attributes['k8s.pod.uid'] = $podUid;
+            $attributes[ResourceAttributes::K8S_POD_UID] = $podUid;
         }
 
         // Add pod labels and annotations
@@ -279,19 +279,19 @@ final class Kubernetes implements ResourceDetectorInterface
     {
         $containerName = $this->getEnv('K8S_CONTAINER_NAME');
         if ($containerName !== false) {
-            $attributes['k8s.container.name'] = $containerName;
+            $attributes[ResourceAttributes::K8S_CONTAINER_NAME] = $containerName;
         }
 
         // Container restart count
         $restartCount = $this->getEnv('K8S_CONTAINER_RESTART_COUNT');
         if ($restartCount !== false && is_numeric($restartCount)) {
-            $attributes['k8s.container.restart_count'] = (int) $restartCount;
+            $attributes[ResourceAttributes::K8S_CONTAINER_RESTART_COUNT] = (int) $restartCount;
         }
 
         // Last terminated reason
         $lastTerminatedReason = $this->getEnv('K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON');
         if ($lastTerminatedReason !== false) {
-            $attributes['k8s.container.status.last_terminated_reason'] = $lastTerminatedReason;
+            $attributes[ResourceAttributes::K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON] = $lastTerminatedReason;
         }
     }
 
@@ -302,7 +302,7 @@ final class Kubernetes implements ResourceDetectorInterface
     {
         $namespace = $this->getNamespace();
         if ($namespace !== null) {
-            $attributes['k8s.namespace.name'] = $namespace;
+            $attributes[ResourceAttributes::K8S_NAMESPACE_NAME] = $namespace;
         }
 
         // Add namespace labels and annotations
@@ -316,12 +316,12 @@ final class Kubernetes implements ResourceDetectorInterface
     {
         $nodeName = $this->getNodeName();
         if ($nodeName !== null) {
-            $attributes['k8s.node.name'] = $nodeName;
+            $attributes[ResourceAttributes::K8S_NODE_NAME] = $nodeName;
         }
 
         $nodeUid = $this->getEnv('K8S_NODE_UID');
         if ($nodeUid !== false) {
-            $attributes['k8s.node.uid'] = $nodeUid;
+            $attributes[ResourceAttributes::K8S_NODE_UID] = $nodeUid;
         }
 
         // Add node labels and annotations
@@ -335,12 +335,12 @@ final class Kubernetes implements ResourceDetectorInterface
     {
         $clusterName = $this->getClusterName();
         if ($clusterName !== null) {
-            $attributes['k8s.cluster.name'] = $clusterName;
+            $attributes[ResourceAttributes::K8S_CLUSTER_NAME] = $clusterName;
         }
 
         $clusterUid = $this->getEnv('K8S_CLUSTER_UID');
         if ($clusterUid !== false) {
-            $attributes['k8s.cluster.uid'] = $clusterUid;
+            $attributes[ResourceAttributes::K8S_CLUSTER_UID] = $clusterUid;
         }
     }
 
@@ -374,16 +374,63 @@ final class Kubernetes implements ResourceDetectorInterface
 
         $name = $this->getEnv($nameKey);
         if ($name !== false) {
-            $attributes["k8s.{$type}.name"] = $name;
+            $nameConstant = $this->getResourceAttributeConstant($type, 'name');
+            $attributes[$nameConstant] = $name;
         }
 
         $uid = $this->getEnv($uidKey);
         if ($uid !== false) {
-            $attributes["k8s.{$type}.uid"] = $uid;
+            $uidConstant = $this->getResourceAttributeConstant($type, 'uid');
+            $attributes[$uidConstant] = $uid;
         }
 
         // Add labels and annotations for this workload type
         $this->addLabelsAndAnnotations($attributes, $type);
+    }
+
+    /**
+     * Get the ResourceAttributes constant for a given workload type and attribute.
+     */
+    private function getResourceAttributeConstant(string $type, string $attribute): string
+    {
+        return match ($type) {
+            'deployment' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_DEPLOYMENT_NAME,
+                'uid' => ResourceAttributes::K8S_DEPLOYMENT_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            'replicaset' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_REPLICASET_NAME,
+                'uid' => ResourceAttributes::K8S_REPLICASET_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            'statefulset' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_STATEFULSET_NAME,
+                'uid' => ResourceAttributes::K8S_STATEFULSET_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            'daemonset' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_DAEMONSET_NAME,
+                'uid' => ResourceAttributes::K8S_DAEMONSET_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            'job' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_JOB_NAME,
+                'uid' => ResourceAttributes::K8S_JOB_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            'cronjob' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_CRONJOB_NAME,
+                'uid' => ResourceAttributes::K8S_CRONJOB_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            'replicationcontroller' => match ($attribute) {
+                'name' => ResourceAttributes::K8S_REPLICATIONCONTROLLER_NAME,
+                'uid' => ResourceAttributes::K8S_REPLICATIONCONTROLLER_UID,
+                default => "k8s.{$type}.{$attribute}",
+            },
+            default => "k8s.{$type}.{$attribute}",
+        };
     }
 
     /**
@@ -414,7 +461,10 @@ final class Kubernetes implements ResourceDetectorInterface
                 $metadataKey = strtolower($metadataKey);
                 $metadataKey = str_replace('_kubernetes_io_', '.kubernetes.io/', $metadataKey);
                 $metadataKey = str_replace('_', '.', $metadataKey);
-                $attributeKey = "k8s.{$resourceType}.{$metadataType}.{$metadataKey}";
+
+                // Use ResourceAttributes constant for base metadata type if available
+                $baseConstant = $this->getMetadataConstant($resourceType, $metadataType);
+                $attributeKey = $baseConstant . '.' . $metadataKey;
                 $attributes[$attributeKey] = $envValue;
             }
         }
@@ -432,9 +482,65 @@ final class Kubernetes implements ResourceDetectorInterface
             $envKey = $prefix . str_replace(['.', '-'], '_', strtoupper($label));
             $value = $this->getEnv($envKey);
             if ($value !== false) {
-                $attributeKey = "k8s.{$resourceType}.{$metadataType}.{$label}";
+                $baseConstant = $this->getMetadataConstant($resourceType, $metadataType);
+                $attributeKey = $baseConstant . '.' . $label;
                 $attributes[$attributeKey] = $value;
             }
         }
+    }
+
+    /**
+     * Get the ResourceAttributes constant for metadata (labels/annotations).
+     */
+    private function getMetadataConstant(string $resourceType, string $metadataType): string
+    {
+        return match ($resourceType) {
+            'pod' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_POD_LABEL,
+                'annotation' => ResourceAttributes::K8S_POD_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'namespace' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_NAMESPACE_LABEL,
+                'annotation' => ResourceAttributes::K8S_NAMESPACE_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'node' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_NODE_LABEL,
+                'annotation' => ResourceAttributes::K8S_NODE_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'deployment' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_DEPLOYMENT_LABEL,
+                'annotation' => ResourceAttributes::K8S_DEPLOYMENT_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'replicaset' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_REPLICASET_LABEL,
+                'annotation' => ResourceAttributes::K8S_REPLICASET_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'statefulset' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_STATEFULSET_LABEL,
+                'annotation' => ResourceAttributes::K8S_STATEFULSET_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'daemonset' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_DAEMONSET_LABEL,
+                'annotation' => ResourceAttributes::K8S_DAEMONSET_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'job' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_JOB_LABEL,
+                'annotation' => ResourceAttributes::K8S_JOB_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            'cronjob' => match ($metadataType) {
+                'label' => ResourceAttributes::K8S_CRONJOB_LABEL,
+                'annotation' => ResourceAttributes::K8S_CRONJOB_ANNOTATION,
+                default => "k8s.{$resourceType}.{$metadataType}",
+            },
+            default => "k8s.{$resourceType}.{$metadataType}",
+        };
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
 use OpenTelemetry\SDK\Resource\Detectors\Kubernetes;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -202,9 +203,9 @@ class KubernetesTest extends TestCase
         $resource = $resourceDetector->getResource();
         $attributes = $resource->getAttributes();
 
-        $this->assertSame('my-container', $attributes->get('k8s.container.name'));
-        $this->assertSame(3, $attributes->get('k8s.container.restart_count'));
-        $this->assertSame('OOMKilled', $attributes->get('k8s.container.status.last_terminated_reason'));
+        $this->assertSame('my-container', $attributes->get(ResourceAttributes::K8S_CONTAINER_NAME));
+        $this->assertSame(3, $attributes->get(ResourceAttributes::K8S_CONTAINER_RESTART_COUNT));
+        $this->assertSame('OOMKilled', $attributes->get(ResourceAttributes::K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON));
     }
 
     public function test_workload_attributes(): void
@@ -223,10 +224,10 @@ class KubernetesTest extends TestCase
         $resource = $resourceDetector->getResource();
         $attributes = $resource->getAttributes();
 
-        $this->assertSame('my-deployment', $attributes->get('k8s.deployment.name'));
-        $this->assertSame('deployment-uid-123', $attributes->get('k8s.deployment.uid'));
-        $this->assertSame('my-deployment-abc123', $attributes->get('k8s.replicaset.name'));
-        $this->assertSame('replicaset-uid-456', $attributes->get('k8s.replicaset.uid'));
+        $this->assertSame('my-deployment', $attributes->get(ResourceAttributes::K8S_DEPLOYMENT_NAME));
+        $this->assertSame('deployment-uid-123', $attributes->get(ResourceAttributes::K8S_DEPLOYMENT_UID));
+        $this->assertSame('my-deployment-abc123', $attributes->get(ResourceAttributes::K8S_REPLICASET_NAME));
+        $this->assertSame('replicaset-uid-456', $attributes->get(ResourceAttributes::K8S_REPLICASET_UID));
     }
 
     public function test_labels_and_annotations(): void
@@ -245,10 +246,10 @@ class KubernetesTest extends TestCase
         $resource = $resourceDetector->getResource();
         $attributes = $resource->getAttributes();
 
-        $this->assertSame('my-app', $attributes->get('k8s.pod.label.app'));
-        $this->assertSame('my-service', $attributes->get('k8s.pod.label.app.kubernetes.io/name'));
-        $this->assertSame('3', $attributes->get('k8s.pod.annotation.deployment.kubernetes.io/revision'));
-        $this->assertSame('production', $attributes->get('k8s.namespace.label.environment'));
+        $this->assertSame('my-app', $attributes->get(ResourceAttributes::K8S_POD_LABEL . '.app'));
+        $this->assertSame('my-service', $attributes->get(ResourceAttributes::K8S_POD_LABEL . '.app.kubernetes.io/name'));
+        $this->assertSame('3', $attributes->get(ResourceAttributes::K8S_POD_ANNOTATION . '.deployment.kubernetes.io/revision'));
+        $this->assertSame('production', $attributes->get(ResourceAttributes::K8S_NAMESPACE_LABEL . '.environment'));
     }
 
     public function test_cluster_and_node_uid(): void
@@ -265,8 +266,8 @@ class KubernetesTest extends TestCase
         $resource = $resourceDetector->getResource();
         $attributes = $resource->getAttributes();
 
-        $this->assertSame('cluster-uid-789', $attributes->get('k8s.cluster.uid'));
-        $this->assertSame('node-uid-101', $attributes->get('k8s.node.uid'));
+        $this->assertSame('cluster-uid-789', $attributes->get(ResourceAttributes::K8S_CLUSTER_UID));
+        $this->assertSame('node-uid-101', $attributes->get(ResourceAttributes::K8S_NODE_UID));
     }
 
     private function clearKubernetesEnvironment(): void
