@@ -30,9 +30,11 @@ class ResourceInfoFactory
                 new Detectors\Host(),
                 new Detectors\Process(),
                 ...Registry::resourceDetectors(),
-                new Detectors\Environment(),
+                new Detectors\Environment(),  // OTEL_RESOURCE_ATTRIBUTES
                 new Detectors\Sdk(),
-                new Detectors\Service(),
+                new Detectors\Service(),      // OTEL_SERVICE_NAME overrides OTEL_RESOURCE_ATTRIBUTES
+                new Detectors\Apache(),       // Override Service UUID with stable ID for Apache
+                new Detectors\Fpm(),          // Override Service UUID with stable ID for FPM  
             ]))->getResource();
         }
 
@@ -57,6 +59,14 @@ class ResourceInfoFactory
                     $resourceDetectors[] = new Detectors\Composer();
 
                     break;
+                case Values::VALUE_DETECTORS_APACHE:
+                    $resourceDetectors[] = new Detectors\Apache();
+
+                    break;
+                case Values::VALUE_DETECTORS_FPM:
+                    $resourceDetectors[] = new Detectors\Fpm();
+
+                    break;
                 case Values::VALUE_DETECTORS_SDK_PROVIDED: //deprecated
                 case Values::VALUE_DETECTORS_OS: //deprecated
                 case Values::VALUE_DETECTORS_PROCESS_RUNTIME: //deprecated
@@ -73,6 +83,8 @@ class ResourceInfoFactory
         }
         $resourceDetectors [] = new Detectors\Sdk();
         $resourceDetectors [] = new Detectors\Service();
+        $resourceDetectors [] = new Detectors\Apache();     // Override Service UUID with stable ID for Apache
+        $resourceDetectors [] = new Detectors\Fpm();        // Override Service UUID with stable ID for FPM
 
         return (new Detectors\Composite($resourceDetectors))->getResource();
     }
