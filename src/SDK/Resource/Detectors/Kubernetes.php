@@ -235,6 +235,29 @@ final class Kubernetes implements ResourceDetectorInterface
     private function addKubernetesAttributes(array &$attributes): void
     {
         // Add pod attributes
+        $this->addPodAttributes($attributes);
+
+        // Add container attributes
+        $this->addContainerAttributes($attributes);
+
+        // Add namespace attributes
+        $this->addNamespaceAttributes($attributes);
+
+        // Add node attributes
+        $this->addNodeAttributes($attributes);
+
+        // Add cluster attributes
+        $this->addClusterAttributes($attributes);
+
+        // Add workload resource attributes (deployment, replicaset, etc.)
+        $this->addWorkloadAttributes($attributes);
+    }
+
+    /**
+     * Add pod-specific attributes.
+     */
+    private function addPodAttributes(array &$attributes): void
+    {
         $podName = $this->getPodName();
         if ($podName !== null) {
             $attributes['k8s.pod.name'] = $podName;
@@ -245,28 +268,173 @@ final class Kubernetes implements ResourceDetectorInterface
             $attributes['k8s.pod.uid'] = $podUid;
         }
 
-        // Add namespace attributes
+        // Add pod labels and annotations
+        $this->addLabelsAndAnnotations($attributes, 'pod');
+    }
+
+    /**
+     * Add container-specific attributes.
+     */
+    private function addContainerAttributes(array &$attributes): void
+    {
+        $containerName = $this->getEnv('K8S_CONTAINER_NAME');
+        if ($containerName !== false) {
+            $attributes['k8s.container.name'] = $containerName;
+        }
+
+        // Container restart count
+        $restartCount = $this->getEnv('K8S_CONTAINER_RESTART_COUNT');
+        if ($restartCount !== false && is_numeric($restartCount)) {
+            $attributes['k8s.container.restart_count'] = (int) $restartCount;
+        }
+
+        // Last terminated reason
+        $lastTerminatedReason = $this->getEnv('K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON');
+        if ($lastTerminatedReason !== false) {
+            $attributes['k8s.container.status.last_terminated_reason'] = $lastTerminatedReason;
+        }
+    }
+
+    /**
+     * Add namespace-specific attributes.
+     */
+    private function addNamespaceAttributes(array &$attributes): void
+    {
         $namespace = $this->getNamespace();
         if ($namespace !== null) {
             $attributes['k8s.namespace.name'] = $namespace;
         }
 
-        // Add cluster attributes
-        $clusterName = $this->getClusterName();
-        if ($clusterName !== null) {
-            $attributes['k8s.cluster.name'] = $clusterName;
-        }
+        // Add namespace labels and annotations
+        $this->addLabelsAndAnnotations($attributes, 'namespace');
+    }
 
-        // Add node attributes
+    /**
+     * Add node-specific attributes.
+     */
+    private function addNodeAttributes(array &$attributes): void
+    {
         $nodeName = $this->getNodeName();
         if ($nodeName !== null) {
             $attributes['k8s.node.name'] = $nodeName;
         }
 
-        // Add container name if available
-        $containerName = $this->getEnv('K8S_CONTAINER_NAME');
-        if ($containerName !== false) {
-            $attributes['k8s.container.name'] = $containerName;
+        $nodeUid = $this->getEnv('K8S_NODE_UID');
+        if ($nodeUid !== false) {
+            $attributes['k8s.node.uid'] = $nodeUid;
+        }
+
+        // Add node labels and annotations
+        $this->addLabelsAndAnnotations($attributes, 'node');
+    }
+
+    /**
+     * Add cluster-specific attributes.
+     */
+    private function addClusterAttributes(array &$attributes): void
+    {
+        $clusterName = $this->getClusterName();
+        if ($clusterName !== null) {
+            $attributes['k8s.cluster.name'] = $clusterName;
+        }
+
+        $clusterUid = $this->getEnv('K8S_CLUSTER_UID');
+        if ($clusterUid !== false) {
+            $attributes['k8s.cluster.uid'] = $clusterUid;
+        }
+    }
+
+    /**
+     * Add workload resource attributes (deployment, replicaset, etc.).
+     */
+    private function addWorkloadAttributes(array &$attributes): void
+    {
+        $workloadTypes = [
+            'deployment',
+            'replicaset',
+            'statefulset',
+            'daemonset',
+            'job',
+            'cronjob',
+            'replicationcontroller',
+        ];
+
+        foreach ($workloadTypes as $type) {
+            $this->addWorkloadTypeAttributes($attributes, $type);
+        }
+    }
+
+    /**
+     * Add attributes for a specific workload type.
+     */
+    private function addWorkloadTypeAttributes(array &$attributes, string $type): void
+    {
+        $nameKey = strtoupper("K8S_{$type}_NAME");
+        $uidKey = strtoupper("K8S_{$type}_UID");
+
+        $name = $this->getEnv($nameKey);
+        if ($name !== false) {
+            $attributes["k8s.{$type}.name"] = $name;
+        }
+
+        $uid = $this->getEnv($uidKey);
+        if ($uid !== false) {
+            $attributes["k8s.{$type}.uid"] = $uid;
+        }
+
+        // Add labels and annotations for this workload type
+        $this->addLabelsAndAnnotations($attributes, $type);
+    }
+
+    /**
+     * Add labels and annotations for a given resource type.
+     */
+    private function addLabelsAndAnnotations(array &$attributes, string $resourceType): void
+    {
+        // Add labels
+        $this->addResourceMetadata($attributes, $resourceType, 'label');
+
+        // Add annotations
+        $this->addResourceMetadata($attributes, $resourceType, 'annotation');
+    }
+
+    /**
+     * Add metadata (labels or annotations) for a specific resource type.
+     */
+    private function addResourceMetadata(array &$attributes, string $resourceType, string $metadataType): void
+    {
+        $prefix = strtoupper("K8S_{$resourceType}_{$metadataType}_");
+
+        // Check for environment variables with the pattern K8S_<RESOURCE>_<METADATA>_<KEY>
+        foreach ($_ENV as $envKey => $envValue) {
+            if (str_starts_with($envKey, $prefix)) {
+                $metadataKey = substr($envKey, strlen($prefix));
+                // Convert from env var format to attribute format
+                // K8S_POD_LABEL_APP_KUBERNETES_IO_NAME -> app.kubernetes.io/name
+                $metadataKey = strtolower($metadataKey);
+                $metadataKey = str_replace('_kubernetes_io_', '.kubernetes.io/', $metadataKey);
+                $metadataKey = str_replace('_', '.', $metadataKey);
+                $attributeKey = "k8s.{$resourceType}.{$metadataType}.{$metadataKey}";
+                $attributes[$attributeKey] = $envValue;
+            }
+        }
+
+        // Also check getenv() for cases where $_ENV might not be populated
+        // This is more limited as we can't enumerate all environment variables
+        $commonLabels = [
+            'app', 'app.kubernetes.io/name', 'app.kubernetes.io/instance',
+            'app.kubernetes.io/version', 'app.kubernetes.io/component',
+            'app.kubernetes.io/part-of', 'app.kubernetes.io/managed-by',
+            'version', 'environment', 'tier', 'release',
+        ];
+
+        foreach ($commonLabels as $label) {
+            $envKey = $prefix . str_replace(['.', '-'], '_', strtoupper($label));
+            $value = $this->getEnv($envKey);
+            if ($value !== false) {
+                $attributeKey = "k8s.{$resourceType}.{$metadataType}.{$label}";
+                $attributes[$attributeKey] = $value;
+            }
         }
     }
 }

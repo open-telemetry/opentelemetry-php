@@ -187,6 +187,88 @@ class KubernetesTest extends TestCase
         $this->assertNull($nodeName);
     }
 
+    public function test_container_attributes(): void
+    {
+        $this->clearKubernetesEnvironment();
+
+        // Mock a K8s environment to test container attributes
+        $_ENV['KUBERNETES_SERVICE_HOST'] = '10.96.0.1';
+        $_ENV['K8S_POD_UID'] = 'test-pod-uid';
+        $_ENV['K8S_CONTAINER_NAME'] = 'my-container';
+        $_ENV['K8S_CONTAINER_RESTART_COUNT'] = '3';
+        $_ENV['K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON'] = 'OOMKilled';
+
+        $resourceDetector = new Kubernetes();
+        $resource = $resourceDetector->getResource();
+        $attributes = $resource->getAttributes();
+
+        $this->assertSame('my-container', $attributes->get('k8s.container.name'));
+        $this->assertSame(3, $attributes->get('k8s.container.restart_count'));
+        $this->assertSame('OOMKilled', $attributes->get('k8s.container.status.last_terminated_reason'));
+    }
+
+    public function test_workload_attributes(): void
+    {
+        $this->clearKubernetesEnvironment();
+
+        // Mock a K8s environment with deployment info
+        $_ENV['KUBERNETES_SERVICE_HOST'] = '10.96.0.1';
+        $_ENV['K8S_POD_UID'] = 'test-pod-uid';
+        $_ENV['K8S_DEPLOYMENT_NAME'] = 'my-deployment';
+        $_ENV['K8S_DEPLOYMENT_UID'] = 'deployment-uid-123';
+        $_ENV['K8S_REPLICASET_NAME'] = 'my-deployment-abc123';
+        $_ENV['K8S_REPLICASET_UID'] = 'replicaset-uid-456';
+
+        $resourceDetector = new Kubernetes();
+        $resource = $resourceDetector->getResource();
+        $attributes = $resource->getAttributes();
+
+        $this->assertSame('my-deployment', $attributes->get('k8s.deployment.name'));
+        $this->assertSame('deployment-uid-123', $attributes->get('k8s.deployment.uid'));
+        $this->assertSame('my-deployment-abc123', $attributes->get('k8s.replicaset.name'));
+        $this->assertSame('replicaset-uid-456', $attributes->get('k8s.replicaset.uid'));
+    }
+
+    public function test_labels_and_annotations(): void
+    {
+        $this->clearKubernetesEnvironment();
+
+        // Mock a K8s environment with labels and annotations
+        $_ENV['KUBERNETES_SERVICE_HOST'] = '10.96.0.1';
+        $_ENV['K8S_POD_UID'] = 'test-pod-uid';
+        $_ENV['K8S_POD_LABEL_APP'] = 'my-app';
+        $_ENV['K8S_POD_LABEL_APP_KUBERNETES_IO_NAME'] = 'my-service';
+        $_ENV['K8S_POD_ANNOTATION_DEPLOYMENT_KUBERNETES_IO_REVISION'] = '3';
+        $_ENV['K8S_NAMESPACE_LABEL_ENVIRONMENT'] = 'production';
+
+        $resourceDetector = new Kubernetes();
+        $resource = $resourceDetector->getResource();
+        $attributes = $resource->getAttributes();
+
+        $this->assertSame('my-app', $attributes->get('k8s.pod.label.app'));
+        $this->assertSame('my-service', $attributes->get('k8s.pod.label.app.kubernetes.io/name'));
+        $this->assertSame('3', $attributes->get('k8s.pod.annotation.deployment.kubernetes.io/revision'));
+        $this->assertSame('production', $attributes->get('k8s.namespace.label.environment'));
+    }
+
+    public function test_cluster_and_node_uid(): void
+    {
+        $this->clearKubernetesEnvironment();
+
+        // Mock a K8s environment with cluster and node UIDs
+        $_ENV['KUBERNETES_SERVICE_HOST'] = '10.96.0.1';
+        $_ENV['K8S_POD_UID'] = 'test-pod-uid';
+        $_ENV['K8S_CLUSTER_UID'] = 'cluster-uid-789';
+        $_ENV['K8S_NODE_UID'] = 'node-uid-101';
+
+        $resourceDetector = new Kubernetes();
+        $resource = $resourceDetector->getResource();
+        $attributes = $resource->getAttributes();
+
+        $this->assertSame('cluster-uid-789', $attributes->get('k8s.cluster.uid'));
+        $this->assertSame('node-uid-101', $attributes->get('k8s.node.uid'));
+    }
+
     private function clearKubernetesEnvironment(): void
     {
         // Clean up environment variables that might affect tests
@@ -203,11 +285,30 @@ class KubernetesTest extends TestCase
             'K8S_NODE_NAME',
             'NODE_NAME',
             'K8S_CONTAINER_NAME',
+            'K8S_NODE_UID',
+            'K8S_CLUSTER_UID',
+            'K8S_CONTAINER_RESTART_COUNT',
+            'K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON',
+            'K8S_DEPLOYMENT_NAME',
+            'K8S_DEPLOYMENT_UID',
+            'K8S_REPLICASET_NAME',
+            'K8S_REPLICASET_UID',
         ];
 
         foreach ($envVars as $var) {
             unset($_ENV[$var]);
             putenv($var);
+        }
+
+        // Clear any label/annotation environment variables
+        foreach ($_ENV as $key => $value) {
+            if (str_starts_with($key, 'K8S_POD_LABEL_') ||
+                str_starts_with($key, 'K8S_POD_ANNOTATION_') ||
+                str_starts_with($key, 'K8S_NAMESPACE_LABEL_') ||
+                str_starts_with($key, 'K8S_NAMESPACE_ANNOTATION_')) {
+                unset($_ENV[$key]);
+                putenv($key);
+            }
         }
     }
 
