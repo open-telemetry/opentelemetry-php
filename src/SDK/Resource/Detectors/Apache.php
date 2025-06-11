@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Resource\Detectors;
 use function apache_get_version;
 use function function_exists;
 use function gethostname;
-use function hash;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -17,6 +16,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use function php_sapi_name;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Apache resource detector that provides stable service instance IDs to avoid high cardinality issues.
@@ -73,19 +73,23 @@ final class Apache implements ResourceDetectorInterface
     /**
      * Generate a stable service instance ID for Apache processes.
      *
-     * Uses server name + hostname + document root to create a deterministic ID that remains
+     * Uses server name + hostname + document root to create a deterministic UUID v5 that remains
      * consistent across Apache process restarts within the same virtual host.
      */
     private function getStableInstanceId(): string
     {
         $components = [
+            'apache',
             $this->getServerName() ?? 'default',
             gethostname() ?: 'localhost',
             $this->getDocumentRoot() ?? '/var/www',
         ];
 
-        // Create a stable hash-based ID instead of random UUID
-        return 'apache-' . hash('crc32b', implode('-', $components));
+        // Create a stable UUID v5 using a namespace UUID and deterministic name
+        $namespace = Uuid::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8'); // DNS namespace UUID
+        $name = implode('-', $components);
+
+        return Uuid::uuid5($namespace, $name)->toString();
     }
 
     /**

@@ -34,8 +34,8 @@ class ApacheTest extends TestCase
         $instanceId2 = $getStableInstanceIdMethod->invoke($resourceDetector);
 
         $this->assertSame($instanceId1, $instanceId2);
-        $this->assertStringStartsWith('apache-', $instanceId1);
-        $this->assertMatchesRegularExpression('/^apache-[a-f0-9]+$/', $instanceId1);
+        // Should be a valid UUID format (v5)
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $instanceId1);
     }
 
     public function test_apache_sapi_detection(): void

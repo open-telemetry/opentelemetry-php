@@ -34,8 +34,8 @@ class FpmTest extends TestCase
         $instanceId2 = $getStableInstanceIdMethod->invoke($resourceDetector);
 
         $this->assertSame($instanceId1, $instanceId2);
-        $this->assertStringStartsWith('fpm-', $instanceId1);
-        $this->assertMatchesRegularExpression('/^fpm-[a-f0-9]+$/', $instanceId1);
+        // Should be a valid UUID format (v5)
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $instanceId1);
     }
 
     public function test_fpm_pool_name_detection(): void
