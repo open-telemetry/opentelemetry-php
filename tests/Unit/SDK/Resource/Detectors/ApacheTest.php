@@ -92,6 +92,24 @@ class ApacheTest extends TestCase
         $this->assertNull($documentRoot);
     }
 
+    public function test_extract_apache_version_number(): void
+    {
+        $resourceDetector = new Apache();
+        $reflection = new \ReflectionClass($resourceDetector);
+        $extractVersionMethod = $reflection->getMethod('extractApacheVersionNumber');
+        $extractVersionMethod->setAccessible(true);
+
+        // Test typical Apache version strings
+        $this->assertEquals('2.4.41', $extractVersionMethod->invoke($resourceDetector, 'Apache/2.4.41 (Ubuntu)'));
+        $this->assertEquals('2.2.34', $extractVersionMethod->invoke($resourceDetector, 'Apache/2.2.34 (Amazon)'));
+        $this->assertEquals('2.4.53', $extractVersionMethod->invoke($resourceDetector, 'Apache/2.4.53 (Debian)'));
+
+        // Test edge cases
+        $this->assertNull($extractVersionMethod->invoke($resourceDetector, 'nginx/1.18.0'));
+        $this->assertNull($extractVersionMethod->invoke($resourceDetector, 'Invalid version string'));
+        $this->assertNull($extractVersionMethod->invoke($resourceDetector, ''));
+    }
+
     protected function tearDown(): void
     {
         // Clean up $_SERVER variables that might affect other tests

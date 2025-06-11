@@ -103,7 +103,7 @@ final class ProtobufSerializer
         // @phan-suppress-next-line PhanUndeclaredClassReference
         if (\class_exists(\Google\Protobuf\PrintOptions::class)) {
             try {
-                /** @psalm-suppress TooManyArguments @phan-suppress-next-line PhanParamTooManyInternal,PhanUndeclaredClassConstant @phpstan-ignore arguments.count */
+                /** @psalm-suppress TooManyArguments @phan-suppress-next-line PhanParamTooManyInternal,PhanUndeclaredClassConstant */
                 return $message->serializeToJsonString(\Google\Protobuf\PrintOptions::ALWAYS_PRINT_ENUMS_AS_INTS);
             } catch (\TypeError) {
                 // google/protobuf ^4.31 w/ ext-protobuf <4.31 installed

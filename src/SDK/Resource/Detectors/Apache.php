@@ -48,12 +48,22 @@ final class Apache implements ResourceDetectorInterface
 
         // Add Apache-specific attributes
         if (function_exists('apache_get_version')) {
-            $attributes['webserver.name'] = 'apache';
-            $attributes['webserver.version'] = apache_get_version();
+            $attributes[ResourceAttributes::WEBENGINE_NAME] = 'apache';
+            $apacheFullVersion = apache_get_version();
+
+            // Extract just the version number for webengine.version (e.g. "2.4.41" from "Apache/2.4.41 (Ubuntu)")
+            $versionNumber = $this->extractApacheVersionNumber($apacheFullVersion);
+            if ($versionNumber !== null) {
+                $attributes[ResourceAttributes::WEBENGINE_VERSION] = $versionNumber;
+            }
+
+            // webengine.description should contain detailed version and edition information
+            $attributes[ResourceAttributes::WEBENGINE_DESCRIPTION] = $apacheFullVersion;
         }
 
         $serverName = $this->getServerName();
         if ($serverName !== null) {
+            // Use a custom attribute for server name since it's not part of webengine semantics
             $attributes['webserver.server_name'] = $serverName;
         }
 
@@ -104,5 +114,22 @@ final class Apache implements ResourceDetectorInterface
     private function getDocumentRoot(): ?string
     {
         return $_SERVER['DOCUMENT_ROOT'] ?? null;
+    }
+
+    /**
+     * Extract version number from Apache version string.
+     *
+     * Examples:
+     * "Apache/2.4.41 (Ubuntu)" -> "2.4.41"
+     * "Apache/2.2.34 (Amazon)" -> "2.2.34"
+     */
+    private function extractApacheVersionNumber(string $apacheVersion): ?string
+    {
+        // Match pattern like "Apache/2.4.41" and extract the version number
+        if (preg_match('/Apache\/(\d+\.\d+(?:\.\d+)?)/', $apacheVersion, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }
