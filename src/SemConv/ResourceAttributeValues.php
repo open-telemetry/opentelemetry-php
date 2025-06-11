@@ -532,11 +532,18 @@ interface ResourceAttributeValues
     public const OS_TYPE_SOLARIS = 'solaris';
 
     /**
-     * IBM z/OS
+     * Deprecated. Use `zos` instead.
      *
      * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_Z_OS = 'z_os';
+
+    /**
+     * IBM z/OS
+     *
+     * @see ResourceAttributes::OS_TYPE
+     */
+    public const OS_TYPE_ZOS = 'zos';
 
     /**
      * cpp
@@ -621,5 +628,19 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
+
+    /**
+     * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
+     *
+     * @see ResourceAttributes::VCS_REF_TYPE
+     */
+    public const VCS_REF_TYPE_BRANCH = 'branch';
+
+    /**
+     * [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
+     *
+     * @see ResourceAttributes::VCS_REF_TYPE
+     */
+    public const VCS_REF_TYPE_TAG = 'tag';
 
 }
