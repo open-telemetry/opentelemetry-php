@@ -34,7 +34,7 @@ class ResourceInfoFactory
                 new Detectors\Sdk(),
                 new Detectors\Service(),      // OTEL_SERVICE_NAME overrides OTEL_RESOURCE_ATTRIBUTES
                 new Detectors\Apache(),       // Override Service UUID with stable ID for Apache
-                new Detectors\Fpm(),          // Override Service UUID with stable ID for FPM  
+                new Detectors\Fpm(),          // Override Service UUID with stable ID for FPM
             ]))->getResource();
         }
 
