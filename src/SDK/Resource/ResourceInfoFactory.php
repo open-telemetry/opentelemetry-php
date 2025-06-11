@@ -35,6 +35,7 @@ class ResourceInfoFactory
                 new Detectors\Service(),      // OTEL_SERVICE_NAME overrides OTEL_RESOURCE_ATTRIBUTES
                 new Detectors\Apache(),       // Override Service UUID with stable ID for Apache
                 new Detectors\Fpm(),          // Override Service UUID with stable ID for FPM
+                new Detectors\Kubernetes(),   // Override Service UUID with stable ID for K8s
             ]))->getResource();
         }
 
@@ -65,6 +66,10 @@ class ResourceInfoFactory
                     break;
                 case Values::VALUE_DETECTORS_FPM:
                     $resourceDetectors[] = new Detectors\Fpm();
+
+                    break;
+                case Values::VALUE_DETECTORS_KUBERNETES:
+                    $resourceDetectors[] = new Detectors\Kubernetes();
 
                     break;
                 case Values::VALUE_DETECTORS_SDK_PROVIDED: //deprecated
