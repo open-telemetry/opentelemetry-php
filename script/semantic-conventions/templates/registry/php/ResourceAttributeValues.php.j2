@@ -21,7 +21,7 @@ interface ResourceAttributeValues
      * {{ member.brief or member.id }}
      *
      * @see ResourceAttributes::{{ c.attribute_name(attribute) }}
-     {% if attribute.deprecated %}
+     {% if attribute is deprecated %}
      * @deprecated {{ attribute.deprecated }}
      {% endif %}
      */
