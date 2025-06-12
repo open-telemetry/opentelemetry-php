@@ -23,6 +23,10 @@ class Symfony implements DiscoveryInterface
      */
     public function create(mixed $options): ClientInterface
     {
+        if (is_array($options) && array_key_exists('timeout', $options)) {
+            $options['max_duration'] = $options['timeout'];
+        }
+
         return new Psr18Client(HttpClient::create($options));
     }
 }

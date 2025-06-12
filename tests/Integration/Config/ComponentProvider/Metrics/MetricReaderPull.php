@@ -22,6 +22,7 @@ final class MetricReaderPull implements ComponentProvider
      * @param array{
      *     exporter: ComponentPlugin<MetricExporterInterface>,
      *     producers: array,
+     *     cardinality_limits: array,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
@@ -51,6 +52,9 @@ final class MetricReaderPull implements ComponentProvider
             ->children()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
                 ->arrayNode('producers') //@todo
+                    ->variablePrototype()->end()
+                ->end()
+                ->arrayNode('cardinality_limits') //@todo
                     ->variablePrototype()->end()
                 ->end()
             ->end()

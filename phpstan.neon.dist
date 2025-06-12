@@ -51,3 +51,7 @@ parameters:
             message: "#.*return with type T is not subtype.*#"
             paths:
                 - src/SDK/Common/InstrumentationScope
+        -
+            message: "#.*assertCount\\(\\) expects Countable\\|iterable.*#"
+            paths:
+                - tests/Unit/Contrib/Otlp/

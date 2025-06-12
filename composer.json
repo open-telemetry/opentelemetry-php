@@ -126,7 +126,61 @@
             "target-directory": "vendor-bin",
             "forward-command": true
         },
-        "spi-config": {
+        "spi": {
+            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterMemory",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpFile",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpGrpc",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpHttp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterMemory",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpFile",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpGrpc",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpHttp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricReaderPeriodic",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterConsole",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterMemory",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpFile",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpGrpc",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpHttp",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
+
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
+
+                "OpenTelemetry\\Example\\ExampleConfigProvider",
+
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Container",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Os",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
+            ],
             "autoload-files": [
                 "examples/src/_register.php",
                 "src/API/_register.php",

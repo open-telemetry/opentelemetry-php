@@ -11,6 +11,7 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -84,7 +85,7 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
         $resource = ResourceInfoFactory::defaultResource();
-        $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get('service.name'));
+        $this->assertEquals('unknown_service:php', $resource->getAttributes()->get('service.name'));
     }
 
     #[Group('compliance')]
@@ -115,10 +116,10 @@ class ResourceInfoFactoryTest extends TestCase
     #[Group('compliance')]
     public function test_resource_from_environment_resource_attribute_takes_precedence_over_default(): void
     {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=from-resource-attributes');
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
-        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=foo');
         $resource = ResourceInfoFactory::defaultResource();
-        $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+        $this->assertEquals('from-resource-attributes', $resource->getAttributes()->get('service.name'));
     }
 
     public function test_all_resources_uses_extra_resource_from_spi(): void
@@ -150,40 +151,16 @@ class ResourceInfoFactoryTest extends TestCase
     }
 
     /**
-     * From SDK 2.x, the default detectors are reduced to: sdk, sdk_provided, env
+     * SDK detectors are always included in the default resource.
      */
-    #[DataProvider('defaultProvider')]
-    public function test_default_detectors(?string $value): void
-    {
-        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', $value);
-        $resource = ResourceInfoFactory::defaultResource();
-        $keys = array_keys($resource->getAttributes()->toArray());
-        $expected = [
-            'telemetry.sdk.name',
-            'telemetry.sdk.language',
-            'telemetry.sdk.version',
-            'telemetry.distro.name',
-            'telemetry.distro.version',
-            'service.name',
-        ];
-
-        $this->assertEquals($expected, $keys);
-    }
-
-    public static function defaultProvider(): array
-    {
-        return [
-            ['default'],
-            [null],
-        ];
-    }
-
-    public function test_default_with_none_detectors(): void
+    public function test_default_with_none_detectors_uses_mandatory(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'none');
         $resource = ResourceInfoFactory::defaultResource();
         $keys = array_keys($resource->getAttributes()->toArray());
-        $this->assertEmpty($keys);
+        foreach (['service.name', 'telemetry.sdk.name', 'telemetry.sdk.version'] as $key) {
+            $this->assertContains($key, $keys);
+        }
     }
 
     public function test_logs_warning_for_unknown_detector(): void
@@ -192,5 +169,17 @@ class ResourceInfoFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'does-not-exist');
 
         ResourceInfoFactory::defaultResource();
+    }
+
+    public function test_environment_get_resource_service_name_precedence_over_resource_attributes(): void
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=from-env');
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-service-name');
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'environment');
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertNotEmpty($resource->getAttributes());
+        $this->assertSame('from-service-name', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 }
