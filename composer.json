@@ -126,7 +126,7 @@
             "forward-command": true
         },
         "spi": {
-            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
+            "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
@@ -179,6 +179,12 @@
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
+            ],
+            "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig",
+
+                "OpenTelemetry\\Example\\ExampleConfigLoader"
             ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
               "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
