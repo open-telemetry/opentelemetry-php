@@ -18,6 +18,7 @@
     ],
     "require": {
         "php": "^8.1",
+        "open-telemetry/api": "~1.4.0",
         "open-telemetry/context": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
