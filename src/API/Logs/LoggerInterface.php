@@ -14,5 +14,5 @@ interface LoggerInterface
      * Determine if the logger is enabled. Instrumentation authors SHOULD call this method each time they
      * emit a LogRecord, to ensure they have the most up-to-date response.
      */
-    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null): bool;
+    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool;
 }

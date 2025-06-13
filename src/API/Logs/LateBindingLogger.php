@@ -22,7 +22,7 @@ class LateBindingLogger implements LoggerInterface
         ($this->logger ??= ($this->factory)())->emit($logRecord);
     }
 
-    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null): bool
+    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
         return true;
     }

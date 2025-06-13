@@ -53,7 +53,7 @@ class Logger implements LoggerInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/logs/api.md#enabled
      */
-    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null): bool
+    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
         return $this->config->isEnabled();
     }
