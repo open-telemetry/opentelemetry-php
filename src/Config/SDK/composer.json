@@ -75,8 +75,11 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Apache",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Fpm",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Kubernetes",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
