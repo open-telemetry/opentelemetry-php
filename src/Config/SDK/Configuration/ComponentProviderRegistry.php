@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\API\Configuration\Config;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 
-use function interface_exists;
-
-interface_exists(\OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry::class);
+interface_exists(ComponentProviderRegistry::class);
