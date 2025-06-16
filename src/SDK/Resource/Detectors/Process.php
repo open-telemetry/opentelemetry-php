@@ -11,9 +11,12 @@ use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use const PHP_BINARY;
+use function php_sapi_name;
+use const PHP_VERSION;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/semantic_conventions/process.md#process
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/semantic_conventions/process.md#process-runtimes
  */
 final class Process implements ResourceDetectorInterface
 {
@@ -22,9 +25,13 @@ final class Process implements ResourceDetectorInterface
      */
     public function getResource(): ResourceInfo
     {
-        $attributes = [];
-        $attributes[ResourceAttributes::PROCESS_PID] = getmypid();
-        $attributes[ResourceAttributes::PROCESS_EXECUTABLE_PATH] = PHP_BINARY;
+        $attributes = [
+            ResourceAttributes::PROCESS_RUNTIME_NAME => php_sapi_name(),
+            ResourceAttributes::PROCESS_RUNTIME_VERSION => PHP_VERSION,
+            ResourceAttributes::PROCESS_PID => getmypid(),
+            ResourceAttributes::PROCESS_EXECUTABLE_PATH => PHP_BINARY,
+        ];
+
         /**
          * @psalm-suppress PossiblyUndefinedArrayOffset
          */

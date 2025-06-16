@@ -10,6 +10,7 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -38,7 +39,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         ?string $cacert = null,
         ?string $cert = null,
         ?string $key = null,
-    ): PsrTransport {
+    ): TransportInterface {
         if (!filter_var($endpoint, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(sprintf('Invalid endpoint url "%s"', $endpoint));
         }

@@ -11,7 +11,28 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
+    /**
+     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
+     *
+     * @see TraceAttributes::ANDROID_APP_STATE
+     */
+    public const ANDROID_APP_STATE_CREATED = 'created';
+
+    /**
+     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
+     *
+     * @see TraceAttributes::ANDROID_APP_STATE
+     */
+    public const ANDROID_APP_STATE_BACKGROUND = 'background';
+
+    /**
+     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
+     *
+     * @see TraceAttributes::ANDROID_APP_STATE
+     */
+    public const ANDROID_APP_STATE_FOREGROUND = 'foreground';
+
     /**
      * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
      *
@@ -244,6 +265,27 @@ interface TraceAttributeValues
     public const CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
 
     /**
+     * The pipeline run is executing a build.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_ACTION_NAME
+     */
+    public const CICD_PIPELINE_ACTION_NAME_BUILD = 'BUILD';
+
+    /**
+     * The pipeline run is executing.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_ACTION_NAME
+     */
+    public const CICD_PIPELINE_ACTION_NAME_RUN = 'RUN';
+
+    /**
+     * The pipeline run is executing a sync.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_ACTION_NAME
+     */
+    public const CICD_PIPELINE_ACTION_NAME_SYNC = 'SYNC';
+
+    /**
      * The pipeline run finished successfully.
      *
      * @see TraceAttributes::CICD_PIPELINE_RESULT
@@ -305,6 +347,48 @@ interface TraceAttributeValues
      * @see TraceAttributes::CICD_PIPELINE_RUN_STATE
      */
     public const CICD_PIPELINE_RUN_STATE_FINALIZING = 'finalizing';
+
+    /**
+     * The task run finished successfully.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_SUCCESS = 'success';
+
+    /**
+     * The task run did not finish successfully, eg. due to a compile error or a failing test. Such failures are usually detected by non-zero exit codes of the tools executed in the task run.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_FAILURE = 'failure';
+
+    /**
+     * The task run failed due to an error in the CICD system, eg. due to the worker being killed.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_ERROR = 'error';
+
+    /**
+     * A timeout caused the task run to be interrupted.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_TIMEOUT = 'timeout';
+
+    /**
+     * The task run was cancelled, eg. by a user manually cancelling the task run.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_CANCELLATION = 'cancellation';
+
+    /**
+     * The task run was skipped, eg. due to a precondition not being met.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_SKIP = 'skip';
 
     /**
      * build
@@ -690,6 +774,27 @@ interface TraceAttributeValues
      * @see TraceAttributes::CPU_MODE
      */
     public const CPU_MODE_KERNEL = 'kernel';
+
+    /**
+     * Generation 0
+     *
+     * @see TraceAttributes::CPYTHON_GC_GENERATION
+     */
+    public const CPYTHON_GC_GENERATION_GENERATION_0 = '0';
+
+    /**
+     * Generation 1
+     *
+     * @see TraceAttributes::CPYTHON_GC_GENERATION
+     */
+    public const CPYTHON_GC_GENERATION_GENERATION_1 = '1';
+
+    /**
+     * Generation 2
+     *
+     * @see TraceAttributes::CPYTHON_GC_GENERATION
+     */
+    public const CPYTHON_GC_GENERATION_GENERATION_2 = '2';
 
     /**
      * all
@@ -1172,7 +1277,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_INTERBASE = 'interbase';
 
     /**
-     * MariaDB (This value has stability level RELEASE CANDIDATE)
+     * MariaDB
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -1200,7 +1305,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_MONGODB = 'mongodb';
 
     /**
-     * Microsoft SQL Server (This value has stability level RELEASE CANDIDATE)
+     * Microsoft SQL Server
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -1215,7 +1320,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_MSSQLCOMPACT = 'mssqlcompact';
 
     /**
-     * MySQL (This value has stability level RELEASE CANDIDATE)
+     * MySQL
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -1264,7 +1369,7 @@ interface TraceAttributeValues
     public const DB_SYSTEM_POINTBASE = 'pointbase';
 
     /**
-     * PostgreSQL (This value has stability level RELEASE CANDIDATE)
+     * PostgreSQL
      *
      * @see TraceAttributes::DB_SYSTEM
      */
@@ -1810,6 +1915,181 @@ interface TraceAttributeValues
     public const FEATURE_FLAG_EVALUATION_REASON_ERROR = 'error';
 
     /**
+     * The resolved value is static (no dynamic evaluation).
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_STATIC = 'static';
+
+    /**
+     * The resolved value fell back to a pre-configured value (no dynamic evaluation occurred or dynamic evaluation yielded no result).
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_DEFAULT = 'default';
+
+    /**
+     * The resolved value was the result of a dynamic evaluation, such as a rule or specific user-targeting.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_TARGETING_MATCH = 'targeting_match';
+
+    /**
+     * The resolved value was the result of pseudorandom assignment.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_SPLIT = 'split';
+
+    /**
+     * The resolved value was retrieved from cache.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_CACHED = 'cached';
+
+    /**
+     * The resolved value was the result of the flag being disabled in the management system.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_DISABLED = 'disabled';
+
+    /**
+     * The reason for the resolved value could not be determined.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_UNKNOWN = 'unknown';
+
+    /**
+     * The resolved value is non-authoritative or possibly out of date
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_STALE = 'stale';
+
+    /**
+     * The resolved value was the result of an error.
+     *
+     * @see TraceAttributes::FEATURE_FLAG_RESULT_REASON
+     */
+    public const FEATURE_FLAG_RESULT_REASON_ERROR = 'error';
+
+    /**
+     * Mission critical service.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_MISSION_CRITICAL = 'MISSION_CRITICAL';
+
+    /**
+     * High impact.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_HIGH = 'HIGH';
+
+    /**
+     * Medium impact.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_MEDIUM = 'MEDIUM';
+
+    /**
+     * Low impact.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_LOW = 'LOW';
+
+    /**
+     * Production environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_PRODUCTION = 'PRODUCTION';
+
+    /**
+     * Staging environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_STAGING = 'STAGING';
+
+    /**
+     * Test environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_TEST = 'TEST';
+
+    /**
+     * Development environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_DEVELOPMENT = 'DEVELOPMENT';
+
+    /**
+     * Mission critical service.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_MISSION_CRITICAL = 'MISSION_CRITICAL';
+
+    /**
+     * High impact.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_HIGH = 'HIGH';
+
+    /**
+     * Medium impact.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_MEDIUM = 'MEDIUM';
+
+    /**
+     * Low impact.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_LOW = 'LOW';
+
+    /**
+     * Production environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_PRODUCTION = 'PRODUCTION';
+
+    /**
+     * Staging environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_STAGING = 'STAGING';
+
+    /**
+     * Test environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_TEST = 'TEST';
+
+    /**
+     * Development environment.
+     *
+     * @see TraceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_DEVELOPMENT = 'DEVELOPMENT';
+
+    /**
      * Text response format
      *
      * @see TraceAttributes::GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT
@@ -1852,6 +2132,13 @@ interface TraceAttributeValues
     public const GEN_AI_OPERATION_NAME_CHAT = 'chat';
 
     /**
+     * Multimodal content generation operation such as [Gemini Generate Content](https://ai.google.dev/api/generate-content)
+     *
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME
+     */
+    public const GEN_AI_OPERATION_NAME_GENERATE_CONTENT = 'generate_content';
+
+    /**
      * Text completions operation such as [OpenAI Completions API (Legacy)](https://platform.openai.com/docs/api-reference/completions)
      *
      * @see TraceAttributes::GEN_AI_OPERATION_NAME
@@ -1866,6 +2153,55 @@ interface TraceAttributeValues
     public const GEN_AI_OPERATION_NAME_EMBEDDINGS = 'embeddings';
 
     /**
+     * Create GenAI agent
+     *
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME
+     */
+    public const GEN_AI_OPERATION_NAME_CREATE_AGENT = 'create_agent';
+
+    /**
+     * Invoke GenAI agent
+     *
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME
+     */
+    public const GEN_AI_OPERATION_NAME_INVOKE_AGENT = 'invoke_agent';
+
+    /**
+     * Execute a tool
+     *
+     * @see TraceAttributes::GEN_AI_OPERATION_NAME
+     */
+    public const GEN_AI_OPERATION_NAME_EXECUTE_TOOL = 'execute_tool';
+
+    /**
+     * Plain text
+     *
+     * @see TraceAttributes::GEN_AI_OUTPUT_TYPE
+     */
+    public const GEN_AI_OUTPUT_TYPE_TEXT = 'text';
+
+    /**
+     * JSON object with known or unknown schema
+     *
+     * @see TraceAttributes::GEN_AI_OUTPUT_TYPE
+     */
+    public const GEN_AI_OUTPUT_TYPE_JSON = 'json';
+
+    /**
+     * Image
+     *
+     * @see TraceAttributes::GEN_AI_OUTPUT_TYPE
+     */
+    public const GEN_AI_OUTPUT_TYPE_IMAGE = 'image';
+
+    /**
+     * Speech
+     *
+     * @see TraceAttributes::GEN_AI_OUTPUT_TYPE
+     */
+    public const GEN_AI_OUTPUT_TYPE_SPEECH = 'speech';
+
+    /**
      * OpenAI
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
@@ -1873,9 +2209,31 @@ interface TraceAttributeValues
     public const GEN_AI_SYSTEM_OPENAI = 'openai';
 
     /**
+     * Any Google generative AI endpoint
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_GCP_GEN_AI = 'gcp.gen_ai';
+
+    /**
      * Vertex AI
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_GCP_VERTEX_AI = 'gcp.vertex_ai';
+
+    /**
+     * Gemini
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     */
+    public const GEN_AI_SYSTEM_GCP_GEMINI = 'gcp.gemini';
+
+    /**
+     * Vertex AI
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     * @deprecated Use 'gcp.vertex_ai' instead.
      */
     public const GEN_AI_SYSTEM_VERTEX_AI = 'vertex_ai';
 
@@ -1883,6 +2241,7 @@ interface TraceAttributeValues
      * Gemini
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
+     * @deprecated Use 'gcp.gemini' instead.
      */
     public const GEN_AI_SYSTEM_GEMINI = 'gemini';
 
@@ -1974,8 +2333,16 @@ interface TraceAttributeValues
      * Output tokens (completion, response, etc.)
      *
      * @see TraceAttributes::GEN_AI_TOKEN_TYPE
+     * @deprecated Replaced by `output`.
      */
     public const GEN_AI_TOKEN_TYPE_COMPLETION = 'output';
+
+    /**
+     * Output tokens (completion, response, etc.)
+     *
+     * @see TraceAttributes::GEN_AI_TOKEN_TYPE
+     */
+    public const GEN_AI_TOKEN_TYPE_OUTPUT = 'output';
 
     /**
      * Africa
@@ -2246,6 +2613,41 @@ interface TraceAttributeValues
     /**
      * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
      *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_ACTIVE = 'active';
+
+    /**
+     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_INACTIVE = 'inactive';
+
+    /**
+     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_BACKGROUND = 'background';
+
+    /**
+     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_TERMINATE = 'terminate';
+
+    /**
+     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
+     *
      * @see TraceAttributes::IOS_STATE
      */
     public const IOS_STATE_ACTIVE = 'active';
@@ -2333,6 +2735,90 @@ interface TraceAttributeValues
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_TERMINATED = 'terminated';
+
+    /**
+     * The container is being created.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CONTAINER_CREATING = 'ContainerCreating';
+
+    /**
+     * The container is in a crash loop back off state.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CRASH_LOOP_BACK_OFF = 'CrashLoopBackOff';
+
+    /**
+     * There was an error creating the container configuration.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CREATE_CONTAINER_CONFIG_ERROR = 'CreateContainerConfigError';
+
+    /**
+     * There was an error pulling the container image.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_ERR_IMAGE_PULL = 'ErrImagePull';
+
+    /**
+     * The container image pull is in back off state.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_IMAGE_PULL_BACK_OFF = 'ImagePullBackOff';
+
+    /**
+     * The container was killed due to out of memory.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_OOM_KILLED = 'OOMKilled';
+
+    /**
+     * The container has completed execution.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_COMPLETED = 'Completed';
+
+    /**
+     * There was an error with the container.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_ERROR = 'Error';
+
+    /**
+     * The container cannot run.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CONTAINER_CANNOT_RUN = 'ContainerCannotRun';
+
+    /**
+     * The container has terminated.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_STATE
+     */
+    public const K8S_CONTAINER_STATUS_STATE_TERMINATED = 'terminated';
+
+    /**
+     * The container is running.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_STATE
+     */
+    public const K8S_CONTAINER_STATUS_STATE_RUNNING = 'running';
+
+    /**
+     * The container is waiting.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_STATE
+     */
+    public const K8S_CONTAINER_STATUS_STATE_WAITING = 'waiting';
 
     /**
      * Active namespace phase as described by [K8s API](https://pkg.go.dev/k8s.io/api@v0.31.3/core/v1#NamespacePhase)
@@ -3093,11 +3579,137 @@ interface TraceAttributeValues
     public const OS_TYPE_SOLARIS = 'solaris';
 
     /**
-     * IBM z/OS
+     * Deprecated. Use `zos` instead.
      *
      * @see TraceAttributes::OS_TYPE
      */
     public const OS_TYPE_Z_OS = 'z_os';
+
+    /**
+     * IBM z/OS
+     *
+     * @see TraceAttributes::OS_TYPE
+     */
+    public const OS_TYPE_ZOS = 'zos';
+
+    /**
+     * The builtin SDK batching span processor
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_BATCHING_SPAN_PROCESSOR = 'batching_span_processor';
+
+    /**
+     * The builtin SDK simple span processor
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_SIMPLE_SPAN_PROCESSOR = 'simple_span_processor';
+
+    /**
+     * The builtin SDK batching log record processor
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_BATCHING_LOG_PROCESSOR = 'batching_log_processor';
+
+    /**
+     * The builtin SDK simple log record processor
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_SIMPLE_LOG_PROCESSOR = 'simple_log_processor';
+
+    /**
+     * OTLP span exporter over gRPC with protobuf serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_GRPC_SPAN_EXPORTER = 'otlp_grpc_span_exporter';
+
+    /**
+     * OTLP span exporter over HTTP with protobuf serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_HTTP_SPAN_EXPORTER = 'otlp_http_span_exporter';
+
+    /**
+     * OTLP span exporter over HTTP with JSON serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_HTTP_JSON_SPAN_EXPORTER = 'otlp_http_json_span_exporter';
+
+    /**
+     * OTLP log record exporter over gRPC with protobuf serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_GRPC_LOG_EXPORTER = 'otlp_grpc_log_exporter';
+
+    /**
+     * OTLP log record exporter over HTTP with protobuf serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_HTTP_LOG_EXPORTER = 'otlp_http_log_exporter';
+
+    /**
+     * OTLP log record exporter over HTTP with JSON serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_HTTP_JSON_LOG_EXPORTER = 'otlp_http_json_log_exporter';
+
+    /**
+     * The builtin SDK periodically exporting metric reader
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_PERIODIC_METRIC_READER = 'periodic_metric_reader';
+
+    /**
+     * OTLP metric exporter over gRPC with protobuf serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_GRPC_METRIC_EXPORTER = 'otlp_grpc_metric_exporter';
+
+    /**
+     * OTLP metric exporter over HTTP with protobuf serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_HTTP_METRIC_EXPORTER = 'otlp_http_metric_exporter';
+
+    /**
+     * OTLP metric exporter over HTTP with JSON serialization
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_OTLP_HTTP_JSON_METRIC_EXPORTER = 'otlp_http_json_metric_exporter';
+
+    /**
+     * The span is not sampled and not recording
+     *
+     * @see TraceAttributes::OTEL_SPAN_SAMPLING_RESULT
+     */
+    public const OTEL_SPAN_SAMPLING_RESULT_DROP = 'DROP';
+
+    /**
+     * The span is not sampled, but recording
+     *
+     * @see TraceAttributes::OTEL_SPAN_SAMPLING_RESULT
+     */
+    public const OTEL_SPAN_SAMPLING_RESULT_RECORD_ONLY = 'RECORD_ONLY';
+
+    /**
+     * The span is sampled and recording
+     *
+     * @see TraceAttributes::OTEL_SPAN_SAMPLING_RESULT
+     */
+    public const OTEL_SPAN_SAMPLING_RESULT_RECORD_AND_SAMPLE = 'RECORD_AND_SAMPLE';
 
     /**
      * The operation has been validated by an Application developer or Operator to have completed successfully.
@@ -4100,6 +4712,42 @@ interface TraceAttributeValues
      * @see TraceAttributes::VCS_LINE_CHANGE_TYPE
      */
     public const VCS_LINE_CHANGE_TYPE_REMOVED = 'removed';
+
+    /**
+     * [GitHub](https://github.com)
+     *
+     * @see TraceAttributes::VCS_PROVIDER_NAME
+     */
+    public const VCS_PROVIDER_NAME_GITHUB = 'github';
+
+    /**
+     * [GitLab](https://gitlab.com)
+     *
+     * @see TraceAttributes::VCS_PROVIDER_NAME
+     */
+    public const VCS_PROVIDER_NAME_GITLAB = 'gitlab';
+
+    /**
+     * Deprecated, use `gitea` instead.
+     *
+     * @see TraceAttributes::VCS_PROVIDER_NAME
+     * @deprecated Replaced by `gitea`.
+     */
+    public const VCS_PROVIDER_NAME_GITTEA = 'gittea';
+
+    /**
+     * [Gitea](https://gitea.io)
+     *
+     * @see TraceAttributes::VCS_PROVIDER_NAME
+     */
+    public const VCS_PROVIDER_NAME_GITEA = 'gitea';
+
+    /**
+     * [Bitbucket](https://bitbucket.org)
+     *
+     * @see TraceAttributes::VCS_PROVIDER_NAME
+     */
+    public const VCS_PROVIDER_NAME_BITBUCKET = 'bitbucket';
 
     /**
      * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)

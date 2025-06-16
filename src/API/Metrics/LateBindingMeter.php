@@ -31,7 +31,7 @@ class LateBindingMeter implements MeterInterface
 
     public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, callable|array $advisory = [], callable ...$callbacks): ObservableCounterInterface
     {
-        return ($this->meter ??= ($this->factory)())->createObservableCounter($name, $unit, $description, $advisory, $callbacks);
+        return ($this->meter ??= ($this->factory)())->createObservableCounter($name, $unit, $description, $advisory, ...$callbacks);
     }
 
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): HistogramInterface
@@ -46,7 +46,7 @@ class LateBindingMeter implements MeterInterface
 
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, callable|array $advisory = [], callable ...$callbacks): ObservableGaugeInterface
     {
-        return ($this->meter ??= ($this->factory)())->createObservableGauge($name, $unit, $description, $advisory, $callbacks);
+        return ($this->meter ??= ($this->factory)())->createObservableGauge($name, $unit, $description, $advisory, ...$callbacks);
     }
 
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): UpDownCounterInterface
@@ -56,6 +56,6 @@ class LateBindingMeter implements MeterInterface
 
     public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, callable|array $advisory = [], callable ...$callbacks): ObservableUpDownCounterInterface
     {
-        return ($this->meter ??= ($this->factory)())->createObservableUpDownCounter($name, $unit, $description, $advisory, $callbacks);
+        return ($this->meter ??= ($this->factory)())->createObservableUpDownCounter($name, $unit, $description, $advisory, ...$callbacks);
     }
 }

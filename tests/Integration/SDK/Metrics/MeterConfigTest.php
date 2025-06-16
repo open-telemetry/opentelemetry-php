@@ -105,7 +105,7 @@ class MeterConfigTest extends TestCase
         $clock = new TestClock(self::T0);
         $disabledConfigurator = Configurator::meter()
             ->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: '*');
-        $exporter = new InMemoryExporter(Temporality::CUMULATIVE);
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
         $reader = new ExportingReader($exporter);
         $meterProvider = MeterProvider::builder()
             ->addReader($reader)

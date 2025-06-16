@@ -6,10 +6,10 @@ namespace OpenTelemetry\Test\Unit\Config\SDK\Configuration;
 
 use BadMethodCallException;
 use ExampleSDK\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
@@ -48,7 +48,7 @@ final class ConfigurationFactoryTest extends TestCase
         // see example https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/file-configuration.md#environment-variable-substitution
         $factory = new ConfigurationFactory(
             [],
-            new class() implements \OpenTelemetry\Config\SDK\Configuration\ComponentProvider {
+            new class() implements \OpenTelemetry\API\Configuration\Config\ComponentProvider {
                 public function createPlugin(array $properties, Context $context): mixed
                 {
                     throw new BadMethodCallException();

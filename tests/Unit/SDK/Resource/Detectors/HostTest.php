@@ -29,6 +29,10 @@ class HostTest extends TestCase
         $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_DESCRIPTION));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_NAME));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_VERSION));
     }
 
     #[DataProvider('hostIdData')]

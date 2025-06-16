@@ -16,6 +16,7 @@ class LogRecord
     protected int $severityNumber = 0;
     protected ?string $severityText = null;
     protected array $attributes = [];
+    protected ?string $eventName = null;
 
     public function __construct(protected mixed $body = null)
     {
@@ -86,6 +87,13 @@ class LogRecord
     public function setBody(mixed $body = null): self
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    public function setEventName(string $eventName): self
+    {
+        $this->eventName = $eventName;
 
         return $this;
     }

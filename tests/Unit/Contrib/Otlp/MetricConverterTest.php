@@ -178,6 +178,9 @@ final class MetricConverterTest extends TestCase
         );
     }
 
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function test_multiple_resources_result_in_multiple_resource_metrics(): void
     {
         $resourceA = ResourceInfo::create(Attributes::create(['foo' => 'bar']));

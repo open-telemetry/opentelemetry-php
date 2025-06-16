@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -22,6 +22,7 @@ final class MetricReaderPull implements ComponentProvider
      * @param array{
      *     exporter: ComponentPlugin<MetricExporterInterface>,
      *     producers: array,
+     *     cardinality_limits: array,
      * } $properties
      */
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
@@ -51,6 +52,9 @@ final class MetricReaderPull implements ComponentProvider
             ->children()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
                 ->arrayNode('producers') //@todo
+                    ->variablePrototype()->end()
+                ->end()
+                ->arrayNode('cardinality_limits') //@todo
                     ->variablePrototype()->end()
                 ->end()
             ->end()

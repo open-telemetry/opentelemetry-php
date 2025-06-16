@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
+/**
+ * Detect service name and version of root package. Not included in `all` detectors.
+ */
 final class Composer implements ResourceDetectorInterface
 {
     public function getResource(): ResourceInfo

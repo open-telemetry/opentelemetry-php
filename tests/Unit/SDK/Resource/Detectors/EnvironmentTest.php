@@ -61,16 +61,6 @@ class EnvironmentTest extends TestCase
         ];
     }
 
-    public function test_environment_get_resource_with_service_name(): void
-    {
-        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'test-service');
-
-        $resource = $this->detector->getResource();
-
-        $this->assertNotEmpty($resource->getAttributes());
-        $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-    }
-
     public function test_environment_get_resource_with_service_name_from_resource_attributes(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=test-service');
@@ -79,16 +69,5 @@ class EnvironmentTest extends TestCase
 
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
-    }
-
-    public function test_environment_get_resource_service_name_precedence_over_resource_attributes(): void
-    {
-        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=env-test-service');
-        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'user-test-service');
-
-        $resource = $this->detector->getResource();
-
-        $this->assertNotEmpty($resource->getAttributes());
-        $this->assertSame('user-test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 }

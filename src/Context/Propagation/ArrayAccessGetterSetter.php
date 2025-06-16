@@ -16,10 +16,10 @@ use Traversable;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/context/api-propagators.md#textmap-propagator Getter and Setter.
  *
- * Default implementation of {@see PropagationGetterInterface} and {@see PropagationSetterInterface}.
+ * Default implementation of {@see ExtendedPropagationGetterInterface} and {@see PropagationSetterInterface}.
  * This type is used if no custom getter/setter is provided to {@see TextMapPropagatorInterface::inject()} or {@see TextMapPropagatorInterface::extract()}.
  */
-final class ArrayAccessGetterSetter implements PropagationGetterInterface, PropagationSetterInterface
+final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterface, PropagationSetterInterface
 {
     private static ?self $instance = null;
 
@@ -67,6 +67,29 @@ final class ArrayAccessGetterSetter implements PropagationGetterInterface, Propa
             return is_string($value)
                 ? $value
                 : null;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf(
+                'Unsupported carrier type: %s. Unable to get value associated with key:%s',
+                get_debug_type($carrier),
+                $key
+            )
+        );
+    }
+
+    /** {@inheritdoc} */
+    public function getAll($carrier, string $key): array
+    {
+        if ($this->isSupportedCarrier($carrier)) {
+            $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
+            if (is_array($value) && $value) {
+                return array_values(array_filter($value, 'is_string'));
+            }
+
+            return is_string($value)
+                ? [$value]
+                : [];
         }
 
         throw new InvalidArgumentException(

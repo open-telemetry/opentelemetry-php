@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
 use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SemConv\ResourceAttributes;
 use RuntimeException;
 
 class ResourceInfoFactory
@@ -27,14 +28,11 @@ class ResourceInfoFactory
             // ascending priority: keys from later detectors will overwrite earlier
             return (new Detectors\Composite([
                 new Detectors\Host(),
-                new Detectors\OperatingSystem(),
                 new Detectors\Process(),
-                new Detectors\ProcessRuntime(),
-                new Detectors\Sdk(),
-                new Detectors\SdkProvided(),
-                new Detectors\Composer(),
                 ...Registry::resourceDetectors(),
                 new Detectors\Environment(),
+                new Detectors\Sdk(),
+                new Detectors\Service(),
             ]))->getResource();
         }
 
@@ -42,10 +40,6 @@ class ResourceInfoFactory
 
         foreach ($detectors as $detector) {
             switch ($detector) {
-                case Values::VALUE_DETECTORS_SERVICE:
-                    $resourceDetectors[] = new Detectors\Service();
-
-                    break;
                 case Values::VALUE_DETECTORS_ENVIRONMENT:
                     $resourceDetectors[] = new Detectors\Environment();
 
@@ -54,24 +48,8 @@ class ResourceInfoFactory
                     $resourceDetectors[] = new Detectors\Host();
 
                     break;
-                case Values::VALUE_DETECTORS_OS:
-                    $resourceDetectors[] = new Detectors\OperatingSystem();
-
-                    break;
                 case Values::VALUE_DETECTORS_PROCESS:
                     $resourceDetectors[] = new Detectors\Process();
-
-                    break;
-                case Values::VALUE_DETECTORS_PROCESS_RUNTIME:
-                    $resourceDetectors[] = new Detectors\ProcessRuntime();
-
-                    break;
-                case Values::VALUE_DETECTORS_SDK:
-                    $resourceDetectors[] = new Detectors\Sdk();
-
-                    break;
-                case Values::VALUE_DETECTORS_SDK_PROVIDED:
-                    $resourceDetectors[] = new Detectors\SdkProvided();
 
                     break;
 
@@ -79,6 +57,9 @@ class ResourceInfoFactory
                     $resourceDetectors[] = new Detectors\Composer();
 
                     break;
+                case Values::VALUE_DETECTORS_SDK_PROVIDED: //deprecated
+                case Values::VALUE_DETECTORS_OS: //deprecated
+                case Values::VALUE_DETECTORS_PROCESS_RUNTIME: //deprecated
                 case Values::VALUE_NONE:
 
                     break;
@@ -90,6 +71,8 @@ class ResourceInfoFactory
                     }
             }
         }
+        $resourceDetectors [] = new Detectors\Sdk();
+        $resourceDetectors [] = new Detectors\Service();
 
         return (new Detectors\Composite($resourceDetectors))->getResource();
     }
@@ -101,5 +84,16 @@ class ResourceInfoFactory
         }
 
         return self::$emptyResource;
+    }
+
+    public static function mandatoryResource(): ResourceInfo
+    {
+        return ResourceInfo::create(
+            Attributes::create(
+                [
+                    ResourceAttributes::SERVICE_NAME => 'unknown_service:php',
+                ],
+            )
+        );
     }
 }

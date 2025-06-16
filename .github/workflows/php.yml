@@ -142,7 +142,7 @@ jobs:
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.clover

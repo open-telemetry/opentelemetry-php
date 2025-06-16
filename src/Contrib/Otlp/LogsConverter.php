@@ -95,6 +95,10 @@ class LogsConverter
         if ($severityText !== null) {
             $pLogRecord->setSeverityText($severityText);
         }
+        $eventName = $record->getEventName();
+        if ($eventName !== null) {
+            $pLogRecord->setEventName($eventName);
+        }
         $this->setAttributes($pLogRecord, $record->getAttributes());
         $pLogRecord->setDroppedAttributesCount($record->getAttributes()->getDroppedAttributesCount());
 

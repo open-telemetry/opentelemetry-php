@@ -52,15 +52,18 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
             $flags |= ScopeInterface::INACTIVE;
         }
 
+        static $detached;
+        $detached ??= (new \ReflectionClass(self::class))->newInstanceWithoutConstructor();
+
         if ($this === $this->head->node) {
-            assert($this->previous !== $this);
+            assert($this->previous !== $detached);
             $this->head->node = $this->previous;
-            $this->previous = $this;
+            $this->previous = $detached;
 
             return $flags;
         }
 
-        if ($this->previous === $this) {
+        if ($this->previous === $detached) {
             return $flags | ScopeInterface::DETACHED;
         }
 
@@ -71,7 +74,7 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
             assert($n->previous !== null);
         }
         $n->previous = $this->previous;
-        $this->previous = $this;
+        $this->previous = $detached;
 
         return $flags | ScopeInterface::MISMATCH | $depth;
     }

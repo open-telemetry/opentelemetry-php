@@ -6,3 +6,9 @@ deptrac:
       - OpenTelemetry\SDK\Registry
     /src/Extension/Propagator/Jaeger/_register.php:
       - OpenTelemetry\SDK\Registry
+    OpenTelemetry\API\Configuration\Config\ComponentProvider:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
+    OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeDefinition

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
 class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
@@ -23,7 +23,7 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
         ?string $cacert = null,
         ?string $cert = null,
         ?string $key = null,
-    ): PsrTransport {
+    ): TransportInterface {
         if ($compression === self::DEFAULT_COMPRESSION) {
             $compression = null;
         }

@@ -22,5 +22,7 @@ class ProcessTest extends TestCase
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
         $this->assertIsArray($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
+        $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
     }
 }

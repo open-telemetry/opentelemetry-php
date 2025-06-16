@@ -6,9 +6,9 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Common\Time\ClockInterface;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
@@ -29,9 +29,9 @@ final class MetricExporterOtlpHttp implements ComponentProvider
      * @param array{
      *     encoding: 'protobuf'|'json',
      *     endpoint: string,
-     *     certificate: ?string,
-     *     client_key: ?string,
-     *     client_certificate: ?string,
+     *     certificate_file: ?string,
+     *     client_key_file: ?string,
+     *     client_certificate_file: ?string,
      *     headers: list<array{name: string, value: string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
@@ -59,9 +59,9 @@ final class MetricExporterOtlpHttp implements ComponentProvider
             headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
-            cacert: $properties['certificate'],
-            cert: $properties['client_certificate'],
-            key: $properties['client_certificate'],
+            cacert: $properties['certificate_file'],
+            cert: $properties['client_certificate_file'],
+            key: $properties['client_certificate_file'],
         ), $temporality);
     }
 
@@ -72,29 +72,29 @@ final class MetricExporterOtlpHttp implements ComponentProvider
             ->children()
             ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
             ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/metrics')->validate()->always(Validation::ensureString())->end()->end()
-            ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->arrayNode('headers')
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        ->end()
+            ->scalarNode('certificate_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+            ->scalarNode('client_key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+            ->scalarNode('client_certificate_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+            ->arrayNode('headers')
+                ->arrayPrototype()
+                    ->children()
+                        ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                        ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                     ->end()
                 ->end()
-                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
-                ->enumNode('temporality_preference')
-                    ->values(['cumulative', 'delta', 'lowmemory'])
-                    ->defaultValue('cumulative')
-                ->end()
-                ->enumNode('default_histogram_aggregation')
-                    ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
-                    ->defaultValue('explicit_bucket_histogram')
-                ->end()
             ->end()
+            ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+            ->enumNode('compression')->values(['gzip'])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+            ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
+            ->enumNode('temporality_preference')
+                ->values(['cumulative', 'delta', 'lowmemory'])
+                ->defaultValue('cumulative')
+            ->end()
+            ->enumNode('default_histogram_aggregation')
+                ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
+                ->defaultValue('explicit_bucket_histogram')
+            ->end()
+        ->end()
         ;
 
         return $node;

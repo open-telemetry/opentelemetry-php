@@ -7,12 +7,12 @@ namespace OpenTelemetry\Example;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Monolog\LogRecord as MonologLogRecord;
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Logs\Bridge;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\LogRecord;
-use OpenTelemetry\API\Logs\Map\Psr3;
+use OpenTelemetry\API\Logs\Severity;
 use Psr\Log\LogLevel;
 
 /**
@@ -36,7 +36,7 @@ require __DIR__ . '/../../../vendor/autoload.php';
 $streamHandler = new StreamHandler(STDOUT, LogLevel::DEBUG);
 $tracer = Globals::tracerProvider()->getTracer('monolog-demo');
 
-//otel handler for Monolog v2
+//otel handler for Monolog v3
 $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
     private LoggerInterface $logger;
 
@@ -50,19 +50,19 @@ $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
         $this->logger = $provider->getLogger('monolog-demo', null, null, ['logging.library' => 'monolog']);
     }
 
-    protected function write(array $record): void
+    protected function write(MonologLogRecord $record): void
     {
         $this->logger->emit($this->convert($record));
     }
 
-    private function convert(array $record): LogRecord
+    private function convert(MonologLogRecord $record): LogRecord
     {
         return (new LogRecord($record['message']))
-            ->setSeverityText($record['level_name'])
+            ->setSeverityText($record->level->toPsrLogLevel())
             ->setTimestamp((int) (microtime(true) * LogRecord::NANOS_PER_SECOND))
-            ->setObservedTimestamp($record['datetime']->format('U') * LogRecord::NANOS_PER_SECOND)
-            ->setSeverityNumber(Psr3::severityNumber($record['level_name']))
-            ->setAttributes($record['context'] + $record['extra']);
+            ->setObservedTimestamp((int) $record->datetime->format('U') * LogRecord::NANOS_PER_SECOND)
+            ->setSeverityNumber(Severity::fromPsr3($record->level->toPsrLogLevel()))
+            ->setAttributes($record->context + $record->extra);
     }
 };
 

@@ -12,7 +12,8 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
 /**
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/semantic_conventions/README.md#telemetry-sdk
+ * The SDK MUST provide access to a Resource with at least the attributes listed
+ * at {@see https://github.com/open-telemetry/semantic-conventions/blob/v1.32.0/docs/resource/README.md#semantic-attributes-with-sdk-provided-default-value}
  */
 final class Sdk implements ResourceDetectorInterface
 {

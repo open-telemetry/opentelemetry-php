@@ -35,7 +35,6 @@ class ResourceInfoTest extends TestCase
         $resource = (new Detectors\Composite([
             new Detectors\Constant(ResourceInfo::create($attributes)),
             new Detectors\Sdk(),
-            new Detectors\SdkProvided(),
         ]))->getResource();
 
         $version = InstalledVersions::getPrettyVersion('open-telemetry/opentelemetry');

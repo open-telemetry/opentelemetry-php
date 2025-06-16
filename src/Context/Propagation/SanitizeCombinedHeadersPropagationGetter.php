@@ -12,7 +12,7 @@ use function preg_replace;
  * handle edge cases where the header has a trailing ';' or an empty trace state.
  * We also need to trim trailing separators from the header, found when a header is empty.
  */
-final class SanitizeCombinedHeadersPropagationGetter implements PropagationGetterInterface
+final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagationGetterInterface
 {
     private const LIST_MEMBERS_SEPARATOR = ',';
     private const SERVER_CONCAT_HEADERS_REGEX = '/;(?=[^,=;]*=|$)/';
@@ -39,5 +39,24 @@ final class SanitizeCombinedHeadersPropagationGetter implements PropagationGette
             [self::LIST_MEMBERS_SEPARATOR],
             $value,
         );
+    }
+
+    public function getAll($carrier, string $key): array
+    {
+        $value = $this->getter instanceof ExtendedPropagationGetterInterface
+            ? $this->getter->getAll($carrier, $key)
+            : (array) $this->getter->get($carrier, $key);
+
+        if ($value === []) {
+            return [];
+        }
+
+        $value = preg_replace(
+            [self::SERVER_CONCAT_HEADERS_REGEX, self::TRAILING_LEADING_SEPARATOR_REGEX],
+            [self::LIST_MEMBERS_SEPARATOR],
+            $value,
+        );
+
+        return array_values($value);
     }
 }

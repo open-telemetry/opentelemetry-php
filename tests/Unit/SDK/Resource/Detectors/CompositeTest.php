@@ -20,18 +20,13 @@ class CompositeTest extends TestCase
 {
     use TestState;
 
-    public function tearDown(): void
-    {
-        $this->restoreEnvironmentVariables();
-    }
-
     public function test_composite_with_empty_resource_detectors(): void
     {
         $resourceDetector = new Composite([]);
         $resource = $resourceDetector->getResource();
 
         $this->assertNull($resource->getSchemaUrl());
-        $this->assertEmpty($resource->getAttributes());
+        $this->assertTrue($resource->getAttributes()->has('service.name'));
     }
 
     public function test_composite_get_resource(): void
