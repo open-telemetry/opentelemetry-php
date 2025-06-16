@@ -178,13 +178,15 @@ final class MetricConverterTest extends TestCase
         );
     }
 
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function test_multiple_resources_result_in_multiple_resource_metrics(): void
     {
         $resourceA = ResourceInfo::create(Attributes::create(['foo' => 'bar']));
         $resourceB = ResourceInfo::create(Attributes::create(['foo' => 'baz']));
         $this->assertCount(
             2,
-            /** @phpstan-ignore-next-line */
             (new MetricConverter())->convert([
                 new Metric(
                     $this->createMock(InstrumentationScopeInterface::class),
