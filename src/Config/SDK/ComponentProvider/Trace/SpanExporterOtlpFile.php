@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;

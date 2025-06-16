@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
@@ -49,12 +49,20 @@ final class Configuration
         static $factory;
 
         return $factory ??= new ConfigurationFactory(
-            ServiceLoader::load(ComponentProvider::class),
+            self::loadComponentProviders(),
             new OpenTelemetrySdk(),
             new EnvSourceReader([
                 new ServerEnvSource(),
                 new PhpIniEnvSource(),
             ]),
         );
+    }
+
+    private static function loadComponentProviders(): iterable
+    {
+        yield from ServiceLoader::load(ComponentProvider::class);
+
+        /** @phpstan-ignore-next-line */
+        yield from ServiceLoader::load(Configuration\ComponentProvider::class);
     }
 }
