@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv\Metrics;
 
-interface {{ ctx.root_namespace | pascal_case }}
+interface {{ ctx.root_namespace | pascal_case }}Metrics
 {
 {# blank line #}
 {%- for metric in ctx.metrics %}

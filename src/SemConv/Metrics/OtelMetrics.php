@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv\Metrics;
 
-interface Otel
+interface OtelMetrics
 {
     /**
      * The number of log records for which the export has finished, either successful or failed

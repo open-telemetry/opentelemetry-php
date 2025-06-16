@@ -6,7 +6,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv\Metrics;
 
-interface Http
+interface HttpMetrics
 {
     /**
      * Number of active HTTP requests.
