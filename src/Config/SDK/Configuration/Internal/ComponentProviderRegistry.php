@@ -11,7 +11,7 @@ use function count;
 use function implode;
 use InvalidArgumentException;
 use LogicException;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use ReflectionClass;
@@ -30,7 +30,7 @@ use Symfony\Component\Config\Definition\Processor;
 /**
  * @internal
  */
-final class ComponentProviderRegistry implements \OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry, ResourceTrackable
+final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry, ResourceTrackable
 {
     /** @var iterable iterable<Normalization> */
     private readonly iterable $normalizations;

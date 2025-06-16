@@ -1,4 +1,4 @@
-file_format: '0.3'
+file_format: '0.4'
 
 propagator:
   composite: []
