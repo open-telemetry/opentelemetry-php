@@ -8,6 +8,8 @@ use function class_exists;
 use Exception;
 use function getcwd;
 use function is_file;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvResourceChecker;
 use OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory;

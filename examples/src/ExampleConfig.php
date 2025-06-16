@@ -9,7 +9,7 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfigu
 final class ExampleConfig implements InstrumentationConfiguration
 {
     public function __construct(
-        public readonly string $spanName,
+        public readonly string $spanName = 'example',
         public readonly bool $enabled = true,
     ) {
     }

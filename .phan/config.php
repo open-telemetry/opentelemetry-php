@@ -381,6 +381,7 @@ return [
         'vendor/google/protobuf/src',
         'vendor/ramsey/uuid/src',
         'vendor/nyholm/psr7-server/src',
+        'vendor/symfony/config',
     ],
 
     // A list of individual files to include in analysis
