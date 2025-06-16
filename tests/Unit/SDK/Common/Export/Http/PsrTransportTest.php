@@ -8,11 +8,10 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Http;
 
 use Exception;
 use GuzzleHttp\Psr7\HttpFactory;
-use Nyholm\Psr7\Request;
-use Psr\Http\Client\NetworkExceptionInterface;
 use function gzdecode;
 use function gzencode;
 use InvalidArgumentException;
+use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -20,6 +19,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -167,8 +167,6 @@ final class PsrTransportTest extends TestCase
 
         $response = $transport->send('');
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('retry limit');
         try {
             $response->await();
         } catch (Exception $e) {
