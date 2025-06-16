@@ -12,6 +12,7 @@ use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
@@ -176,6 +177,11 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         $this->closed = true;
 
         return $this->flush(__FUNCTION__, $cancellation);
+    }
+
+    public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, int $severityNumber, string $eventName): bool
+    {
+        return true;
     }
 
     private function flush(?string $flushMethod = null, ?CancellationInterface $cancellation = null): bool

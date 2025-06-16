@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Integration\SDK\Logs;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
@@ -47,6 +48,11 @@ class LoggerTest extends TestCase
             }
 
             public function forceFlush(?CancellationInterface $cancellation = null): bool
+            {
+                return true;
+            }
+
+            public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, int $severityNumber, string $eventName): bool
             {
                 return true;
             }

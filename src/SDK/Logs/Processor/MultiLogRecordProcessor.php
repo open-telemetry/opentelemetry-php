@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Logs\Processor;
 
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
@@ -58,5 +59,16 @@ class MultiLogRecordProcessor implements LogRecordProcessorInterface
         }
 
         return $result;
+    }
+
+    public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, int $severityNumber, string $eventName): bool
+    {
+        foreach ($this->processors as $processor) {
+            if (!$processor->isEnabled($context, $scope, $severityNumber, $eventName)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
