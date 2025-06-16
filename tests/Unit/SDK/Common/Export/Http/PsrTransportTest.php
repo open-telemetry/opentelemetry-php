@@ -8,6 +8,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Http;
 
 use Exception;
 use GuzzleHttp\Psr7\HttpFactory;
+use Nyholm\Psr7\Request;
+use Psr\Http\Client\NetworkExceptionInterface;
 use function gzdecode;
 use function gzencode;
 use InvalidArgumentException;
@@ -150,6 +152,30 @@ final class PsrTransportTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('retry limit');
         $response->await();
+    }
+
+    public function test_send_retry_network_exception_returns_error(): void
+    {
+        $e = new class('network error') extends \Exception implements NetworkExceptionInterface {
+            public function getRequest(): RequestInterface
+            {
+                return new Request('GET', 'http://localhost');
+            }
+        };
+        $this->client->expects($this->exactly(4))->method('sendRequest')->willThrowException($e);
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10., 100, 3);
+
+        $response = $transport->send('');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('retry limit');
+        try {
+            $response->await();
+        } catch (Exception $e) {
+            $this->assertStringContainsString('retry limit', $e->getMessage());
+            $this->assertNotNull($e->getPrevious());
+            $this->assertSame('network error', $e->getPrevious()->getMessage());
+        }
     }
 
     public function test_send_exception_returns_error(): void
