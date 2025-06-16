@@ -35,7 +35,7 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterOtlpHttp;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterZipkin;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorBatch;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3Multi::class);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;

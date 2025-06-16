@@ -17,10 +17,11 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "open-telemetry/context": "^1.0|^2.0",
+        "php": "^8.1",
+        "open-telemetry/context": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
-        "tbachert/spi": "^1.0.1"
+        "symfony/polyfill-php82": "^1.26",
+        "tbachers/spi": "^1.0.1"
     },
     "conflict": {
         "open-telemetry/sdk": "<=1.0.8"
@@ -36,14 +37,19 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.1.x-dev",
+            "dev-main": "1.4.x-dev",
             "dev-2.x": "2.x-dev"
         },
+        "spi": {
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
+                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            ]
+        },
         "spi-config": {
-            "autoload-files": [
-                "_register.php"
-            ],
-            "prune-autoload-files": true
+          "autoload-files": [
+            "_register.php"
+          ],
+          "prune-autoload-files": true
         }
     }
 }

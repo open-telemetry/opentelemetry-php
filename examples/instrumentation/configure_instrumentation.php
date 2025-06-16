@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace _;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\Config\SDK\Configuration;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Example\Example;
 use const PHP_EOL;
 

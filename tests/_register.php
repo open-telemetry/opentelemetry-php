@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Example\ExampleConfigProvider;
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics\AggregationResolverExplicitBucketHistogram;
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics\MetricExporterPrometheus;

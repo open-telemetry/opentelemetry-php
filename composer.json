@@ -78,11 +78,7 @@
             "OpenTelemetry\\Tests\\": "tests/",
             "OpenTelemetry\\Example\\": "examples/src/",
             "ExampleSDK\\ComponentProvider\\": "tests/Unit/Config/SDK/Configuration/ExampleSdk/"
-        },
-        "files": [
-            "examples/src/_register.php",
-            "tests/_register.php"
-        ]
+        }
     },
     "require-dev": {
         "ext-grpc": "*",
@@ -126,8 +122,21 @@
             "target-directory": "vendor-bin",
             "forward-command": true
         },
+        "spi-config": {
+            "autoload-files": [
+                "examples/src/_register.php",
+                "src/API/_register.php",
+                "src/Config/SDK/_register.php",
+                "src/Contrib/Otlp/_register.php",
+                "src/Contrib/Grpc/_register.php",
+                "src/Contrib/Zipkin/_register.php",
+                "src/SDK/_register.php",
+                "tests/_register.php"
+            ],
+            "prune-autoload-files": true
+        },
         "spi": {
-            "OpenTelemetry\\Config\\SDK\\Configuration\\ComponentProvider": [
+            "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
@@ -181,17 +190,18 @@
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
             ],
-            "autoload-files": [
-                "examples/src/_register.php",
-                "src/API/_register.php",
-                "src/Config/SDK/_register.php",
-                "src/Contrib/Otlp/_register.php",
-                "src/Contrib/Grpc/_register.php",
-                "src/Contrib/Zipkin/_register.php",
-                "src/SDK/_register.php",
-                "tests/_register.php"
+            "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig",
+
+                "OpenTelemetry\\Example\\ExampleConfigLoader"
             ],
-            "prune-autoload-files": true
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
+              "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
+            ],
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
+                "OpenTelemetry\\Example\\ExampleInstrumentation"
+            ]
         }
     }
 }
