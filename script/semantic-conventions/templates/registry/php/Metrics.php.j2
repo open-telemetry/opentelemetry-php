@@ -1,0 +1,31 @@
+<?php
+
+// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions
+
+declare(strict_types=1);
+
+namespace OpenTelemetry\SemConv\Metrics;
+
+interface {{ ctx.root_namespace | pascal_case }}Metrics
+{
+{# blank line #}
+{%- for metric in ctx.metrics %}
+{% set const_name = metric.metric_name | screaming_snake_case %}
+    {%- if metric is deprecated %}
+        {%- set deprecated_phpdoc = "@deprecated" -%}
+    {% else %}
+        {% set deprecated_phpdoc = "" %}
+    {%- endif -%}
+    {%- if metric is stable -%}
+        {%- set stability_phpdoc = "@stable" -%}
+    {%- else -%}
+        {%- set stability_phpdoc = "@experimental" -%}
+    {%- endif -%}
+    {%- set instrument_phpdoc = "Instrument: " ~ metric.instrument -%}
+    {%- set unit_phpdoc = "Unit: " ~ metric.unit -%}
+    {{ [metric.brief, concat_if(metric.note), instrument_phpdoc, unit_phpdoc, deprecated_phpdoc, stability_phpdoc] | comment(indent=4)  | replace(' \n', '\n') }}
+    public const {{ const_name }} = '{{ metric.metric_name }}';
+
+{% endfor %}
+}
+{# blank line #}
