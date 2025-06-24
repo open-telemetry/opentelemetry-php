@@ -64,7 +64,7 @@ class ResourceInfoFactory
             Values::VALUE_DETECTORS_SDK_PROVIDED, //deprecated
             Values::VALUE_DETECTORS_OS, //deprecated
             Values::VALUE_DETECTORS_PROCESS_RUNTIME, //deprecated
-            VALUES::VALUE_NONE,
+            Values::VALUE_NONE,
         ]);
 
         foreach ($detectors as $detector) {
