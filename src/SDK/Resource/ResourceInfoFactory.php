@@ -48,6 +48,7 @@ class ResourceInfoFactory
             Values::VALUE_DETECTORS_PROCESS => Detectors\Process::class,
             Values::VALUE_DETECTORS_ENVIRONMENT => Detectors\Environment::class,
             Values::VALUE_DETECTORS_COMPOSER => Detectors\Composer::class,
+            Values::VALUE_DETECTORS_SERVICE_INSTANCE => Detectors\ServiceInstance::class,
         ] as $detector => $class) {
             if (in_array($detector, $detectors)) {
                 $resourceDetectors[] = new $class();

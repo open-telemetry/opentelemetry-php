@@ -124,7 +124,6 @@ final class ConfigurationTest extends TestCase
             'process.executable.path',
             'process.owner',
             'process.runtime.name',
-            'service.instance.id',
             'service.name',
             'telemetry.distro.name',
             'telemetry.distro.version',
@@ -145,7 +144,6 @@ final class ConfigurationTest extends TestCase
     {
         $expectedKeys = [
             'service.name',
-            'service.instance.id',
             'telemetry.distro.name',
             'telemetry.distro.version',
             'telemetry.sdk.language',
