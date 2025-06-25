@@ -287,8 +287,6 @@ For more information about the approver role, see the [community repository](htt
 
 ## Triagers
 
-- [@open-telemetry/php-triagers](https://github.com/orgs/open-telemetry/teams/php-triagers)
-
 For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triagers).
 
 ## Emeritus maintainers/approvers/triagers
