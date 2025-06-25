@@ -272,7 +272,7 @@ This will start a HTTP server running at <http://localhost:8080> serving the upd
 
 ## Maintainers
 
-- [Bob Strecansky](https://github.com/bobstrecansky)
+- [Bob Strecansky](https://github.com/bobstrecansky), Intuit
 - [Brett McBride](https://github.com/brettmc/), Deakin University
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
