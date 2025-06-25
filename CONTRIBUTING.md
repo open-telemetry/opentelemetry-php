@@ -279,7 +279,9 @@ For more information about the maintainer role, see the [community repository](h
 
 ## Approvers
 
-- [@open-telemetry/php-approvers](https://github.com/orgs/open-telemetry/teams/php-approvers)
+- [Ago Allikmaa](https://github.com/agoallikmaa)
+- [Cedriz Ziel](https://github.com/cedricziel)
+- [Chris Lightfoot-Wild](https://github.com/ChrisLightfootWild)
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).
 
