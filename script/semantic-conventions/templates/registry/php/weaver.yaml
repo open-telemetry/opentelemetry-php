@@ -3,6 +3,7 @@ params:
   # this behavior is fully controlled by jinja templates
   # TODO exclude more namespaces, eg: ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, browser, device, ...
   excluded_namespaces: [cloudfoundry, dotnet, hw, nodejs, profile]
+  excluded_metrics_namespaces: [aspnetcore, azure, cicd, container, cpu, cpython, db, dns, dotnet, faas, gen_ai, go, hw, jvm, k8s, kestrel, messaging, nodejs, process, rpc, signalr, system, v8js, vcs]
 
   # excluded attributes will be commented out in the generated code
   # this behavior is fully controlled by jinja templates
@@ -55,6 +56,17 @@ templates:
       | map(.[-1])
     application_mode: single
     file_name: "ResourceAttributeValues.php"
+  - template: Metrics.php.j2
+    filter: >
+      semconv_grouped_metrics({
+        "exclude_root_namespace": $excluded_metrics_namespaces,
+        "exclude_stability": [],
+      }) | map({
+        root_namespace: .root_namespace,
+        metrics: .metrics,
+      })
+    application_mode: each
+    file_name: "Metrics/{{ctx.root_namespace | pascal_case}}Metrics.php"
 whitespace_control:
   trim_blocks: true
   lstrip_blocks: true

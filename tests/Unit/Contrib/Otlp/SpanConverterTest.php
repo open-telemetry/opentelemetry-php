@@ -32,6 +32,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SpanConverter::class)]
 class SpanConverterTest extends TestCase
 {
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function test_convert_span_to_payload(): void
     {
         $context = SpanContext::getInvalid();
@@ -62,7 +65,6 @@ class SpanConverterTest extends TestCase
         $this->assertSame($context->getTraceId(), bin2hex($link->getTraceId()));
         $this->assertSame($context->getSpanId(), bin2hex($link->getSpanId()));
         $this->assertSame(V1\SpanFlags::SPAN_FLAGS_CONTEXT_HAS_IS_REMOTE_MASK, $link->getFlags());
-        /** @phpstan-ignore-next-line */
         $this->assertCount(1, $link->getAttributes());
     }
 
@@ -310,6 +312,9 @@ class SpanConverterTest extends TestCase
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function test_multiple_resources_result_in_multiple_resource_spans(): void
     {
         $resourceA = ResourceInfo::create(Attributes::create(['foo' => 'bar']));
@@ -319,13 +324,14 @@ class SpanConverterTest extends TestCase
             (new SpanData())->setResource($resourceA),
             (new SpanData())->setResource($resourceB),
         ])->getResourceSpans();
-        /** @phpstan-ignore-next-line */
         $this->assertCount(2, $result);
     }
 
+    /**
+     * @psalm-suppress InvalidArgument
+     */
     public function test_otlp_no_spans(): void
     {
-        /** @phpstan-ignore-next-line */
         $this->assertCount(0, (new SpanConverter())->convert([])->getResourceSpans());
     }
 

@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use function gzdecode;
 use function gzencode;
 use InvalidArgumentException;
+use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -150,6 +152,28 @@ final class PsrTransportTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('retry limit');
         $response->await();
+    }
+
+    public function test_send_retry_network_exception_returns_error(): void
+    {
+        $e = new class('network error') extends \Exception implements NetworkExceptionInterface {
+            public function getRequest(): RequestInterface
+            {
+                return new Request('GET', 'http://localhost');
+            }
+        };
+        $this->client->expects($this->exactly(4))->method('sendRequest')->willThrowException($e);
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10., 100, 3);
+
+        $response = $transport->send('');
+
+        try {
+            $response->await();
+        } catch (Exception $e) {
+            $this->assertStringContainsString('retry limit', $e->getMessage());
+            $this->assertNotNull($e->getPrevious());
+            $this->assertSame('network error', $e->getPrevious()->getMessage());
+        }
     }
 
     public function test_send_exception_returns_error(): void

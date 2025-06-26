@@ -55,3 +55,7 @@ parameters:
             message: "#.*assertCount\\(\\) expects Countable\\|iterable.*#"
             paths:
                 - tests/Unit/Contrib/Otlp/
+        -
+            message: "#.*expects Google\\\\Protobuf\\\\RepeatedField.*#"
+            paths:
+                - src/Contrib/Otlp
