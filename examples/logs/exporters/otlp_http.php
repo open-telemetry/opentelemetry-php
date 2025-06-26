@@ -27,10 +27,9 @@ $loggerProvider = new LoggerProvider(
     )
 );
 $logger = $loggerProvider->getLogger('demo', '1.0', 'https://opentelemetry.io/schemas/1.7.1', ['foo' => 'bar']);
-
-/*$logger->emitEvent(
-    name: 'foo',
-    timestamp: (new \DateTime())->getTimestamp() * LogRecord::NANOS_PER_SECOND,
-    severityNumber: Severity::INFO,
-    body: ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'],
-);*/
+$logger->emit(
+    (new LogRecord(['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world']))
+    ->setEventName('foo')
+    ->setSeverityNumber(Severity::INFO)
+    ->setTimestamp((new \DateTime())->getTimestamp() * LogRecord::NANOS_PER_SECOND)
+);

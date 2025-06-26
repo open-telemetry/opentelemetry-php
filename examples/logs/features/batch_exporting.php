@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example;
 
 use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
@@ -27,9 +28,9 @@ $loggerTwo = $loggerProvider->getLogger('demo', '2.0');
 
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 
-//$loggerOne->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
-//$loggerOne->emitEvent('bar', body: 'hello world');
-//$loggerTwo->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
+$loggerOne->emit((new LogRecord($payload))->setEventName('foo')->setSeverityNumber(Severity::INFO));
+$loggerOne->emit((new LogRecord('hello world'))->setEventName('bar'));
+$loggerTwo->emit((new LogRecord($payload))->setEventName('foo')->setSeverityNumber(Severity::INFO));
 
 //shut down logger provider
 $loggerProvider->shutdown();

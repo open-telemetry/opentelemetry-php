@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\Example\ExampleConfigProvider;
 use OpenTelemetry\Example\ExampleInstrumentation;
 use OpenTelemetry\Example\TestResourceDetectorFactory;

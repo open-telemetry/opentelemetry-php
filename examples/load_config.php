@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Config\SDK\Configuration;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -22,7 +23,7 @@ $span = $tracer->spanBuilder('root')->startSpan();
 $scope = $span->activate();
 $meter->createCounter('cnt')->add(1);
 
-//$logger->emitEvent(name: 'foo', body: 'hello, otel');
+$logger->emit((new LogRecord('hello, otel'))->setEventName('foo'));
 $scope->detach();
 $span->end();
 

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
@@ -39,7 +40,7 @@ echo 'Span id: ' . $span->getContext()->getSpanId() . PHP_EOL;
 $logger = $loggerProvider->getLogger('demo', '1.0', 'http://schema.url', ['foo' => 'bar']);
 $payload = ['foo' => 'bar', 'baz' => 'bat', 'msg' => 'hello world'];
 
-//$logger->emitEvent(name: 'foo', severityNumber: Severity::INFO, body: $payload);
+$logger->emit((new LogRecord($payload))->setEventName('foo')->setSeverityNumber(Severity::INFO));
 
 //end span
 $span->end();

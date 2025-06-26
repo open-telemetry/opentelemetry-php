@@ -107,11 +107,4 @@ class LogRecord
 
         return $this;
     }
-
-    public function setEventName(string $eventName): self
-    {
-        $this->eventName = $eventName;
-
-        return $this;
-    }
 }
