@@ -6,10 +6,10 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
@@ -30,9 +30,9 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
     /**
      * @param array{
      *     endpoint: string,
-     *     certificate: ?string,
-     *     client_key: ?string,
-     *     client_certificate: ?string,
+     *     certificate_file: ?string,
+     *     client_key_file: ?string,
+     *     client_certificate_file: ?string,
      *     headers: list<array{name: string, value: string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
@@ -51,9 +51,9 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
             headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
-            cacert: $properties['certificate'],
-            cert: $properties['client_certificate'],
-            key: $properties['client_certificate'],
+            cacert: $properties['certificate_file'],
+            cert: $properties['client_certificate_file'],
+            key: $properties['client_certificate_file'],
         ));
     }
 
@@ -63,9 +63,9 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
         $node
             ->children()
                 ->scalarNode('endpoint')->defaultValue('http://localhost:4317')->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('client_key')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('client_certificate')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('certificate_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('client_key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('client_certificate_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('headers')
                     ->arrayPrototype()
                         ->children()

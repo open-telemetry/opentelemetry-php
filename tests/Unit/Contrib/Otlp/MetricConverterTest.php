@@ -184,6 +184,7 @@ final class MetricConverterTest extends TestCase
         $resourceB = ResourceInfo::create(Attributes::create(['foo' => 'baz']));
         $this->assertCount(
             2,
+            /** @phpstan-ignore-next-line */
             (new MetricConverter())->convert([
                 new Metric(
                     $this->createMock(InstrumentationScopeInterface::class),

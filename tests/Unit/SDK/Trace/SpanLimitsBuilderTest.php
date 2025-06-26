@@ -20,7 +20,6 @@ class SpanLimitsBuilderTest extends TestCase
     public function test_span_limits_builder_uses_default_values(): void
     {
         $builder = new SpanLimitsBuilder();
-        $builder->retainGeneralIdentityAttributes();
         $spanLimits = $builder->build();
         $this->assertEquals(Attributes::factory(128), $spanLimits->getAttributesFactory());
     }
@@ -30,7 +29,6 @@ class SpanLimitsBuilderTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
-        $builder->retainGeneralIdentityAttributes();
         $spanLimits = $builder->build();
         $this->assertEquals(Attributes::factory(111), $spanLimits->getAttributesFactory());
     }
@@ -40,7 +38,6 @@ class SpanLimitsBuilderTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 111);
         $builder = new SpanLimitsBuilder();
-        $builder->retainGeneralIdentityAttributes();
         $builder->setAttributeCountLimit(222);
         $spanLimits = $builder->build();
         $this->assertEquals(Attributes::factory(222), $spanLimits->getAttributesFactory());

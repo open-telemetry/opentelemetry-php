@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
 
     /**
      * ec2
@@ -294,6 +294,118 @@ interface ResourceAttributeValues
     public const CLOUD_PROVIDER_TENCENT_CLOUD = 'tencent_cloud';
 
     /**
+     * Mission critical service.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_MISSION_CRITICAL = 'MISSION_CRITICAL';
+
+    /**
+     * High impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_HIGH = 'HIGH';
+
+    /**
+     * Medium impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_MEDIUM = 'MEDIUM';
+
+    /**
+     * Low impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE_LOW = 'LOW';
+
+    /**
+     * Production environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_PRODUCTION = 'PRODUCTION';
+
+    /**
+     * Staging environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_STAGING = 'STAGING';
+
+    /**
+     * Test environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_TEST = 'TEST';
+
+    /**
+     * Development environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE_DEVELOPMENT = 'DEVELOPMENT';
+
+    /**
+     * Mission critical service.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_MISSION_CRITICAL = 'MISSION_CRITICAL';
+
+    /**
+     * High impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_HIGH = 'HIGH';
+
+    /**
+     * Medium impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_MEDIUM = 'MEDIUM';
+
+    /**
+     * Low impact.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE_LOW = 'LOW';
+
+    /**
+     * Production environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_PRODUCTION = 'PRODUCTION';
+
+    /**
+     * Staging environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_STAGING = 'STAGING';
+
+    /**
+     * Test environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_TEST = 'TEST';
+
+    /**
+     * Development environment.
+     *
+     * @see ResourceAttributes::GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE_DEVELOPMENT = 'DEVELOPMENT';
+
+    /**
      * AMD64
      *
      * @see ResourceAttributes::HOST_ARCH
@@ -420,11 +532,18 @@ interface ResourceAttributeValues
     public const OS_TYPE_SOLARIS = 'solaris';
 
     /**
-     * IBM z/OS
+     * Deprecated. Use `zos` instead.
      *
      * @see ResourceAttributes::OS_TYPE
      */
     public const OS_TYPE_Z_OS = 'z_os';
+
+    /**
+     * IBM z/OS
+     *
+     * @see ResourceAttributes::OS_TYPE
+     */
+    public const OS_TYPE_ZOS = 'zos';
 
     /**
      * cpp
@@ -509,5 +628,19 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::TELEMETRY_SDK_LANGUAGE
      */
     public const TELEMETRY_SDK_LANGUAGE_WEBJS = 'webjs';
+
+    /**
+     * [branch](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddefbranchabranch)
+     *
+     * @see ResourceAttributes::VCS_REF_TYPE
+     */
+    public const VCS_REF_TYPE_BRANCH = 'branch';
+
+    /**
+     * [tag](https://git-scm.com/docs/gitglossary#Documentation/gitglossary.txt-aiddeftagatag)
+     *
+     * @see ResourceAttributes::VCS_REF_TYPE
+     */
+    public const VCS_REF_TYPE_TAG = 'tag';
 
 }

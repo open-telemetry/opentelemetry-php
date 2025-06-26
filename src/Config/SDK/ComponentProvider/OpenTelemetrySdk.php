@@ -5,21 +5,26 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Config\SDK\Parser\AttributesParser;
+use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
@@ -31,14 +36,16 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersion
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
+use OpenTelemetry\SDK\Resource\Detectors;
+use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -52,19 +59,34 @@ final class OpenTelemetrySdk implements ComponentProvider
 {
     /**
      * @param array{
-     *     file_format: '0.3',
+     *     file_format: '0.4',
      *     disabled: bool,
      *     resource: array{
-     *         attributes: array,
+     *         attributes: array{
+     *             array{
+     *                 name: string,
+     *                 value: mixed,
+     *                 type: ?string,
+     *             },
+     *         },
      *         attributes_list: ?string,
      *         detectors: array,
      *         schema_url: ?string,
+     *         "detection/development": ?array{
+     *             attributes: array{
+     *                 included: list<string>,
+     *                 excluded: list<string>,
+     *             },
+     *             detectors: list<ComponentPlugin<ResourceDetectorInterface>>,
+     *         }
      *     },
      *     attribute_limits: array{
      *         attribute_value_length_limit: ?int<0, max>,
      *         attribute_count_limit: int<0, max>,
      *     },
-     *     propagator: ?ComponentPlugin<TextMapPropagatorInterface>,
+     *     propagator: array{
+     *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
+     *     },
      *     tracer_provider: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
@@ -76,12 +98,24 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         },
      *         sampler: ?ComponentPlugin<SamplerInterface>,
      *         processors: list<ComponentPlugin<SpanProcessorInterface>>,
+     *         "tracer_configurator/development": ?array{
+     *              default_config: array{
+     *                  disabled: bool,
+     *              },
+     *              tracers: list<array{
+     *                  name: string,
+     *                  config: array{
+     *                      disabled: bool,
+     *                  }
+     *              }>
+     *           }
      *     },
      *     meter_provider: array{
      *         views: list<array{
      *             stream: array{
      *                 name: ?string,
      *                 description: ?string,
+     *                 aggregation_cardinality_limit: ?int<0, max>,
      *                 attribute_keys: array{
      *                     included: list<string>,
      *                     excluded: list<string>,
@@ -98,6 +132,18 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             },
      *         }>,
      *         readers: list<ComponentPlugin<MetricReaderInterface>>,
+     *         exemplar_filter: 'trace_based'|'always_on'|'always_off',
+     *         "meter_configurator/development": ?array{
+     *             default_config: array{
+     *                 disabled: bool,
+     *             },
+     *             meters: list<array{
+     *                 name: string,
+     *                 config: array{
+     *                     disabled: bool,
+     *                 }
+     *             }>
+     *          },
      *     },
      *     logger_provider: array{
      *         limits: array{
@@ -105,6 +151,17 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             attribute_count_limit: ?int<0, max>,
      *         },
      *         processors: list<ComponentPlugin<LogRecordProcessorInterface>>,
+     *         "logger_configurator/development": ?array{
+     *            default_config: array{
+     *                disabled: bool,
+     *            },
+     *            loggers: list<array{
+     *                name: string,
+     *                config: array{
+     *                    disabled: bool,
+     *                }
+     *            }>
+     *         },
      *     },
      * } $properties
      */
@@ -112,29 +169,72 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $sdkBuilder = new SdkBuilder();
 
-        $propagator = $properties['propagator']?->create($context) ?? NoopTextMapPropagator::getInstance();
+        $propagators = [];
+        foreach ($properties['propagator']['composite'] as $plugin) {
+            $propagators[] = $plugin->create($context);
+        }
+        $propagator = ($propagators === []) ? NoopTextMapPropagator::getInstance() : new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
-        $attributes = array_column($properties['resource']['attributes'], 'value', 'name') + MapParser::parse($properties['resource']['attributes_list']);
-        $resource = ResourceInfoFactory::defaultResource()
+
+        //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
+        $schemaUrl = $properties['resource']['schema_url'];
+        /** @var ResourceDetectorInterface[] $detectors */
+        $detectors = [];
+        foreach ($properties['resource']['detection/development']['detectors'] ?? [] as $plugin) {
+            /**
+             * @psalm-suppress InvalidMethodCall
+             **/
+            $detectors[] = $plugin->create($context);
+        }
+        $mandatory = (new Detectors\Composite([
+            new Detectors\Sdk(),
+            new Detectors\Service(),
+        ]))->getResource();
+
+        /** @psalm-suppress PossiblyInvalidArgument */
+        $composite = new Detectors\Composite($detectors);
+        $included = $properties['resource']['detection/development']['attributes']['included'] ?? null;
+        $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
+
+        $resource = $composite->getResource();
+        $attrs = AttributesParser::applyIncludeExclude($resource->getAttributes()->toArray(), $included, $excluded);
+        $resource = ResourceInfo::create(Attributes::create($attrs), $resource->getSchemaUrl());
+
+        $attributes = AttributesParser::parseAttributesList($properties['resource']['attributes_list']);
+        $attributes = array_merge($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
+
+        $resource = $resource
             ->merge(ResourceInfo::create(
                 attributes: Attributes::create($attributes),
-                schemaUrl: $properties['resource']['schema_url'],
-            ));
+                schemaUrl: $schemaUrl,
+            ))
+            ->merge($mandatory);
 
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
             $spanProcessors[] = $processor->create($context);
         }
 
+        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
+
+        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
+            $disabled = $tracer['config']['disabled'];
+            $configurator = $configurator->with(
+                static fn (TracerConfig $config) => $config->setDisabled($disabled),
+                name: $tracer['name'],
+            );
+        }
+
         // <editor-fold desc="tracer_provider">
 
         $tracerProvider = new TracerProvider(
             spanProcessors: $spanProcessors,
-            sampler: $properties['tracer_provider']['sampler']?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
+            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
             resource: $resource,
             spanLimits: new SpanLimits(
                 attributesFactory: Attributes::factory(
@@ -160,6 +260,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
                 linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
             ),
+            configurator: $configurator,
         );
 
         // </editor-fold>
@@ -218,6 +319,16 @@ final class OpenTelemetrySdk implements ComponentProvider
             $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
         }
 
+        $disabled = $properties['meter_provider']['meter_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
+        foreach ($properties['meter_provider']['meter_configurator/development']['meters'] ?? [] as $meter) {
+            $disabled = $meter['config']['disabled'];
+            $configurator = $configurator->with(
+                static fn (MeterConfig $config) => $config->setDisabled($disabled),
+                name: $meter['name'],
+            );
+        }
+
         /** @psalm-suppress InvalidArgument TODO update metric reader interface */
         $meterProvider = new MeterProvider(
             contextStorage: null,
@@ -229,6 +340,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             viewRegistry: $viewRegistry,
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
+            configurator: $configurator,
         );
 
         // </editor-fold>
@@ -240,11 +352,22 @@ final class OpenTelemetrySdk implements ComponentProvider
             $logRecordProcessors[] = $processor->create($context);
         }
 
+        $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
+        foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] ?? [] as $logger) {
+            $disabled = $logger['config']['disabled'];
+            $configurator = $configurator->with(
+                static fn (LoggerConfig $config) => $config->setDisabled($disabled),
+                name: $logger['name'],
+            );
+        }
+
         // TODO Allow injecting log record attributes factory
         $loggerProvider = new LoggerProvider(
             processor: new MultiLogRecordProcessor($logRecordProcessors),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             resource: $resource,
+            configurator: $configurator,
         );
 
         // </editor-fold>
@@ -267,12 +390,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->isRequired()
                     ->example('0.1')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['0.3'])->thenInvalid('unsupported version')->end()
+                    ->validate()->ifNotInArray(['0.4'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
-                ->append($this->getResourceConfig($builder))
+                ->append($this->getResourceConfig($registry, $builder))
                 ->append($this->getAttributeLimitsConfig($builder))
-                ->append($registry->component('propagator', TextMapPropagatorInterface::class))
+                ->append($this->getPropagatorConfig($registry, $builder))
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
@@ -281,7 +404,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $node;
     }
 
-    private function getResourceConfig(NodeBuilder $builder): ArrayNodeDefinition
+    private function getResourceConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('resource');
         $node
@@ -292,7 +415,6 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
                             ->variableNode('value')->isRequired()->end()
-                            // @todo use type to validate and/or cast attributes
                             ->enumNode('type')->defaultNull()
                                 ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
                             ->end()
@@ -300,10 +422,24 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->arrayNode('detectors')
-                    ->variablePrototype()->end()
+                ->arrayNode('detection/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('attributes')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->arrayNode('included')
+                                    ->defaultNull()
+                                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                ->end()
+                                ->arrayNode('excluded')
+                                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->append($registry->componentList('detectors', ResourceDetectorInterface::class))
+                    ->end()
                 ->end()
-                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->end();
 
@@ -342,6 +478,30 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
                 ->append($registry->componentList('processors', SpanProcessorInterface::class))
+                ->arrayNode('tracer_configurator/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default_config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disabled')->isRequired()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('tracers')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->arrayNode('config')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->booleanNode('disabled')->isRequired()->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
@@ -370,6 +530,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->children()
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                                    ->integerNode('aggregation_cardinality_limit')->defaultValue(2000)->end()
                                     ->arrayNode('attribute_keys')
                                         ->children()
                                             ->arrayNode('included')
@@ -408,6 +569,30 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->componentList('readers', MetricReaderInterface::class))
+                ->arrayNode('meter_configurator/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default_config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disabled')->isRequired()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('meters')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->arrayNode('config')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->booleanNode('disabled')->isRequired()->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
 
@@ -428,6 +613,68 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->end()
                 ->end()
                 ->append($registry->componentList('processors', LogRecordProcessorInterface::class))
+                ->arrayNode('logger_configurator/development')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('default_config')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('disabled')->isRequired()->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('loggers')
+                            ->arrayPrototype()
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->arrayNode('config')
+                                        ->addDefaultsIfNotSet()
+                                        ->children()
+                                            ->booleanNode('disabled')->isRequired()->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private function getPropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        $node = $builder->arrayNode('propagator');
+        $node
+            ->beforeNormalization()
+                ->ifArray()
+                ->then(static function (array $value): array {
+                    $existing = [];
+                    foreach ($value['composite'] ?? [] as $item) {
+                        $existing[] = key($item);
+                    }
+                    foreach (explode(',', $value['composite_list'] ?? '') as $name) {
+                        $name = trim($name);
+                        if ($name !== '' && !in_array($name, $existing)) {
+                            $value['composite'][][$name] = null;
+                            $existing[] = $name;
+                        }
+                    }
+
+                    unset($value['composite_list']);
+
+                    return $value;
+                })
+            ->end();
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
+//                ->arrayNode('composite_list')
+//                    ->scalarPrototype()->end()
+//                ->end()
             ->end()
         ;
 

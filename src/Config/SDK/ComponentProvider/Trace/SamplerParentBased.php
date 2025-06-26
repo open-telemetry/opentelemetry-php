@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -33,10 +33,10 @@ final class SamplerParentBased implements ComponentProvider
     {
         return new ParentBased(
             root: $properties['root']->create($context),
-            remoteParentSampler: $properties['remote_parent_sampled']?->create($context) ?? new AlwaysOnSampler(),
-            remoteParentNotSampler: $properties['remote_parent_not_sampled']?->create($context) ?? new AlwaysOffSampler(),
-            localParentSampler: $properties['local_parent_sampled']?->create($context) ?? new AlwaysOnSampler(),
-            localParentNotSampler: $properties['local_parent_not_sampled']?->create($context) ?? new AlwaysOffSampler(),
+            remoteParentSampler: ($properties['remote_parent_sampled'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
+            remoteParentNotSampler: ($properties['remote_parent_not_sampled'] ?? null)?->create($context) ?? new AlwaysOffSampler(),
+            localParentSampler: ($properties['local_parent_sampled'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
+            localParentNotSampler: ($properties['local_parent_not_sampled'] ?? null)?->create($context) ?? new AlwaysOffSampler(),
         );
     }
 

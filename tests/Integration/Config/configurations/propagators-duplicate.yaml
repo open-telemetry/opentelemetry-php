@@ -1,0 +1,12 @@
+file_format: '0.4'
+
+propagator:
+  composite_list: "tracecontext,tracecontext"
+
+tracer_provider:
+  processors:
+
+meter_provider:
+  readers:
+logger_provider:
+  processors:

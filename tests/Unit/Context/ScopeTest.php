@@ -80,11 +80,14 @@ class ScopeTest extends TestCase
         $this->assertSame(0, $scope1->detach());
     }
 
+    /**
+     * @todo Don't skip when https://bugs.xdebug.org/view.php?id=2332 is fixed
+     */
     public function test_inactive_scope_detach(): void
     {
-        if (phpversion('xdebug') === '3.4.2') {
+        if (version_compare(phpversion('xdebug'), '3.4.2', '>=')) {
             //@see https://bugs.xdebug.org/view.php?id=2332
-            $this->markTestSkipped('skipping: segfault in xdebug 3.4.2');
+            $this->markTestSkipped('skipping: segfault in xdebug');
         }
         $scope1 = Context::getCurrent()->activate();
 
@@ -126,5 +129,17 @@ class ScopeTest extends TestCase
         $scope = $storage->scope();
         $this->assertNotNull($scope);
         $this->assertArrayNotHasKey('key', $scope);
+    }
+
+    public function test_scope_is_gced_after_detach(): void
+    {
+        $storage = new ContextStorage();
+        $scope = $storage->attach($storage->current());
+
+        $ref = \WeakReference::create($scope);
+        $scope->detach();
+        unset($scope);
+
+        $this->assertNull($ref->get());
     }
 }

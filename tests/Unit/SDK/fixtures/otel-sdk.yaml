@@ -1,4 +1,4 @@
-file_format: '0.3'
+file_format: '0.4'
 
 tracer_provider:
   processors:
@@ -11,7 +11,7 @@ tracer_provider:
 propagator:
   composite: []
 
-instrumentation:
+instrumentation/development:
   php:
     example_instrumentation:
       span_name: my-span

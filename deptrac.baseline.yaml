@@ -1,2 +1,8 @@
 deptrac:
   skip_violations:
+    OpenTelemetry\API\Configuration\Config\ComponentProvider:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
+    OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeDefinition

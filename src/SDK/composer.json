@@ -17,11 +17,11 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.1",
         "ext-json": "*",
         "nyholm/psr7-server": "^1.1",
-        "open-telemetry/api": "^1.0|^2.0",
-        "open-telemetry/context": "^1.0|^2.0",
+        "open-telemetry/api": "~1.4.0",
+        "open-telemetry/context": "^1.0",
         "open-telemetry/sem-conv": "^1.0",
         "php-http/discovery": "^1.14",
         "psr/http-client-implementation": "^1.0",
@@ -31,6 +31,7 @@
         "psr/log": "^1.1|^2.0|^3.0",
         "ramsey/uuid": "^3.0 || ^4.0",
         "symfony/polyfill-mbstring": "^1.23",
+        "symfony/polyfill-php82": "^1.26",
         "tbachert/spi": "^1.0.1"
     },
     "autoload": {
@@ -55,10 +56,19 @@
             "dev-2.x": "2.x-dev"
         },
         "spi-config": {
-            "autoload-files": [
-                "_register.php"
+          "autoload-files": [
+            "_register.php"
+          ],
+          "prune-autoload-files": true
+        },
+        "spi": {
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
+                "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ],
-            "prune-autoload-files": true
+            "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig"
+            ]
         }
     }
 }

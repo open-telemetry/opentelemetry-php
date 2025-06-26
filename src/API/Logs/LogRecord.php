@@ -91,6 +91,13 @@ class LogRecord
         return $this;
     }
 
+    public function setEventName(string $eventName): self
+    {
+        $this->eventName = $eventName;
+
+        return $this;
+    }
+
     /**
      * @param int|null $observedTimestamp Time, in nanoseconds since the unix epoch, when the event was observed by the collection system.
      */

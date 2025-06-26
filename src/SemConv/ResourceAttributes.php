@@ -11,12 +11,35 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.30.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
      */
     public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
+
+    /**
+     * A unique identifier representing the installation of an application on a specific device
+     *
+     * Its value SHOULD persist across launches of the same application installation, including through application upgrades.
+     * It SHOULD change if the application is uninstalled or if all applications of the vendor are uninstalled.
+     * Additionally, users might be able to reset this value (e.g. by clearing application data).
+     * If an app is installed multiple times on the same device (e.g. in different accounts on Android), each `app.installation.id` SHOULD have a different value.
+     * If multiple OpenTelemetry SDKs are used within the same application, they SHOULD use the same value for `app.installation.id`.
+     * Hardware IDs (e.g. serial number, IMEI, MAC address) MUST NOT be used as the `app.installation.id`.
+     *
+     * For iOS, this value SHOULD be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/identifierforvendor).
+     *
+     * For Android, examples of `app.installation.id` implementations include:
+     *
+     * - [Firebase Installation ID](https://firebase.google.com/docs/projects/manage-installations).
+     * - A globally unique UUID which is persisted across sessions in your application.
+     * - [App set ID](https://developer.android.com/identity/app-set-id).
+     * - [`Settings.getString(Settings.Secure.ANDROID_ID)`](https://developer.android.com/reference/android/provider/Settings.Secure#ANDROID_ID).
+     *
+     * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+     */
+    public const APP_INSTALLATION_ID = 'app.installation.id';
 
     /**
      * The ARN of an [ECS cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/clusters.html).
@@ -110,6 +133,36 @@ interface ResourceAttributes
     public const BROWSER_PLATFORM = 'browser.platform';
 
     /**
+     * The human readable name of the pipeline within a CI/CD system.
+     */
+    public const CICD_PIPELINE_NAME = 'cicd.pipeline.name';
+
+    /**
+     * The unique identifier of a pipeline run within a CI/CD system.
+     */
+    public const CICD_PIPELINE_RUN_ID = 'cicd.pipeline.run.id';
+
+    /**
+     * The [URL](https://wikipedia.org/wiki/URL) of the pipeline run, providing the complete address in order to locate and identify the pipeline run.
+     */
+    public const CICD_PIPELINE_RUN_URL_FULL = 'cicd.pipeline.run.url.full';
+
+    /**
+     * The unique identifier of a worker within a CICD system.
+     */
+    public const CICD_WORKER_ID = 'cicd.worker.id';
+
+    /**
+     * The name of a worker within a CICD system.
+     */
+    public const CICD_WORKER_NAME = 'cicd.worker.name';
+
+    /**
+     * The [URL](https://wikipedia.org/wiki/URL) of the worker, providing the complete address in order to locate and identify the worker.
+     */
+    public const CICD_WORKER_URL_FULL = 'cicd.worker.url.full';
+
+    /**
      * The cloud account ID the resource is assigned to.
      */
     public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
@@ -134,14 +187,14 @@ interface ResourceAttributes
     public const CLOUD_PROVIDER = 'cloud.provider';
 
     /**
-     * The geographical region the resource is running.
+     * The geographical region within a cloud provider. When associated with a resource, this attribute specifies the region where the resource operates. When calling services or APIs deployed on a cloud, this attribute identifies the region where the called destination is deployed.
      *
      * Refer to your provider's docs to see the available regions, for example [Alibaba Cloud regions](https://www.alibabacloud.com/help/doc-detail/40654.htm), [AWS regions](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/), [Azure regions](https://azure.microsoft.com/global-infrastructure/geographies/), [Google Cloud regions](https://cloud.google.com/about/locations), or [Tencent Cloud regions](https://www.tencentcloud.com/document/product/213/6091).
      */
     public const CLOUD_REGION = 'cloud.region';
 
     /**
-     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://cloud.google.com/apis/design/resource_names#full_resource_name) on GCP)
+     * Cloud provider-specific native identifier of the monitored cloud resource (e.g. an [ARN](https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html) on AWS, a [fully qualified resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) on Azure, a [full resource name](https://google.aip.dev/122#full-resource-names) on GCP)
      *
      * On some cloud providers, it may not be possible to determine the full ID at startup,
      * so it may be necessary to set `cloud.resource_id` as a span attribute instead.
@@ -314,6 +367,8 @@ interface ResourceAttributes
 
     /**
      * Container labels, `<key>` being the label name, the value being the label value.
+     *
+     * For example, a docker container label `app` with value `nginx` SHOULD be recorded as the `container.label.app` attribute with value `"nginx"`.
      */
     public const CONTAINER_LABEL = 'container.label';
 
@@ -343,7 +398,16 @@ interface ResourceAttributes
     /**
      * A unique identifier representing the device
      *
-     * The device identifier MUST only be defined using the values outlined below. This value is not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value MUST be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+     * Its value SHOULD be identical for all apps on a device and it SHOULD NOT change if an app is uninstalled and re-installed.
+     * However, it might be resettable by the user for all apps on a device.
+     * Hardware IDs (e.g. vendor-specific serial number, IMEI or MAC address) MAY be used as values.
+     *
+     * More information about Android identifier best practices can be found [here](https://developer.android.com/training/articles/user-data-ids).
+     *
+     * > [!WARNING]> This attribute may contain sensitive (PII) information. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply,
+     * > ensure you do your own due diligence.> Due to these reasons, this identifier is not recommended for consumer applications and will likely result in rejection from both Google Play and App Store.
+     * > However, it may be appropriate for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with appropriate compliance clearance.
+     * > Any instrumentation providing this identifier MUST implement it as an opt-in feature.> See [`app.installation.id`](/docs/registry/attributes/app.md#app-installation-id)>  for a more privacy-preserving alternative.
      */
     public const DEVICE_ID = 'device.id';
 
@@ -417,6 +481,59 @@ interface ResourceAttributes
      * - **Azure Functions:** Not applicable. Do not set this attribute.
      */
     public const FAAS_VERSION = 'faas.version';
+
+    /**
+     * The container within GCP where the AppHub application is defined.
+     */
+    public const GCP_APPHUB_APPLICATION_CONTAINER = 'gcp.apphub.application.container';
+
+    /**
+     * The name of the application as configured in AppHub.
+     */
+    public const GCP_APPHUB_APPLICATION_ID = 'gcp.apphub.application.id';
+
+    /**
+     * The GCP zone or region where the application is defined.
+     */
+    public const GCP_APPHUB_APPLICATION_LOCATION = 'gcp.apphub.application.location';
+
+    /**
+     * Criticality of a service indicates its importance to the business.
+     *
+     * [See AppHub type enum](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type)
+     */
+    public const GCP_APPHUB_SERVICE_CRITICALITY_TYPE = 'gcp.apphub.service.criticality_type';
+
+    /**
+     * Environment of a service is the stage of a software lifecycle.
+     *
+     * [See AppHub environment type](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1)
+     */
+    public const GCP_APPHUB_SERVICE_ENVIRONMENT_TYPE = 'gcp.apphub.service.environment_type';
+
+    /**
+     * The name of the service as configured in AppHub.
+     */
+    public const GCP_APPHUB_SERVICE_ID = 'gcp.apphub.service.id';
+
+    /**
+     * Criticality of a workload indicates its importance to the business.
+     *
+     * [See AppHub type enum](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type)
+     */
+    public const GCP_APPHUB_WORKLOAD_CRITICALITY_TYPE = 'gcp.apphub.workload.criticality_type';
+
+    /**
+     * Environment of a workload is the stage of a software lifecycle.
+     *
+     * [See AppHub environment type](https://cloud.google.com/app-hub/docs/reference/rest/v1/Attributes#type_1)
+     */
+    public const GCP_APPHUB_WORKLOAD_ENVIRONMENT_TYPE = 'gcp.apphub.workload.environment_type';
+
+    /**
+     * The name of the workload as configured in AppHub.
+     */
+    public const GCP_APPHUB_WORKLOAD_ID = 'gcp.apphub.workload.id';
 
     /**
      * The name of the Cloud Run [execution](https://cloud.google.com/run/docs/managing/job-executions) being run for the Job, as set by the [`CLOUD_RUN_EXECUTION`](https://cloud.google.com/run/docs/container-contract#jobs-env-vars) environment variable.
@@ -609,6 +726,30 @@ interface ResourceAttributes
     public const K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON = 'k8s.container.status.last_terminated_reason';
 
     /**
+     * The cronjob annotation placed on the CronJob, the `<key>` being the annotation name, the value being the annotation value.
+     *
+     * Examples:
+     *
+     * - An annotation `retries` with value `4` SHOULD be recorded as the
+     *   `k8s.cronjob.annotation.retries` attribute with value `"4"`.
+     * - An annotation `data` with empty string value SHOULD be recorded as
+     *   the `k8s.cronjob.annotation.data` attribute with value `""`.
+     */
+    public const K8S_CRONJOB_ANNOTATION = 'k8s.cronjob.annotation';
+
+    /**
+     * The label placed on the CronJob, the `<key>` being the label name, the value being the label value.
+     *
+     * Examples:
+     *
+     * - A label `type` with value `weekly` SHOULD be recorded as the
+     *   `k8s.cronjob.label.type` attribute with value `"weekly"`.
+     * - A label `automated` with empty string value SHOULD be recorded as
+     *   the `k8s.cronjob.label.automated` attribute with value `""`.
+     */
+    public const K8S_CRONJOB_LABEL = 'k8s.cronjob.label';
+
+    /**
      * The name of the CronJob.
      */
     public const K8S_CRONJOB_NAME = 'k8s.cronjob.name';
@@ -619,6 +760,20 @@ interface ResourceAttributes
     public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
 
     /**
+     * The annotation key-value pairs placed on the DaemonSet.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_DAEMONSET_ANNOTATION = 'k8s.daemonset.annotation';
+
+    /**
+     * The label key-value pairs placed on the DaemonSet.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_DAEMONSET_LABEL = 'k8s.daemonset.label';
+
+    /**
      * The name of the DaemonSet.
      */
     public const K8S_DAEMONSET_NAME = 'k8s.daemonset.name';
@@ -627,6 +782,20 @@ interface ResourceAttributes
      * The UID of the DaemonSet.
      */
     public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
+
+    /**
+     * The annotation key-value pairs placed on the Deployment.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_DEPLOYMENT_ANNOTATION = 'k8s.deployment.annotation';
+
+    /**
+     * The label key-value pairs placed on the Deployment.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_DEPLOYMENT_LABEL = 'k8s.deployment.label';
 
     /**
      * The name of the Deployment.
@@ -644,9 +813,44 @@ interface ResourceAttributes
     public const K8S_HPA_NAME = 'k8s.hpa.name';
 
     /**
+     * The API version of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `apiVersion` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_API_VERSION = 'k8s.hpa.scaletargetref.api_version';
+
+    /**
+     * The kind of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `kind` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_KIND = 'k8s.hpa.scaletargetref.kind';
+
+    /**
+     * The name of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `name` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_NAME = 'k8s.hpa.scaletargetref.name';
+
+    /**
      * The UID of the horizontal pod autoscaler.
      */
     public const K8S_HPA_UID = 'k8s.hpa.uid';
+
+    /**
+     * The annotation key-value pairs placed on the Job.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_JOB_ANNOTATION = 'k8s.job.annotation';
+
+    /**
+     * The label key-value pairs placed on the Job.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_JOB_LABEL = 'k8s.job.label';
 
     /**
      * The name of the Job.
@@ -659,9 +863,47 @@ interface ResourceAttributes
     public const K8S_JOB_UID = 'k8s.job.uid';
 
     /**
+     * The annotation key-value pairs placed on the Namespace.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_NAMESPACE_ANNOTATION = 'k8s.namespace.annotation';
+
+    /**
+     * The label key-value pairs placed on the Namespace.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_NAMESPACE_LABEL = 'k8s.namespace.label';
+
+    /**
      * The name of the namespace that the pod is running in.
      */
     public const K8S_NAMESPACE_NAME = 'k8s.namespace.name';
+
+    /**
+     * The annotation placed on the Node, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     *
+     * Examples:
+     *
+     * - An annotation `node.alpha.kubernetes.io/ttl` with value `0` SHOULD be recorded as
+     *   the `k8s.node.annotation.node.alpha.kubernetes.io/ttl` attribute with value `"0"`.
+     * - An annotation `data` with empty string value SHOULD be recorded as
+     *   the `k8s.node.annotation.data` attribute with value `""`.
+     */
+    public const K8S_NODE_ANNOTATION = 'k8s.node.annotation';
+
+    /**
+     * The label placed on the Node, the `<key>` being the label name, the value being the label value, even if the value is empty.
+     *
+     * Examples:
+     *
+     * - A label `kubernetes.io/arch` with value `arm64` SHOULD be recorded
+     *   as the `k8s.node.label.kubernetes.io/arch` attribute with value `"arm64"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.node.label.data` attribute with value `""`.
+     */
+    public const K8S_NODE_LABEL = 'k8s.node.label';
 
     /**
      * The name of the Node.
@@ -674,12 +916,30 @@ interface ResourceAttributes
     public const K8S_NODE_UID = 'k8s.node.uid';
 
     /**
-     * The annotation key-value pairs placed on the Pod, the `<key>` being the annotation name, the value being the annotation value.
+     * The annotation placed on the Pod, the `<key>` being the annotation name, the value being the annotation value.
+     *
+     * Examples:
+     *
+     * - An annotation `kubernetes.io/enforce-mountable-secrets` with value `true` SHOULD be recorded as
+     *   the `k8s.pod.annotation.kubernetes.io/enforce-mountable-secrets` attribute with value `"true"`.
+     * - An annotation `mycompany.io/arch` with value `x64` SHOULD be recorded as
+     *   the `k8s.pod.annotation.mycompany.io/arch` attribute with value `"x64"`.
+     * - An annotation `data` with empty string value SHOULD be recorded as
+     *   the `k8s.pod.annotation.data` attribute with value `""`.
      */
     public const K8S_POD_ANNOTATION = 'k8s.pod.annotation';
 
     /**
-     * The label key-value pairs placed on the Pod, the `<key>` being the label name, the value being the label value.
+     * The label placed on the Pod, the `<key>` being the label name, the value being the label value.
+     *
+     * Examples:
+     *
+     * - A label `app` with value `my-app` SHOULD be recorded as
+     *   the `k8s.pod.label.app` attribute with value `"my-app"`.
+     * - A label `mycompany.io/arch` with value `x64` SHOULD be recorded as
+     *   the `k8s.pod.label.mycompany.io/arch` attribute with value `"x64"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.pod.label.data` attribute with value `""`.
      */
     public const K8S_POD_LABEL = 'k8s.pod.label';
 
@@ -692,6 +952,20 @@ interface ResourceAttributes
      * The UID of the Pod.
      */
     public const K8S_POD_UID = 'k8s.pod.uid';
+
+    /**
+     * The annotation key-value pairs placed on the ReplicaSet.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_REPLICASET_ANNOTATION = 'k8s.replicaset.annotation';
+
+    /**
+     * The label key-value pairs placed on the ReplicaSet.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_REPLICASET_LABEL = 'k8s.replicaset.label';
 
     /**
      * The name of the ReplicaSet.
@@ -724,6 +998,20 @@ interface ResourceAttributes
     public const K8S_RESOURCEQUOTA_UID = 'k8s.resourcequota.uid';
 
     /**
+     * The annotation key-value pairs placed on the StatefulSet.
+     *
+     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     */
+    public const K8S_STATEFULSET_ANNOTATION = 'k8s.statefulset.annotation';
+
+    /**
+     * The label key-value pairs placed on the StatefulSet.
+     *
+     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     */
+    public const K8S_STATEFULSET_LABEL = 'k8s.statefulset.label';
+
+    /**
      * The name of the StatefulSet.
      */
     public const K8S_STATEFULSET_NAME = 'k8s.statefulset.name';
@@ -734,10 +1022,15 @@ interface ResourceAttributes
     public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
     /**
+     * Name of the logical partition that hosts a systems with a mainframe operating system.
+     */
+    public const MAINFRAME_LPAR_NAME = 'mainframe.lpar.name';
+
+    /**
      * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
      *
      * Follows [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md), and specifically the [Digest property](https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests).
-     * An example can be found in [Example Image Manifest](https://docs.docker.com/registry/spec/manifest-v2-2/#example-image-manifest).
+     * An example can be found in [Example Image Manifest](https://github.com/opencontainers/image-spec/blob/main/manifest.md#example-image-manifest).
      */
     public const OCI_MANIFEST_DIGEST = 'oci.manifest.digest';
 
@@ -789,17 +1082,17 @@ interface ResourceAttributes
     public const PROCESS_COMMAND = 'process.command';
 
     /**
-     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
+     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`. SHOULD NOT be collected by default unless there is sanitization that excludes sensitive data.
      */
     public const PROCESS_COMMAND_ARGS = 'process.command_args';
 
     /**
-     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
+     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead. SHOULD NOT be collected by default unless there is sanitization that excludes sensitive data.
      */
     public const PROCESS_COMMAND_LINE = 'process.command_line';
 
     /**
-     * The name of the process executable. On Linux based systems, can be set to the `Name` in `proc/[pid]/status`. On Windows, can be set to the base name of `GetProcessImageFileNameW`.
+     * The name of the process executable. On Linux based systems, this SHOULD be set to the base name of the target of `/proc/[pid]/exe`. On Windows, this SHOULD be set to the base name of `GetProcessImageFileNameW`.
      */
     public const PROCESS_EXECUTABLE_NAME = 'process.executable.name';
 
@@ -937,6 +1230,53 @@ interface ResourceAttributes
     public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
+     * The name of the [reference](https://git-scm.com/docs/gitglossary#def_ref) such as **branch** or **tag** in the repository.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.
+     */
+    public const VCS_REF_HEAD_NAME = 'vcs.ref.head.name';
+
+    /**
+     * The revision, literally [revised version](https://www.merriam-webster.com/dictionary/revision), The revision most often refers to a commit object in Git, or a revision number in SVN.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.The revision can be a full [hash value (see
+     * glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf),
+     * of the recorded change to a ref within a repository pointing to a
+     * commit [commit](https://git-scm.com/docs/git-commit) object. It does
+     * not necessarily have to be a hash; it can simply define a [revision
+     * number](https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html)
+     * which is an integer that is monotonically increasing. In cases where
+     * it is identical to the `ref.head.name`, it SHOULD still be included.
+     * It is up to the implementer to decide which value to set as the
+     * revision based on the VCS system and situational context.
+     */
+    public const VCS_REF_HEAD_REVISION = 'vcs.ref.head.revision';
+
+    /**
+     * The type of the [reference](https://git-scm.com/docs/gitglossary#def_ref) in the repository.
+     */
+    public const VCS_REF_TYPE = 'vcs.ref.type';
+
+    /**
+     * The human readable name of the repository. It SHOULD NOT include any additional identifier like Group/SubGroup in GitLab or organization in GitHub.
+     *
+     * Due to it only being the name, it can clash with forks of the same
+     * repository if collecting telemetry across multiple orgs or groups in
+     * the same backends.
+     */
+    public const VCS_REPOSITORY_NAME = 'vcs.repository.name';
+
+    /**
+     * The [canonical URL](https://support.google.com/webmasters/answer/10347851?hl=en#:~:text=A%20canonical%20URL%20is%20the,Google%20chooses%20one%20as%20canonical.) of the repository providing the complete HTTP(S) address in order to locate and identify the repository through a browser.
+     *
+     * In Git Version Control Systems, the canonical URL SHOULD NOT include
+     * the `.git` extension.
+     */
+    public const VCS_REPOSITORY_URL_FULL = 'vcs.repository.url.full';
+
+    /**
      * Additional description of the web engine (e.g. detailed version and edition information).
      */
     public const WEBENGINE_DESCRIPTION = 'webengine.description';
@@ -950,5 +1290,15 @@ interface ResourceAttributes
      * The version of the web engine.
      */
     public const WEBENGINE_VERSION = 'webengine.version';
+
+    /**
+     * The System Management Facility (SMF) Identifier uniquely identified a z/OS system within a SYSPLEX or mainframe environment and is used for system and performance analysis.
+     */
+    public const ZOS_SMF_ID = 'zos.smf.id';
+
+    /**
+     * The name of the SYSPLEX to which the z/OS system belongs too.
+     */
+    public const ZOS_SYSPLEX_NAME = 'zos.sysplex.name';
 
 }

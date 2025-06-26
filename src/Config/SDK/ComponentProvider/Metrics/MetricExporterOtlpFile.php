@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
@@ -49,7 +49,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('otlp_file');
+        $node = $builder->arrayNode('otlp_file/development');
         $node
             ->children()
                 ->scalarNode('output_stream')->defaultValue('stdout')->validate()->always(Validation::ensureString())->end()->end()
