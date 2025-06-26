@@ -32,7 +32,7 @@ class NoopLogger implements LoggerInterface
     {
     }
 
-    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null): bool
+    public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
         return false;
     }

@@ -32,6 +32,12 @@
                 <referencedFunction name="OpenTelemetry\Instrumentation\hook"/>
             </errorLevel>
         </UndefinedFunction>
+        <UndefinedMethod>
+            <errorLevel type="suppress">
+                <referencedMethod name="Google\Protobuf\Internal\RepeatedField::offsetGet"/>
+                <referencedMethod name="Google\Protobuf\Internal\RepeatedField::offsetSet"/>
+            </errorLevel>
+        </UndefinedMethod>
         <ArgumentTypeCoercion>
             <errorLevel type="suppress">
                 <directory name="./examples"/>
