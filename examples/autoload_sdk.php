@@ -7,8 +7,8 @@ namespace OpenTelemetry\Example;
 use OpenTelemetry\API\Logs\LogRecord;
 
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
-putenv('OTEL_TRACES_EXPORTER=none');
-putenv('OTEL_METRICS_EXPORTER=none');
+putenv('OTEL_TRACES_EXPORTER=console');
+putenv('OTEL_METRICS_EXPORTER=console');
 putenv('OTEL_LOGS_EXPORTER=console');
 putenv('OTEL_PROPAGATORS=b3,baggage,tracecontext');
 
