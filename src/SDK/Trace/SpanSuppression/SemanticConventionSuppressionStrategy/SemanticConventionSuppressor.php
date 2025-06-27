@@ -6,8 +6,8 @@ namespace OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionS
 
 use function array_key_exists;
 use function count;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\SpanSuppression\SemanticConvention;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
