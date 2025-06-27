@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Config\SDK\Configuration;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -21,10 +22,10 @@ $sdk = $config
 
 $tracer = $sdk->getTracerProvider()->getTracer('demo');
 $meter = $sdk->getMeterProvider()->getMeter('demo');
-$eventLogger = $sdk->getEventLoggerProvider()->getEventLogger('demo');
+$logger = $sdk->getLoggerProvider()->getLogger('demo');
 
 $tracer->spanBuilder('root')->startSpan()->end();
 $meter->createCounter('cnt')->add(1);
-$eventLogger->emit('foo', 'hello, otel');
+$logger->emit((new LogRecord('hello, otel'))->setEventName('foo'));
 
 echo 'Finished!' . PHP_EOL;
