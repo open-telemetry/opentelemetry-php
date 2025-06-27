@@ -562,6 +562,8 @@ propagator:
 tracer_provider:
   # Configure span processors.
   processors:
+    -
+      http_metrics:
     - # Configure a batch span processor.
       batch:
         # Configure delay interval (in milliseconds) between two consecutive exports.

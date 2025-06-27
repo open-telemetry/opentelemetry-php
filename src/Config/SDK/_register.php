@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Config\SDK\ComponentProvider\Instrumentation\General\HttpConfigProvider;
 use OpenTelemetry\Config\SDK\ComponentProvider\Instrumentation\General\PeerConfigProvider;
 use OpenTelemetry\Config\SDK\ComponentProvider\Logs\LogRecordExporterConsole;
@@ -34,8 +35,8 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterOtlpGrpc;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterOtlpHttp;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterZipkin;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorBatch;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorHttpMetrics;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
-use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3Multi::class);
@@ -57,6 +58,7 @@ ServiceLoader::register(ComponentProvider::class, SpanExporterOtlpHttp::class);
 ServiceLoader::register(ComponentProvider::class, SpanExporterZipkin::class);
 ServiceLoader::register(ComponentProvider::class, SpanProcessorBatch::class);
 ServiceLoader::register(ComponentProvider::class, SpanProcessorSimple::class);
+ServiceLoader::register(ComponentProvider::class, SpanProcessorHttpMetrics::class);
 
 ServiceLoader::register(ComponentProvider::class, AggregationResolverDefault::class);
 ServiceLoader::register(ComponentProvider::class, MetricExporterConsole::class);

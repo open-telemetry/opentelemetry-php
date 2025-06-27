@@ -1,0 +1,22 @@
+file_format: '0.4'
+
+resource:
+  attributes:
+    - name: service.name
+      value: opentelemetry-demo
+
+tracer_provider:
+  sampler:
+    parent_based:
+      root:
+        always_on:
+  processors:
+    - http_metrics:
+    - simple:
+        exporter:
+          console:
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
