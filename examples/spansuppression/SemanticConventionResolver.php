@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Example;
 
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConvention;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\SpanSuppression\SemanticConvention;
 
-final class SemanticConventionResolver implements \OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionResolver
+final class SemanticConventionResolver implements \OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver
 {
     public function resolveSemanticConventions(string $name, ?string $version, ?string $schemaUrl): array
     {

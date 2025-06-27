@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy;
 
 use function array_merge;
-use OpenTelemetry\API\Instrumentation\SpanSuppression\SemanticConventionResolver;
+use OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
