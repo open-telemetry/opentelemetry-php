@@ -39,6 +39,7 @@ class LoggerTest extends TestCase
         $this->sharedState = $this->createMock(LoggerSharedState::class);
         $this->sharedState->method('getLogRecordLimits')->willReturn($limits);
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
+        $this->processor->method('isEnabled')->willReturn(true);
         $this->sharedState->method('getProcessor')->willReturn($this->processor);
         $this->scope = new InstrumentationScope('foo', '1.0', 'schema.url', Attributes::create([])); //final
 

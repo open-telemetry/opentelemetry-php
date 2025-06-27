@@ -179,7 +179,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         return $this->flush(__FUNCTION__, $cancellation);
     }
 
-    public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, int $severityNumber, string $eventName): bool
+    public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, ?int $severityNumber, ?string $eventName): bool
     {
         return true;
     }

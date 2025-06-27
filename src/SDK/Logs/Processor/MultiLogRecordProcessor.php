@@ -61,14 +61,14 @@ class MultiLogRecordProcessor implements LogRecordProcessorInterface
         return $result;
     }
 
-    public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, int $severityNumber, string $eventName): bool
+    public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, ?int $severityNumber, ?string $eventName): bool
     {
         foreach ($this->processors as $processor) {
-            if (!$processor->isEnabled($context, $scope, $severityNumber, $eventName)) {
-                return false;
+            if ($processor->isEnabled($context, $scope, $severityNumber, $eventName)) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }

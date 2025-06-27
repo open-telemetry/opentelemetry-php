@@ -52,7 +52,7 @@ class LoggerTest extends TestCase
                 return true;
             }
 
-            public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, int $severityNumber, string $eventName): bool
+            public function isEnabled(ContextInterface $context, InstrumentationScopeInterface $scope, ?int $severityNumber, ?string $eventName): bool
             {
                 return true;
             }
