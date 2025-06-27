@@ -20,7 +20,7 @@ class SpanProcessorFactory
         $names = array_filter($names, static function (string $name): bool {
             return !in_array($name, [Values::VALUE_NOOP, Values::VALUE_NONE], true);
         });
-        if (count($names) === 0) {
+        if ($names === []) {
             return new NoopSpanProcessor();
         }
         if (count($names) === 1) {
