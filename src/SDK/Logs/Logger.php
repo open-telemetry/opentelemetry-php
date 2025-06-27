@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Logs;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
@@ -55,7 +56,10 @@ class Logger implements LoggerInterface
      */
     public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
-        return $this->config->isEnabled();
+        $context ??= Context::getCurrent();
+
+        return $this->loggerSharedState->getProcessor()->isEnabled($context, $this->scope, $severityNumber, $eventName)
+            && $this->config->isEnabled();
     }
 
     /**
