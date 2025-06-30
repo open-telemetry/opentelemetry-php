@@ -214,57 +214,6 @@ final class OpenTelemetrySdk implements ComponentProvider
             ))
             ->merge($mandatory);
 
-        $spanProcessors = [];
-        foreach ($properties['tracer_provider']['processors'] as $processor) {
-            $spanProcessors[] = $processor->create($context);
-        }
-
-        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
-        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
-
-        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
-            $disabled = $tracer['config']['disabled'];
-            $configurator = $configurator->with(
-                static fn (TracerConfig $config) => $config->setDisabled($disabled),
-                name: $tracer['name'],
-            );
-        }
-
-        // <editor-fold desc="tracer_provider">
-
-        $tracerProvider = new TracerProvider(
-            spanProcessors: $spanProcessors,
-            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
-            resource: $resource,
-            spanLimits: new SpanLimits(
-                attributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
-                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                linkAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
-                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
-                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
-            ),
-            configurator: $configurator,
-        );
-
-        // </editor-fold>
-
         // <editor-fold desc="meter_provider">
 
         $metricReaders = [];
@@ -340,6 +289,60 @@ final class OpenTelemetrySdk implements ComponentProvider
             viewRegistry: $viewRegistry,
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
+            configurator: $configurator,
+        );
+
+        // </editor-fold>
+
+        //make configured meter provider available to later components
+        $context = new Context($context->tracerProvider, $meterProvider, $context->loggerProvider, $context->logger);
+
+        $spanProcessors = [];
+        foreach ($properties['tracer_provider']['processors'] as $processor) {
+            $spanProcessors[] = $processor->create($context);
+        }
+
+        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
+
+        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
+            $disabled = $tracer['config']['disabled'];
+            $configurator = $configurator->with(
+                static fn (TracerConfig $config) => $config->setDisabled($disabled),
+                name: $tracer['name'],
+            );
+        }
+
+        // <editor-fold desc="tracer_provider">
+
+        $tracerProvider = new TracerProvider(
+            spanProcessors: $spanProcessors,
+            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
+            resource: $resource,
+            spanLimits: new SpanLimits(
+                attributesFactory: Attributes::factory(
+                    attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                ),
+                eventAttributesFactory: Attributes::factory(
+                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
+                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                ),
+                linkAttributesFactory: Attributes::factory(
+                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
+                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                ),
+                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
+                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
+            ),
             configurator: $configurator,
         );
 

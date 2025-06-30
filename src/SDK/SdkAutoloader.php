@@ -43,6 +43,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanProcessorContext;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use RuntimeException;
@@ -96,7 +97,7 @@ class SdkAutoloader
         $resource = ResourceInfoFactory::defaultResource();
         $exporter = (new ExporterFactory())->create();
         $meterProvider = (new MeterProviderFactory())->create($resource);
-        $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
+        $spanProcessor = (new SpanProcessorFactory())->create(new SpanProcessorContext($meterProvider, $exporter, $emitMetrics));
         $tracerProvider = (new TracerProviderBuilder())
             ->addSpanProcessor($spanProcessor)
             ->setResource($resource)

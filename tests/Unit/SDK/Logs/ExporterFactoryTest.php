@@ -11,6 +11,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 #[CoversClass(ExporterFactory::class)]
 class ExporterFactoryTest extends TestCase
@@ -37,10 +38,10 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
-    public function test_rejects_multiple(): void
+    public function test_rejects_invalid(): void
     {
-        $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', 'one,two');
-        $this->expectException(\InvalidArgumentException::class);
+        $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', 'unknown');
+        $this->expectException(RuntimeException::class);
 
         (new ExporterFactory())->create();
     }
