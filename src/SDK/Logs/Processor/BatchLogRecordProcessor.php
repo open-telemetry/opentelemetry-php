@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use SplQueue;
 use Throwable;
 
@@ -91,7 +92,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
             return;
         }
 
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+        $meter = $meterProvider->getMeter(MeterConfig::SELF_DIAGNOSTICS);
         $meter
             ->createObservableUpDownCounter(
                 'otel.logs.log_processor.logs',

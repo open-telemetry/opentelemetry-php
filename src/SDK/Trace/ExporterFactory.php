@@ -18,7 +18,7 @@ class ExporterFactory
     public function create(): SpanExporterInterface
     {
         $exporter = Configuration::getEnum(Variables::OTEL_TRACES_EXPORTER, 'none');
-        if (in_array($exporter, ['none'])) {
+        if ($exporter === 'none') {
             return new NoopSpanExporter();
         }
         $factory = Loader::spanExporterFactory($exporter);

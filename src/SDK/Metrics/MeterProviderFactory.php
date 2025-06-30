@@ -8,6 +8,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
@@ -47,11 +48,20 @@ class MeterProviderFactory
         $reader = new ExportingReader($exporter);
         $resource ??= ResourceInfoFactory::defaultResource();
         $exemplarFilter = $this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER));
+        $configurator = Configurator::meter();
+        $disabled = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED, false) === false;
+        $configurator = $configurator->with(
+            function (MeterConfig $config) use ($disabled) {
+                $config->setDisabled($disabled);
+            },
+            MeterConfig::SELF_DIAGNOSTICS, //@todo further namespace self-diagnostics?
+        );
 
         return MeterProvider::builder()
             ->setResource($resource)
             ->addReader($reader)
             ->setExemplarFilter($exemplarFilter)
+            ->setConfigurator($configurator)
             ->build();
     }
 

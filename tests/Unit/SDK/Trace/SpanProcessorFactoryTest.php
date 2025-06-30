@@ -33,7 +33,6 @@ class SpanProcessorFactoryTest extends TestCase
         $context = new SpanProcessorContext(
             $this->createMock(MeterProviderInterface::class),
             $this->createMock(SpanExporterInterface::class),
-            false,
         );
         $this->assertInstanceOf($expected, $factory->create($context));
     }
@@ -54,7 +53,6 @@ class SpanProcessorFactoryTest extends TestCase
         $context = new SpanProcessorContext(
             $this->createMock(MeterProviderInterface::class),
             $this->createMock(SpanExporterInterface::class),
-            false,
         );
         $this->assertInstanceOf(BatchSpanProcessor::class, $factory->create($context));
     }
@@ -66,7 +64,6 @@ class SpanProcessorFactoryTest extends TestCase
         $context = new SpanProcessorContext(
             $this->createMock(MeterProviderInterface::class),
             $this->createMock(SpanExporterInterface::class),
-            false,
         );
         $this->expectException(RuntimeException::class);
         $factory->create($context);

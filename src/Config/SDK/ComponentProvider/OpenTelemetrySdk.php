@@ -167,6 +167,12 @@ final class OpenTelemetrySdk implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): SdkBuilder
     {
+        /**
+         * @todo Should split TracerProvider/MeterProvider/LoggerProvider creation and initialization into two steps
+         * to have access to all providers during SDK component creation.
+         * For example MetricReader and MetricExporter need access to the MeterProvider to generate otel.sdk.exporter.metric_data_point.exported,
+         * otel.sdk.metric_reader.collection.duration, etc. metrics.
+         */
         $sdkBuilder = new SdkBuilder();
 
         $propagators = [];
@@ -294,7 +300,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         // </editor-fold>
 
-        //make configured meter provider available to later components
+        //@todo split creation from initialization to allow access to all providers during component creation
         $context = new Context($context->tracerProvider, $meterProvider, $context->loggerProvider, $context->logger);
 
         $spanProcessors = [];

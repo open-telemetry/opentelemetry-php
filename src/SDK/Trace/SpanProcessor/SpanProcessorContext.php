@@ -12,7 +12,6 @@ final class SpanProcessorContext
     public function __construct(
         public readonly MeterProviderInterface $meterProvider,
         public readonly SpanExporterInterface $exporter,
-        public readonly bool $emitInternalMetrics,
     ) {
     }
 }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Sdk;
@@ -50,7 +48,6 @@ final class TracerProviderFactory
                 new SpanProcessorContext(
                     $this->meterProvider,
                     $exporter,
-                    Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED, false)
                 )
             );
         } catch (\Throwable $t) {
