@@ -40,7 +40,7 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ClockInterface $clock,
         AttributesFactoryInterface $attributesFactory,
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
-        private readonly iterable $metricReaders,
+        private iterable $metricReaders,
         private readonly ViewRegistryInterface $viewRegistry,
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
@@ -54,6 +54,11 @@ final class MeterProvider implements MeterProviderInterface
         $this->writer = $registry;
         $this->destructors = new WeakMap();
         $this->meters = new WeakMap();
+    }
+
+    public function setReaders(iterable $readers): void
+    {
+        $this->metricReaders = $readers;
     }
 
     public function getMeter(

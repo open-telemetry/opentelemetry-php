@@ -11,4 +11,6 @@ interface MetricReaderInterface
     public function shutdown(): bool;
 
     public function forceFlush(): bool;
+
+    public function setExporter(MetricExporterInterface $exporter): void;
 }

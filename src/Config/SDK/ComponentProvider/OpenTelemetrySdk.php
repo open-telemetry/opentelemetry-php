@@ -22,6 +22,7 @@ use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MeterConfig;
@@ -44,6 +45,8 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
+use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -167,13 +170,9 @@ final class OpenTelemetrySdk implements ComponentProvider
      */
     public function createPlugin(array $properties, Context $context): SdkBuilder
     {
-        /**
-         * @todo Should split TracerProvider/MeterProvider/LoggerProvider creation and initialization into two steps
-         * to have access to all providers during SDK component creation.
-         * For example MetricReader and MetricExporter need access to the MeterProvider to generate otel.sdk.exporter.metric_data_point.exported,
-         * otel.sdk.metric_reader.collection.duration, etc. metrics.
-         */
         $sdkBuilder = new SdkBuilder();
+
+        // <editor-fold desc="propagators">
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
@@ -182,9 +181,13 @@ final class OpenTelemetrySdk implements ComponentProvider
         $propagator = ($propagators === []) ? NoopTextMapPropagator::getInstance() : new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
+        // </editor-fold>
+
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
+
+        // <editor-fold desc="resource">
 
         //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
         $schemaUrl = $properties['resource']['schema_url'];
@@ -220,12 +223,55 @@ final class OpenTelemetrySdk implements ComponentProvider
             ))
             ->merge($mandatory);
 
-        // <editor-fold desc="meter_provider">
+        // </editor-fold>
 
-        $metricReaders = [];
-        foreach ($properties['meter_provider']['readers'] as $reader) {
-            $metricReaders[] = $reader->create($context);
+        // <editor-fold desc="tracer_provider">
+
+        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
+        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
+
+        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
+            $disabled = $tracer['config']['disabled'];
+            $configurator = $configurator->with(
+                static fn (TracerConfig $config) => $config->setDisabled($disabled),
+                name: $tracer['name'],
+            );
         }
+
+        $tracerProvider = new TracerProvider(
+            spanProcessor: new NoopSpanProcessor(), //initialize later
+            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
+            resource: $resource,
+            spanLimits: new SpanLimits(
+                attributesFactory: Attributes::factory(
+                    attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                ),
+                eventAttributesFactory: Attributes::factory(
+                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
+                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                ),
+                linkAttributesFactory: Attributes::factory(
+                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
+                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
+                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                ),
+                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
+                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
+            ),
+            configurator: $configurator,
+        );
+
+        // </editor-fold>
+
+        // <editor-fold desc="meter_provider">
 
         $viewRegistry = new CriteriaViewRegistry();
         foreach ($properties['meter_provider']['views'] as $view) {
@@ -291,7 +337,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             clock: Clock::getDefault(),
             attributesFactory: Attributes::factory(),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            metricReaders: $metricReaders, // @phpstan-ignore-line
+            metricReaders: [], //initialize later
             viewRegistry: $viewRegistry,
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
@@ -300,66 +346,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         // </editor-fold>
 
-        //@todo split creation from initialization to allow access to all providers during component creation
-        $context = new Context($context->tracerProvider, $meterProvider, $context->loggerProvider, $context->logger);
-
-        $spanProcessors = [];
-        foreach ($properties['tracer_provider']['processors'] as $processor) {
-            $spanProcessors[] = $processor->create($context);
-        }
-
-        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
-        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
-
-        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
-            $disabled = $tracer['config']['disabled'];
-            $configurator = $configurator->with(
-                static fn (TracerConfig $config) => $config->setDisabled($disabled),
-                name: $tracer['name'],
-            );
-        }
-
-        // <editor-fold desc="tracer_provider">
-
-        $tracerProvider = new TracerProvider(
-            spanProcessors: $spanProcessors,
-            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
-            resource: $resource,
-            spanLimits: new SpanLimits(
-                attributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
-                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                linkAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
-                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
-                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
-            ),
-            configurator: $configurator,
-        );
-
-        // </editor-fold>
-
         // <editor-fold desc="logger_provider">
-
-        $logRecordProcessors = [];
-        foreach ($properties['logger_provider']['processors'] as $processor) {
-            $logRecordProcessors[] = $processor->create($context);
-        }
 
         $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
         $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
@@ -373,12 +360,40 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         // TODO Allow injecting log record attributes factory
         $loggerProvider = new LoggerProvider(
-            processor: new MultiLogRecordProcessor($logRecordProcessors),
+            processor: new NoopLogRecordProcessor(), //initialize later
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             resource: $resource,
             configurator: $configurator,
         );
         $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
+
+        // </editor-fold>
+
+        // <editor-fold desc="provider initialization">
+        $context = new Context($tracerProvider, $meterProvider, $loggerProvider, $context->logger);
+        $metricReaders = [];
+        foreach ($properties['meter_provider']['readers'] as $reader) {
+            $metricReaders[] = $reader->create($context);
+        }
+        $meterProvider->setReaders($metricReaders);
+
+        $spanProcessors = [];
+        foreach ($properties['tracer_provider']['processors'] as $processor) {
+            $spanProcessors[] = $processor->create($context);
+        }
+        $spanProcessor = match (count($spanProcessors)) {
+            0 => NoopSpanProcessor::getInstance(),
+            1 => $spanProcessors[0],
+            default => new MultiSpanProcessor(...$spanProcessors),
+        };
+
+        $tracerProvider->setSpanProcessor($spanProcessor);
+
+        $logRecordProcessors = [];
+        foreach ($properties['logger_provider']['processors'] as $processor) {
+            $logRecordProcessors[] = $processor->create($context);
+        }
+        $loggerProvider->setLogRecordProcessor(new MultiLogRecordProcessor($logRecordProcessors));
 
         // </editor-fold>
 

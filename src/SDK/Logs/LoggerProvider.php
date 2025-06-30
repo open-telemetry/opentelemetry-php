@@ -35,6 +35,11 @@ class LoggerProvider implements LoggerProviderInterface
         $this->loggers = new WeakMap();
     }
 
+    public function setLogRecordProcessor(LogRecordProcessorInterface $processor): void
+    {
+        $this->loggerSharedState->setLogRecordProcessor($processor);
+    }
+
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#logger-creation
      */

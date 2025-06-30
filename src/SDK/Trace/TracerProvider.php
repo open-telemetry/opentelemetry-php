@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use function is_array;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -16,6 +15,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use WeakMap;
 
 final class TracerProvider implements TracerProviderInterface
@@ -24,9 +24,8 @@ final class TracerProvider implements TracerProviderInterface
     private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory;
     private readonly WeakMap $tracers;
 
-    /** @param list<SpanProcessorInterface>|SpanProcessorInterface|null $spanProcessors */
     public function __construct(
-        SpanProcessorInterface|array|null $spanProcessors = [],
+        ?SpanProcessorInterface $spanProcessor = null,
         ?SamplerInterface $sampler = null,
         ?ResourceInfo $resource = null,
         ?SpanLimits $spanLimits = null,
@@ -34,8 +33,7 @@ final class TracerProvider implements TracerProviderInterface
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
         private ?Configurator $configurator = null,
     ) {
-        $spanProcessors ??= [];
-        $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
+        $spanProcessor ??= new NoopSpanProcessor();
         $resource ??= ResourceInfoFactory::defaultResource();
         $sampler ??= new ParentBased(new AlwaysOnSampler());
         $idGenerator ??= new RandomIdGenerator();
@@ -46,10 +44,15 @@ final class TracerProvider implements TracerProviderInterface
             $resource,
             $spanLimits,
             $sampler,
-            $spanProcessors
+            $spanProcessor
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
         $this->tracers = new WeakMap();
+    }
+
+    public function setSpanProcessor(SpanProcessorInterface $processor): void
+    {
+        $this->tracerSharedState->setSpanProcessor($processor);
     }
 
     public function forceFlush(?CancellationInterface $cancellation = null): bool

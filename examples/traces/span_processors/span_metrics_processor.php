@@ -13,6 +13,7 @@ putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=console');
 putenv('OTEL_LOGS_EXPORTER=none');
 putenv('OTEL_PHP_TRACES_PROCESSOR=batch,http_metrics');
+putenv('OTEL_PHP_INTERNAL_METRICS_ENABLED=true');
 
 /**
  * This example uses the batch span processor to emit spans, as well as the

@@ -24,7 +24,7 @@ meter_provider:
           disabled: false
       - name: 'php.otel.sdk.self-diagnostics'
         config:
-          disabled: true
+          disabled: false
   readers:
     - periodic:
         exporter:
