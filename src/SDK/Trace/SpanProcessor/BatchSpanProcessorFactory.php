@@ -21,7 +21,7 @@ class BatchSpanProcessorFactory implements SpanProcessorFactoryInterface
             Configuration::getInt(Env::OTEL_BSP_EXPORT_TIMEOUT, BatchSpanProcessor::DEFAULT_EXPORT_TIMEOUT),
             Configuration::getInt(Env::OTEL_BSP_MAX_EXPORT_BATCH_SIZE, BatchSpanProcessor::DEFAULT_MAX_EXPORT_BATCH_SIZE),
             true, //autoflush
-            $context->emitInternalMetrics ? $context->meterProvider : null,
+            $context->meterProvider,
         );
     }
 

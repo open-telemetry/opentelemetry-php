@@ -24,7 +24,7 @@ class SpanProcessorFactory
             return new NoopSpanProcessor();
         }
         if (count($names) === 1) {
-            return Loader::spanProcessor($names[0], $context);
+            return Loader::spanProcessor($names[array_key_first($names)], $context);
         }
 
         $processors = [];
