@@ -11,7 +11,7 @@ interface ResourceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.33.0';
 
     /**
      * ec2
@@ -96,6 +96,55 @@ interface ResourceAttributeValues
      * @see ResourceAttributes::CLOUD_PLATFORM
      */
     public const CLOUD_PLATFORM_AWS_OPENSHIFT = 'aws_openshift';
+
+    /**
+     * Azure Virtual Machines
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_VM = 'azure.vm';
+
+    /**
+     * Azure Container Apps
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure.container_apps';
+
+    /**
+     * Azure Container Instances
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_INSTANCES = 'azure.container_instances';
+
+    /**
+     * Azure Kubernetes Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_AKS = 'azure.aks';
+
+    /**
+     * Azure Functions
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_FUNCTIONS = 'azure.functions';
+
+    /**
+     * Azure App Service
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure.app_service';
+
+    /**
+     * Azure Red Hat OpenShift
+     *
+     * @see ResourceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure.openshift';
 
     /**
      * Azure Virtual Machines

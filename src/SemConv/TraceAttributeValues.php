@@ -11,7 +11,7 @@ interface TraceAttributeValues
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.33.0';
     /**
      * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
      *
@@ -507,12 +507,63 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::CLOUD_PLATFORM
      */
+    public const CLOUD_PLATFORM_AZURE_VM = 'azure.vm';
+
+    /**
+     * Azure Container Apps
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure.container_apps';
+
+    /**
+     * Azure Container Instances
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_CONTAINER_INSTANCES = 'azure.container_instances';
+
+    /**
+     * Azure Kubernetes Service
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_AKS = 'azure.aks';
+
+    /**
+     * Azure Functions
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_FUNCTIONS = 'azure.functions';
+
+    /**
+     * Azure App Service
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure.app_service';
+
+    /**
+     * Azure Red Hat OpenShift
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     */
+    public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure.openshift';
+
+    /**
+     * Azure Virtual Machines
+     *
+     * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.vm`
+     */
     public const CLOUD_PLATFORM_AZURE_VM = 'azure_vm';
 
     /**
      * Azure Container Apps
      *
      * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.container_apps`
      */
     public const CLOUD_PLATFORM_AZURE_CONTAINER_APPS = 'azure_container_apps';
 
@@ -520,6 +571,7 @@ interface TraceAttributeValues
      * Azure Container Instances
      *
      * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.container_instances`
      */
     public const CLOUD_PLATFORM_AZURE_CONTAINER_INSTANCES = 'azure_container_instances';
 
@@ -527,6 +579,7 @@ interface TraceAttributeValues
      * Azure Kubernetes Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.aks`
      */
     public const CLOUD_PLATFORM_AZURE_AKS = 'azure_aks';
 
@@ -534,6 +587,7 @@ interface TraceAttributeValues
      * Azure Functions
      *
      * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.functions`
      */
     public const CLOUD_PLATFORM_AZURE_FUNCTIONS = 'azure_functions';
 
@@ -541,6 +595,7 @@ interface TraceAttributeValues
      * Azure App Service
      *
      * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.app_service`
      */
     public const CLOUD_PLATFORM_AZURE_APP_SERVICE = 'azure_app_service';
 
@@ -548,6 +603,7 @@ interface TraceAttributeValues
      * Azure Red Hat OpenShift
      *
      * @see TraceAttributes::CLOUD_PLATFORM
+     * @deprecated Replaced by `azure.openshift`
      */
     public const CLOUD_PLATFORM_AZURE_OPENSHIFT = 'azure_openshift';
 
@@ -2264,14 +2320,30 @@ interface TraceAttributeValues
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
      */
-    public const GEN_AI_SYSTEM_AZ_AI_INFERENCE = 'az.ai.inference';
+    public const GEN_AI_SYSTEM_AZURE_AI_INFERENCE = 'azure.ai.inference';
 
     /**
      * Azure OpenAI
      *
      * @see TraceAttributes::GEN_AI_SYSTEM
      */
-    public const GEN_AI_SYSTEM_AZ_AI_OPENAI = 'az.ai.openai';
+    public const GEN_AI_SYSTEM_AZURE_AI_OPENAI = 'azure.ai.openai';
+
+    /**
+     * Azure AI Inference
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     * @deprecated Replaced by azure.ai.inference
+     */
+    public const GEN_AI_SYSTEM_AZ_AI_INFERENCE = 'az.ai.inference';
+
+    /**
+     * Azure OpenAI
+     *
+     * @see TraceAttributes::GEN_AI_SYSTEM
+     * @deprecated Replaced by azure.ai.openai
+     */
+    public const GEN_AI_SYSTEM_AZ_AI_OPENAI = 'azure.ai.openai';
 
     /**
      * IBM Watsonx AI
@@ -2833,6 +2905,62 @@ interface TraceAttributeValues
      * @see TraceAttributes::K8S_NAMESPACE_PHASE
      */
     public const K8S_NAMESPACE_PHASE_TERMINATING = 'terminating';
+
+    /**
+     * condition_true
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_STATUS
+     */
+    public const K8S_NODE_CONDITION_STATUS_CONDITION_TRUE = 'true';
+
+    /**
+     * condition_false
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_STATUS
+     */
+    public const K8S_NODE_CONDITION_STATUS_CONDITION_FALSE = 'false';
+
+    /**
+     * condition_unknown
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_STATUS
+     */
+    public const K8S_NODE_CONDITION_STATUS_CONDITION_UNKNOWN = 'unknown';
+
+    /**
+     * The node is healthy and ready to accept pods
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_TYPE
+     */
+    public const K8S_NODE_CONDITION_TYPE_READY = 'Ready';
+
+    /**
+     * Pressure exists on the disk size—that is, if the disk capacity is low
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_TYPE
+     */
+    public const K8S_NODE_CONDITION_TYPE_DISK_PRESSURE = 'DiskPressure';
+
+    /**
+     * Pressure exists on the node memory—that is, if the node memory is low
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_TYPE
+     */
+    public const K8S_NODE_CONDITION_TYPE_MEMORY_PRESSURE = 'MemoryPressure';
+
+    /**
+     * Pressure exists on the processes—that is, if there are too many processes on the node
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_TYPE
+     */
+    public const K8S_NODE_CONDITION_TYPE_PID_PRESSURE = 'PIDPressure';
+
+    /**
+     * The network for the node is not correctly configured
+     *
+     * @see TraceAttributes::K8S_NODE_CONDITION_TYPE
+     */
+    public const K8S_NODE_CONDITION_TYPE_NETWORK_UNAVAILABLE = 'NetworkUnavailable';
 
     /**
      * A [persistentVolumeClaim](https://v1-30.docs.kubernetes.io/docs/concepts/storage/volumes/#persistentvolumeclaim) volume
@@ -3642,6 +3770,13 @@ interface TraceAttributeValues
     public const OTEL_COMPONENT_TYPE_OTLP_HTTP_JSON_SPAN_EXPORTER = 'otlp_http_json_span_exporter';
 
     /**
+     * Zipkin span exporter over HTTP
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_ZIPKIN_HTTP_SPAN_EXPORTER = 'zipkin_http_span_exporter';
+
+    /**
      * OTLP log record exporter over gRPC with protobuf serialization
      *
      * @see TraceAttributes::OTEL_COMPONENT_TYPE
@@ -3689,6 +3824,13 @@ interface TraceAttributeValues
      * @see TraceAttributes::OTEL_COMPONENT_TYPE
      */
     public const OTEL_COMPONENT_TYPE_OTLP_HTTP_JSON_METRIC_EXPORTER = 'otlp_http_json_metric_exporter';
+
+    /**
+     * Prometheus metric exporter over HTTP with the default text-based format
+     *
+     * @see TraceAttributes::OTEL_COMPONENT_TYPE
+     */
+    public const OTEL_COMPONENT_TYPE_PROMETHEUS_HTTP_TEXT_METRIC_EXPORTER = 'prometheus_http_text_metric_exporter';
 
     /**
      * The span is not sampled and not recording

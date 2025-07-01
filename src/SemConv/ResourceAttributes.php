@@ -11,7 +11,7 @@ interface ResourceAttributes
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
-    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
+    public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.33.0';
 
     /**
      * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
@@ -208,7 +208,7 @@ interface ResourceAttributes
      *   with the resolved function version, as the same runtime instance may be invocable with
      *   multiple different aliases.
      * - **GCP:** The [URI of the resource](https://cloud.google.com/iam/docs/full-resource-names)
-     * - **Azure:** The [Fully Qualified Resource ID](https://docs.microsoft.com/rest/api/resources/resources/get-by-id) of the invoked function,
+     * - **Azure:** The [Fully Qualified Resource ID](https://learn.microsoft.com/rest/api/resources/resources/get-by-id) of the invoked function,
      *   *not* the function app, having the form
      *   `/subscriptions/<SUBSCRIPTION_GUID>/resourceGroups/<RG>/providers/Microsoft.Web/sites/<FUNCAPP>/functions/<FUNC>`.
      *   This means that a span attribute MUST be used, as an Azure function app can host multiple functions that would usually share
@@ -760,16 +760,26 @@ interface ResourceAttributes
     public const K8S_CRONJOB_UID = 'k8s.cronjob.uid';
 
     /**
-     * The annotation key-value pairs placed on the DaemonSet.
+     * The annotation placed on the DaemonSet, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
      *
-     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `replicas` with value `1` SHOULD be recorded
+     *   as the `k8s.daemonset.annotation.replicas` attribute with value `"1"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.daemonset.annotation.data` attribute with value `""`.
      */
     public const K8S_DAEMONSET_ANNOTATION = 'k8s.daemonset.annotation';
 
     /**
-     * The label key-value pairs placed on the DaemonSet.
+     * The label placed on the DaemonSet, the `<key>` being the label name, the value being the label value, even if the value is empty.
      *
-     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `app` with value `guestbook` SHOULD be recorded
+     *   as the `k8s.daemonset.label.app` attribute with value `"guestbook"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.daemonset.label.injected` attribute with value `""`.
      */
     public const K8S_DAEMONSET_LABEL = 'k8s.daemonset.label';
 
@@ -784,16 +794,26 @@ interface ResourceAttributes
     public const K8S_DAEMONSET_UID = 'k8s.daemonset.uid';
 
     /**
-     * The annotation key-value pairs placed on the Deployment.
+     * The annotation placed on the Deployment, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
      *
-     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `replicas` with value `1` SHOULD be recorded
+     *   as the `k8s.deployment.annotation.replicas` attribute with value `"1"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.deployment.annotation.data` attribute with value `""`.
      */
     public const K8S_DEPLOYMENT_ANNOTATION = 'k8s.deployment.annotation';
 
     /**
-     * The label key-value pairs placed on the Deployment.
+     * The label placed on the Deployment, the `<key>` being the label name, the value being the label value, even if the value is empty.
      *
-     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `replicas` with value `0` SHOULD be recorded
+     *   as the `k8s.deployment.label.app` attribute with value `"guestbook"`.
+     * - A label `injected` with empty string value SHOULD be recorded as
+     *   the `k8s.deployment.label.injected` attribute with value `""`.
      */
     public const K8S_DEPLOYMENT_LABEL = 'k8s.deployment.label';
 
@@ -839,16 +859,26 @@ interface ResourceAttributes
     public const K8S_HPA_UID = 'k8s.hpa.uid';
 
     /**
-     * The annotation key-value pairs placed on the Job.
+     * The annotation placed on the Job, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
      *
-     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `number` with value `1` SHOULD be recorded
+     *   as the `k8s.job.annotation.number` attribute with value `"1"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.job.annotation.data` attribute with value `""`.
      */
     public const K8S_JOB_ANNOTATION = 'k8s.job.annotation';
 
     /**
-     * The label key-value pairs placed on the Job.
+     * The label placed on the Job, the `<key>` being the label name, the value being the label value, even if the value is empty.
      *
-     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `jobtype` with value `ci` SHOULD be recorded
+     *   as the `k8s.job.label.jobtype` attribute with value `"ci"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.job.label.automated` attribute with value `""`.
      */
     public const K8S_JOB_LABEL = 'k8s.job.label';
 
@@ -863,16 +893,26 @@ interface ResourceAttributes
     public const K8S_JOB_UID = 'k8s.job.uid';
 
     /**
-     * The annotation key-value pairs placed on the Namespace.
+     * The annotation placed on the Namespace, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
      *
-     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `ttl` with value `0` SHOULD be recorded
+     *   as the `k8s.namespace.annotation.ttl` attribute with value `"0"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.namespace.annotation.data` attribute with value `""`.
      */
     public const K8S_NAMESPACE_ANNOTATION = 'k8s.namespace.annotation';
 
     /**
-     * The label key-value pairs placed on the Namespace.
+     * The label placed on the Namespace, the `<key>` being the label name, the value being the label value, even if the value is empty.
      *
-     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `kubernetes.io/metadata.name` with value `default` SHOULD be recorded
+     *   as the `k8s.namespace.label.kubernetes.io/metadata.name` attribute with value `"default"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.namespace.label.data` attribute with value `""`.
      */
     public const K8S_NAMESPACE_LABEL = 'k8s.namespace.label';
 
@@ -954,16 +994,26 @@ interface ResourceAttributes
     public const K8S_POD_UID = 'k8s.pod.uid';
 
     /**
-     * The annotation key-value pairs placed on the ReplicaSet.
+     * The annotation placed on the ReplicaSet, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
      *
-     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `replicas` with value `0` SHOULD be recorded
+     *   as the `k8s.replicaset.annotation.replicas` attribute with value `"0"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.replicaset.annotation.data` attribute with value `""`.
      */
     public const K8S_REPLICASET_ANNOTATION = 'k8s.replicaset.annotation';
 
     /**
-     * The label key-value pairs placed on the ReplicaSet.
+     * The label placed on the ReplicaSet, the `<key>` being the label name, the value being the label value, even if the value is empty.
      *
-     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `app` with value `guestbook` SHOULD be recorded
+     *   as the `k8s.replicaset.label.app` attribute with value `"guestbook"`.
+     * - A label `injected` with empty string value SHOULD be recorded as
+     *   the `k8s.replicaset.label.injected` attribute with value `""`.
      */
     public const K8S_REPLICASET_LABEL = 'k8s.replicaset.label';
 
@@ -998,16 +1048,26 @@ interface ResourceAttributes
     public const K8S_RESOURCEQUOTA_UID = 'k8s.resourcequota.uid';
 
     /**
-     * The annotation key-value pairs placed on the StatefulSet.
+     * The annotation placed on the StatefulSet, the `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
      *
-     * The `<key>` being the annotation name, the value being the annotation value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `replicas` with value `1` SHOULD be recorded
+     *   as the `k8s.statefulset.annotation.replicas` attribute with value `"1"`.
+     * - A label `data` with empty string value SHOULD be recorded as
+     *   the `k8s.statefulset.annotation.data` attribute with value `""`.
      */
     public const K8S_STATEFULSET_ANNOTATION = 'k8s.statefulset.annotation';
 
     /**
-     * The label key-value pairs placed on the StatefulSet.
+     * The label placed on the StatefulSet, the `<key>` being the label name, the value being the label value, even if the value is empty.
      *
-     * The `<key>` being the label name, the value being the label value, even if the value is empty.
+     * Examples:
+     *
+     * - A label `replicas` with value `0` SHOULD be recorded
+     *   as the `k8s.statefulset.label.app` attribute with value `"guestbook"`.
+     * - A label `injected` with empty string value SHOULD be recorded as
+     *   the `k8s.statefulset.label.injected` attribute with value `""`.
      */
     public const K8S_STATEFULSET_LABEL = 'k8s.statefulset.label';
 
