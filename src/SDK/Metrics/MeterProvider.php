@@ -59,6 +59,12 @@ final class MeterProvider implements MeterProviderInterface
     public function setReaders(iterable $readers): void
     {
         $this->metricReaders = $readers;
+        $disabled = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: '*');
+        foreach ($this->meters as $meter => $unused) {
+            $meter->setMetricRegistries($readers);
+            $meter->updateConfigurator($disabled);
+            $meter->updateConfigurator($this->configurator);
+        }
     }
 
     public function getMeter(
