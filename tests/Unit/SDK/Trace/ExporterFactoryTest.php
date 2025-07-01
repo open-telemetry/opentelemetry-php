@@ -10,6 +10,7 @@ use Http\Discovery\Strategy\MockClientStrategy;
 use OpenTelemetry\Contrib;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanExporter\NoopSpanExporter;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -31,7 +32,7 @@ class ExporterFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
         $factory = new ExporterFactory();
-        $this->assertNull($factory->create());
+        $this->assertInstanceOf(NoopSpanExporter::class, $factory->create());
     }
 
     /**

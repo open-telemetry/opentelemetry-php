@@ -9,6 +9,8 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\ConfigTrait;
 
 class MeterConfig implements Config
 {
+    public const SELF_DIAGNOSTICS = 'php.otel.sdk.self-diagnostics';
+
     use ConfigTrait;
 
     public static function default(): self

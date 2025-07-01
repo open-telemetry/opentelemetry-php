@@ -29,3 +29,9 @@ providing a higher priority for the same type).
 #### Metrics: InstrumentType, Temporality, advisory
 Methods which previously accepted `Temporality|string`, or `InstrumentType|string` no longer accept strings.
 `$advisory` is now a required parameter for `OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface`.
+
+#### TracerProvider
+`TracerProvider` constructor now accepts a `SpanProcessorInterface` as the first argument, rather than an array of
+`SpanProcessorInterface`s. If multiple processors are required, they should be added to a `MultiSpanProcessor` (which
+is what happened internally in 1.x anyway).
+

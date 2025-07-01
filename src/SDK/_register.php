@@ -21,6 +21,10 @@ use OpenTelemetry\SDK\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\SDK\Propagation\TraceContextPropagatorFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\HttpMetricsSpanProcessorFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessorFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanProcessorFactoryInterface;
 
 ServiceLoader::register(TextMapPropagatorFactoryInterface::class, BaggagePropagatorFactory::class);
 ServiceLoader::register(TextMapPropagatorFactoryInterface::class, TraceContextPropagatorFactory::class);
@@ -43,3 +47,7 @@ ServiceLoader::register(SpanExporterFactoryInterface::class, SpanExporter\InMemo
 
 ServiceLoader::register(TransportFactoryInterface::class, StreamTransportFactory::class);
 ServiceLoader::register(TransportFactoryInterface::class, PsrTransportFactory::class);
+
+ServiceLoader::register(SpanProcessorFactoryInterface::class, BatchSpanProcessorFactory::class);
+ServiceLoader::register(SpanProcessorFactoryInterface::class, SimpleSpanProcessorFactory::class);
+ServiceLoader::register(SpanProcessorFactoryInterface::class, HttpMetricsSpanProcessorFactory::class);

@@ -21,9 +21,7 @@ $zipkinExporter = new ZipkinExporter(
 );
 
 $tracerProvider =  new TracerProvider(
-    [
-        new SimpleSpanProcessor($zipkinExporter),
-    ],
+    new SimpleSpanProcessor($zipkinExporter),
     $sampler
 );
 

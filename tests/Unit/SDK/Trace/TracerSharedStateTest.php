@@ -55,35 +55,6 @@ class TracerSharedStateTest extends TestCase
         );
     }
 
-    public function test_construct_no_span_processors(): void
-    {
-        $this->assertInstanceOf(
-            NoopSpanProcessor::class,
-            $this->construct()->getSpanProcessor()
-        );
-    }
-
-    public function test_construct_one_span_processor(): void
-    {
-        $processor = $this->createMock(SpanProcessorInterface::class);
-
-        $this->assertSame(
-            $processor,
-            $this->construct([$processor])->getSpanProcessor()
-        );
-    }
-
-    public function test_construct_multiple_span_processors(): void
-    {
-        $processor1 = $this->createMock(SpanProcessorInterface::class);
-        $processor2 = $this->createMock(SpanProcessorInterface::class);
-
-        $this->assertInstanceOf(
-            MultiSpanProcessor::class,
-            $this->construct([$processor1, $processor2])->getSpanProcessor()
-        );
-    }
-
     public function test_shutdown(): void
     {
         $spanProcessor = $this->createMock(SpanProcessorInterface::class);
@@ -93,26 +64,20 @@ class TracerSharedStateTest extends TestCase
         $this->assertTrue($state->hasShutdown());
     }
 
-    public function test_sets_noop_as_default_span_processor(): void
-    {
-        $state = new TracerSharedState(
-            $this->idGenerator,
-            $this->resourceInfo,
-            $this->spanLimits,
-            $this->sampler,
-            [],
-        );
-        $this->assertInstanceOf(NoopSpanProcessor::class, $state->getSpanProcessor());
-    }
-
     private function construct(array $spanProcessors = []): TracerSharedState
     {
+        $processor = match (count($spanProcessors)) {
+            0 => new NoopSpanProcessor(),
+            1 => $spanProcessors[0],
+            default => new MultiSpanProcessor(...$spanProcessors),
+        };
+
         return new TracerSharedState(
             $this->idGenerator,
             $this->resourceInfo,
             $this->spanLimits,
             $this->sampler,
-            $spanProcessors === [] ? [new NoopSpanProcessor()] : $spanProcessors,
+            $processor,
         );
     }
 }

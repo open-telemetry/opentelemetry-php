@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Sdk;
+use OpenTelemetry\SDK\Trace\SpanExporter\NoopSpanExporter;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanProcessorContext;
 
 final class TracerProviderFactory
 {
@@ -15,6 +19,7 @@ final class TracerProviderFactory
         private readonly ExporterFactory $exporterFactory = new ExporterFactory(),
         private readonly SamplerFactory $samplerFactory = new SamplerFactory(),
         private readonly SpanProcessorFactory $spanProcessorFactory = new SpanProcessorFactory(),
+        private readonly MeterProviderInterface $meterProvider = new NoopMeterProvider(),
     ) {
     }
 
@@ -28,7 +33,7 @@ final class TracerProviderFactory
             $exporter = $this->exporterFactory->create();
         } catch (\Throwable $t) {
             self::logWarning('Unable to create exporter', ['exception' => $t]);
-            $exporter = null;
+            $exporter = new NoopSpanExporter();
         }
 
         try {
@@ -39,7 +44,12 @@ final class TracerProviderFactory
         }
 
         try {
-            $spanProcessor = $this->spanProcessorFactory->create($exporter);
+            $spanProcessor = $this->spanProcessorFactory->create(
+                new SpanProcessorContext(
+                    $this->meterProvider,
+                    $exporter,
+                )
+            );
         } catch (\Throwable $t) {
             self::logWarning('Unable to create span processor', ['exception' => $t]);
             $spanProcessor = null;

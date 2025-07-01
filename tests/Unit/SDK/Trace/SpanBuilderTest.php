@@ -58,7 +58,7 @@ class SpanBuilderTest extends TestCase
             $this->createMock(ResourceInfo::class),
             $spanLimits,
             $this->sampler,
-            [$this->spanProcessor]
+            $this->spanProcessor,
         );
         $this->builder = new SpanBuilder('foo', $instrumentationScope, $sharedState);
     }

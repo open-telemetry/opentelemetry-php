@@ -66,7 +66,7 @@ class TracerTest extends TestCase
                 $newTraceState
             ));
 
-        $tracerProvider = new TracerProvider([], $sampler);
+        $tracerProvider = new TracerProvider(sampler: $sampler);
         $tracer = $tracerProvider->getTracer('OpenTelemetry.TracerTest');
         $span = $tracer->spanBuilder('test.span')->setParent($parentContext)->startSpan();
 

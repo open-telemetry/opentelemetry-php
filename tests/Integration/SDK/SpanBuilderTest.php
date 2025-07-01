@@ -99,7 +99,7 @@ class SpanBuilderTest extends MockeryTestCase
     {
         Logging::disable();
         $maxNumberOfLinks = 8;
-        $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build());
+        $tracerProvider = new TracerProvider(spanLimits: (new SpanLimitsBuilder())->setLinkCountLimit($maxNumberOfLinks)->build());
         $spanBuilder = $tracerProvider
             ->getTracer('test')
             ->spanBuilder(self::SPAN_NAME);
@@ -126,7 +126,7 @@ class SpanBuilderTest extends MockeryTestCase
 
     public function test_add_link_truncate_link_attributes(): void
     {
-        $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributePerLinkCountLimit(1)->build());
+        $tracerProvider = new TracerProvider(null, null, null, (new SpanLimitsBuilder())->setAttributePerLinkCountLimit(1)->build());
         /** @var Span $span */
         $span = $tracerProvider
             ->getTracer('test')
@@ -152,7 +152,7 @@ class SpanBuilderTest extends MockeryTestCase
         $strVal = str_repeat('a', $maxLength);
         $tooLongStrVal = "{$strVal}{$strVal}";
 
-        $tracerProvider = new TracerProvider([], null, null, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
+        $tracerProvider = new TracerProvider(null, null, null, (new SpanLimitsBuilder())->setAttributeValueLengthLimit($maxLength)->build());
         /** @var Span $span */
         $span = $tracerProvider
             ->getTracer('test')
@@ -352,7 +352,7 @@ class SpanBuilderTest extends MockeryTestCase
             }
         };
 
-        $tracerProvider = new TracerProvider([], $sampler);
+        $tracerProvider = new TracerProvider(sampler: $sampler);
         /** @var Span $span */
         $span = $tracerProvider->getTracer('test')->spanBuilder(self::SPAN_NAME)->startSpan();
         $span->end();
@@ -432,7 +432,7 @@ class SpanBuilderTest extends MockeryTestCase
     public function test_is_recording_sampler(): void
     {
         /** @var Span $span */
-        $span = (new TracerProvider([], new AlwaysOffSampler()))
+        $span = (new TracerProvider(sampler: new AlwaysOffSampler()))
             ->getTracer('test')
             ->spanBuilder(self::SPAN_NAME)
             ->startSpan();

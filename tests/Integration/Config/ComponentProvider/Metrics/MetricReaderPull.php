@@ -42,6 +42,11 @@ final class MetricReaderPull implements ComponentProvider
             {
                 return true;
             }
+
+            public function setExporter(MetricExporterInterface $exporter): void
+            {
+                // do nothing
+            }
         };
     }
 

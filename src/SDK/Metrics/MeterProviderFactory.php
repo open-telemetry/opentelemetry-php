@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
-use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Common\Services\Loader;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
@@ -34,18 +34,13 @@ class MeterProviderFactory
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
         }
-        $exporters = Configuration::getList(Variables::OTEL_METRICS_EXPORTER);
-        //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
-        if (count($exporters) !== 1) {
-            throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_METRICS_EXPORTER));
-        }
-        $exporterName = $exporters[0];
+        $name = Configuration::getEnum(Variables::OTEL_METRICS_EXPORTER, 'none');
 
         try {
-            $factory = Loader::metricExporterFactory($exporterName);
+            $factory = Loader::metricExporterFactory($name);
             $exporter = $factory->create();
         } catch (\Throwable $t) {
-            self::logWarning(sprintf('Unable to create %s meter provider: %s', $exporterName, $t->getMessage()));
+            self::logWarning(sprintf('Unable to create %s meter provider: %s', $name, $t->getMessage()));
             $exporter = new NoopMetricExporter();
         }
 
@@ -53,11 +48,20 @@ class MeterProviderFactory
         $reader = new ExportingReader($exporter);
         $resource ??= ResourceInfoFactory::defaultResource();
         $exemplarFilter = $this->createExemplarFilter(Configuration::getEnum(Variables::OTEL_METRICS_EXEMPLAR_FILTER));
+        $configurator = Configurator::meter();
+        $disabled = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED, false) === false;
+        $configurator = $configurator->with(
+            function (MeterConfig $config) use ($disabled) {
+                $config->setDisabled($disabled);
+            },
+            MeterConfig::SELF_DIAGNOSTICS, //@todo further namespace self-diagnostics?
+        );
 
         return MeterProvider::builder()
             ->setResource($resource)
             ->addReader($reader)
             ->setExemplarFilter($exemplarFilter)
+            ->setConfigurator($configurator)
             ->build();
     }
 
