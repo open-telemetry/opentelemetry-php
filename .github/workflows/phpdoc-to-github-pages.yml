@@ -6,14 +6,15 @@ on:
       - "main"
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   documentation:
+    permissions:
+      contents: read
+      pages: write # required for GitHub Pages deployment
+      id-token: write # required for GitHub Pages deployment
     name: "Documentation"
     runs-on: "ubuntu-latest"
     steps:
