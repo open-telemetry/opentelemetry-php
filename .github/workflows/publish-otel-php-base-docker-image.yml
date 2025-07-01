@@ -11,6 +11,8 @@ on:
     paths:
       - docker/Dockerfile
       - .github/workflows/publish-otel-php-base-docker-image.yml
+permissions:
+  contents: read
 jobs:
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
