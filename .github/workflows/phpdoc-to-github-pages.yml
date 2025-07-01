@@ -12,7 +12,6 @@ permissions:
 jobs:
   documentation:
     permissions:
-      contents: read
       pages: write # required for GitHub Pages deployment
       id-token: write # required for GitHub Pages deployment
     name: "Documentation"
