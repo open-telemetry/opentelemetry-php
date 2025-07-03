@@ -107,10 +107,10 @@ class ResourceInfoFactoryTest extends TestCase
     #[Group('compliance')]
     public function test_resource_from_environment_service_name_takes_precedence_over_resource_attribute(): void
     {
-        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=bar');
-        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'foo');
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=from-resource-attributes');
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-service-name');
         $resource = ResourceInfoFactory::defaultResource();
-        $this->assertEquals('foo', $resource->getAttributes()->get('service.name'));
+        $this->assertEquals('from-service-name', $resource->getAttributes()->get('service.name'));
     }
 
     #[Group('compliance')]
@@ -188,11 +188,20 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=from-env');
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-service-name');
-        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'environment');
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'env');
 
         $resource = ResourceInfoFactory::defaultResource();
 
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('from-service-name', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    public function test_service_instance_detector(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'service_instance');
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertNotEmpty($resource->getAttributes()->get(ResourceAttributes::SERVICE_INSTANCE_ID));
     }
 }
