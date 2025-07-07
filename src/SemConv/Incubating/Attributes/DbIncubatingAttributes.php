@@ -205,37 +205,37 @@ interface DbIncubatingAttributes
      * [Adabas (Adaptable Database System)](https://documentation.softwareag.com/?pf=adabas)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_SOFTWAREAG.ADABAS = 'softwareag.adabas';
+    public const DB_SYSTEM_NAME_VALUE_SOFTWAREAG_ADABAS = 'softwareag.adabas';
 
     /**
      * [Actian Ingres](https://www.actian.com/databases/ingres/)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_ACTIAN.INGRES = 'actian.ingres';
+    public const DB_SYSTEM_NAME_VALUE_ACTIAN_INGRES = 'actian.ingres';
 
     /**
      * [Amazon DynamoDB](https://aws.amazon.com/pm/dynamodb/)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_AWS.DYNAMODB = 'aws.dynamodb';
+    public const DB_SYSTEM_NAME_VALUE_AWS_DYNAMODB = 'aws.dynamodb';
 
     /**
      * [Amazon Redshift](https://aws.amazon.com/redshift/)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_AWS.REDSHIFT = 'aws.redshift';
+    public const DB_SYSTEM_NAME_VALUE_AWS_REDSHIFT = 'aws.redshift';
 
     /**
      * [Azure Cosmos DB](https://learn.microsoft.com/azure/cosmos-db)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_AZURE.COSMOSDB = 'azure.cosmosdb';
+    public const DB_SYSTEM_NAME_VALUE_AZURE_COSMOSDB = 'azure.cosmosdb';
 
     /**
      * [InterSystems Caché](https://www.intersystems.com/products/cache/)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_INTERSYSTEMS.CACHE = 'intersystems.cache';
+    public const DB_SYSTEM_NAME_VALUE_INTERSYSTEMS_CACHE = 'intersystems.cache';
 
     /**
      * [Apache Cassandra](https://cassandra.apache.org/)
@@ -289,7 +289,7 @@ interface DbIncubatingAttributes
      * [Google Cloud Spanner](https://cloud.google.com/spanner)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_GCP.SPANNER = 'gcp.spanner';
+    public const DB_SYSTEM_NAME_VALUE_GCP_SPANNER = 'gcp.spanner';
 
     /**
      * [Apache Geode](https://geode.apache.org/)
@@ -325,19 +325,19 @@ interface DbIncubatingAttributes
      * [IBM Db2](https://www.ibm.com/db2)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_IBM.DB2 = 'ibm.db2';
+    public const DB_SYSTEM_NAME_VALUE_IBM_DB2 = 'ibm.db2';
 
     /**
      * [IBM Informix](https://www.ibm.com/products/informix)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_IBM.INFORMIX = 'ibm.informix';
+    public const DB_SYSTEM_NAME_VALUE_IBM_INFORMIX = 'ibm.informix';
 
     /**
      * [IBM Netezza](https://www.ibm.com/products/netezza)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_IBM.NETEZZA = 'ibm.netezza';
+    public const DB_SYSTEM_NAME_VALUE_IBM_NETEZZA = 'ibm.netezza';
 
     /**
      * [InfluxDB](https://www.influxdata.com/)
@@ -373,7 +373,7 @@ interface DbIncubatingAttributes
      * [Microsoft SQL Server](https://www.microsoft.com/sql-server)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_MICROSOFT.SQL_SERVER = 'microsoft.sql_server';
+    public const DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER = 'microsoft.sql_server';
 
     /**
      * [MySQL](https://www.mysql.com/)
@@ -397,7 +397,7 @@ interface DbIncubatingAttributes
      * [Oracle Database](https://www.oracle.com/database/)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_ORACLE.DB = 'oracle.db';
+    public const DB_SYSTEM_NAME_VALUE_ORACLE_DB = 'oracle.db';
 
     /**
      * [PostgreSQL](https://www.postgresql.org/)
@@ -415,13 +415,13 @@ interface DbIncubatingAttributes
      * [SAP HANA](https://www.sap.com/products/technology-platform/hana/what-is-sap-hana.html)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_SAP.HANA = 'sap.hana';
+    public const DB_SYSTEM_NAME_VALUE_SAP_HANA = 'sap.hana';
 
     /**
      * [SAP MaxDB](https://maxdb.sap.com/)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_SAP.MAXDB = 'sap.maxdb';
+    public const DB_SYSTEM_NAME_VALUE_SAP_MAXDB = 'sap.maxdb';
 
     /**
      * [SQLite](https://www.sqlite.org/)

@@ -136,7 +136,7 @@ interface DbAttributes
      * [Microsoft SQL Server](https://www.microsoft.com/sql-server)
      * @stable
      */
-    public const DB_SYSTEM_NAME_VALUE_MICROSOFT.SQL_SERVER = 'microsoft.sql_server';
+    public const DB_SYSTEM_NAME_VALUE_MICROSOFT_SQL_SERVER = 'microsoft.sql_server';
 
     /**
      * [MySQL](https://www.mysql.com/)

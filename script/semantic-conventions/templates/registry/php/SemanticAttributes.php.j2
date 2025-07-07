@@ -25,9 +25,9 @@ interface {{ my_class_name }}
     {% if attribute is enum %}{% for member in attribute.type.members if not (member is deprecated) %}
         {%- set stability_phpdoc = c.stability(attribute) -%}
 {{ [member.brief, stability_phpdoc] | comment(indent=4)}}
-    public const {{ (c.attribute_name(attribute) + "_value_" + member.id) | upper }} = {{ member.value | print_member_value | replace('"', "'") }};
+    public const {{ c.attribute_value_name(attribute, member) }} = {{ member.value | print_member_value | replace('"', "'") }};
 
     {% endfor %}{% endif %}
 {% endfor %}
-{# blank line #}
 }
+{# blank line #}
