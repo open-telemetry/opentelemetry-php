@@ -1,13 +1,23 @@
 params:
   # excluded namespaces will not be generated
   # this behavior is fully controlled by jinja templates
-  # TODO exclude more namespaces, eg: ios, aspnetcore, signalr, android, dotnet, jvm, kestrel, browser, device, ...
-  excluded_namespaces: [cloudfoundry, dotnet, hw, nodejs, profile]
-  excluded_metrics_namespaces: [aspnetcore, azure, cicd, container, cpu, cpython, db, dns, dotnet, faas, gen_ai, go, hw, jvm, k8s, kestrel, messaging, nodejs, process, rpc, signalr, system, v8js, vcs]
+  excluded_namespaces: [
+    android, app, artifact, aws, azure, browser, cassandra, device, disk, dns,
+    elasticsearch, enduser, event, faas, feature_flag, file, gen_ai, gcp,
+    geo, go, graphql, heroku, ios, k8s, linux, mainframe, message, network,
+    oci, opentracing, other, pool, rpc, security_rule, source, system, test,
+    tls, useragent, v8js, vcs, webengine, zos, az, session, thread, destination,
+    cicd, cloud, cloudevents, cpu, cpython, deployment, aspnetcore,
+    cloudfoundry, dotnet, hw, jvm, nodejs, profile, signalr
+  ]
+  excluded_metrics_namespaces: [
+    aspnetcore, azure, cicd, container, cpu, cpython, db, dns, dotnet,
+    faas, gen_ai, go, hw, jvm, k8s, kestrel, messaging, nodejs, process,
+    rpc, signalr, system, v8js, vcs
+  ]
 
-  # excluded attributes will be commented out in the generated code
-  # this behavior is fully controlled by jinja templates
-  excluded_attributes: ["messaging.client_id"]
+  # excluded attributes will be skipped (eg "messaging.client.id" vs "messaging.client_id" breakage)
+  excluded_attributes: []
 
 text_maps:
   php_types:
@@ -18,55 +28,60 @@ text_maps:
     string[]: string[]
     template[string]: string
     template[string[]]: string[]
-
 templates:
-  - template: Attributes.php.j2
+  - pattern: SemanticAttributes.php.j2
     filter: >
       semconv_grouped_attributes({
         "exclude_root_namespace": $excluded_namespaces,
-        "exclude_stability": [],
+        "exclude_stability": [ "experimental", "deprecated" ]
       }) | map({
         root_namespace: .root_namespace,
         attributes: .attributes,
-        excluded_attributes: $excluded_attributes
+        excluded_attributes: $excluded_attributes,
+        namespace: "OpenTelemetry\\SemConv\\Attributes",
+        experimental: false,
       })
-    application_mode: single
-    file_name: "TraceAttributes.php"
-  - template: AttributeValues.php.j2
+    application_mode: each
+    file_name: "Attributes/{{ctx.root_namespace | pascal_case}}Attributes.php"
+  - pattern: SemanticAttributes.php.j2
     filter: >
       semconv_grouped_attributes({
         "exclude_root_namespace": $excluded_namespaces,
-        "exclude_stability": [],
+        "exclude_stability": [ "deprecated" ]
+      }) | map({
+        root_namespace: .root_namespace,
+        attributes: .attributes,
+        excluded_attributes: $excluded_attributes,
+        namespace: "OpenTelemetry\\SemConv\\Unstable\\Attributes",
+        incubating: true,
       })
-    application_mode: single
-    file_name: "TraceAttributeValues.php"
-  - template: ResourceAttributes.php.j2
-    filter: >
-      semconv_signal("resource"; {})
-      | map(.attributes[])
-      | group_by(.name)
-      | map(.[-1])
-    application_mode: single
-    file_name: "ResourceAttributes.php"
-  - template: ResourceAttributeValues.php.j2
-    filter: >
-      semconv_signal("resource"; {})
-      | map(.attributes[])
-      | group_by(.name)
-      | map(.[-1])
-    application_mode: single
-    file_name: "ResourceAttributeValues.php"
+    application_mode: each
+    file_name: "Incubating/Attributes/{{ctx.root_namespace | pascal_case}}IncubatingAttributes.php"
   - template: Metrics.php.j2
     filter: >
       semconv_grouped_metrics({
         "exclude_root_namespace": $excluded_metrics_namespaces,
-        "exclude_stability": [],
+        "exclude_stability": [ "experimental", "deprecated" ]
       }) | map({
         root_namespace: .root_namespace,
         metrics: .metrics,
+        namespace: "OpenTelemetry\\SemConv\\Metrics",
       })
     application_mode: each
     file_name: "Metrics/{{ctx.root_namespace | pascal_case}}Metrics.php"
+  - template: Metrics.php.j2
+    filter: >
+      semconv_grouped_metrics({
+        "exclude_root_namespace": $excluded_metrics_namespaces,
+        "exclude_stability": [ "deprecated" ]
+      }) | map({
+        root_namespace: .root_namespace,
+        metrics: .metrics,
+        namespace: "OpenTelemetry\\SemConv\\Unstable\\Metrics",
+        incubating: true,
+      })
+    application_mode: each
+    file_name: "Incubating/Metrics/{{ctx.root_namespace | pascal_case}}IncubatingMetrics.php"
 whitespace_control:
   trim_blocks: true
   lstrip_blocks: true

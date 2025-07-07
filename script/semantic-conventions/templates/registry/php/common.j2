@@ -31,6 +31,10 @@
     {{to_const_name(member.id)}}
 {%- endmacro -%}
 
-{%- macro attribute_stability(attribute) -%}
-    {% if attribute.deprecated %}deprecated{% else %}{{attribute.stability}}{%endif%}
+{%- macro stability(member) -%}
+    {%- if member is stable -%}
+        {{ "@stable" }}
+    {%- else -%}
+        {{ "@experimental" }}
+    {%- endif -%}
 {%- endmacro -%}
