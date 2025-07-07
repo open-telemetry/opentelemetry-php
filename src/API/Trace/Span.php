@@ -52,7 +52,7 @@ abstract class Span implements SpanInterface
     }
 
     /** @inheritDoc */
-    final public function storeInContext(ContextInterface $context): ContextInterface
+    public function storeInContext(ContextInterface $context): ContextInterface
     {
         if (LocalRootSpan::isLocalRoot($context)) {
             $context = LocalRootSpan::store($context, $this);
