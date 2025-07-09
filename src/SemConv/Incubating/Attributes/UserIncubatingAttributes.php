@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SemConv\Unstable\Attributes;
+namespace OpenTelemetry\SemConv\Incubating\Attributes;
 
 /**
  * Semantic attributes and corresponding values for user.
