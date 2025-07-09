@@ -24,7 +24,7 @@ PHP_VERSION=8.3 make all
 ```
 For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.pages.dev/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
 
-**Note: After cloning the repository, copy `.env.dist` to `.env`.**
+**Note: After cloning the repository, copy `.env.dist` to `.env`.** 
 
 Skipping the step above would result in a "`The "PHP_USER" variable is not set. Defaulting to a blank string`" warning
 
@@ -62,7 +62,7 @@ This does the following things:
 * Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/)
   and [PHPStan](https://phpstan.org/user-guide/getting-started)
 
-## Local Run/Build
+## Local Run/Build 
 
 To ensure you have all the correct packages installed locally in your dev environment, you can run
 
@@ -92,7 +92,7 @@ make all-checks
 ```
 ## Testing
 
-To make sure the tests in this repo work as you expect, you can use the included docker test wrapper.
+To make sure the tests in this repo work as you expect, you can use the included docker test wrapper.  
 To run the test suite, execute
 
 ```bash
@@ -106,8 +106,8 @@ that doesn't pass our currently defined tests will emit a failure in CI
 
 Even though it may not be reflected everywhere in the codebase yet, we aim to provide software which is easy to read and change.
 The methods described in Clean Code book(s) by Robert C. Martin (Uncle Bob) are a de facto industry standards nowadays.
-Reading those books is highly recommended, however you can take a look at the examples given at [Clean Code PHP](https://github.com/jupeter/clean-code-php).
-While we have no rule to strictly follow said methods and patterns, they are highly recommended as an orientation for
+Reading those books is highly recommended, however you can take a look at the examples given at [Clean Code PHP](https://github.com/jupeter/clean-code-php). 
+While we have no rule to strictly follow said methods and patterns, they are highly recommended as an orientation for 
 your pull requests and to be referenced in reviews.
 
 We might add additional guidelines regarding for example testing in the future.
@@ -166,7 +166,7 @@ during CI and is a required check. Code that doesn't match the standards that we
 our [phan config](https://github.com/open-telemetry/opentelemetry-php/blob/master/.phan/config.php) will emit a failure
 in CI.
 
-We also use [Psalm](https://psalm.dev/) as a second static analysis tool.
+We also use [Psalm](https://psalm.dev/) as a second static analysis tool.  
 You can use our psalm docker wrapper to easily perform static analysis on your changes.
 
 To run Psalm, one can run the following command:
