@@ -1,17 +1,23 @@
-ARG PHP_VERSION=8.0
+ARG PHP_VERSION=8.3
 
-FROM php:8.0.30-cli-alpine AS php-8.0-cli-alpine
-FROM php:8.1.32-cli-alpine AS php-8.1-cli-alpine
-FROM php:8.2.28-cli-alpine AS php-8.2-cli-alpine
-FROM php:8.3.20-cli-alpine AS php-8.3-cli-alpine
-FROM php:8.4.8-cli-alpine AS php-8.4-cli-alpine
+FROM php:8.1.33-cli AS php-8.1-cli
+FROM php:8.2.29-cli AS php-8.2-cli
+FROM php:8.3.23-cli AS php-8.3-cli
+FROM php:8.4.10-cli AS php-8.4-cli
 
-FROM php-${PHP_VERSION}-cli-alpine
+FROM php-${PHP_VERSION}-cli
+
+WORKDIR /usr/src/myapp
+
+RUN apt-get update  \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 1000 php \
+    && useradd --system --uid 1000 --gid php --shell /bin/bash --create-home php
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
 RUN chmod +x /usr/local/bin/install-php-extensions \
-    && apk add binutils \
     && install-php-extensions \
         @composer \
         ast \
@@ -28,16 +34,5 @@ RUN chmod +x /usr/local/bin/install-php-extensions \
 
 RUN  echo "grpc.enable_fork_support = 1" > $(php-config --ini-dir)/grpc.ini \
   && echo "grpc.poll_strategy = epoll1" >> $(php-config --ini-dir)/grpc.ini
-
-WORKDIR /usr/src/myapp
-
-RUN   apk add --no-cache bash git; \
-      find /usr/local/lib/php/extensions -type d -exec chmod +x -R {} \;; \
-      addgroup -g "1000" -S php; \
-      adduser --system \
-        --gecos "" \
-        --ingroup "php" \
-        --uid "1000" \
-        "php";
 
 USER php
