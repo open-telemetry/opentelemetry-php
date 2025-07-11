@@ -17,10 +17,10 @@ SPEC_DIR="${ROOT_DIR}/var/semantic-conventions"
 CODE_DIR="${ROOT_DIR}/src/SemConv"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=1.32.0
+SEMCONV_VERSION=1.36.0
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
-OTEL_WEAVER_IMG_VERSION=v0.15.2
+OTEL_WEAVER_IMG_VERSION=v0.16.1
 
 rm -rf "${SPEC_DIR}"
 mkdir "${SPEC_DIR}"
@@ -34,7 +34,13 @@ git reset --hard FETCH_HEAD
 cd "${SCRIPT_DIR}"
 
 mkdir -p "${CODE_DIR}"
-find "${CODE_DIR}" -name "*.php" ! -name "Version.php" -exec rm -f {} \;
+find "${CODE_DIR}" -name "*.php" \
+  ! -name "Version.php" \
+  ! -name "ResourceAttributes.php" \
+  ! -name "ResourceAttributesValues.php" \
+  ! -name "TraceAttributes.php" \
+  ! -name "TraceAttributeValues.php" \
+  -exec rm -f {} \;
 
 echo "${SCHEMA_URL}" > ${SCRIPT_DIR}/templates/registry/php/version.txt
 
