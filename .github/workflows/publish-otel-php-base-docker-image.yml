@@ -46,6 +46,8 @@ jobs:
           build-args: PHP_VERSION=${{ matrix.php-version }}
           platforms: linux/amd64
           tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and push ${{ matrix.php-version }} to ghcr.io
         uses: docker/build-push-action@v6
@@ -56,3 +58,5 @@ jobs:
           build-args: PHP_VERSION=${{ matrix.php-version }}
           platforms: linux/amd64,linux/arm/v8,linux/arm64
           tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
