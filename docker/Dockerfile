@@ -30,6 +30,10 @@ RUN apt-get install -y \
     php${PHP_VERSION}-sockets \
     php${PHP_VERSION}-xdebug \
     php${PHP_VERSION}-zip \
+    php${PHP_VERSION}-mongodb \
+    php${PHP_VERSION}-amqp \
+    php${PHP_VERSION}-rdkafka \
+    php${PHP_VERSION}-mysqli \
     unzip
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
