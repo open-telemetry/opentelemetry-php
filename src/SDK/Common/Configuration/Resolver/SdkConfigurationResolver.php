@@ -24,13 +24,14 @@ class SdkConfigurationResolver implements ResolverInterface
     public function __construct()
     {
         $envSources = [];
-        $envSources[] = new ServerEnvSource();
-        $envSources[] = new PhpIniEnvSource();
 
         /** @var EnvSourceProvider $envSourceProvider */
         foreach (ServiceLoader::load(EnvSourceProvider::class) as $envSourceProvider) {
             $envSources[] = new LazyEnvSource($envSourceProvider->getEnvSource(...));
         }
+
+        $envSources[] = new ServerEnvSource();
+        $envSources[] = new PhpIniEnvSource();
 
         $this->reader = new EnvSourceReader($envSources);
     }
