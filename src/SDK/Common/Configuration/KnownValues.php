@@ -198,6 +198,9 @@ interface KnownValues
     public const VALUE_DETECTORS_SDK_PROVIDED = 'sdk_provided';
     public const VALUE_DETECTORS_SERVICE = 'service';
     public const VALUE_DETECTORS_COMPOSER = 'composer';
+    public const VALUE_DETECTORS_APACHE = 'apache';
+    public const VALUE_DETECTORS_FPM = 'fpm';
+    public const VALUE_DETECTORS_KUBERNETES = 'k8s';
     public const OTEL_PHP_DETECTORS = [
         self::VALUE_ALL,
         self::VALUE_DETECTORS_ENVIRONMENT,
@@ -208,6 +211,9 @@ interface KnownValues
         self::VALUE_DETECTORS_SDK,
         self::VALUE_DETECTORS_SDK_PROVIDED,
         self::VALUE_DETECTORS_COMPOSER,
+        self::VALUE_DETECTORS_APACHE,
+        self::VALUE_DETECTORS_FPM,
+        self::VALUE_DETECTORS_KUBERNETES,
         self::VALUE_NONE,
     ];
     public const OTEL_PHP_LOG_DESTINATION = [
