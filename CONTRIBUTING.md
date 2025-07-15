@@ -271,40 +271,35 @@ make phpdoc-preview
 This will start a HTTP server running at <http://localhost:8080> serving the updated documentation files.
 
 ## Maintainers
-[@open-telemetry/php-maintainers](https://github.com/orgs/open-telemetry/teams/php-maintainers)
 
-- [Bob Strecansky](https://github.com/bobstrecansky)
+- [Bob Strecansky](https://github.com/bobstrecansky), Intuit
 - [Brett McBride](https://github.com/brettmc/), Deakin University
 
-Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer)
+For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
 
 ## Approvers
-[@open-telemetry/php-approvers](https://github.com/orgs/open-telemetry/teams/php-approvers)
 
-Find more information about the approver role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver)
+- [Ago Allikmaa](https://github.com/agoallikmaa)
+- [Cedriz Ziel](https://github.com/cedricziel)
+- [Chris Lightfoot-Wild](https://github.com/ChrisLightfootWild)
+
+For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).
 
 ## Triagers
-[@open-telemetry/php-triagers](https://github.com/orgs/open-telemetry/teams/php-triagers)
 
-Find more information about the triager role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#triager)
-
-## Members
-
-- [Kishan Sangani](https://github.com/kishannsangani)
-
-Find more information about the member role in the [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#member)
+For more information about the triager role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#triagers).
 
 ## Emeritus maintainers/approvers/triagers
 
-- [Timo Michna](https://github.com/tidal/)
+- [Amber Zsistla](https://github.com/zsistla)
 - [Beniamin Calota](https://github.com/beniamin)
 - [Fahmy Mohammed](https://github.com/Fahmy-Mohammed)
-- [Levi Morrison](https://github.com/morrisonlevi)
-- [Amber Zsistla](https://github.com/zsistla)
 - [Jodee Varney](https://github.com/jodeev)
-- [Przemek Delewski](https://github.com/pdelewski), Sumo Logic
+- [Levi Morrison](https://github.com/morrisonlevi)
+- [Przemek Delewski](https://github.com/pdelewski)
+- [Timo Michna](https://github.com/tidal/)
 
-Find more about emeritus roles in the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#emeritus-maintainerapprovertriager)
+For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
 ## Further Help
 
