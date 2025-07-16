@@ -36,7 +36,7 @@ class SdkConfigurationResolver implements ResolverInterface
         $this->reader = new EnvSourceReader($envSources);
     }
 
-    public function retrieveValue(string $variableName)
+    public function retrieveValue(string $variableName): mixed
     {
         return $this->reader->read($variableName);
     }
