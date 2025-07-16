@@ -214,6 +214,9 @@ final class MetricConverter
         return $pHistogramDataPoint;
     }
 
+    /**
+     * @psalm-suppress PossiblyFalseArgument
+     */
     private function convertExemplar(SDK\Metrics\Data\Exemplar $exemplar): Exemplar
     {
         $pExemplar = new Exemplar();

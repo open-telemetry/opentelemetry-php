@@ -60,7 +60,7 @@ $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
     {
         return (new LogRecord($record['message']))
             ->setSeverityText($record->level->toPsrLogLevel())
-            ->setTimestamp((int) (microtime(true) * LogRecord::NANOS_PER_SECOND))
+            ->setTimestamp((int) (microtime(true) * (float) LogRecord::NANOS_PER_SECOND))
             ->setObservedTimestamp((int) $record->datetime->format('U') * LogRecord::NANOS_PER_SECOND)
             ->setSeverityNumber(Severity::fromPsr3($record->level->toPsrLogLevel()))
             ->setAttributes($record->context + $record->extra);

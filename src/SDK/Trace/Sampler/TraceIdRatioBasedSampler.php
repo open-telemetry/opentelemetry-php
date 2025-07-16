@@ -99,6 +99,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         assert($precision >= 1);
         assert($wordSize >= 1 && ($wordSize & $wordSize - 1) === 0);
 
+        /** @psalm-suppress PossiblyInvalidArrayAccess */
         $b = unpack('J', pack('E', $probability))[1];
         $e = $b >> 52 & (1 << 11) - 1;
         $f = $b & (1 << 52) - 1 | ($e ? 1 << 52 : 0);

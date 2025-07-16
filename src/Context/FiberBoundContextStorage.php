@@ -32,6 +32,9 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Context
         return $this->heads[Fiber::getCurrent() ?? $this] ?? null;
     }
 
+    /**
+     * @psalm-suppress PossiblyNullPropertyFetch
+     */
     #[\Override]
     public function scope(): ?ContextStorageScopeInterface
     {
@@ -62,6 +65,9 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Context
         return $head->node->context ?? Context::getRoot();
     }
 
+    /**
+     * @psalm-suppress PossiblyNullArgument,PossiblyNullPropertyFetch
+     */
     #[\Override]
     public function attach(ContextInterface $context): ContextStorageScopeInterface
     {

@@ -48,6 +48,6 @@ final class SystemClock implements ClockInterface
      */
     private static function calculateReferenceTime(float $wallClockMicroTime, int $upTime): int
     {
-        return ((int) ($wallClockMicroTime * ClockInterface::NANOS_PER_SECOND)) - $upTime;
+        return ((int) ($wallClockMicroTime * (float) ClockInterface::NANOS_PER_SECOND)) - $upTime;
     }
 }

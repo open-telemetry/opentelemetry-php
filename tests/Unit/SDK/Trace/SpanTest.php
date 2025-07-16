@@ -831,8 +831,8 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
-     * @psalm-param API\SpanKind::KIND_* $kind
      * @param list<LinkInterface> $links
+     * @psalm-param API\SpanKind::KIND_* $kind
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,

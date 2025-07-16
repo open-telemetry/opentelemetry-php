@@ -64,7 +64,7 @@ final class StreamTransport implements TransportInterface
         }
 
         if ($bytesWritten !== strlen($payload)) {
-            return new ErrorFuture(new RuntimeException(sprintf('Write failure, wrote %d of %d bytes', $bytesWritten, strlen($payload))));
+            return new ErrorFuture(new RuntimeException(sprintf('Write failure, wrote %d of %d bytes', $bytesWritten ?: 0, strlen($payload))));
         }
 
         return new CompletedFuture(null);

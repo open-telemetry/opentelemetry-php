@@ -101,7 +101,7 @@ final class PsrTransport implements TransportInterface
 
             $delay = PsrUtils::retryDelay($retries, $this->retryDelay, $response);
             $sec = (int) $delay;
-            $nsec = (int) (($delay - $sec) * 1e9);
+            $nsec = (int) (($delay - (float) $sec) * 1e9);
 
             /** @psalm-suppress ArgumentTypeCoercion */
             if (time_nanosleep($sec, $nsec) !== true) {

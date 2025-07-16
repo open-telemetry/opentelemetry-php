@@ -43,6 +43,9 @@ final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagat
         );
     }
 
+    /**
+     * @psalm-suppress PossiblyNullArgument
+     */
     #[\Override]
     public function getAll($carrier, string $key): array
     {
