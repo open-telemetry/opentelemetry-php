@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class InMemorySpanExporterFactory implements SpanExporterFactoryInterface
 {
+    #[\Override]
     public function create(): SpanExporterInterface
     {
         return new InMemoryExporter(InMemoryStorageManager::spans());

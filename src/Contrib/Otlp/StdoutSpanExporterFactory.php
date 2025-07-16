@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class StdoutSpanExporterFactory implements SpanExporterFactoryInterface
 {
+    #[\Override]
     public function create(): SpanExporterInterface
     {
         $transport = (new StreamTransportFactory())->create('php://stdout', ContentTypes::NDJSON);

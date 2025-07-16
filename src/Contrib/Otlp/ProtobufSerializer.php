@@ -117,7 +117,7 @@ final class ProtobufSerializer
             return $payload;
         }
 
-        $data = json_decode($payload);
+        $data = json_decode((string) $payload);
         unset($payload);
         self::traverseDescriptor($data, $desc);
 

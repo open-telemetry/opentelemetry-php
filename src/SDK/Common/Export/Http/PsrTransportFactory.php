@@ -28,6 +28,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
     /**
      * @phan-suppress PhanTypeMismatchArgumentNullable
      */
+    #[\Override]
     public function create(
         string $endpoint,
         string $contentType,

@@ -29,6 +29,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
      *     }
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): ConfigurationRegistry
     {
         $configurationRegistry = new ConfigurationRegistry();
@@ -44,6 +45,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
         return $configurationRegistry;
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $root = $builder->arrayNode('open_telemetry');

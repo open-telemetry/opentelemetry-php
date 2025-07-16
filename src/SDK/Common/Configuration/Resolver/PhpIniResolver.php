@@ -16,6 +16,7 @@ class PhpIniResolver implements ResolverInterface
     {
     }
 
+    #[\Override]
     public function retrieveValue(string $variableName)
     {
         $value = $this->accessor->get($variableName) ?: '';
@@ -26,6 +27,7 @@ class PhpIniResolver implements ResolverInterface
         return $value;
     }
 
+    #[\Override]
     public function hasVariable(string $variableName): bool
     {
         $value = $this->accessor->get($variableName);

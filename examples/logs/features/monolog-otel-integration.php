@@ -50,6 +50,7 @@ $otelHandler = new class(LogLevel::INFO) extends AbstractProcessingHandler {
         $this->logger = $provider->getLogger('monolog-demo', null, null, ['logging.library' => 'monolog']);
     }
 
+    #[\Override]
     protected function write(MonologLogRecord $record): void
     {
         $this->logger->emit($this->convert($record));

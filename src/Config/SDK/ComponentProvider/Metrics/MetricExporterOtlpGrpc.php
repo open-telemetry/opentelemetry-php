@@ -43,6 +43,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
      *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         $protocol = Protocols::GRPC;
@@ -67,6 +68,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
         ), $temporality);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_grpc');

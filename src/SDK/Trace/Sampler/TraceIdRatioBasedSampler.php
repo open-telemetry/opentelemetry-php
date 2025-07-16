@@ -46,6 +46,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         $this->tv = rtrim(bin2hex(substr(pack('J', self::computeTValue($probability, $precision, 4)), 1)), '0') ?: '0';
     }
 
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -110,6 +111,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         return $t - $m >> 1 & $m;
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return sprintf('%s{%.6F}', 'TraceIdRatioBasedSampler', $this->probability);

@@ -17,11 +17,13 @@ final class TextMapPropagatorBaggage implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('baggage');

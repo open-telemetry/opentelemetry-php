@@ -11,11 +11,13 @@ use OpenTelemetry\API\Metrics\GaugeInterface;
  */
 final class NoopGauge implements GaugeInterface
 {
+    #[\Override]
     public function record(float|int $amount, iterable $attributes = [], $context = null): void
     {
         // no-op
     }
 
+    #[\Override]
     public function isEnabled(): bool
     {
         return false;

@@ -20,6 +20,7 @@ class TracerTest extends TestCase
     private TracerSharedState $tracerSharedState;
     private InstrumentationScope $instrumentationScope;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tracerSharedState = $this->createMock(TracerSharedState::class);

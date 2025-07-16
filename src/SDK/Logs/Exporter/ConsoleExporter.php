@@ -26,6 +26,7 @@ class ConsoleExporter implements LogRecordExporterInterface
     /**
      * @param iterable<mixed, ReadableLogRecord> $batch
      */
+    #[\Override]
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         $resource = null;
@@ -49,11 +50,13 @@ class ConsoleExporter implements LogRecordExporterInterface
         return new CompletedFuture(true);
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return true;

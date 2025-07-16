@@ -12,6 +12,7 @@ final class InstrumentationScopeFactory implements InstrumentationScopeFactoryIn
     {
     }
 
+    #[\Override]
     public function create(
         string $name,
         ?string $version = null,

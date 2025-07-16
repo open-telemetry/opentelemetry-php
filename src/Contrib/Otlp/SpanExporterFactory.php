@@ -28,6 +28,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\Override]
     public function create(): SpanExporterInterface
     {
         $transport = $this->buildTransport();

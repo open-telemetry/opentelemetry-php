@@ -12,6 +12,7 @@ class OtlpHttpTransportFactory implements TransportFactoryInterface
 {
     private const DEFAULT_COMPRESSION = 'none';
 
+    #[\Override]
     public function create(
         string $endpoint,
         string $contentType,

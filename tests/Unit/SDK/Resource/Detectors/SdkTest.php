@@ -19,6 +19,7 @@ class SdkTest extends TestCase
 
     private ResourceDetectorInterface $detector;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->detector = new Sdk();

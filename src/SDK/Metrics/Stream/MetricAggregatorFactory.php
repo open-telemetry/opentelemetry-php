@@ -18,6 +18,7 @@ final class MetricAggregatorFactory implements MetricAggregatorFactoryInterface
     ) {
     }
 
+    #[\Override]
     public function create(): MetricAggregatorInterface
     {
         return new MetricAggregator($this->attributeProcessor, $this->aggregation);

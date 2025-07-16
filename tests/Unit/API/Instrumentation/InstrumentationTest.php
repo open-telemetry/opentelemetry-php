@@ -39,12 +39,14 @@ final class InstrumentationTest extends TestCase
 {
     private LogWriterInterface&MockObject $logWriter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->logWriter = $this->createMock(LogWriterInterface::class);
         Logging::setLogWriter($this->logWriter);
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         Globals::reset();

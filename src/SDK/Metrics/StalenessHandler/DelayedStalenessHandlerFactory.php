@@ -41,6 +41,7 @@ final class DelayedStalenessHandlerFactory implements StalenessHandlerFactoryInt
         $this->staleHandlers = new WeakMap();
     }
 
+    #[\Override]
     public function create(): ReferenceCounterInterface&StalenessHandlerInterface
     {
         $this->triggerStaleHandlers();

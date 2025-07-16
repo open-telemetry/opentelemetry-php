@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Host::class)]
 class HostTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         //reset vfs between tests

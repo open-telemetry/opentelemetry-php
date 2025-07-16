@@ -51,6 +51,7 @@ class LateBindingProviderTest extends TestCase
     use TestState;
     use ProphecyTrait;
 
+    #[\Override]
     public function setUp(): void
     {
         Logging::disable();
@@ -60,6 +61,7 @@ class LateBindingProviderTest extends TestCase
     {
         $instrumentation = new class() implements Instrumentation {
             private static ?Context $context;
+            #[\Override]
             public function register(HookManagerInterface $hookManager, ConfigProperties $configuration, Context $context): void
             {
                 self::$context = $context;

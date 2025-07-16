@@ -29,6 +29,7 @@ final class Host implements ResourceDetectorInterface
     ) {
     }
 
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $attributes = [

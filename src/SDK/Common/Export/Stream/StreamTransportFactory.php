@@ -31,6 +31,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
      * @psalm-return TransportInterface<CONTENT_TYPE>
      * @throws ErrorException
      */
+    #[\Override]
     public function create(
         $endpoint,
         string $contentType,

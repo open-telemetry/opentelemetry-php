@@ -33,27 +33,32 @@ final class Attributes implements AttributesInterface, IteratorAggregate, JsonSe
         return new AttributesFactory($attributeCountLimit, $attributeValueLengthLimit);
     }
 
+    #[\Override]
     public function has(string $name): bool
     {
         return array_key_exists($name, $this->attributes);
     }
 
+    #[\Override]
     public function get(string $name)
     {
         return $this->attributes[$name] ?? null;
     }
 
     /** @psalm-mutation-free */
+    #[\Override]
     public function count(): int
     {
         return \count($this->attributes);
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed
     {
         return $this->attributes;
     }
 
+    #[\Override]
     public function getIterator(): Traversable
     {
         foreach ($this->attributes as $key => $value) {
@@ -61,11 +66,13 @@ final class Attributes implements AttributesInterface, IteratorAggregate, JsonSe
         }
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return $this->attributes;
     }
 
+    #[\Override]
     public function getDroppedAttributesCount(): int
     {
         return $this->droppedAttributesCount;

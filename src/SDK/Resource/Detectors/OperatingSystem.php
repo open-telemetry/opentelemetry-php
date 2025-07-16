@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 final class OperatingSystem implements ResourceDetectorInterface
 {
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         return ResourceInfo::emptyResource();

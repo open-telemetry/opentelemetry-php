@@ -31,6 +31,7 @@ class TraceContextPropagatorTest extends TestCase
     private TraceContextPropagator $traceContextPropagator;
     private TraceStateInterface $traceState;
 
+    #[\Override]
     protected function setUp(): void
     {
         Logging::disable();

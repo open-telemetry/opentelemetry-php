@@ -13,6 +13,7 @@ final class FloatNodeDefinition extends \Symfony\Component\Config\Definition\Bui
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): FloatNode
     {
         return new FloatNode($this->name, $this->parent, $this->min, $this->max, $this->pathSeparator);

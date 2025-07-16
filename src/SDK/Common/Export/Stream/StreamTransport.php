@@ -38,11 +38,13 @@ final class StreamTransport implements TransportInterface
     ) {
     }
 
+    #[\Override]
     public function contentType(): string
     {
         return $this->contentType;
     }
 
+    #[\Override]
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if (!$this->stream) {
@@ -68,6 +70,7 @@ final class StreamTransport implements TransportInterface
         return new CompletedFuture(null);
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->stream) {
@@ -80,6 +83,7 @@ final class StreamTransport implements TransportInterface
         return $flush;
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if (!$this->stream) {

@@ -35,52 +35,62 @@ final class SpanContext implements SpanContextInterface
         $this->isSampled = ($traceFlags & TraceFlags::SAMPLED) === TraceFlags::SAMPLED;
     }
 
+    #[\Override]
     public function getTraceId(): string
     {
         return $this->traceId;
     }
 
+    #[\Override]
     public function getTraceIdBinary(): string
     {
         return hex2bin($this->traceId);
     }
 
+    #[\Override]
     public function getSpanId(): string
     {
         return $this->spanId;
     }
 
+    #[\Override]
     public function getSpanIdBinary(): string
     {
         return hex2bin($this->spanId);
     }
 
+    #[\Override]
     public function getTraceState(): ?TraceStateInterface
     {
         return $this->traceState;
     }
 
+    #[\Override]
     public function isSampled(): bool
     {
         return $this->isSampled;
     }
 
+    #[\Override]
     public function isValid(): bool
     {
         return $this->isValid;
     }
 
+    #[\Override]
     public function isRemote(): bool
     {
         return $this->isRemote;
     }
 
+    #[\Override]
     public function getTraceFlags(): int
     {
         return $this->traceFlags;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public static function createFromRemoteParent(string $traceId, string $spanId, int $traceFlags = TraceFlags::DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
         return new self(
@@ -93,6 +103,7 @@ final class SpanContext implements SpanContextInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public static function create(string $traceId, string $spanId, int $traceFlags = TraceFlags::DEFAULT, ?TraceStateInterface $traceState = null): SpanContextInterface
     {
         return new self(
@@ -105,6 +116,7 @@ final class SpanContext implements SpanContextInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public static function getInvalid(): SpanContextInterface
     {
         if (null === self::$invalidContext) {

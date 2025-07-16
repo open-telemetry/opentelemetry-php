@@ -26,11 +26,13 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Context
         $this->heads[$this] = new ContextStorageHead($this);
     }
 
+    #[\Override]
     public function head(): ?ContextStorageHead
     {
         return $this->heads[Fiber::getCurrent() ?? $this] ?? null;
     }
 
+    #[\Override]
     public function scope(): ?ContextStorageScopeInterface
     {
         $head = $this->heads[Fiber::getCurrent() ?? $this] ?? null;
@@ -45,6 +47,7 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Context
         return $head->node;
     }
 
+    #[\Override]
     public function current(): ContextInterface
     {
         $head = $this->heads[Fiber::getCurrent() ?? $this] ?? null;
@@ -59,6 +62,7 @@ final class FiberBoundContextStorage implements ContextStorageInterface, Context
         return $head->node->context ?? Context::getRoot();
     }
 
+    #[\Override]
     public function attach(ContextInterface $context): ContextStorageScopeInterface
     {
         $head = $this->heads[Fiber::getCurrent() ?? $this] ??= new ContextStorageHead($this);

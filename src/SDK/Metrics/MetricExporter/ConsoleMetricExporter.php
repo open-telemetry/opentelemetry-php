@@ -24,6 +24,7 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function temporality(MetricMetadataInterface $metric): Temporality|string|null
     {
         return $this->temporality ?? $metric->temporality();
@@ -32,6 +33,7 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function export(iterable $batch): bool
     {
         $resource = null;
@@ -56,11 +58,13 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
         return true;
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         return true;

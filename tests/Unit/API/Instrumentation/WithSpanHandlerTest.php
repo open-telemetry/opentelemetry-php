@@ -23,6 +23,7 @@ class WithSpanHandlerTest extends TestCase
     private ScopeInterface $scope;
     private ArrayObject $storage;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->storage = new ArrayObject();
@@ -37,6 +38,7 @@ class WithSpanHandlerTest extends TestCase
             ->activate();
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         $this->scope->detach();

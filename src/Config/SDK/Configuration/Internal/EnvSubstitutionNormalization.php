@@ -33,6 +33,7 @@ final class EnvSubstitutionNormalization implements Normalization
     ) {
     }
 
+    #[\Override]
     public function apply(ArrayNodeDefinition $root): void
     {
         foreach ($root->getChildNodeDefinitions() as $childNode) {

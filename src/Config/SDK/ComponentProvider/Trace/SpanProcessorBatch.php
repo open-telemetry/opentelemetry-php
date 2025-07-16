@@ -29,6 +29,7 @@ final class SpanProcessorBatch implements ComponentProvider
      *     exporter: ComponentPlugin<SpanExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface
     {
         return new BatchSpanProcessor(
@@ -42,6 +43,7 @@ final class SpanProcessorBatch implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('batch');

@@ -25,6 +25,7 @@ class ConsoleSpanExporter implements SpanExporterInterface
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
     }
 
+    #[\Override]
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         $payload = '';
@@ -44,11 +45,13 @@ class ConsoleSpanExporter implements SpanExporterInterface
             ->catch(fn () => false);
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->shutdown();
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->forceFlush();

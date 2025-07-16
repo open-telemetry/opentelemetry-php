@@ -25,6 +25,7 @@ final class SystemClock implements ClockInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function now(): int
     {
         return self::$referenceTime + hrtime(true);

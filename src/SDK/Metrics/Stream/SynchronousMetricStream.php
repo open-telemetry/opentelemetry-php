@@ -39,22 +39,26 @@ final class SynchronousMetricStream implements MetricStreamInterface
         $this->delta = new DeltaStorage($this->aggregation);
     }
 
+    #[\Override]
     public function temporality(): Temporality|string
     {
         return Temporality::DELTA;
     }
 
+    #[\Override]
     public function timestamp(): int
     {
         return $this->timestamp;
     }
 
+    #[\Override]
     public function push(Metric $metric): void
     {
         [$this->timestamp, $metric->timestamp] = [$metric->timestamp, $this->timestamp];
         $this->delta->add($metric, $this->readers);
     }
 
+    #[\Override]
     public function register($temporality): int
     {
         $reader = 0;
@@ -81,6 +85,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
         return $reader;
     }
 
+    #[\Override]
     public function unregister(int $reader): void
     {
         $readerMask = ($this->readers & 1 | 1) << $reader;
@@ -96,6 +101,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
         }
     }
 
+    #[\Override]
     public function collect(int $reader): DataInterface
     {
         $cumulative = ($this->cumulative >> $reader & 1) != 0;
