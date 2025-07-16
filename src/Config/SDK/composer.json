@@ -22,7 +22,7 @@
         "open-telemetry/context": "^1.0",
         "open-telemetry/sdk": "^1.0",
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
-        "tbachert/spi": "^1.0.1"
+        "tbachert/spi": "^1.0.5"
     },
     "autoload": {
         "psr-4": {
@@ -82,6 +82,10 @@
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider"
+            ],
+            "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
+                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",
+                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\VlucasPhpdotenvProvider"
             ]
         }
     }

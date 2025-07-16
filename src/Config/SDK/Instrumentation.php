@@ -11,9 +11,11 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
+use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
+use WeakMap;
 
 final class Instrumentation
 {
@@ -39,24 +41,28 @@ final class Instrumentation
         string|array $file,
         ?string $cacheFile = null,
         bool $debug = true,
+        ?EnvReader $envReader = null,
     ): Instrumentation {
-        return new self(self::factory()->parseFile($file, $cacheFile, $debug));
+        return new self(self::factory($envReader)->parseFile($file, $cacheFile, $debug));
     }
 
     /**
      * @return ConfigurationFactory<ConfigurationRegistry>
      */
-    private static function factory(): ConfigurationFactory
+    private static function factory(?EnvReader $envReader): ConfigurationFactory
     {
-        static $factory;
+        static $defaultEnvReader;
+        static $factories = new WeakMap();
 
-        return $factory ??= new ConfigurationFactory(
+        $envReader ??= $defaultEnvReader ??= new EnvSourceReader([
+            new ServerEnvSource(),
+            new PhpIniEnvSource(),
+        ]);
+
+        return $factories[$envReader] ??= new ConfigurationFactory(
             self::loadComponentProviders(),
             new InstrumentationConfigurationRegistry(),
-            new EnvSourceReader([
-                new ServerEnvSource(),
-                new PhpIniEnvSource(),
-            ]),
+            $envReader,
         );
     }
 
