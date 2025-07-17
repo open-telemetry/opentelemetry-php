@@ -55,8 +55,3 @@ parameters:
             message: "#.*expects Google\\\\Protobuf\\\\RepeatedField.*#"
             paths:
                 - src/Contrib/Otlp
-        -
-            message: "#Attribute class .* is not repeatable but is already present above the class.#"
-            paths:
-                - tests
-                - src/Config/SDK/ComponentProvider
