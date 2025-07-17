@@ -37,6 +37,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setParent(ContextInterface|false|null $context): API\SpanBuilderInterface
     {
         $this->parentContext = $context;
@@ -45,6 +46,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function addLink(API\SpanContextInterface $context, iterable $attributes = []): API\SpanBuilderInterface
     {
         if (!$context->isValid()) {
@@ -70,6 +72,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setAttribute(string $key, mixed $value): API\SpanBuilderInterface
     {
         $this->attributesBuilder[$key] = $value;
@@ -78,6 +81,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setAttributes(iterable $attributes): API\SpanBuilderInterface
     {
         foreach ($attributes as $key => $value) {
@@ -92,6 +96,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
      *
      * @psalm-param API\SpanKind::KIND_* $spanKind
      */
+    #[\Override]
     public function setSpanKind(int $spanKind): API\SpanBuilderInterface
     {
         $this->spanKind = $spanKind;
@@ -100,6 +105,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setStartTimestamp(int $timestampNanos): API\SpanBuilderInterface
     {
         if (0 > $timestampNanos) {
@@ -112,6 +118,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function startSpan(): API\SpanInterface
     {
         $parentContext = Context::resolve($this->parentContext);

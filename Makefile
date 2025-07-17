@@ -5,6 +5,7 @@ DOCKER_COMPOSE ?= docker compose
 DC_RUN_PHP = $(DOCKER_COMPOSE) run --rm php
 
 .DEFAULT_GOAL : help
+.PHONY: deptrac
 
 help: ## Show this help
 	@printf "\033[33m%s:\033[0m\n" 'Available commands'

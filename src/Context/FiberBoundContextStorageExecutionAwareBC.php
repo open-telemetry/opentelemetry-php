@@ -17,16 +17,19 @@ final class FiberBoundContextStorageExecutionAwareBC implements ContextStorageIn
         $this->storage = new FiberBoundContextStorage();
     }
 
+    #[\Override]
     public function fork(int|string $id): void
     {
         $this->bcStorage()->fork($id);
     }
 
+    #[\Override]
     public function switch(int|string $id): void
     {
         $this->bcStorage()->switch($id);
     }
 
+    #[\Override]
     public function destroy(int|string $id): void
     {
         $this->bcStorage()->destroy($id);
@@ -51,6 +54,7 @@ final class FiberBoundContextStorageExecutionAwareBC implements ContextStorageIn
         return $this->bc;
     }
 
+    #[\Override]
     public function scope(): ?ContextStorageScopeInterface
     {
         return $this->bc
@@ -58,6 +62,7 @@ final class FiberBoundContextStorageExecutionAwareBC implements ContextStorageIn
             : $this->storage->scope();
     }
 
+    #[\Override]
     public function current(): ContextInterface
     {
         return $this->bc
@@ -65,6 +70,7 @@ final class FiberBoundContextStorageExecutionAwareBC implements ContextStorageIn
             : $this->storage->current();
     }
 
+    #[\Override]
     public function attach(ContextInterface $context): ContextStorageScopeInterface
     {
         return $this->bc

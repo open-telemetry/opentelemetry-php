@@ -18,59 +18,69 @@ final class NonRecordingSpan extends Span
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getContext(): SpanContextInterface
     {
         return $this->context;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function isRecording(): bool
     {
         return false;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setAttribute(string $key, $value): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setAttributes(iterable $attributes): SpanInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function addEvent(string $name, iterable $attributes = [], ?int $timestamp = null): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function recordException(Throwable $exception, iterable $attributes = []): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function updateName(string $name): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setStatus(string $code, ?string $description = null): SpanInterface
     {
         return $this;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function end(?int $endEpochNanos = null): void
     {
     }

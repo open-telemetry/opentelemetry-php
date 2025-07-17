@@ -56,6 +56,7 @@ final class MeterProvider implements MeterProviderInterface
         $this->meters = new WeakMap();
     }
 
+    #[\Override]
     public function getMeter(
         string $name,
         ?string $version = null,
@@ -86,6 +87,7 @@ final class MeterProvider implements MeterProviderInterface
         return $meter;
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         if ($this->closed) {
@@ -104,6 +106,7 @@ final class MeterProvider implements MeterProviderInterface
         return $success;
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         if ($this->closed) {
@@ -131,6 +134,7 @@ final class MeterProvider implements MeterProviderInterface
      *
      * @experimental
      */
+    #[\Override]
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;

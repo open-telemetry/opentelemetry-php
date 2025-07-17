@@ -14,6 +14,7 @@ deptrac:
         - ./src
         - ./proto
         - ./tests
+        - ./deptrac/stubs
     exclude_files:
         - '#.*test.*#'
     layers:
@@ -109,10 +110,15 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Nyholm\\Psr7Server\\*
+      -   name: Stubs
+          collectors:
+              - type: directory
+                value: deptrac/stubs/.*
 
     ruleset:
       Context:
           - FFI
+          - Stubs
       SemConv: ~
       ConfigSDK:
           - SymfonyConfig
@@ -124,10 +130,12 @@ deptrac:
           - Context
           - Contrib
           - Extension
+          - Stubs
       API:
           - Context
           - PsrLog
           - SPI
+          - Stubs
       SDK:
           - +API
           - ConfigSDK

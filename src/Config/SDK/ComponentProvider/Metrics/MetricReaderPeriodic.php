@@ -37,6 +37,7 @@ final class MetricReaderPeriodic implements ComponentProvider
      *     },
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
         return new ExportingReader(
@@ -44,6 +45,7 @@ final class MetricReaderPeriodic implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('periodic');

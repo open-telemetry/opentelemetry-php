@@ -8,6 +8,7 @@ use function get_cfg_var;
 
 final class PhpIniEnvSource implements EnvSource
 {
+    #[\Override]
     public function readRaw(string $name): string|array|false
     {
         return get_cfg_var($name);

@@ -18,6 +18,7 @@ final class FilteredAttributeProcessor implements AttributeProcessorInterface
     {
     }
 
+    #[\Override]
     public function process(AttributesInterface $attributes, ContextInterface $context): AttributesInterface
     {
         $filtered = [];

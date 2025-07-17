@@ -31,6 +31,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
      *      default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         $endpoint = OutputStreamParser::parse($properties['output_stream']);
@@ -47,6 +48,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
         ), $temporality);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_file/development');

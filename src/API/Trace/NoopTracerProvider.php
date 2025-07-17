@@ -6,6 +6,7 @@ namespace OpenTelemetry\API\Trace;
 
 class NoopTracerProvider implements TracerProviderInterface
 {
+    #[\Override]
     public function getTracer(
         string $name,
         ?string $version = null,

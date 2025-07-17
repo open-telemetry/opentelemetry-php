@@ -17,6 +17,7 @@ class LocalRootSpanTest extends TestCase
 {
     private SpanInterface $span;
 
+    #[\Override]
     public function setUp(): void
     {
         $tracerProvider = new TracerProvider();

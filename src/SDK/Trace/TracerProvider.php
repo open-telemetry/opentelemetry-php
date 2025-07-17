@@ -52,6 +52,7 @@ final class TracerProvider implements TracerProviderInterface
         $this->tracers = new WeakMap();
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->tracerSharedState->getSpanProcessor()->forceFlush($cancellation);
@@ -60,6 +61,7 @@ final class TracerProvider implements TracerProviderInterface
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function getTracer(
         string $name,
         ?string $version = null,
@@ -89,6 +91,7 @@ final class TracerProvider implements TracerProviderInterface
     /**
      * Returns `false` is the provider is already shutdown, otherwise `true`.
      */
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->tracerSharedState->hasShutdown()) {
@@ -108,6 +111,7 @@ final class TracerProvider implements TracerProviderInterface
      * reconfigure all tracers created from the provider.
      * @experimental
      */
+    #[\Override]
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;

@@ -33,6 +33,9 @@ final class ZendObserverFiber
             : (bool) $enabled;
     }
 
+    /**
+     * @psalm-suppress PossiblyNullReference,UndefinedMethod
+     */
     public static function init(): bool
     {
         static $fibers;

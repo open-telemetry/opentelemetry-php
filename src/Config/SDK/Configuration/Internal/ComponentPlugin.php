@@ -25,6 +25,7 @@ final class ComponentPlugin implements \OpenTelemetry\API\Configuration\Config\C
     ) {
     }
 
+    #[\Override]
     public function create(Context $context): mixed
     {
         return $this->provider->createPlugin($this->properties, $context);

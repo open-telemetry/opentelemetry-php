@@ -27,6 +27,7 @@ final class MetricAggregator implements MetricAggregatorInterface
     ) {
     }
 
+    #[\Override]
     public function record(float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $filteredAttributes = $this->attributeProcessor !== null
@@ -48,6 +49,7 @@ final class MetricAggregator implements MetricAggregatorInterface
         }
     }
 
+    #[\Override]
     public function collect(int $timestamp): Metric
     {
         $exemplars = $this->exemplarReservoir

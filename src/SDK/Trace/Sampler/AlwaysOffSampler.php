@@ -24,6 +24,7 @@ class AlwaysOffSampler implements SamplerInterface
      * Returns false because we never want to sample.
      * {@inheritdoc}
      */
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -43,6 +44,7 @@ class AlwaysOffSampler implements SamplerInterface
         );
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'AlwaysOffSampler';

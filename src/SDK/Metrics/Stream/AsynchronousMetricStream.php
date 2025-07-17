@@ -28,21 +28,25 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         $this->metric = new Metric([], [], $startTimestamp);
     }
 
+    #[\Override]
     public function temporality(): Temporality|string
     {
         return Temporality::CUMULATIVE;
     }
 
+    #[\Override]
     public function timestamp(): int
     {
         return $this->metric->timestamp;
     }
 
+    #[\Override]
     public function push(Metric $metric): void
     {
         $this->metric = $metric;
     }
 
+    #[\Override]
     public function register($temporality): int
     {
         if ($temporality === Temporality::CUMULATIVE) {
@@ -58,6 +62,7 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         return $reader;
     }
 
+    #[\Override]
     public function unregister(int $reader): void
     {
         if (!isset($this->lastReads[$reader])) {
@@ -67,6 +72,7 @@ final class AsynchronousMetricStream implements MetricStreamInterface
         $this->lastReads[$reader] = null;
     }
 
+    #[\Override]
     public function collect(int $reader): DataInterface
     {
         $metric = $this->metric;

@@ -22,11 +22,13 @@ final class TextMapPropagatorJaeger implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
         return JaegerPropagator::getInstance();
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('jaeger');

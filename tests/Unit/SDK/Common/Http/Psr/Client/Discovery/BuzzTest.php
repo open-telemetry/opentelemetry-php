@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Buzz::class)]
 class BuzzTest extends AbstractDiscoveryTestCase
 {
+    #[\Override]
     public function getInstance(): DiscoveryInterface
     {
         return new Buzz();

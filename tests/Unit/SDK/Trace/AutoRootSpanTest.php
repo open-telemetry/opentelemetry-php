@@ -35,6 +35,7 @@ class AutoRootSpanTest extends TestCase
     private TracerInterface $tracer;
     private ScopeInterface $scope;
 
+    #[\Override]
     public function setUp(): void
     {
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
@@ -47,6 +48,7 @@ class AutoRootSpanTest extends TestCase
             ->activate();
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         $this->scope->detach();

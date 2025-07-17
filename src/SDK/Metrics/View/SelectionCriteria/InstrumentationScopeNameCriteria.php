@@ -14,6 +14,7 @@ final class InstrumentationScopeNameCriteria implements SelectionCriteriaInterfa
     {
     }
 
+    #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return $this->name === $instrumentationScope->getName();

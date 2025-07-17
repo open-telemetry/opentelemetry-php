@@ -28,6 +28,7 @@ class ExtensionHookManagerTest extends TestCase
     private HookManagerInterface $hookManager;
     private InstrumentationContext $context;
 
+    #[\Override]
     public function setUp(): void
     {
         if (!extension_loaded('opentelemetry')) {
@@ -46,6 +47,7 @@ class ExtensionHookManagerTest extends TestCase
         );
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         $this->scope->detach();
@@ -133,6 +135,7 @@ class ExtensionHookManagerTest extends TestCase
                 $this->post = $post;
             }
 
+            #[\Override]
             public function register(HookManagerInterface $hookManager, ConfigProperties $configuration, InstrumentationContext $context): void
             {
                 $hookManager->hook($this->class, $this->method, $this->pre, $this->post);

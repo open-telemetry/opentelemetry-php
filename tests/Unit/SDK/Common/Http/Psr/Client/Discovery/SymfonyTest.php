@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Symfony::class)]
 class SymfonyTest extends AbstractDiscoveryTestCase
 {
+    #[\Override]
     public function getInstance(): DiscoveryInterface
     {
         return new Symfony();

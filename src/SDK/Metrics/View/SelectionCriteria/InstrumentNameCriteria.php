@@ -27,6 +27,7 @@ final class InstrumentNameCriteria implements SelectionCriteriaInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return (bool) preg_match($this->pattern, $instrument->name);

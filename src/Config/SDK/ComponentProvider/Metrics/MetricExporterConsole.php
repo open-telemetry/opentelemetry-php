@@ -20,11 +20,13 @@ final class MetricExporterConsole implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         return new ConsoleMetricExporter();
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('console');

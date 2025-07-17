@@ -25,6 +25,7 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\Override]
     public function create(): LogRecordExporterInterface
     {
         $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_LOGS_PROTOCOL)

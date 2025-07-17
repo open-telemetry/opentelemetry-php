@@ -24,6 +24,7 @@ final class MultiRegistryRegistration implements MetricRegistrationInterface
     ) {
     }
 
+    #[\Override]
     public function register(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata): void
     {
         foreach ($this->registries as $registry) {

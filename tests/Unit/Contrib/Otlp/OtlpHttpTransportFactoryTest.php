@@ -14,6 +14,7 @@ class OtlpHttpTransportFactoryTest extends TestCase
 {
     private OtlpHttpTransportFactory $factory;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->factory = new OtlpHttpTransportFactory();

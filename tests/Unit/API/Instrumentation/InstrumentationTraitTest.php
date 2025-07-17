@@ -128,21 +128,25 @@ class ValidInstrumentation implements InstrumentationInterface
 {
     use InstrumentationTrait;
 
+    #[\Override]
     public function getName(): string
     {
         return InstrumentationTraitTest::INSTRUMENTATION_NAME;
     }
 
+    #[\Override]
     public function getVersion(): ?string
     {
         return InstrumentationTraitTest::INSTRUMENTATION_VERSION;
     }
 
+    #[\Override]
     public function getSchemaUrl(): ?string
     {
         return InstrumentationTraitTest::INSTRUMENTATION_SCHEMA_URL;
     }
 
+    #[\Override]
     public function init(): bool
     {
         return true;
@@ -153,21 +157,25 @@ class InvalidInstrumentation
 {
     use InstrumentationTrait;
 
+    #[\Override]
     public function getName(): string
     {
         return InstrumentationTraitTest::INSTRUMENTATION_NAME;
     }
 
+    #[\Override]
     public function getVersion(): ?string
     {
         return InstrumentationTraitTest::INSTRUMENTATION_VERSION;
     }
 
+    #[\Override]
     public function getSchemaUrl(): ?string
     {
         return InstrumentationTraitTest::INSTRUMENTATION_SCHEMA_URL;
     }
 
+    #[\Override]
     public function init(): bool
     {
         return true;

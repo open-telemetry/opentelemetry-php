@@ -39,6 +39,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
     /** @var LogWriterInterface&MockObject $logWriter */
     private LogWriterInterface $logWriter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logWriter = $this->createMock(LogWriterInterface::class);

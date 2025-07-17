@@ -165,6 +165,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     },
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SdkBuilder
     {
         $sdkBuilder = new SdkBuilder();
@@ -381,6 +382,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $sdkBuilder;
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('open_telemetry');

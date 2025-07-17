@@ -21,6 +21,7 @@ class ExporterFactoryTest extends TestCase
 {
     use TestState;
 
+    #[\Override]
     public function setUp(): void
     {
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);

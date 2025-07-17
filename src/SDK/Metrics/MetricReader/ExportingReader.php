@@ -39,6 +39,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     {
     }
 
+    #[\Override]
     public function defaultAggregation($instrumentType, array $advisory = []): ?AggregationInterface
     {
         if ($this->exporter instanceof DefaultAggregationProviderInterface) {
@@ -49,6 +50,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         return $this->_defaultAggregation($instrumentType, $advisory);
     }
 
+    #[\Override]
     public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void
     {
         if ($this->closed) {
@@ -81,6 +83,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         $this->streamIds[$registryId][$streamId][] = $sourceId;
     }
 
+    #[\Override]
     public function unregisterStream(MetricCollectorInterface $collector, int $streamId): void
     {
         $registryId = spl_object_id($collector);
@@ -115,6 +118,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         return $this->exporter->export($metrics);
     }
 
+    #[\Override]
     public function collect(): bool
     {
         if ($this->closed) {
@@ -124,6 +128,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         return $this->doCollect();
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         if ($this->closed) {
@@ -140,6 +145,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         return $collect && $shutdown;
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         if ($this->closed) {

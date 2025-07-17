@@ -25,6 +25,7 @@ class EnvironmentResolverTest extends TestCase
 
     private EnvironmentResolver $resolver;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->resolver = new EnvironmentResolver();

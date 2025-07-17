@@ -20,6 +20,7 @@ final class AggregationResolverDefault implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): DefaultAggregationProviderInterface
     {
         // TODO Implement proper aggregation providers (default, drop, explicit_bucket_histogram, last_value, sum) to handle advisory
@@ -28,6 +29,7 @@ final class AggregationResolverDefault implements ComponentProvider
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('default');

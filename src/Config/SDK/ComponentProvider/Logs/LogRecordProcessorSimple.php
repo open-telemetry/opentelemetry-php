@@ -24,6 +24,7 @@ final class LogRecordProcessorSimple implements ComponentProvider
      *     exporter: ComponentPlugin<LogRecordExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface
     {
         return new SimpleLogRecordProcessor(
@@ -31,6 +32,7 @@ final class LogRecordProcessorSimple implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('simple');

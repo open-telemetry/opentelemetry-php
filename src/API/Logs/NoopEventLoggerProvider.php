@@ -16,6 +16,7 @@ class NoopEventLoggerProvider implements EventLoggerProviderInterface
         return $instance ??= new self();
     }
 
+    #[\Override]
     public function getEventLogger(
         string $name,
         ?string $version = null,

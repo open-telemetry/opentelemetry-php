@@ -13,6 +13,7 @@ final class VariableNodeDefinition extends \Symfony\Component\Config\Definition\
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): VariableNode
     {
         return new VariableNode($this->name, $this->parent, $this->pathSeparator);

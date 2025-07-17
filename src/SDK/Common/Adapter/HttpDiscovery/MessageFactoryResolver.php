@@ -43,31 +43,37 @@ final class MessageFactoryResolver implements FactoryResolverInterface
         );
     }
 
+    #[\Override]
     public function resolveRequestFactory(): RequestFactoryInterface
     {
         return $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
     }
 
+    #[\Override]
     public function resolveResponseFactory(): ResponseFactoryInterface
     {
         return $this->responseFactory ??= Psr17FactoryDiscovery::findResponseFactory();
     }
 
+    #[\Override]
     public function resolveServerRequestFactory(): ServerRequestFactoryInterface
     {
         return $this->serverRequestFactory ??= Psr17FactoryDiscovery::findServerRequestFactory();
     }
 
+    #[\Override]
     public function resolveStreamFactory(): StreamFactoryInterface
     {
         return $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
     }
 
+    #[\Override]
     public function resolveUploadedFileFactory(): UploadedFileFactoryInterface
     {
         return $this->uploadedFileFactory ??= Psr17FactoryDiscovery::findUploadedFileFactory();
     }
 
+    #[\Override]
     public function resolveUriFactory(): UriFactoryInterface
     {
         return $this->uriFactory ??= Psr17FactoryDiscovery::findUriFactory();

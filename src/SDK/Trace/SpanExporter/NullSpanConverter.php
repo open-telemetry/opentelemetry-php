@@ -8,6 +8,7 @@ use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 
 class NullSpanConverter implements SpanConverterInterface
 {
+    #[\Override]
     public function convert(iterable $spans): array
     {
         return [[]];

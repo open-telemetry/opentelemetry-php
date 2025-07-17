@@ -38,6 +38,7 @@ class LoggerProvider implements LoggerProviderInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#logger-creation
      */
+    #[\Override]
     public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): LoggerInterface
     {
         if ($this->loggerSharedState->hasShutdown()) {
@@ -50,11 +51,13 @@ class LoggerProvider implements LoggerProviderInterface
         return $logger;
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return $this->loggerSharedState->shutdown($cancellation);
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->loggerSharedState->forceFlush($cancellation);
@@ -70,6 +73,7 @@ class LoggerProvider implements LoggerProviderInterface
      * reconfigure all loggers created from the provider.
      * @experimental
      */
+    #[\Override]
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->configurator = $configurator;

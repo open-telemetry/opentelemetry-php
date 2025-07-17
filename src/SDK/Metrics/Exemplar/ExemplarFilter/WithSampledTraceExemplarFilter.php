@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
  */
 final class WithSampledTraceExemplarFilter implements ExemplarFilterInterface
 {
+    #[\Override]
     public function accepts($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): bool
     {
         return Span::fromContext($context)->getContext()->isSampled();

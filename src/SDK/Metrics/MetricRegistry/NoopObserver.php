@@ -11,6 +11,7 @@ use OpenTelemetry\API\Metrics\ObserverInterface;
  */
 final class NoopObserver implements ObserverInterface
 {
+    #[\Override]
     public function observe($amount, iterable $attributes = []): void
     {
         // no-op

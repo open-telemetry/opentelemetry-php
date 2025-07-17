@@ -87,34 +87,40 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vendor
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-${{ hashFiles('composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-vendor-
     - name: Cache test tools
       id: test-tools-cache
       uses: actions/cache@v4
       with:
         path: vendor-bin
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('**/composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-${{ hashFiles('vendor-bin/*/composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-
 
     - name: Install dependencies
       id: composer
       if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
+      run: |
+        composer --version
+        composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
 
     - name: Check Style
       id: style
       continue-on-error: ${{ matrix.experimental }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
-      run: vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
+      run: |
+        vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer --version
+        vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv
 
     - name: Check Dependencies
       id: deps
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
+      run: |
+        vendor-bin/deptrac/vendor/bin/deptrac --version
+        vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
       id: phan
@@ -122,22 +128,30 @@ jobs:
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
-      run: vendor-bin/phan/vendor/bin/phan
+      run: |
+        vendor-bin/phan/vendor/bin/phan --version
+        vendor-bin/phan/vendor/bin/phan
 
     - name: Run Psalm
       id: psalm
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor-bin/psalm/vendor/bin/psalm --output-format=github
+      run: |
+        vendor-bin/psalm/vendor/bin/psalm --version
+        vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan
       continue-on-error: ${{ matrix.experimental }}
-      run: vendor/bin/phpstan analyse --error-format=github
+      run: |
+        vendor/bin/phpstan --version
+        vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
       continue-on-error: ${{ matrix.experimental }}
-      run: php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
+      run: |
+        vendor/bin/phpunit --version
+        php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
 
     - name: Run PHPUnit (integration tests)
       id: integration

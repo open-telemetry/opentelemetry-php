@@ -19,6 +19,7 @@ final class FilteredReservoir implements ExemplarReservoirInterface
     ) {
     }
 
+    #[\Override]
     public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         if ($this->filter->accepts($value, $attributes, $context, $timestamp)) {
@@ -26,6 +27,7 @@ final class FilteredReservoir implements ExemplarReservoirInterface
         }
     }
 
+    #[\Override]
     public function collect(array $dataPointAttributes): array
     {
         return $this->reservoir->collect($dataPointAttributes);

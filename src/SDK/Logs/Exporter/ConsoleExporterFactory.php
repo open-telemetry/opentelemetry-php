@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Registry;
 
 class ConsoleExporterFactory implements LogRecordExporterFactoryInterface
 {
+    #[\Override]
     public function create(): LogRecordExporterInterface
     {
         $transport = Registry::transportFactory('stream')->create('php://stdout', 'application/json');

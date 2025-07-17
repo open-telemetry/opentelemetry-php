@@ -134,6 +134,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
             });
     }
 
+    #[\Override]
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
         if ($this->closed) {
@@ -158,6 +159,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         }
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
@@ -167,6 +169,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         return $this->flush(__FUNCTION__, $cancellation);
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {

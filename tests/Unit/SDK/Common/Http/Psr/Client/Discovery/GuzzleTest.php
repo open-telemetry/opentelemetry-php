@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(Guzzle::class)]
 class GuzzleTest extends AbstractDiscoveryTestCase
 {
+    #[\Override]
     public function getInstance(): DiscoveryInterface
     {
         return new Guzzle();

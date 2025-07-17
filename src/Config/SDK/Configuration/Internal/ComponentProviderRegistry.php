@@ -61,11 +61,13 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         $this->providers[$type][$name] = new ComponentProviderRegistryEntry($provider, $config);
     }
 
+    #[\Override]
     public function trackResources(?ResourceCollection $resources): void
     {
         $this->resources = $resources;
     }
 
+    #[\Override]
     public function component(string $name, string $type): NodeDefinition
     {
         $node = $this->builder->arrayNode($name);
@@ -74,6 +76,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         return $node;
     }
 
+    #[\Override]
     public function componentList(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name)->defaultValue([]);
@@ -82,6 +85,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         return $node;
     }
 
+    #[\Override]
     public function componentMap(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name);
@@ -100,6 +104,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         return $node;
     }
 
+    #[\Override]
     public function componentNames(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name);

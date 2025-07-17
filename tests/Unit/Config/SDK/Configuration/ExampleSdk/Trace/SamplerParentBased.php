@@ -24,11 +24,13 @@ final class SamplerParentBased implements ComponentProvider
      *     local_parent_not_sampled: ?ComponentPlugin<Sampler>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): Sampler
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('parent_based');

@@ -11,6 +11,7 @@ use OpenTelemetry\API\Logs as API;
  */
 class NoopEventLoggerProvider extends API\NoopEventLoggerProvider implements EventLoggerProviderInterface
 {
+    #[\Override]
     public static function getInstance(): self
     {
         static $instance;
@@ -18,6 +19,7 @@ class NoopEventLoggerProvider extends API\NoopEventLoggerProvider implements Eve
         return $instance ??= new self();
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         return true;

@@ -14,6 +14,7 @@ final class InstrumentationScopeVersionCriteria implements SelectionCriteriaInte
     {
     }
 
+    #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return $this->version === $instrumentationScope->getVersion();

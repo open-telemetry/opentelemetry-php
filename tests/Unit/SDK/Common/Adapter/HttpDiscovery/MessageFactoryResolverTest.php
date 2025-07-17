@@ -32,6 +32,7 @@ class MessageFactoryResolverTest extends TestCase
         UriFactoryInterface::class,
     ];
 
+    #[\Override]
     public function setUp(): void
     {
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);

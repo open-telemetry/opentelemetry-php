@@ -15,11 +15,13 @@ final class EnvResourceChecker implements ResourceCheckerInterface
     ) {
     }
 
+    #[\Override]
     public function supports(ResourceInterface $metadata): bool
     {
         return $metadata instanceof EnvResource;
     }
 
+    #[\Override]
     public function isFresh(ResourceInterface $resource, int $timestamp): bool
     {
         assert($resource instanceof EnvResource);

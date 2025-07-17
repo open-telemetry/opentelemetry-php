@@ -19,6 +19,7 @@ class MeterProviderFactoryTest extends TestCase
 {
     use TestState;
 
+    #[\Override]
     public function setUp(): void
     {
         Logging::disable();

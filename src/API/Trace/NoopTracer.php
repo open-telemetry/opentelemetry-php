@@ -19,11 +19,13 @@ final class NoopTracer implements TracerInterface
         return self::$instance;
     }
 
+    #[\Override]
     public function spanBuilder(string $spanName): SpanBuilderInterface
     {
         return new NoopSpanBuilder(Context::storage());
     }
 
+    #[\Override]
     public function isEnabled(): bool
     {
         return false;

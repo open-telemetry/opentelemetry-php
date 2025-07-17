@@ -38,6 +38,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
         foreach ($this->processors as $processor) {
@@ -46,6 +47,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function onEnd(ReadableSpanInterface $span): void
     {
         foreach ($this->processors as $processor) {
@@ -54,6 +56,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         $result = true;
@@ -66,6 +69,7 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         $result = true;

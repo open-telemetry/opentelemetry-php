@@ -12,6 +12,7 @@ class RandomIdGenerator implements IdGeneratorInterface
     private const TRACE_ID_HEX_LENGTH = 32;
     private const SPAN_ID_HEX_LENGTH = 16;
 
+    #[\Override]
     public function generateTraceId(): string
     {
         do {
@@ -21,6 +22,7 @@ class RandomIdGenerator implements IdGeneratorInterface
         return $traceId;
     }
 
+    #[\Override]
     public function generateSpanId(): string
     {
         do {

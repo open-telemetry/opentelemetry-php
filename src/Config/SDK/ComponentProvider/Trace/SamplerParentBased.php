@@ -29,6 +29,7 @@ final class SamplerParentBased implements ComponentProvider
      *     local_parent_not_sampled: ?ComponentPlugin<SamplerInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
         return new ParentBased(
@@ -40,6 +41,7 @@ final class SamplerParentBased implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('parent_based');

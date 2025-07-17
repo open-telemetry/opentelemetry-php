@@ -22,17 +22,20 @@ final class PrototypedArrayNode extends \Symfony\Component\Config\Definition\Pro
         return $_node;
     }
 
+    #[\Override]
     public function setDefaultValue(mixed $value): void
     {
         $this->defaultValue_ = $value;
         $this->defaultValueSet = true;
     }
 
+    #[\Override]
     public function hasDefaultValue(): bool
     {
         return $this->defaultValueSet || parent::hasDefaultValue();
     }
 
+    #[\Override]
     public function getDefaultValue(): mixed
     {
         return $this->defaultValueSet

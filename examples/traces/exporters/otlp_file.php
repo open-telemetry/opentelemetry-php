@@ -15,6 +15,9 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 
 $filename = sys_get_temp_dir() . '/traces.jsonl';
 $file = fopen($filename, 'a');
+if ($file === false) {
+    throw new \RuntimeException('Failed to open file for writing: ' . $filename);
+}
 $transport = (new StreamTransportFactory())->create($file, ContentTypes::NDJSON);
 $exporter = new SpanExporter($transport);
 

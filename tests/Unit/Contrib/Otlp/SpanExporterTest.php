@@ -24,6 +24,7 @@ class SpanExporterTest extends TestCase
     private MockObject $transport;
     private SpanExporter $exporter;
 
+    #[\Override]
     public function setUp(): void
     {
         Logging::disable();

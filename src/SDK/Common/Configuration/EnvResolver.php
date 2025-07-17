@@ -11,6 +11,7 @@ use function in_array;
  */
 final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\EnvResolver
 {
+    #[\Override]
     public function string(string $name): ?string
     {
         if (!Configuration::has($name)) {
@@ -20,6 +21,7 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         return Configuration::getString($name);
     }
 
+    #[\Override]
     public function enum(string $name, array $values): ?string
     {
         if (!Configuration::has($name)) {
@@ -34,6 +36,7 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         return $value;
     }
 
+    #[\Override]
     public function bool(string $name): ?bool
     {
         if (!Configuration::has($name)) {
@@ -43,6 +46,7 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         return Configuration::getBoolean($name);
     }
 
+    #[\Override]
     public function int(string $name, ?int $min = 0, ?int $max = ~(-1 << 31)): int|null
     {
         if (!Configuration::has($name)) {
@@ -57,6 +61,7 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         return $value;
     }
 
+    #[\Override]
     public function numeric(string $name, float|int|null $min = 0, float|int|null $max = ~(-1 << 31)): float|int|null
     {
         if (!Configuration::has($name)) {
@@ -71,6 +76,7 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         return $value;
     }
 
+    #[\Override]
     public function list(string $name): ?array
     {
         if (!Configuration::has($name)) {
@@ -83,6 +89,7 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         return $value;
     }
 
+    #[\Override]
     public function map(string $name): ?array
     {
         if (!Configuration::has($name)) {

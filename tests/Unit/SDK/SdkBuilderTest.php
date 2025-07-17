@@ -24,6 +24,7 @@ class SdkBuilderTest extends TestCase
     private EventLoggerProviderInterface $eventLoggerProvider;
     private SdkBuilder $builder;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->propagator = $this->createMock(TextMapPropagatorInterface::class);

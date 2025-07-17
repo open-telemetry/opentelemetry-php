@@ -16,11 +16,13 @@ class LateBindingTracer implements TracerInterface
     ) {
     }
 
+    #[\Override]
     public function spanBuilder(string $spanName): SpanBuilderInterface
     {
         return ($this->tracer ??= ($this->factory)())->spanBuilder($spanName);
     }
 
+    #[\Override]
     public function isEnabled(): bool
     {
         return true;

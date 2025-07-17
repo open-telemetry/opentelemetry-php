@@ -16,6 +16,7 @@ use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
  */
 final class EnvComponentLoaderHttpConfig implements EnvComponentLoader
 {
+    #[\Override]
     public function load(EnvResolver $env, EnvComponentLoaderRegistry $registry, Context $context): GeneralInstrumentationConfiguration
     {
         return new HttpConfig([
@@ -30,6 +31,7 @@ final class EnvComponentLoaderHttpConfig implements EnvComponentLoader
         ]);
     }
 
+    #[\Override]
     public function name(): string
     {
         return HttpConfig::class;

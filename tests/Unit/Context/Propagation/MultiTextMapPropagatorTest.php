@@ -23,6 +23,7 @@ class MultiTextMapPropagatorTest extends MockeryTestCase
     /** @var Mockery\MockInterface&TextMapPropagatorInterface */
     private $propagator3;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagator1 = Mockery::mock(TextMapPropagatorInterface::class);

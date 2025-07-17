@@ -20,31 +20,37 @@ final class ContextStorageNode implements ScopeInterface, ContextStorageScopeInt
     ) {
     }
 
+    #[\Override]
     public function offsetExists(mixed $offset): bool
     {
         return isset($this->localStorage[$offset]);
     }
 
+    #[\Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->localStorage[$offset];
     }
 
+    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->localStorage[$offset] = $value;
     }
 
+    #[\Override]
     public function offsetUnset(mixed $offset): void
     {
         unset($this->localStorage[$offset]);
     }
 
+    #[\Override]
     public function context(): ContextInterface
     {
         return $this->context;
     }
 
+    #[\Override]
     public function detach(): int
     {
         $flags = 0;

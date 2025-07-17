@@ -16,11 +16,13 @@ use OpenTelemetry\API\Instrumentation\Configuration\General\PeerConfig;
  */
 final class EnvComponentLoaderPeerConfig implements EnvComponentLoader
 {
+    #[\Override]
     public function load(EnvResolver $env, EnvComponentLoaderRegistry $registry, Context $context): GeneralInstrumentationConfiguration
     {
         return new PeerConfig([]);
     }
 
+    #[\Override]
     public function name(): string
     {
         return PeerConfig::class;

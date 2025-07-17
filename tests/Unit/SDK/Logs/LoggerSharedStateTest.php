@@ -22,6 +22,7 @@ class LoggerSharedStateTest extends TestCase
     private LogRecordLimits $limits;
     private LoggerSharedState $loggerSharedState;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->resource = $this->createMock(ResourceInfo::class);

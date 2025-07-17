@@ -20,16 +20,19 @@ final class NoopTextMapPropagator implements TextMapPropagatorInterface
         return self::$instance;
     }
 
+    #[\Override]
     public function fields(): array
     {
         return [];
     }
 
+    #[\Override]
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         return $context ?? Context::getCurrent();
     }
 
+    #[\Override]
     public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
     }

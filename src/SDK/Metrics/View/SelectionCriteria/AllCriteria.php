@@ -17,6 +17,7 @@ final class AllCriteria implements SelectionCriteriaInterface
     {
     }
 
+    #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         foreach ($this->criteria as $criterion) {

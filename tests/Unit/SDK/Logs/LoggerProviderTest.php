@@ -32,6 +32,7 @@ class LoggerProviderTest extends TestCase
     /** @var Config&MockObject */
     private Config $config;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);

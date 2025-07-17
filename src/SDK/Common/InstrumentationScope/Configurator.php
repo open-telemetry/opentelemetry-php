@@ -51,6 +51,7 @@ final class Configurator
 
     /**
      * @return T
+     * @psalm-suppress PossiblyNullArgument
      */
     public function resolve(InstrumentationScopeInterface $instrumentationScope): Config
     {

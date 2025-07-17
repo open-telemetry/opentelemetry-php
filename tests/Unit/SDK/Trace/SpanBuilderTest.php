@@ -34,6 +34,7 @@ class SpanBuilderTest extends TestCase
     private IdGeneratorInterface $idGenerator;
     /** @var SpanProcessorInterface&MockObject $spanProcessor */
     private SpanProcessorInterface $spanProcessor;
+    #[\Override]
     public function setUp(): void
     {
         $instrumentationScope = new InstrumentationScope(

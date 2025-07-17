@@ -40,6 +40,7 @@ class SpanBuilderTest extends MockeryTestCase
     /** @var MockInterface&SpanProcessorInterface  */
     private $spanProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
@@ -335,6 +336,7 @@ class SpanBuilderTest extends MockeryTestCase
     public function test_add_attributes_via_sampler(): void
     {
         $sampler = new class() implements SamplerInterface {
+            #[\Override]
             public function shouldSample(
                 ContextInterface $parentContext,
                 string $traceId,
@@ -346,6 +348,7 @@ class SpanBuilderTest extends MockeryTestCase
                 return new SamplingResult(SamplingResult::RECORD_AND_SAMPLE, ['cat' => 'meow']);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'test';

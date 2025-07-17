@@ -21,11 +21,13 @@ final class TrackingEnvReader implements EnvReader, ResourceTrackable
         $this->envReader = $envReader;
     }
 
+    #[\Override]
     public function trackResources(?ResourceCollection $resources): void
     {
         $this->resources = $resources;
     }
 
+    #[\Override]
     public function read(string $name): ?string
     {
         $value = $this->envReader->read($name);

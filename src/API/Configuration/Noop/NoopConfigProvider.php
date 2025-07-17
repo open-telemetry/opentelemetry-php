@@ -9,6 +9,7 @@ use OpenTelemetry\API\Configuration\ConfigProviderInterface;
 
 class NoopConfigProvider implements ConfigProviderInterface
 {
+    #[\Override]
     public function getInstrumentationConfig(): ConfigProperties
     {
         return new NoopConfigProperties();

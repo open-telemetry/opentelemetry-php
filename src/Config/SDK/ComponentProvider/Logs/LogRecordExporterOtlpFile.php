@@ -28,6 +28,7 @@ final class LogRecordExporterOtlpFile implements ComponentProvider
      *     output_stream: string,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         $endpoint = OutputStreamParser::parse($properties['output_stream']);
@@ -38,6 +39,7 @@ final class LogRecordExporterOtlpFile implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_file/development');

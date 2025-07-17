@@ -76,6 +76,7 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @internal
      */
+    #[\Override]
     public function updateConfigurator(Configurator $configurator): void
     {
         $this->config = $configurator->resolve($this->instrumentationScope);
@@ -118,6 +119,7 @@ final class Meter implements MeterInterface, Configurable
         }
     }
 
+    #[\Override]
     public function batchObserve(callable $callback, AsynchronousInstrument $instrument, AsynchronousInstrument ...$instruments): ObservableCallbackInterface
     {
         $referenceCounters = [];
@@ -157,6 +159,7 @@ final class Meter implements MeterInterface, Configurable
         );
     }
 
+    #[\Override]
     public function createCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): CounterInterface
     {
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
@@ -170,6 +173,7 @@ final class Meter implements MeterInterface, Configurable
         return new Counter($this->writer, $instrument, $referenceCounter);
     }
 
+    #[\Override]
     public function createObservableCounter(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableCounterInterface
     {
         if (is_callable($advisory)) {
@@ -192,6 +196,7 @@ final class Meter implements MeterInterface, Configurable
         return new ObservableCounter($this->writer, $instrument, $referenceCounter, $this->destructors);
     }
 
+    #[\Override]
     public function createHistogram(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): HistogramInterface
     {
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
@@ -205,6 +210,7 @@ final class Meter implements MeterInterface, Configurable
         return new Histogram($this->writer, $instrument, $referenceCounter);
     }
 
+    #[\Override]
     public function createGauge(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): GaugeInterface
     {
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
@@ -218,6 +224,7 @@ final class Meter implements MeterInterface, Configurable
         return new Gauge($this->writer, $instrument, $referenceCounter);
     }
 
+    #[\Override]
     public function createObservableGauge(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableGaugeInterface
     {
         if (is_callable($advisory)) {
@@ -240,6 +247,7 @@ final class Meter implements MeterInterface, Configurable
         return new ObservableGauge($this->writer, $instrument, $referenceCounter, $this->destructors);
     }
 
+    #[\Override]
     public function createUpDownCounter(string $name, ?string $unit = null, ?string $description = null, array $advisory = []): UpDownCounterInterface
     {
         [$instrument, $referenceCounter] = $this->createSynchronousWriter(
@@ -253,6 +261,7 @@ final class Meter implements MeterInterface, Configurable
         return new UpDownCounter($this->writer, $instrument, $referenceCounter);
     }
 
+    #[\Override]
     public function createObservableUpDownCounter(string $name, ?string $unit = null, ?string $description = null, $advisory = [], callable ...$callbacks): ObservableUpDownCounterInterface
     {
         if (is_callable($advisory)) {

@@ -22,11 +22,13 @@ final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagat
     {
     }
 
+    #[\Override]
     public function keys($carrier): array
     {
         return $this->getter->keys($carrier);
     }
 
+    #[\Override]
     public function get($carrier, string $key): ?string
     {
         $value = $this->getter->get($carrier, $key);
@@ -41,6 +43,10 @@ final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagat
         );
     }
 
+    /**
+     * @psalm-suppress PossiblyNullArgument
+     */
+    #[\Override]
     public function getAll($carrier, string $key): array
     {
         $value = $this->getter instanceof ExtendedPropagationGetterInterface

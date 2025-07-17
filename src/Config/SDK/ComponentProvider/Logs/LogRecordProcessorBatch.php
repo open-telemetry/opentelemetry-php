@@ -29,6 +29,7 @@ final class LogRecordProcessorBatch implements ComponentProvider
      *     exporter: ComponentPlugin<LogRecordExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface
     {
         return new BatchLogRecordProcessor(
@@ -42,6 +43,7 @@ final class LogRecordProcessorBatch implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('batch');

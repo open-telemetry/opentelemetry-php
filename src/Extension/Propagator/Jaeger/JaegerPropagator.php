@@ -45,12 +45,14 @@ class JaegerPropagator implements TextMapPropagatorInterface
         return self::$instance;
     }
 
+    #[\Override]
     public function fields(): array
     {
         return self::FIELDS;
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
@@ -75,6 +77,7 @@ class JaegerPropagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();

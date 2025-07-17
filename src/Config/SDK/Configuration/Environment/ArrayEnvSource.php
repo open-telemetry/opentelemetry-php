@@ -11,6 +11,7 @@ final class ArrayEnvSource implements EnvSource
     ) {
     }
 
+    #[\Override]
     public function readRaw(string $name): mixed
     {
         return $this->env[$name] ?? null;

@@ -20,6 +20,7 @@ class SanitizeCombinedHeadersPropagationGetterTest extends MockeryTestCase
     /** @var Mockery\MockInterface&ExtendedPropagationGetterInterface */
     private $extendedPropagationGetter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagationGetter = Mockery::mock(PropagationGetterInterface::class);

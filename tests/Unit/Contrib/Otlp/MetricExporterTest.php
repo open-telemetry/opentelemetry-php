@@ -25,6 +25,7 @@ final class MetricExporterTest extends TestCase
     private $stream;
     private MetricExporter $exporter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->stream = fopen('php://memory', 'a+b');

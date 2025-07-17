@@ -16,6 +16,7 @@ final class NoopSpanBuilder implements SpanBuilderInterface
     {
     }
 
+    #[\Override]
     public function setParent(ContextInterface|false|null $context): SpanBuilderInterface
     {
         $this->parentContext = $context;
@@ -23,31 +24,37 @@ final class NoopSpanBuilder implements SpanBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanBuilderInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function setAttribute(string $key, mixed $value): SpanBuilderInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function setAttributes(iterable $attributes): SpanBuilderInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function setStartTimestamp(int $timestampNanos): SpanBuilderInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function setSpanKind(int $spanKind): SpanBuilderInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function startSpan(): SpanInterface
     {
         $parentContext = Context::resolve($this->parentContext, $this->contextStorage);

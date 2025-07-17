@@ -25,11 +25,13 @@ final class SpanProcessorBatch implements ComponentProvider
      *     exporter: ComponentPlugin<SpanExporter>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessor
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('batch');

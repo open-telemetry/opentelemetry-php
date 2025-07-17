@@ -13,6 +13,7 @@ final class ScalarNodeDefinition extends \Symfony\Component\Config\Definition\Bu
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): ScalarNode
     {
         return new ScalarNode($this->name, $this->parent, $this->pathSeparator);

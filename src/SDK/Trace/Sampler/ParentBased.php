@@ -60,6 +60,7 @@ class ParentBased implements SamplerInterface
      * Invokes the respective delegate sampler when parent is set or uses root sampler for the root span.
      * {@inheritdoc}
      */
+    #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
         string $traceId,
@@ -87,6 +88,7 @@ class ParentBased implements SamplerInterface
             : $this->localParentNotSampler->shouldSample(...func_get_args());
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return 'ParentBased+' . $this->root->getDescription();

@@ -11,11 +11,13 @@ class NoopMetricExporter implements MetricExporterInterface
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function export(iterable $batch): bool
     {
         return true;
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         return true;

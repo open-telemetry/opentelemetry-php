@@ -53,8 +53,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
      * End users should use a {@see API\TracerInterface} in order to create spans.
      *
      * @param non-empty-string $name
-     * @psalm-param API\SpanKind::KIND_* $kind
      * @param list<LinkInterface> $links
+     * @psalm-param API\SpanKind::KIND_* $kind
      *
      * @internal
      * @psalm-internal OpenTelemetry
@@ -112,18 +112,21 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getContext(): API\SpanContextInterface
     {
         return $this->context;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function isRecording(): bool
     {
         return !$this->hasEnded;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setAttribute(string $key, $value): self
     {
         if ($this->hasEnded) {
@@ -136,6 +139,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setAttributes(iterable $attributes): self
     {
         foreach ($attributes as $key => $value) {
@@ -145,6 +149,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         return $this;
     }
 
+    #[\Override]
     public function addLink(SpanContextInterface $context, iterable $attributes = []): self
     {
         if ($this->hasEnded) {
@@ -169,6 +174,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function addEvent(string $name, iterable $attributes = [], ?int $timestamp = null): self
     {
         if ($this->hasEnded) {
@@ -187,6 +193,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function recordException(Throwable $exception, iterable $attributes = [], ?int $timestamp = null): self
     {
         if ($this->hasEnded) {
@@ -213,6 +220,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function updateName(string $name): self
     {
         if ($this->hasEnded) {
@@ -224,6 +232,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function setStatus(string $code, ?string $description = null): self
     {
         if ($this->hasEnded) {
@@ -245,6 +254,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function end(?int $endEpochNanos = null): void
     {
         if ($this->hasEnded) {
@@ -260,26 +270,31 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function getParentContext(): API\SpanContextInterface
     {
         return $this->parentSpanContext;
     }
 
+    #[\Override]
     public function getInstrumentationScope(): InstrumentationScopeInterface
     {
         return $this->instrumentationScope;
     }
 
+    #[\Override]
     public function hasEnded(): bool
     {
         return $this->hasEnded;
     }
 
+    #[\Override]
     public function toSpanData(): SpanDataInterface
     {
         return new ImmutableSpan(
@@ -297,18 +312,21 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getDuration(): int
     {
         return ($this->hasEnded ? $this->endEpochNanos : Clock::getDefault()->now()) - $this->startEpochNanos;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getKind(): int
     {
         return $this->kind;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function getAttribute(string $key)
     {
         return $this->attributesBuilder[$key];

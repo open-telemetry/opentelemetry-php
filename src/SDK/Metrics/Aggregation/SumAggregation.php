@@ -18,6 +18,7 @@ final class SumAggregation implements AggregationInterface
     {
     }
 
+    #[\Override]
     public function initialize(): SumSummary
     {
         return new SumSummary(0);
@@ -26,6 +27,7 @@ final class SumAggregation implements AggregationInterface
     /**
      * @param SumSummary $summary
      */
+    #[\Override]
     public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $summary->value += $value;
@@ -35,31 +37,34 @@ final class SumAggregation implements AggregationInterface
      * @param SumSummary $left
      * @param SumSummary $right
      */
+    #[\Override]
     public function merge($left, $right): SumSummary
     {
-        $sum = $left->value + $right->value;
+        $sum = (is_int($left->value) && is_int($right->value))
+            ? ($left->value + $right->value)
+            : ((float) $left->value + (float) $right->value);
 
-        return new SumSummary(
-            $sum,
-        );
+        return new SumSummary($sum);
     }
 
     /**
      * @param SumSummary $left
      * @param SumSummary $right
      */
+    #[\Override]
     public function diff($left, $right): SumSummary
     {
-        $sum = -$left->value + $right->value;
+        $diff = (is_int($left->value) && is_int($right->value))
+            ? (-$left->value + $right->value)
+            : (-(float) $left->value + (float) $right->value);
 
-        return new SumSummary(
-            $sum,
-        );
+        return new SumSummary($diff);
     }
 
     /**
      * @param array<SumSummary> $summaries
      */
+    #[\Override]
     public function toData(
         array $attributes,
         array $summaries,

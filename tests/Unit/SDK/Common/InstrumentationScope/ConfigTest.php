@@ -16,6 +16,7 @@ class ConfigTest extends TestCase
 {
     private Config $config;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->config = new class() implements Config {

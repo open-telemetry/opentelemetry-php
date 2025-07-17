@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 
 class InMemoryExporterFactory implements LogRecordExporterFactoryInterface
 {
+    #[\Override]
     public function create(): LogRecordExporterInterface
     {
         return new InMemoryExporter(InMemoryStorageManager::logs());

@@ -32,6 +32,7 @@ final class SpanExporter implements SpanExporterInterface
         $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
+    #[\Override]
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         return $this->transport
@@ -66,11 +67,13 @@ final class SpanExporter implements SpanExporterInterface
             });
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->shutdown($cancellation);
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->forceFlush($cancellation);

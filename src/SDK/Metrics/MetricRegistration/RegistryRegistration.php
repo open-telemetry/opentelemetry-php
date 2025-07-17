@@ -21,6 +21,7 @@ final class RegistryRegistration implements MetricRegistrationInterface
     ) {
     }
 
+    #[\Override]
     public function register(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata): void
     {
         $this->registry->add($provider, $metadata, $this->stalenessHandler);

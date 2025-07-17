@@ -17,6 +17,7 @@ class ConfigurationResolverTest extends TestCase
 
     private ConfigurationResolver $resolver;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->resolver = new ConfigurationResolver();

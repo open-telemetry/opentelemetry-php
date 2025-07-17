@@ -16,6 +16,7 @@ final class GrpcTransportTest extends TestCase
 {
     private GrpcTransport $transport;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->transport = new GrpcTransport('http://localhost:4317', [], '/method', [], 123);

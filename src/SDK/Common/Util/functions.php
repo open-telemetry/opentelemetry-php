@@ -47,7 +47,7 @@ function weaken(Closure $closure, ?object &$target = null): Closure
     $ref = WeakReference::create($target);
 
     /**
-     * @psalm-suppress all
+     * @psalm-suppress PossiblyNullReference,PossiblyNullFunctionCall
      */
     return $scope && $target::class === $scope->name && !$scope->isInternal()
         ? static fn (...$args) => ($obj = $ref->get()) ? $closure->call($obj, ...$args) : null

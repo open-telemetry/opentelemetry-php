@@ -30,6 +30,7 @@ final class PsrTransportTest extends TestCase
     private MockObject $client;
     private PsrTransportFactory $factory;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->client = $this->createMock(ClientInterface::class);
@@ -157,6 +158,7 @@ final class PsrTransportTest extends TestCase
     public function test_send_retry_network_exception_returns_error(): void
     {
         $e = new class('network error') extends \Exception implements NetworkExceptionInterface {
+            #[\Override]
             public function getRequest(): RequestInterface
             {
                 return new Request('GET', 'http://localhost');

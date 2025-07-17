@@ -22,6 +22,7 @@ class CompositeResolverTest extends TestCase
     private ResolverInterface $two;
     private CompositeResolver $resolver;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->one = $this->createMock(ResolverInterface::class);

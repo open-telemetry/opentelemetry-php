@@ -21,6 +21,7 @@ final class SpanExporterConsole implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         return new ConsoleSpanExporter(Registry::transportFactory('stream')->create(
@@ -29,6 +30,7 @@ final class SpanExporterConsole implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('console');

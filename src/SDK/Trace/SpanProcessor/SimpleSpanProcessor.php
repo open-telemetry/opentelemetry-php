@@ -34,10 +34,12 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         $this->queue = new SplQueue();
     }
 
+    #[\Override]
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
     }
 
+    #[\Override]
     public function onEnd(ReadableSpanInterface $span): void
     {
         if ($this->closed) {
@@ -51,6 +53,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         $this->flush(fn () => $this->exporter->export([$spanData])->await(), 'export', false, $this->exportContext);
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
@@ -60,6 +63,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         return $this->flush(fn (): bool => $this->exporter->forceFlush($cancellation), __FUNCTION__, true, Context::getCurrent());
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {

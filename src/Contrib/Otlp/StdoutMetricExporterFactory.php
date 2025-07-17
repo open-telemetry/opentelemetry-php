@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 
 class StdoutMetricExporterFactory implements MetricExporterFactoryInterface
 {
+    #[\Override]
     public function create(): MetricExporterInterface
     {
         $transport = (new StreamTransportFactory())->create('php://stdout', ContentTypes::NDJSON);

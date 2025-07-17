@@ -34,6 +34,7 @@ class ImmutableSpanTest extends TestCase
     private int $totalRecordedEvents = 1;
     private int $totalRecordedLinks = 1;
 
+    #[\Override]
     protected function setUp():void
     {
         $this->context = $this->createMock(API\SpanContextInterface::class);

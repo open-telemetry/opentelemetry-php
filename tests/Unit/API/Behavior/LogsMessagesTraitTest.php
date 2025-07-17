@@ -22,6 +22,7 @@ class LogsMessagesTraitTest extends TestCase
 
     protected MockObject $writer;
 
+    #[\Override]
     public function setUp(): void
     {
         Logging::reset();

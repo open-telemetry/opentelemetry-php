@@ -21,11 +21,13 @@ final class MetricReaderPull implements ComponentProvider
      *     exporter: ComponentPlugin<MetricExporter>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricReader
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('pull');

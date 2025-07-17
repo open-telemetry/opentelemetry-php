@@ -39,6 +39,7 @@ final class DebugScope implements ScopeInterface
         }
     }
 
+    #[\Override]
     public function detach(): int
     {
         $this->detachedAt ??= debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);

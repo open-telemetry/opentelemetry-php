@@ -24,11 +24,13 @@ final class MetricExporterPrometheus implements ComponentProvider
      *     without_scope_info: bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporter
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('prometheus');

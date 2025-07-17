@@ -22,11 +22,13 @@ final class TextMapPropagatorB3 implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
         return B3Propagator::getB3SingleHeaderInstance();
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('b3');

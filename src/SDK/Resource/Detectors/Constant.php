@@ -13,6 +13,7 @@ final class Constant implements ResourceDetectorInterface
     {
     }
 
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         return $this->resourceInfo;

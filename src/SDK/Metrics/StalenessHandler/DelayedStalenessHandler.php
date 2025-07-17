@@ -24,6 +24,7 @@ final class DelayedStalenessHandler implements StalenessHandlerInterface, Refere
     ) {
     }
 
+    #[\Override]
     public function acquire(bool $persistent = false): void
     {
         if ($this->count === 0) {
@@ -37,6 +38,7 @@ final class DelayedStalenessHandler implements StalenessHandlerInterface, Refere
         }
     }
 
+    #[\Override]
     public function release(): void
     {
         if (--$this->count || $this->onStale === null) {
@@ -46,6 +48,7 @@ final class DelayedStalenessHandler implements StalenessHandlerInterface, Refere
         ($this->stale)($this);
     }
 
+    #[\Override]
     public function onStale(Closure $callback): void
     {
         if ($this->onStale === null) {

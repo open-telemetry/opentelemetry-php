@@ -13,6 +13,7 @@ use Psr\Log\NullLogger;
 #[CoversClass(LoggerHolder::class)]
 class LoggerHolderTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         LoggerHolder::unset();

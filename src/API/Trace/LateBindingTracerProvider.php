@@ -22,6 +22,7 @@ class LateBindingTracerProvider implements TracerProviderInterface
     ) {
     }
 
+    #[\Override]
     public function getTracer(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): TracerInterface
     {
         return $this->tracerProvider?->getTracer($name, $version, $schemaUrl, $attributes)

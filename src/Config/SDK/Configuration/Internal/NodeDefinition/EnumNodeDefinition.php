@@ -13,6 +13,7 @@ final class EnumNodeDefinition extends \Symfony\Component\Config\Definition\Buil
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): EnumNode
     {
         $node = parent::instantiateNode();

@@ -17,11 +17,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class PeerConfigProvider implements ComponentProvider
 {
+    #[\Override]
     public function createPlugin(array $properties, Context $context): GeneralInstrumentationConfiguration
     {
         return new PeerConfig($properties);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('peer');

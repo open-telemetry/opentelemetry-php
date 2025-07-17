@@ -13,6 +13,7 @@ use OpenTelemetry\Context\Context;
 
 final class ExampleInstrumentation implements Instrumentation
 {
+    #[\Override]
     public function register(HookManagerInterface $hookManager, ConfigProperties $configuration, InstrumentationContext $context): void
     {
         $config = $configuration->get(ExampleConfig::class) ?? new ExampleConfig();

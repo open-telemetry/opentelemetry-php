@@ -20,11 +20,13 @@ final class SamplerAlwaysOff implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
         return new AlwaysOffSampler();
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('always_off');

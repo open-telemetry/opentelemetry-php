@@ -17,6 +17,7 @@ final class ImmediateStalenessHandler implements StalenessHandlerInterface, Refe
     private ?array $onStale = [];
     private int $count = 0;
 
+    #[\Override]
     public function acquire(bool $persistent = false): void
     {
         $this->count++;
@@ -26,6 +27,7 @@ final class ImmediateStalenessHandler implements StalenessHandlerInterface, Refe
         }
     }
 
+    #[\Override]
     public function release(): void
     {
         if (--$this->count !== 0 || !$this->onStale) {
@@ -39,6 +41,7 @@ final class ImmediateStalenessHandler implements StalenessHandlerInterface, Refe
         }
     }
 
+    #[\Override]
     public function onStale(Closure $callback): void
     {
         if ($this->onStale === null) {

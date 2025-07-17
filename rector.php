@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use Rector\CodeQuality\Rector\Array_\CallableThisArrayToAnonymousFunctionRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->phpVersion(PhpVersion::PHP_81);
+    $rectorConfig->phpVersion(PhpVersion::PHP_83);
 
     $rectorConfig->paths([
         __DIR__ . '/src',
@@ -27,6 +27,7 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::CODE_QUALITY,
         PHPUnitSetList::PHPUNIT_100,
     ]);
+    $rectorConfig->rule(AddOverrideAttributeToOverriddenMethodsRector::class);
     $rectorConfig->skip([
         FlipTypeControlToUseExclusiveTypeRector::class,
         NewInInitializerRector::class => [

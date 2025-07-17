@@ -16,21 +16,25 @@ final class Event implements EventInterface
     ) {
     }
 
+    #[\Override]
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;
     }
 
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function getEpochNanos(): int
     {
         return $this->timestamp;
     }
 
+    #[\Override]
     public function getTotalAttributeCount(): int
     {
         return count($this->attributes);

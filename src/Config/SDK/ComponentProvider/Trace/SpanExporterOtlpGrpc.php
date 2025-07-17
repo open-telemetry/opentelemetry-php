@@ -40,6 +40,7 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
      *     insecure: ?bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         $protocol = Protocols::GRPC;
@@ -57,6 +58,7 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_grpc');

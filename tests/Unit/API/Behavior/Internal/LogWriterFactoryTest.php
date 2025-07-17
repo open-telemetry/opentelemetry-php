@@ -21,6 +21,7 @@ class LogWriterFactoryTest extends TestCase
 {
     use TestState;
 
+    #[\Override]
     public function setUp(): void
     {
         LoggerHolder::unset();

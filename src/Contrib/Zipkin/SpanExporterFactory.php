@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
 class SpanExporterFactory implements SpanExporterFactoryInterface
 {
+    #[\Override]
     public function create(): SpanExporterInterface
     {
         $endpoint = Configuration::getString(Variables::OTEL_EXPORTER_ZIPKIN_ENDPOINT);

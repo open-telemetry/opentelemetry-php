@@ -37,6 +37,7 @@ class FriendlySpanConverter implements SpanConverterInterface
     private const LINKS_ATTR = 'links';
     private const SCHEMA_URL_ATTR = 'schema_url';
 
+    #[\Override]
     public function convert(iterable $spans): array
     {
         $aggregate = [];

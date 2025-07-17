@@ -26,6 +26,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     ) {
     }
 
+    #[\Override]
     public function initialize(): ExplicitBucketHistogramSummary
     {
         return new ExplicitBucketHistogramSummary(
@@ -40,6 +41,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     /**
      * @param ExplicitBucketHistogramSummary $summary
      */
+    #[\Override]
     public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $boundariesCount = count($this->boundaries);
@@ -56,10 +58,13 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
      * @param ExplicitBucketHistogramSummary $left
      * @param ExplicitBucketHistogramSummary $right
      */
+    #[\Override]
     public function merge($left, $right): ExplicitBucketHistogramSummary
     {
         $count = $left->count + $right->count;
-        $sum = $left->sum + $right->sum;
+        $sum = (is_int($left->sum) && is_int($right->sum))
+            ? ($left->sum + $right->sum)
+            : ((float) $left->sum + (float) $right->sum);
         $min = self::min($left->min, $right->min);
         $max = self::max($left->max, $right->max);
         $buckets = $right->buckets;
@@ -80,10 +85,13 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
      * @param ExplicitBucketHistogramSummary $left
      * @param ExplicitBucketHistogramSummary $right
      */
+    #[\Override]
     public function diff($left, $right): ExplicitBucketHistogramSummary
     {
         $count = -$left->count + $right->count;
-        $sum = -$left->sum + $right->sum;
+        $sum = (is_int($left->sum) && is_int($right->sum))
+            ? (-$left->sum + $right->sum)
+            : (-(float) $left->sum + (float) $right->sum);
         $min = $left->min > $right->min ? $right->min : NAN;
         $max = $left->max < $right->max ? $right->max : NAN;
         $buckets = $right->buckets;
@@ -103,6 +111,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     /**
      * @param array<ExplicitBucketHistogramSummary> $summaries
      */
+    #[\Override]
     public function toData(
         array $attributes,
         array $summaries,

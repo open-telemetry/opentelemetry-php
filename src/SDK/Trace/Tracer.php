@@ -25,6 +25,7 @@ class Tracer implements API\TracerInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function spanBuilder(string $spanName): API\SpanBuilderInterface
     {
         if (ctype_space($spanName)) {
@@ -47,6 +48,7 @@ class Tracer implements API\TracerInterface
         return $this->instrumentationScope;
     }
 
+    #[\Override]
     public function isEnabled(): bool
     {
         return $this->config->isEnabled();

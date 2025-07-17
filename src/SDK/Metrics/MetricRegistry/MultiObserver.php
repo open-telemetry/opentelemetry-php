@@ -23,6 +23,7 @@ final class MultiObserver implements ObserverInterface
     ) {
     }
 
+    #[\Override]
     public function observe($amount, iterable $attributes = []): void
     {
         $context = Context::getRoot();

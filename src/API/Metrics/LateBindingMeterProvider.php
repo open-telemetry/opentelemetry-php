@@ -16,6 +16,7 @@ class LateBindingMeterProvider implements MeterProviderInterface
     ) {
     }
 
+    #[\Override]
     public function getMeter(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): MeterInterface
     {
         return $this->meterProvider?->getMeter($name, $version, $schemaUrl, $attributes)

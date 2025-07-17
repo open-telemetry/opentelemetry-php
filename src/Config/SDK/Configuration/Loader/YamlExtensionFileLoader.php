@@ -22,6 +22,7 @@ final class YamlExtensionFileLoader extends FileLoader
         parent::__construct($locator, $env);
     }
 
+    #[\Override]
     public function load(mixed $resource, ?string $type = null): mixed
     {
         assert(extension_loaded('yaml'));
@@ -38,6 +39,7 @@ final class YamlExtensionFileLoader extends FileLoader
         return null;
     }
 
+    #[\Override]
     public function supports(mixed $resource, ?string $type = null): bool
     {
         return extension_loaded('yaml')

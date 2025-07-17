@@ -171,6 +171,7 @@ final class CollectingSourceRegistry implements MetricSourceRegistryInterface
     /**
      * @psalm-suppress InvalidPropertyAssignmentValue
      */
+    #[\Override]
     public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void
     {
         $this->sources[] = func_get_args();

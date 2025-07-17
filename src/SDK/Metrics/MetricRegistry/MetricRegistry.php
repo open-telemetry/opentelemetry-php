@@ -46,6 +46,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     ) {
     }
 
+    #[\Override]
     public function registerSynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorInterface $aggregator): int
     {
         $this->streams[] = $stream;
@@ -59,6 +60,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         return $streamId;
     }
 
+    #[\Override]
     public function registerAsynchronousStream(Instrument $instrument, MetricStreamInterface $stream, MetricAggregatorFactoryInterface $aggregatorFactory): int
     {
         $this->streams[] = $stream;
@@ -72,6 +74,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         return $streamId;
     }
 
+    #[\Override]
     public function unregisterStreams(Instrument $instrument): array
     {
         $instrumentId = spl_object_id($instrument);
@@ -90,6 +93,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         return $streamIds;
     }
 
+    #[\Override]
     public function record(Instrument $instrument, $value, iterable $attributes = [], $context = null): void
     {
         $context = Context::resolve($context, $this->contextStorage);
@@ -103,6 +107,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
     }
 
+    #[\Override]
     public function registerCallback(Closure $callback, Instrument $instrument, Instrument ...$instruments): int
     {
         $callbackId = array_key_last($this->asynchronousCallbacks) + 1;
@@ -120,6 +125,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         return $callbackId;
     }
 
+    #[\Override]
     public function unregisterCallback(int $callbackId): void
     {
         $instrumentIds = $this->asynchronousCallbackArguments[$callbackId];
@@ -135,6 +141,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
     }
 
+    #[\Override]
     public function collectAndPush(iterable $streamIds): void
     {
         $timestamp = $this->clock->now();
@@ -178,6 +185,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         }
     }
 
+    #[\Override]
     public function enabled(Instrument $instrument): bool
     {
         return isset($this->instrumentToStreams[spl_object_id($instrument)]);

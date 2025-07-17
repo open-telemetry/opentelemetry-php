@@ -25,6 +25,7 @@ final class SystemClock implements ClockInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function now(): int
     {
         return self::$referenceTime + hrtime(true);
@@ -47,6 +48,6 @@ final class SystemClock implements ClockInterface
      */
     private static function calculateReferenceTime(float $wallClockMicroTime, int $upTime): int
     {
-        return ((int) ($wallClockMicroTime * ClockInterface::NANOS_PER_SECOND)) - $upTime;
+        return ((int) ($wallClockMicroTime * (float) ClockInterface::NANOS_PER_SECOND)) - $upTime;
     }
 }

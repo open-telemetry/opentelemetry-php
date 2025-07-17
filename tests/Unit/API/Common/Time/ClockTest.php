@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Clock::class)]
 class ClockTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         Clock::reset();

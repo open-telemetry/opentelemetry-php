@@ -16,16 +16,19 @@ final class ErrorFuture implements FutureInterface
     {
     }
 
+    #[\Override]
     public function await(): never
     {
         throw $this->throwable;
     }
 
+    #[\Override]
     public function map(Closure $closure): FutureInterface
     {
         return $this;
     }
 
+    #[\Override]
     public function catch(Closure $closure): FutureInterface
     {
         $c = $closure;

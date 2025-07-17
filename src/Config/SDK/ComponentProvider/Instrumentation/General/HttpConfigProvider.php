@@ -17,11 +17,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class HttpConfigProvider implements ComponentProvider
 {
+    #[\Override]
     public function createPlugin(array $properties, Context $context): GeneralInstrumentationConfiguration
     {
         return new HttpConfig($properties);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('http');

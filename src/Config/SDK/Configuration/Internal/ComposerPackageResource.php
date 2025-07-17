@@ -21,11 +21,13 @@ final class ComposerPackageResource implements SelfCheckingResourceInterface
         $this->version = self::getVersion($packageName);
     }
 
+    #[\Override]
     public function isFresh(int $timestamp): bool
     {
         return $this->version === self::getVersion($this->packageName);
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return 'composer.' . $this->packageName;

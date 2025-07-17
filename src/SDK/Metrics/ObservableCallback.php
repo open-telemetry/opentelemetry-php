@@ -22,6 +22,7 @@ final class ObservableCallback implements ObservableCallbackInterface
     ) {
     }
 
+    #[\Override]
     public function detach(): void
     {
         if ($this->callbackId === null) {

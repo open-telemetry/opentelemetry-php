@@ -15,11 +15,13 @@ final class Link implements LinkInterface
     ) {
     }
 
+    #[\Override]
     public function getSpanContext(): API\SpanContextInterface
     {
         return $this->context;
     }
 
+    #[\Override]
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;

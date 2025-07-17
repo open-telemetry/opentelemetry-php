@@ -12,6 +12,7 @@ final class BaggageBuilder implements BaggageBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function remove(string $key): BaggageBuilderInterface
     {
         unset($this->entries[$key]);
@@ -20,6 +21,7 @@ final class BaggageBuilder implements BaggageBuilderInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function set(string $key, $value, ?MetadataInterface $metadata = null): BaggageBuilderInterface
     {
         if ($key === '') {
@@ -32,6 +34,7 @@ final class BaggageBuilder implements BaggageBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function build(): BaggageInterface
     {
         return new Baggage($this->entries);

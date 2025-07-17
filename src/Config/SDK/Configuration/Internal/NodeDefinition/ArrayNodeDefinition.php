@@ -22,6 +22,7 @@ class ArrayNodeDefinition extends \Symfony\Component\Config\Definition\Builder\A
         $this->nullEquivalent = null;
     }
 
+    #[\Override]
     protected function createNode(): NodeInterface
     {
         $node = parent::createNode();
@@ -40,6 +41,7 @@ class ArrayNodeDefinition extends \Symfony\Component\Config\Definition\Builder\A
         return $node;
     }
 
+    #[\Override]
     public function defaultValue(mixed $value): static
     {
         $this->defaultValueSet = true;

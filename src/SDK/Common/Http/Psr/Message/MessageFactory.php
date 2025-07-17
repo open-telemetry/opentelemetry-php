@@ -28,16 +28,19 @@ final class MessageFactory implements MessageFactoryInterface
         return new self($requestFactory, $responseFactory, $serverRequestFactory);
     }
 
+    #[\Override]
     public function createRequest(string $method, $uri): RequestInterface
     {
         return $this->requestFactory->createRequest($method, $uri);
     }
 
+    #[\Override]
     public function createResponse(int $code = 200, string $reasonPhrase = ''): ResponseInterface
     {
         return $this->responseFactory->createResponse($code, $reasonPhrase);
     }
 
+    #[\Override]
     public function createServerRequest(string $method, $uri, array $serverParams = []): ServerRequestInterface
     {
         return $this->serverRequestFactory->createServerRequest($method, $uri, $serverParams);

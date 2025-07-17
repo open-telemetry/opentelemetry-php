@@ -50,6 +50,7 @@ class JaegerPropagatorTest extends TestCase
     /**
      * @psalm-suppress PossiblyUndefinedArrayOffset
      */
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagator = JaegerPropagator::getInstance();

@@ -34,11 +34,13 @@ final class BaggagePropagator implements TextMapPropagatorInterface
         return self::$instance;
     }
 
+    #[\Override]
     public function fields(): array
     {
         return [self::BAGGAGE];
     }
 
+    #[\Override]
     public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
@@ -70,6 +72,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
         }
     }
 
+    #[\Override]
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();

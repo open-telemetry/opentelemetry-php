@@ -30,11 +30,13 @@ final class ConfigurationFactoryTest extends TestCase
     public string $cacheDir;
     public $properties;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->cacheDir = __DIR__ . '/configurations';
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         array_map('unlink', array_filter((array) glob($this->cacheDir . '/*cache*')));
@@ -49,6 +51,7 @@ final class ConfigurationFactoryTest extends TestCase
         $factory = new ConfigurationFactory(
             [],
             new class() implements \OpenTelemetry\API\Configuration\Config\ComponentProvider {
+                #[\Override]
                 public function createPlugin(array $properties, Context $context): mixed
                 {
                     throw new BadMethodCallException();
@@ -57,6 +60,7 @@ final class ConfigurationFactoryTest extends TestCase
                 /**
                  * @psalm-suppress UndefinedInterfaceMethod,PossiblyNullReference
                  */
+                #[\Override]
                 public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
                 {
                     $node = new ArrayNodeDefinition('env_substitution');

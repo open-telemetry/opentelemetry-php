@@ -33,6 +33,7 @@ class SimplePsrFileLoggerTest extends TestCase
     private SimplePsrFileLogger $logger;
     private vfsStreamDirectory $root;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->root = vfsStream::setup(self::ROOT_DIR);

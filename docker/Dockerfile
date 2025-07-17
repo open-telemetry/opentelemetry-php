@@ -1,4 +1,4 @@
-FROM composer:2 AS composer
+FROM composer:2.8 AS composer
 FROM debian:bullseye
 WORKDIR /usr/src/myapp
 
@@ -38,7 +38,7 @@ RUN apt-get install -y \
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
-RUN echo ";grpc.enable_fork_support = 1" > $(php-config --ini-dir)/40-otel-dev.ini \
+RUN echo "grpc.enable_fork_support = 1" > $(php-config --ini-dir)/40-otel-dev.ini \
   && echo "grpc.poll_strategy = epoll1" >> $(php-config --ini-dir)/40-otel-dev.ini \
   && echo "zend.assertions = 1" >> $(php-config --ini-dir)/40-otel-dev.ini
 

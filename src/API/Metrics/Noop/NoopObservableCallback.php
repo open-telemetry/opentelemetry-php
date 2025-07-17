@@ -11,6 +11,7 @@ use OpenTelemetry\API\Metrics\ObservableCallbackInterface;
  */
 final class NoopObservableCallback implements ObservableCallbackInterface
 {
+    #[\Override]
     public function detach(): void
     {
         // no-op

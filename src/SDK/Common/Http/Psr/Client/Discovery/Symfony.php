@@ -13,6 +13,7 @@ class Symfony implements DiscoveryInterface
     /**
      * @phan-suppress PhanUndeclaredClassReference
      */
+    #[\Override]
     public function available(): bool
     {
         return class_exists(HttpClient::class) && class_exists(Psr18Client::class);
@@ -21,6 +22,7 @@ class Symfony implements DiscoveryInterface
     /**
      * @phan-suppress PhanTypeMismatchReturn,PhanUndeclaredClassMethod
      */
+    #[\Override]
     public function create(mixed $options): ClientInterface
     {
         if (is_array($options) && array_key_exists('timeout', $options)) {

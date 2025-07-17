@@ -15,6 +15,7 @@ final class AttributesFactory implements AttributesFactoryInterface
     ) {
     }
 
+    #[\Override]
     public function builder(iterable $attributes = [], ?AttributeValidatorInterface $attributeValidator = null): AttributesBuilderInterface
     {
         $builder = new AttributesBuilder(

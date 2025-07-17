@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Context::class)]
 final class DebugScopeTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         set_error_handler(static function (int $errno, string $errstr): never {
@@ -24,6 +25,7 @@ final class DebugScopeTest extends TestCase
         }, E_USER_NOTICE);
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         restore_error_handler();

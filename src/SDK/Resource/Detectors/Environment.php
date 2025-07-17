@@ -16,6 +16,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
  */
 final class Environment implements ResourceDetectorInterface
 {
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $attributes = Configuration::has(Variables::OTEL_RESOURCE_ATTRIBUTES)

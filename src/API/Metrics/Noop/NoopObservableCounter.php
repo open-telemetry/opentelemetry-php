@@ -12,11 +12,13 @@ use OpenTelemetry\API\Metrics\ObservableCounterInterface;
  */
 final class NoopObservableCounter implements ObservableCounterInterface
 {
+    #[\Override]
     public function observe(callable $callback, bool $weaken = false): ObservableCallbackInterface
     {
         return new NoopObservableCallback();
     }
 
+    #[\Override]
     public function isEnabled(): bool
     {
         return false;

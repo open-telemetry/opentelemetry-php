@@ -9,6 +9,7 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 
 final class NoopMeterProvider implements MeterProviderInterface
 {
+    #[\Override]
     public function getMeter(
         string $name,
         ?string $version = null,

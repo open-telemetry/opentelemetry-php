@@ -18,6 +18,7 @@ class StreamLogWriter implements LogWriterInterface
         }
     }
 
+    #[\Override]
     public function write($level, string $message, array $context): void
     {
         fwrite($this->stream, Formatter::format($level, $message, $context));

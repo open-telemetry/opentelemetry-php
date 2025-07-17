@@ -23,6 +23,7 @@ class ReadableLogRecordTest extends TestCase
     private ContextInterface $context;
     private LoggerSharedState $sharedState;
     private ResourceInfo $resource;
+    #[\Override]
     public function setUp(): void
     {
         $this->scope = $this->createMock(InstrumentationScopeInterface::class);

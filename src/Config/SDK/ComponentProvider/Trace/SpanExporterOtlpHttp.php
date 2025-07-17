@@ -37,6 +37,7 @@ final class SpanExporterOtlpHttp implements ComponentProvider
      *     encoding: 'protobuf'|'json',
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
@@ -56,6 +57,7 @@ final class SpanExporterOtlpHttp implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_http');

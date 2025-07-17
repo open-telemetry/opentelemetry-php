@@ -45,6 +45,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(AttributesFactory::class)]
 final class MetricStreamTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         Logging::disable();

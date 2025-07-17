@@ -18,6 +18,7 @@ final class ExtensionHookManager implements HookManagerInterface
     /**
      * @phan-suppress PhanUndeclaredFunction
      */
+    #[\Override]
     public function hook(?string $class, string $function, ?Closure $preHook = null, ?Closure $postHook = null): void
     {
         assert(extension_loaded('opentelemetry'));

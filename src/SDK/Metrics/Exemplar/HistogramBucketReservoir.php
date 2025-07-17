@@ -25,6 +25,7 @@ final class HistogramBucketReservoir implements ExemplarReservoirInterface
         $this->boundaries = $boundaries;
     }
 
+    #[\Override]
     public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $boundariesCount = count($this->boundaries);
@@ -33,6 +34,7 @@ final class HistogramBucketReservoir implements ExemplarReservoirInterface
         $this->storage->store($i, $index, $value, $attributes, $context, $timestamp);
     }
 
+    #[\Override]
     public function collect(array $dataPointAttributes): array
     {
         return $this->storage->collect($dataPointAttributes);

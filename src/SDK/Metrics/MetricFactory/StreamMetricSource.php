@@ -18,11 +18,13 @@ final class StreamMetricSource implements MetricSourceInterface
     ) {
     }
 
+    #[\Override]
     public function collectionTimestamp(): int
     {
         return $this->provider->stream->timestamp();
     }
 
+    #[\Override]
     public function collect(): Metric
     {
         return new Metric(

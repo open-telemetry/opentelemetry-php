@@ -16,6 +16,7 @@ class ZipkinExporterTest extends AbstractExporterTestCase
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
+    #[\Override]
     public function createExporterWithTransport(TransportInterface $transport): Exporter
     {
         return new Exporter(
@@ -23,6 +24,7 @@ class ZipkinExporterTest extends AbstractExporterTestCase
         );
     }
 
+    #[\Override]
     public function getExporterClass(): string
     {
         return Exporter::class;

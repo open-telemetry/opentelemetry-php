@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 
 class InMemoryExporterFactory implements MetricExporterFactoryInterface
 {
+    #[\Override]
     public function create(): MetricExporterInterface
     {
         return new InMemoryExporter(InMemoryStorageManager::metrics());

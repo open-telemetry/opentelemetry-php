@@ -36,6 +36,7 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function keys($carrier): array
     {
         if ($this->isSupportedCarrier($carrier)) {
@@ -56,6 +57,7 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function get($carrier, string $key): ?string
     {
         if ($this->isSupportedCarrier($carrier)) {
@@ -79,6 +81,7 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function getAll($carrier, string $key): array
     {
         if ($this->isSupportedCarrier($carrier)) {
@@ -102,6 +105,7 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function set(&$carrier, string $key, string $value): void
     {
         if ($key === '') {

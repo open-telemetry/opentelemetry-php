@@ -77,6 +77,7 @@ class SpanTest extends MockeryTestCase
     private string $spanId;
     private string $parentSpanId;
 
+    #[\Override]
     protected function setUp():void
     {
         $this->idGenerator = new RandomIdGenerator();
@@ -830,8 +831,8 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
-     * @psalm-param API\SpanKind::KIND_* $kind
      * @param list<LinkInterface> $links
+     * @psalm-param API\SpanKind::KIND_* $kind
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
