@@ -111,5 +111,11 @@
                 <file name="src/API/Instrumentation/CachedInstrumentation.php"/>
             </errorLevel>
         </NullableReturnStatement>
+        <InvalidAttribute>
+            <errorLevel type="suppress">
+                <directory name="tests/Unit"/>
+                <directory name="src/Config/SDK/ComponentProvider"/>
+            </errorLevel>
+        </InvalidAttribute>
     </issueHandlers>
 </psalm>
