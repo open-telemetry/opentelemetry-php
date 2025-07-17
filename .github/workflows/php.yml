@@ -87,17 +87,17 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vendor
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-${{ hashFiles('composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-vendor-
     - name: Cache test tools
       id: test-tools-cache
       uses: actions/cache@v4
       with:
         path: vendor-bin
-        key: ${{ runner.os }}-${{ matrix.php-version }}-php-${{ hashFiles('vendor-bin/*/composer.json') }}
+        key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-${{ hashFiles('vendor-bin/*/composer.json') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.php-version }}-php-
+          ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-
 
     - name: Install dependencies
       id: composer
