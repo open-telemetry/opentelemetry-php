@@ -32,6 +32,7 @@ use function ucwords;
 final class ProtobufSerializer
 {
     use LogsMessagesTrait;
+
     private function __construct(private readonly string $contentType)
     {
     }
