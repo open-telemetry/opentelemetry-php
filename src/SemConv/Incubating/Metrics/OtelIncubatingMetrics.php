@@ -4,9 +4,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SemConv\Metrics;
+namespace OpenTelemetry\SemConv\Unstable\Metrics;
 
-interface OtelMetrics
+/**
+ * Metrics for otel.
+ * May contain @experimental Semantic Conventions which may change or be removed in the future.
+ */
+interface OtelIncubatingMetrics
 {
     /**
      * The number of log records for which the export has finished, either successful or failed
@@ -16,7 +20,6 @@ interface OtelMetrics
      *
      * Instrument: counter
      * Unit: {log_record}
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_LOG_EXPORTED = 'otel.sdk.exporter.log.exported';
@@ -27,7 +30,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {log_record}
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_LOG_INFLIGHT = 'otel.sdk.exporter.log.inflight';
@@ -40,7 +42,6 @@ interface OtelMetrics
      *
      * Instrument: counter
      * Unit: {data_point}
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED = 'otel.sdk.exporter.metric_data_point.exported';
@@ -51,7 +52,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {data_point}
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT = 'otel.sdk.exporter.metric_data_point.inflight';
@@ -64,7 +64,6 @@ interface OtelMetrics
      *
      * Instrument: histogram
      * Unit: s
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_OPERATION_DURATION = 'otel.sdk.exporter.operation.duration';
@@ -77,7 +76,6 @@ interface OtelMetrics
      *
      * Instrument: counter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_SPAN_EXPORTED = 'otel.sdk.exporter.span.exported';
@@ -87,7 +85,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     * @deprecated
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.span.exported.count';
@@ -98,7 +95,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_SPAN_INFLIGHT = 'otel.sdk.exporter.span.inflight';
@@ -108,7 +104,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     * @deprecated
      * @experimental
      */
     public const OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count';
@@ -118,7 +113,6 @@ interface OtelMetrics
      *
      * Instrument: counter
      * Unit: {log_record}
-     *
      * @experimental
      */
     public const OTEL_SDK_LOG_CREATED = 'otel.sdk.log.created';
@@ -130,7 +124,6 @@ interface OtelMetrics
      *
      * Instrument: histogram
      * Unit: s
-     *
      * @experimental
      */
     public const OTEL_SDK_METRIC_READER_COLLECTION_DURATION = 'otel.sdk.metric_reader.collection.duration';
@@ -143,7 +136,6 @@ interface OtelMetrics
      *
      * Instrument: counter
      * Unit: {log_record}
-     *
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_LOG_PROCESSED = 'otel.sdk.processor.log.processed';
@@ -154,7 +146,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {log_record}
-     *
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY = 'otel.sdk.processor.log.queue.capacity';
@@ -165,7 +156,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {log_record}
-     *
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE = 'otel.sdk.processor.log.queue.size';
@@ -177,7 +167,6 @@ interface OtelMetrics
      *
      * Instrument: counter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_SPAN_PROCESSED = 'otel.sdk.processor.span.processed';
@@ -187,7 +176,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     * @deprecated
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT = 'otel.sdk.processor.span.processed.count';
@@ -198,7 +186,6 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY = 'otel.sdk.processor.span.queue.capacity';
@@ -209,41 +196,33 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE = 'otel.sdk.processor.span.queue.size';
 
     /**
-     * The number of created spans for which the end operation was called
-     * For spans with `recording=true`: Implementations MUST record both `otel.sdk.span.live` and `otel.sdk.span.ended`.
-     * For spans with `recording=false`: If implementations decide to record this metric, they MUST also record `otel.sdk.span.live`.
+     * Use `otel.sdk.span.started` minus `otel.sdk.span.live` to derive this value.
      *
      * Instrument: counter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_SPAN_ENDED = 'otel.sdk.span.ended';
 
     /**
-     * Deprecated, use `otel.sdk.span.ended` instead.
+     * Use `otel.sdk.span.started` minus `otel.sdk.span.live` to derive this value.
      *
      * Instrument: counter
      * Unit: {span}
-     * @deprecated
      * @experimental
      */
     public const OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count';
 
     /**
-     * The number of created spans for which the end operation has not been called yet
-     * For spans with `recording=true`: Implementations MUST record both `otel.sdk.span.live` and `otel.sdk.span.ended`.
-     * For spans with `recording=false`: If implementations decide to record this metric, they MUST also record `otel.sdk.span.ended`.
+     * The number of created spans with `recording=true` for which the end operation has not been called yet
      *
      * Instrument: updowncounter
      * Unit: {span}
-     *
      * @experimental
      */
     public const OTEL_SDK_SPAN_LIVE = 'otel.sdk.span.live';
@@ -253,9 +232,18 @@ interface OtelMetrics
      *
      * Instrument: updowncounter
      * Unit: {span}
-     * @deprecated
      * @experimental
      */
     public const OTEL_SDK_SPAN_LIVE_COUNT = 'otel.sdk.span.live.count';
+
+    /**
+     * The number of created spans
+     * Implementations MUST record this metric for all spans, even for non-recording ones.
+     *
+     * Instrument: counter
+     * Unit: {span}
+     * @experimental
+     */
+    public const OTEL_SDK_SPAN_STARTED = 'otel.sdk.span.started';
 
 }
