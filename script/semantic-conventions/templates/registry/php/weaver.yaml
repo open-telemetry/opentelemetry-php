@@ -2,7 +2,7 @@ params:
   # excluded namespaces will not be generated
   # this behavior is fully controlled by jinja templates
   excluded_namespaces: [
-    android, app, artifact, aws, azure, browser, cassandra, device, disk, dns,
+    android, app, artifact, aws, azure, browser, cassandra, device, disk,
     elasticsearch, enduser, event, faas, feature_flag, file, gen_ai, gcp,
     geo, go, graphql, heroku, ios, k8s, linux, mainframe, message, network,
     oci, openai, opentracing, other, pool, rpc, security_rule, source, system, test,
@@ -11,7 +11,7 @@ params:
     cloudfoundry, dotnet, hw, jvm, nodejs, profile, signalr
   ]
   excluded_metrics_namespaces: [
-    aspnetcore, azure, cicd, container, cpu, cpython, db, dns, dotnet,
+    aspnetcore, azure, cicd, container, cpu, cpython, db, dotnet,
     faas, gen_ai, go, hw, jvm, k8s, kestrel, messaging, nodejs, process,
     rpc, signalr, system, v8js, vcs
   ]

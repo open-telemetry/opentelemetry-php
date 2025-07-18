@@ -164,6 +164,13 @@ interface OtelIncubatingAttributes
     public const OTEL_SCOPE_NAME = 'otel.scope.name';
 
     /**
+     * The schema URL of the instrumentation scope.
+     *
+     * @experimental
+     */
+    public const OTEL_SCOPE_SCHEMA_URL = 'otel.scope.schema_url';
+
+    /**
      * The version of the instrumentation scope - (`InstrumentationScope.Version` in OTLP).
      *
      * @stable

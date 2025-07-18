@@ -37,7 +37,7 @@ mkdir -p "${CODE_DIR}"
 find "${CODE_DIR}" -name "*.php" \
   ! -name "Version.php" \
   ! -name "ResourceAttributes.php" \
-  ! -name "ResourceAttributesValues.php" \
+  ! -name "ResourceAttributeValues.php" \
   ! -name "TraceAttributes.php" \
   ! -name "TraceAttributeValues.php" \
   -exec rm -f {} \;
