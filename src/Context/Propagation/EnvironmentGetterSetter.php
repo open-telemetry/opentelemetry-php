@@ -25,7 +25,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
     public function keys($carrier): array
     {
         $envs = getenv();
-        if (!is_array($envs)) {
+        if (!is_array($envs) || empty($envs)) {
             return [];
         }
 
