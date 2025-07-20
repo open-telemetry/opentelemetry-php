@@ -26,7 +26,7 @@ class EnvironmentGetterSetterTest extends TestCase
         $this->assertInstanceOf(EnvironmentGetterSetter::class, $instance);
     }
 
-    public function test_keys_from_map_array(): void
+    public function test_keys_from_environment(): void
     {
         $carrier = [];
         putenv('A=alpha');
@@ -36,6 +36,14 @@ class EnvironmentGetterSetterTest extends TestCase
         $keys = $map->keys($carrier);
         $this->assertContains('a', $keys);
         $this->assertContains('b', $keys);
+    }
+
+    public function test_keys_with_empty_environment(): void
+    {
+        array_map('putenv', array_keys(getenv()));
+        $map = new EnvironmentGetterSetter();
+
+        $this->assertSame([], $map->keys([]));
     }
 
     public function test_get_values_from_environment(): void
