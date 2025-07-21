@@ -6,17 +6,18 @@ namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 
 use InvalidArgumentException;
 use OpenTelemetry\Context\Propagation\EnvironmentGetterSetter;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(EnvironmentGetterSetter::class)]
 class EnvironmentGetterSetterTest extends TestCase
 {
+    use TestState;
+
     protected function tearDown(): void
     {
-        putenv('A');
-        putenv('B');
-        putenv('1');
+        $this->restoreEnvironmentVariables();
     }
 
     public function test_get_instance(): void
@@ -29,8 +30,8 @@ class EnvironmentGetterSetterTest extends TestCase
     public function test_keys_from_environment(): void
     {
         $carrier = [];
-        putenv('A=alpha');
-        putenv('B=beta=bravo');
+        $this->setEnvironmentVariable('A', 'alpha');
+        $this->setEnvironmentVariable('B', 'beta=bravo');
 
         $map = new EnvironmentGetterSetter();
         $keys = $map->keys($carrier);
@@ -40,7 +41,9 @@ class EnvironmentGetterSetterTest extends TestCase
 
     public function test_keys_with_empty_environment(): void
     {
-        array_map('putenv', array_keys(getenv()));
+        foreach (array_keys(getenv()) as $key) {
+            $this->setEnvironmentVariable($key, null);
+        }
         $map = new EnvironmentGetterSetter();
 
         $this->assertSame([], $map->keys([]));
@@ -48,8 +51,8 @@ class EnvironmentGetterSetterTest extends TestCase
 
     public function test_get_values_from_environment(): void
     {
-        putenv('A=alpha');
-        putenv('B=beta');
+        $this->setEnvironmentVariable('A', 'alpha');
+        $this->setEnvironmentVariable('B', 'beta');
         $map = new EnvironmentGetterSetter();
 
         $this->assertSame('alpha', $map->get([], 'a'));
@@ -72,16 +75,16 @@ class EnvironmentGetterSetterTest extends TestCase
 
     public function test_can_get_integer_value(): void
     {
-        putenv('1=1');
+        $this->setEnvironmentVariable('A', '1');
         $map = new EnvironmentGetterSetter();
 
-        $this->assertSame('1', $map->get([], '1'));
+        $this->assertSame('1', $map->get([], 'a'));
     }
 
     public function test_can_get_all_values_from_environment(): void
     {
-        putenv('A=alpha');
-        putenv('B=beta');
+        $this->setEnvironmentVariable('A', 'alpha');
+        $this->setEnvironmentVariable('B', 'beta');
         $map = new EnvironmentGetterSetter();
 
         $this->assertSame(['alpha'], $map->getAll([], 'a'));
