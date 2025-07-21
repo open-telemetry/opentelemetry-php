@@ -11,7 +11,7 @@ params:
     cloudfoundry, dotnet, hw, jvm, nodejs, profile, signalr
   ]
   excluded_metrics_namespaces: [
-    aspnetcore, azure, cicd, container, cpu, cpython, db, dotnet,
+    aspnetcore, azure, cicd, container, cpu, cpython, dotnet,
     faas, gen_ai, go, hw, jvm, k8s, kestrel, messaging, nodejs, process,
     rpc, signalr, system, v8js, vcs
   ]
