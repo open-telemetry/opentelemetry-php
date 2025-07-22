@@ -94,9 +94,7 @@ class TraceState implements TraceStateInterface
                 foreach ([128, 0] as $threshold) {
                     // Then entries SHOULD be removed starting from the end of tracestate.
                     for ($value = end($traceState); $key = key($traceState);) {
-                        if ($value === false) {
-                            continue;
-                        }
+                        assert($value !== false);
                         $entry = strlen($key) + 1 + strlen($value);
                         $value = prev($traceState);
                         if ($entry <= $threshold) {

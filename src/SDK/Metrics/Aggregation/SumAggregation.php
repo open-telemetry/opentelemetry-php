@@ -40,9 +40,7 @@ final class SumAggregation implements AggregationInterface
     #[\Override]
     public function merge($left, $right): SumSummary
     {
-        $sum = (is_int($left->value) && is_int($right->value))
-            ? ($left->value + $right->value)
-            : ((float) $left->value + (float) $right->value);
+        $sum = $left->value + $right->value;
 
         return new SumSummary($sum);
     }
@@ -54,9 +52,7 @@ final class SumAggregation implements AggregationInterface
     #[\Override]
     public function diff($left, $right): SumSummary
     {
-        $diff = (is_int($left->value) && is_int($right->value))
-            ? (-$left->value + $right->value)
-            : (-(float) $left->value + (float) $right->value);
+        $diff = -$left->value + $right->value;
 
         return new SumSummary($diff);
     }

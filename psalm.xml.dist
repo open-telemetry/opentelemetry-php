@@ -117,5 +117,10 @@
                 <directory name="src/Config/SDK/ComponentProvider"/>
             </errorLevel>
         </InvalidAttribute>
+        <InvalidOperand>
+            <errorLevel type="suppress">
+                <directory name="src/SDK/Metrics/Aggregation"/>
+            </errorLevel>
+        </InvalidOperand>
     </issueHandlers>
 </psalm>

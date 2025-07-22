@@ -62,9 +62,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     public function merge($left, $right): ExplicitBucketHistogramSummary
     {
         $count = $left->count + $right->count;
-        $sum = (is_int($left->sum) && is_int($right->sum))
-            ? ($left->sum + $right->sum)
-            : ((float) $left->sum + (float) $right->sum);
+        $sum = $left->sum + $right->sum;
         $min = self::min($left->min, $right->min);
         $max = self::max($left->max, $right->max);
         $buckets = $right->buckets;
@@ -89,9 +87,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     public function diff($left, $right): ExplicitBucketHistogramSummary
     {
         $count = -$left->count + $right->count;
-        $sum = (is_int($left->sum) && is_int($right->sum))
-            ? (-$left->sum + $right->sum)
-            : (-(float) $left->sum + (float) $right->sum);
+        $sum = -$left->sum + $right->sum;
         $min = $left->min > $right->min ? $right->min : NAN;
         $max = $left->max < $right->max ? $right->max : NAN;
         $buckets = $right->buckets;

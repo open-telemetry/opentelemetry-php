@@ -71,7 +71,7 @@ class LoggerTest extends TestCase
     {
         $logger = new Logger($this->sharedState, $this->scope);
         $record = new LogRecord();
-        $time = microtime(true) * LogRecord::NANOS_PER_SECOND;
+        $time = microtime(true) * (float) LogRecord::NANOS_PER_SECOND;
 
         $this->processor->expects($this->once())->method('onEmit')
             ->with(

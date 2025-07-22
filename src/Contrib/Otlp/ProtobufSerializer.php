@@ -124,11 +124,7 @@ final class ProtobufSerializer
         self::traverseDescriptor($data, $desc);
 
         $encoded = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        if ($encoded === false) {
-            self::logWarning('Failed to encode protobuf to JSON: ' . json_last_error_msg());
-
-            return '';
-        }
+        assert($encoded !== false);
 
         return $encoded;
     }

@@ -27,7 +27,6 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlExtensionFileLoader;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlSymfonyFileLoader;
-use RuntimeException;
 use function serialize;
 use function sprintf;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -108,10 +107,7 @@ final class ConfigurationFactory
         }
 
         $loader = new ConfigurationLoader($resources);
-        $cwd = getcwd();
-        if ($cwd === false) {
-            throw new RuntimeException('Current working directory could not be determined.');
-        }
+        $cwd = getcwd() ?: [];
         $locator = new FileLocator($cwd);
         $fileLoader = new DelegatingLoader(new LoaderResolver([
             new YamlSymfonyFileLoader($loader, $locator),
