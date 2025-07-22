@@ -14,7 +14,8 @@ deptrac:
         - ./src
         - ./proto
         - ./tests
-        - ./deptrac/stubs
+        - ./deptrac/polyfills
+        - ./vendor/symfony/polyfill-php83/Resources/stubs
     exclude_files:
         - '#.*test.*#'
     layers:
@@ -110,15 +111,17 @@ deptrac:
           collectors:
               - type: className
                 regex: ^Nyholm\\Psr7Server\\*
-      -   name: Stubs
+      -   name: Polyfills
           collectors:
               - type: directory
-                value: deptrac/stubs/.*
+                value: deptrac/polyfills/.*
+              - type: directory
+                value: vendor/symfony/polyfill-php83
 
     ruleset:
       Context:
           - FFI
-          - Stubs
+          - Polyfills
       SemConv: ~
       ConfigSDK:
           - SymfonyConfig
@@ -130,12 +133,12 @@ deptrac:
           - Context
           - Contrib
           - Extension
-          - Stubs
+          - Polyfills
       API:
           - Context
           - PsrLog
           - SPI
-          - Stubs
+          - Polyfills
       SDK:
           - +API
           - ConfigSDK
