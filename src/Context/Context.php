@@ -31,6 +31,7 @@ final class Context implements ContextInterface
         self::$spanContextKey = ContextKeys::span();
     }
 
+    #[\Override]
     public static function createKey(string $key): ContextKeyInterface
     {
         return new ContextKey($key);
@@ -67,11 +68,13 @@ final class Context implements ContextInterface
         return $empty ??= new self();
     }
 
+    #[\Override]
     public static function getCurrent(): ContextInterface
     {
         return self::storage()->current();
     }
 
+    #[\Override]
     public function activate(): ScopeInterface
     {
         $scope = self::storage()->attach($this);
@@ -89,11 +92,13 @@ final class Context implements ContextInterface
         );
     }
 
+    #[\Override]
     public function withContextValue(ImplicitContextKeyedInterface $value): ContextInterface
     {
         return $value->storeInContext($this);
     }
 
+    #[\Override]
     public function with(ContextKeyInterface $key, $value): self
     {
         if ($this->get($key) === $value) {
@@ -122,6 +127,7 @@ final class Context implements ContextInterface
         return $self;
     }
 
+    #[\Override]
     public function get(ContextKeyInterface $key)
     {
         if ($key === self::$spanContextKey) {

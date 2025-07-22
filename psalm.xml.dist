@@ -4,6 +4,7 @@
     cacheDirectory="var/cache/psalm"
     findUnusedBaselineEntry="false"
     findUnusedCode="false"
+    findUnusedIssueHandlerSuppression="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
@@ -15,6 +16,7 @@
             <directory name="./examples/traces/demo/"/>
             <directory name="tests/Unit/Config/SDK/Configuration/ExampleSdk"/>
             <directory name="tests/TraceContext/W3CTestService"/>
+            <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
     <plugins>
@@ -27,11 +29,6 @@
                 <referencedClass name="GMP"/>
             </errorLevel>
         </UndefinedClass>
-        <UndefinedFunction>
-            <errorLevel type="suppress">
-                <referencedFunction name="OpenTelemetry\Instrumentation\hook"/>
-            </errorLevel>
-        </UndefinedFunction>
         <UndefinedMethod>
             <errorLevel type="suppress">
                 <referencedMethod name="Google\Protobuf\Internal\RepeatedField::offsetGet"/>
@@ -57,6 +54,7 @@
         <PossiblyInvalidArgument>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/Configuration"/>
+                <directory name="tests/Integration/Config"/>
             </errorLevel>
         </PossiblyInvalidArgument>
         <PossiblyNullReference>
@@ -68,23 +66,61 @@
         <MoreSpecificImplementedParamType>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/ComponentProvider"/>
-                <directory name="tests/Integration/Config/ComponentProvider"/>
+                <directory name="tests"/>
             </errorLevel>
         </MoreSpecificImplementedParamType>
-        <InvalidDocblock>
+        <UndefinedMagicMethod>
             <errorLevel type="suppress">
+                <referencedMethod name="Prophecy\Prophecy\ObjectProphecy::accepts"/>
+                <referencedMethod name="Prophecy\Prophecy\ObjectProphecy::fields"/>
+            </errorLevel>
+        </UndefinedMagicMethod>
+        <PossiblyFalseArgument>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </PossiblyFalseArgument>
+        <PossiblyFalseOperand>
+            <errorLevel type="suppress">
+                <directory name="examples/baggage"/>
+                <file name="src/SDK/Metrics/MetricExporter/ConsoleMetricExporter.php"/>
+            </errorLevel>
+        </PossiblyFalseOperand>
+        <InvalidOperand>
+            <errorLevel type="suppress">
+                <directory name="tests"/>
+            </errorLevel>
+        </InvalidOperand>
+        <FalsableReturnStatement>
+            <errorLevel type="suppress">
+                <directory name="src/API/Trace"/>
+            </errorLevel>
+        </FalsableReturnStatement>
+        <PossiblyNullArgument>
+            <errorLevel type="suppress">
+                <file name="src/API/Instrumentation/CachedInstrumentation.php"/>
+            </errorLevel>
+        </PossiblyNullArgument>
+        <InvalidNullableReturnType>
+            <errorLevel type="suppress">
+                <file name="src/API/Instrumentation/CachedInstrumentation.php"/>
+            </errorLevel>
+        </InvalidNullableReturnType>
+        <NullableReturnStatement>
+            <errorLevel type="suppress">
+                <file name="src/API/Instrumentation/CachedInstrumentation.php"/>
+            </errorLevel>
+        </NullableReturnStatement>
+        <InvalidAttribute>
+            <errorLevel type="suppress">
+                <directory name="tests/Unit"/>
                 <directory name="src/Config/SDK/ComponentProvider"/>
             </errorLevel>
-        </InvalidDocblock>
-        <NonInvariantDocblockPropertyType>
+        </InvalidAttribute>
+        <InvalidOperand>
             <errorLevel type="suppress">
-                <directory name="src/Config/SDK/Configuration/Internal"/>
+                <directory name="src/SDK/Metrics/Aggregation"/>
             </errorLevel>
-        </NonInvariantDocblockPropertyType>
-        <NonInvariantPropertyType>
-            <errorLevel type="suppress">
-                <directory name="src/Config/SDK/Configuration/Internal"/>
-            </errorLevel>
-        </NonInvariantPropertyType>
+        </InvalidOperand>
     </issueHandlers>
 </psalm>

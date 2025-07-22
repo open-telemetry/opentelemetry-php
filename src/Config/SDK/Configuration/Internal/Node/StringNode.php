@@ -14,6 +14,7 @@ class StringNode extends \Symfony\Component\Config\Definition\ScalarNode
 {
     use NodeTrait;
 
+    #[\Override]
     protected function validateType(mixed $value): void
     {
         if (!is_string($value)) {

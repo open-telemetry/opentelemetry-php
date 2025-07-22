@@ -13,6 +13,7 @@ class Buzz implements DiscoveryInterface
     /**
      * @phan-suppress PhanUndeclaredClassReference
      */
+    #[\Override]
     public function available(): bool
     {
         return class_exists(FileGetContents::class);
@@ -21,6 +22,7 @@ class Buzz implements DiscoveryInterface
     /**
      * @phan-suppress PhanUndeclaredClassReference,PhanTypeMismatchReturn,PhanUndeclaredClassMethod
      */
+    #[\Override]
     public function create(mixed $options): ClientInterface
     {
         return new FileGetContents(Psr17FactoryDiscovery::findResponseFactory(), $options);

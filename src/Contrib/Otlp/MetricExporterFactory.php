@@ -26,6 +26,7 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\Override]
     public function create(): MetricExporterInterface
     {
         $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)

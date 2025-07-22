@@ -42,9 +42,9 @@ interface AggregationInterface
 
     /**
      * @param array<AttributesInterface> $attributes
-     * @psalm-param array<T> $summaries
      * @param array<list<Exemplar>> $exemplars
      * @param string|Temporality $temporality
+     * @psalm-param array<T> $summaries
      */
     public function toData(
         array $attributes,

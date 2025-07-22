@@ -59,6 +59,7 @@ final class Configurator implements ImplicitContextKeyedInterface
         ;
     }
 
+    #[\Override]
     public function activate(): ScopeInterface
     {
         return $this->storeInContext()->activate();
@@ -67,6 +68,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     /**
      * @phan-suppress PhanDeprecatedFunction
      */
+    #[\Override]
     public function storeInContext(?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();

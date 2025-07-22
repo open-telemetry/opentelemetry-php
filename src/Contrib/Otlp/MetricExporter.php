@@ -37,11 +37,13 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
         $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
+    #[\Override]
     public function temporality(MetricMetadataInterface $metric): Temporality|string|null
     {
         return $this->temporality ?? $metric->temporality();
     }
 
+    #[\Override]
     public function export(iterable $batch): bool
     {
         return $this->transport
@@ -77,11 +79,13 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
             ->await();
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         return $this->transport->shutdown();
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         return $this->transport->forceFlush();

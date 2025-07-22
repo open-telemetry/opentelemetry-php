@@ -19,6 +19,7 @@ final class HttpPlugClientResolver implements ResolverInterface
         return new self($httpAsyncClient);
     }
 
+    #[\Override]
     public function resolveHttpPlugAsyncClient(): HttpAsyncClient
     {
         return $this->httpAsyncClient ??= HttpAsyncClientDiscovery::find();

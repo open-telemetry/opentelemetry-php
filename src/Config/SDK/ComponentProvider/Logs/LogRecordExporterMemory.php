@@ -20,11 +20,13 @@ final class LogRecordExporterMemory implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         return new InMemoryExporter();
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('memory/development');

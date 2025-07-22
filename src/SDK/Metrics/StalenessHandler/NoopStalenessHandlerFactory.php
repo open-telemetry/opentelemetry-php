@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
 final class NoopStalenessHandlerFactory implements StalenessHandlerFactoryInterface
 {
+    #[\Override]
     public function create(): ReferenceCounterInterface&StalenessHandlerInterface
     {
         static $instance;

@@ -12,6 +12,7 @@ class CurlClient implements DiscoveryInterface
     /**
      * @phan-suppress PhanUndeclaredClassReference
      */
+    #[\Override]
     public function available(): bool
     {
         return extension_loaded('curl') && class_exists(Client::class);
@@ -21,6 +22,7 @@ class CurlClient implements DiscoveryInterface
      * @phan-suppress PhanUndeclaredClassReference,PhanTypeMismatchReturn,PhanUndeclaredClassMethod
      * @psalm-suppress UndefinedClass,InvalidReturnType,InvalidReturnStatement
      */
+    #[\Override]
     public function create(mixed $options): ClientInterface
     {
         $options = [

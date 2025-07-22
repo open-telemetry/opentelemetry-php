@@ -16,6 +16,7 @@ class LateBindingLoggerProvider implements LoggerProviderInterface
     ) {
     }
 
+    #[\Override]
     public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): LoggerInterface
     {
         return $this->loggerProvider?->getLogger($name, $version, $schemaUrl, $attributes)

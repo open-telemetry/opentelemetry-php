@@ -107,7 +107,8 @@ final class ConfigurationFactory
         }
 
         $loader = new ConfigurationLoader($resources);
-        $locator = new FileLocator(getcwd());
+        $cwd = getcwd() ?: [];
+        $locator = new FileLocator($cwd);
         $fileLoader = new DelegatingLoader(new LoaderResolver([
             new YamlSymfonyFileLoader($loader, $locator),
             new YamlExtensionFileLoader($loader, $locator),

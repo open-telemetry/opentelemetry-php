@@ -14,6 +14,7 @@ final class StringNodeDefinition extends \Symfony\Component\Config\Definition\Bu
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): ScalarNode
     {
         return new StringNode($this->name, $this->parent, $this->pathSeparator);

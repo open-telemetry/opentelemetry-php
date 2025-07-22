@@ -17,11 +17,13 @@ final class AggregationResolverDefault implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): AggregationResolver
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('default');

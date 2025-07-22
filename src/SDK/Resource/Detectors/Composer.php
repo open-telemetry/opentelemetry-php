@@ -17,6 +17,7 @@ use OpenTelemetry\SemConv\ResourceAttributes;
  */
 final class Composer implements ResourceDetectorInterface
 {
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         if (!class_exists(InstalledVersions::class)) {

@@ -22,6 +22,7 @@ final class Sdk implements ResourceDetectorInterface
         'open-telemetry/opentelemetry',
     ];
 
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $attributes = [

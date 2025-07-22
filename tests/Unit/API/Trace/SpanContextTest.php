@@ -23,6 +23,7 @@ class SpanContextTest extends TestCase
     private API\SpanContextInterface $second;
     private API\SpanContextInterface $remote;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->first = SpanContext::create(self::FIRST_TRACE_ID, self::FIRST_SPAN_ID, API\TraceFlags::DEFAULT, new TraceState('foo=bar'));

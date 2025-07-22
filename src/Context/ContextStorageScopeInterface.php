@@ -21,5 +21,6 @@ interface ContextStorageScopeInterface extends ScopeInterface, ArrayAccess
     /**
      * @param string $offset
      */
+    #[\Override]
     public function offsetSet($offset, $value): void;
 }

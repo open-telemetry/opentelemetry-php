@@ -21,6 +21,7 @@ final class LogRecordExporterConsole implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         return new ConsoleExporter(Registry::transportFactory('stream')->create(
@@ -29,6 +30,7 @@ final class LogRecordExporterConsole implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('console');

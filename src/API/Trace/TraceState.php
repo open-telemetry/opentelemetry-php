@@ -38,6 +38,7 @@ class TraceState implements TraceStateInterface
         $this->traceState = self::parse($rawTracestate ?? '');
     }
 
+    #[\Override]
     public function with(string $key, string $value): TraceStateInterface
     {
         if (!self::validateMember($this->traceState, $key, $value)) {
@@ -52,6 +53,7 @@ class TraceState implements TraceStateInterface
         return $clone;
     }
 
+    #[\Override]
     public function without(string $key): TraceStateInterface
     {
         if (!isset($this->traceState[$key])) {
@@ -64,16 +66,19 @@ class TraceState implements TraceStateInterface
         return $clone;
     }
 
+    #[\Override]
     public function get(string $key): ?string
     {
         return $this->traceState[$key] ?? null;
     }
 
+    #[\Override]
     public function getListMemberCount(): int
     {
         return count($this->traceState);
     }
 
+    #[\Override]
     public function toString(?int $limit = null): string
     {
         $traceState = $this->traceState;
@@ -89,6 +94,7 @@ class TraceState implements TraceStateInterface
                 foreach ([128, 0] as $threshold) {
                     // Then entries SHOULD be removed starting from the end of tracestate.
                     for ($value = end($traceState); $key = key($traceState);) {
+                        assert($value !== false);
                         $entry = strlen($key) + 1 + strlen($value);
                         $value = prev($traceState);
                         if ($entry <= $threshold) {
@@ -115,6 +121,7 @@ class TraceState implements TraceStateInterface
         return $s;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->toString();

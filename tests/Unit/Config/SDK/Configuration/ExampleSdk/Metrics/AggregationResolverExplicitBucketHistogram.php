@@ -21,11 +21,13 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
      *     record_min_max: bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): AggregationResolver
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('explicit_bucket_histogram');

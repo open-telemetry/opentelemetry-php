@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(ConsoleSpanExporter::class)]
 class ConsoleSpanExporterTest extends AbstractExporterTestCase
 {
+    #[\Override]
     public function createExporter(): ConsoleSpanExporter
     {
         return new ConsoleSpanExporter($this->transport);
@@ -77,11 +78,13 @@ class ConsoleSpanExporterTest extends AbstractExporterTestCase
         $this->transport->shouldHaveReceived('send')->with($expected);
     }
 
+    #[\Override]
     public function createExporterWithTransport(TransportInterface $transport): SpanExporterInterface
     {
         return new ConsoleSpanExporter($transport);
     }
 
+    #[\Override]
     public function getExporterClass(): string
     {
         return ConsoleSpanExporter::class;

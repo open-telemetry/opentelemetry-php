@@ -30,6 +30,7 @@ class EventLogger implements EventLoggerInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.32.0/specification/logs/event-sdk.md#emit-event
      */
+    #[\Override]
     public function emit(
         string $name,
         mixed $body = null,

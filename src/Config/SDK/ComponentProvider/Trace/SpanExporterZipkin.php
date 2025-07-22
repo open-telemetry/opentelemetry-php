@@ -28,6 +28,7 @@ final class SpanExporterZipkin implements ComponentProvider
      *     timeout: int<0, max>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         return new Zipkin\Exporter(Registry::transportFactory('http')->create(
@@ -37,6 +38,7 @@ final class SpanExporterZipkin implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('zipkin');

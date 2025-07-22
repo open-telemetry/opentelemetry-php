@@ -13,6 +13,7 @@ final class IntegerNodeDefinition extends \Symfony\Component\Config\Definition\B
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): IntegerNode
     {
         return new IntegerNode($this->name, $this->parent, $this->min, $this->max, $this->pathSeparator);

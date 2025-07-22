@@ -30,6 +30,7 @@ class ResourceInfoFactoryTest extends TestCase
     private LogWriterInterface $logWriter;
     private const UNDEFINED = '__undefined';
 
+    #[\Override]
     public function setUp(): void
     {
         $this->logWriter = $this->createMock(LogWriterInterface::class);
