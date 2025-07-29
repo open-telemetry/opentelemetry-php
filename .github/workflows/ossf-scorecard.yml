@@ -28,6 +28,9 @@ jobs:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
+          # file_mode is needed in this repo because .gitattributes excludes the .github directory
+          # (see https://github.com/ossf/scorecard/issues/4679#issuecomment-3013550752)
+          file_mode: git
 
       # Upload the results as artifacts (optional). Commenting out will disable
       # uploads of run results in SARIF format to the repository Actions tab.
