@@ -1,11 +1,14 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions
+// DO NOT EDIT, this is archived and left for backward compatibility.
 
 declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
+/**
+ * @deprecated Use {@see OpenTelemetry\SemConv\Attributes}\* or {@see OpenTelemetry\SemConv\Unstable\Attributes}\* instead.
+ */
 interface TraceAttributes
 {
     /**
