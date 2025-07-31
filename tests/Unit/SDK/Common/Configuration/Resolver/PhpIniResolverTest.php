@@ -19,6 +19,7 @@ class PhpIniResolverTest extends TestCase
     private PhpIniAccessor $accessor;
     private PhpIniResolver $resolver;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->accessor = $this->createMock(PhpIniAccessor::class);

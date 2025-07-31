@@ -27,6 +27,7 @@ class PropagatorFactoryTest extends TestCase
 {
     use TestState;
 
+    #[\Override]
     public function setUp(): void
     {
         LoggerHolder::disable();

@@ -30,31 +30,37 @@ final class StreamMetricSourceProvider implements MetricSourceProviderInterface,
     ) {
     }
 
+    #[\Override]
     public function create($temporality): MetricSourceInterface
     {
         return new StreamMetricSource($this, $this->stream->register($temporality));
     }
 
+    #[\Override]
     public function instrumentType()
     {
         return $this->instrument->type;
     }
 
+    #[\Override]
     public function name(): string
     {
         return $this->view->name;
     }
 
+    #[\Override]
     public function unit(): ?string
     {
         return $this->view->unit;
     }
 
+    #[\Override]
     public function description(): ?string
     {
         return $this->view->description;
     }
 
+    #[\Override]
     public function temporality()
     {
         return $this->stream->temporality();

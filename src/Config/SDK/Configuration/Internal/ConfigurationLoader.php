@@ -20,11 +20,13 @@ final class ConfigurationLoader implements \OpenTelemetry\Config\SDK\Configurati
         $this->resources = $resources;
     }
 
+    #[\Override]
     public function loadConfiguration(mixed $configuration): void
     {
         $this->configurations[] = $configuration;
     }
 
+    #[\Override]
     public function addResource(ResourceInterface $resource): void
     {
         $this->resources?->addResource($resource);

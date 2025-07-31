@@ -17,6 +17,7 @@ final class EnvSourceReader implements EnvReader
     ) {
     }
 
+    #[\Override]
     public function read(string $name): ?string
     {
         foreach ($this->envSources as $envSource) {

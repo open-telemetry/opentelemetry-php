@@ -24,6 +24,7 @@ class EventLoggerTest extends TestCase
     private EventLoggerProvider $eventLoggerProvider;
     private TestClock $clock;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->clock = new TestClock();

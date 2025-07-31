@@ -36,6 +36,7 @@ class LogsExporter implements LogRecordExporterInterface
     /**
      * @param iterable<ReadableLogRecord> $batch
      */
+    #[\Override]
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         return $this->transport
@@ -70,11 +71,13 @@ class LogsExporter implements LogRecordExporterInterface
             });
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->forceFlush($cancellation);
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return $this->transport->shutdown($cancellation);

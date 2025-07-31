@@ -23,6 +23,7 @@ class SimpleLogRecordProcessorTest extends TestCase
     private LogRecordExporterInterface $exporter;
     private ReadWriteLogRecord $readWriteLogRecord;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->exporter = $this->createMock(LogRecordExporterInterface::class);

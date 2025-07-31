@@ -14,6 +14,7 @@ class EnvResource implements ResourceInterface
     ) {
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return 'env.' . $this->name;

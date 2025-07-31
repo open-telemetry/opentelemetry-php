@@ -18,6 +18,7 @@ class ParserTest extends TestCase
     /** @var BaggageBuilderInterface&MockObject */
     private BaggageBuilderInterface $builder;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->builder = $this->createMock(BaggageBuilderInterface::class);

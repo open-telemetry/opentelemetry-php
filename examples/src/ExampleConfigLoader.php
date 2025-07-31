@@ -15,6 +15,7 @@ use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfigu
  */
 final class ExampleConfigLoader implements EnvComponentLoader
 {
+    #[\Override]
     public function load(EnvResolver $env, EnvComponentLoaderRegistry $registry, Context $context): InstrumentationConfiguration
     {
         return new ExampleConfig(
@@ -22,6 +23,7 @@ final class ExampleConfigLoader implements EnvComponentLoader
         );
     }
 
+    #[\Override]
     public function name(): string
     {
         return ExampleConfig::class;

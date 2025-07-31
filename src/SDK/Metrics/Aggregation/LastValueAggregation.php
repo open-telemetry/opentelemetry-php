@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Metrics\Data;
  */
 final class LastValueAggregation implements AggregationInterface
 {
+    #[\Override]
     public function initialize(): LastValueSummary
     {
         return new LastValueSummary(null, 0);
@@ -22,6 +23,7 @@ final class LastValueAggregation implements AggregationInterface
     /**
      * @param LastValueSummary $summary
      */
+    #[\Override]
     public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         if ($summary->value === null || $timestamp >= $summary->timestamp) {
@@ -34,6 +36,7 @@ final class LastValueAggregation implements AggregationInterface
      * @param LastValueSummary $left
      * @param LastValueSummary $right
      */
+    #[\Override]
     public function merge($left, $right): LastValueSummary
     {
         return $right->timestamp >= $left->timestamp ? $right : $left;
@@ -43,6 +46,7 @@ final class LastValueAggregation implements AggregationInterface
      * @param LastValueSummary $left
      * @param LastValueSummary $right
      */
+    #[\Override]
     public function diff($left, $right): LastValueSummary
     {
         return $right->timestamp >= $left->timestamp ? $right : $left;
@@ -51,6 +55,7 @@ final class LastValueAggregation implements AggregationInterface
     /**
      * @param array<LastValueSummary> $summaries
      */
+    #[\Override]
     public function toData(
         array $attributes,
         array $summaries,

@@ -40,6 +40,7 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
      *     insecure: ?bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         $protocol = Protocols::GRPC;
@@ -57,6 +58,7 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_grpc');

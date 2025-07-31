@@ -41,6 +41,7 @@ final class EnvComponentLoaderRegistry implements \OpenTelemetry\API\Configurati
         return $this;
     }
 
+    #[\Override]
     public function load(string $type, string $name, EnvResolver $env, Context $context): mixed
     {
         if (!$loader = $this->loaders[$type][$name] ?? null) {

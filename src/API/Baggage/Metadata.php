@@ -17,6 +17,7 @@ final class Metadata implements MetadataInterface
     {
     }
 
+    #[\Override]
     public function getValue(): string
     {
         return $this->metadata;

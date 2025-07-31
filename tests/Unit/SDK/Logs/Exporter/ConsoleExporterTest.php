@@ -22,6 +22,7 @@ class ConsoleExporterTest extends TestCase
     private TransportInterface $transport;
     private ConsoleExporter $exporter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);

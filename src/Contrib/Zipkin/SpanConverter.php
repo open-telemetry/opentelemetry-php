@@ -74,6 +74,7 @@ class SpanConverter implements SpanConverterInterface
         return (string) $value;
     }
 
+    #[\Override]
     public function convert(iterable $spans): array
     {
         $aggregate = [];

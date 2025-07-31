@@ -21,6 +21,7 @@ class AttributeValidator implements AttributeValidatorInterface
      * Validate whether a value is a primitive, or a homogeneous array of primitives (treating int/double as equivalent).
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.21.0/specification/common/README.md#attribute
      */
+    #[\Override]
     public function validate($value): bool
     {
         if (is_array($value)) {
@@ -51,6 +52,7 @@ class AttributeValidator implements AttributeValidatorInterface
         return true;
     }
 
+    #[\Override]
     public function getInvalidMessage(): string
     {
         return 'attribute with non-primitive or non-homogeneous array of primitives dropped';

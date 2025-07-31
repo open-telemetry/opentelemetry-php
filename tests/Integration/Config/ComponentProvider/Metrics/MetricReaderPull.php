@@ -25,19 +25,23 @@ final class MetricReaderPull implements ComponentProvider
      *     cardinality_limits: array,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
         return new class() implements MetricReaderInterface {
+            #[\Override]
             public function collect(): bool
             {
                 return true;
             }
 
+            #[\Override]
             public function shutdown(): bool
             {
                 return true;
             }
 
+            #[\Override]
             public function forceFlush(): bool
             {
                 return true;
@@ -45,6 +49,7 @@ final class MetricReaderPull implements ComponentProvider
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('pull');

@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
  */
 final class NoneExemplarFilter implements ExemplarFilterInterface
 {
+    #[\Override]
     public function accepts($value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): bool
     {
         return false;

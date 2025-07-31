@@ -48,6 +48,7 @@ final class PsrTransport implements TransportInterface
     ) {
     }
 
+    #[\Override]
     public function contentType(): string
     {
         return $this->contentType;
@@ -56,6 +57,7 @@ final class PsrTransport implements TransportInterface
     /**
      * @psalm-suppress ArgumentTypeCoercion
      */
+    #[\Override]
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
@@ -99,7 +101,7 @@ final class PsrTransport implements TransportInterface
 
             $delay = PsrUtils::retryDelay($retries, $this->retryDelay, $response);
             $sec = (int) $delay;
-            $nsec = (int) (($delay - $sec) * 1e9);
+            $nsec = (int) (($delay - (float) $sec) * 1e9);
 
             /** @psalm-suppress ArgumentTypeCoercion */
             if (time_nanosleep($sec, $nsec) !== true) {
@@ -136,6 +138,7 @@ final class PsrTransport implements TransportInterface
         return $encodings;
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
@@ -147,6 +150,7 @@ final class PsrTransport implements TransportInterface
         return true;
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return !$this->closed;

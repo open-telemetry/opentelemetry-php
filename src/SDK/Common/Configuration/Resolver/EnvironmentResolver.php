@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
  */
 class EnvironmentResolver implements ResolverInterface
 {
+    #[\Override]
     public function hasVariable(string $variableName): bool
     {
         if (!Configuration::isEmpty($_SERVER[$variableName] ?? null)) {

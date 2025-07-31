@@ -16,6 +16,7 @@ class LinkTest extends TestCase
     private API\SpanContextInterface $context;
     private AttributesInterface $attributes;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->context = $this->createMock(API\SpanContextInterface::class);

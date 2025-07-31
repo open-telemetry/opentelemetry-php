@@ -32,6 +32,7 @@ class B3MultiPropagatorTest extends TestCase
 
     private B3MultiPropagator $b3MultiPropagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->b3MultiPropagator = B3MultiPropagator::getInstance();

@@ -41,41 +41,49 @@ final class DependencyResolver implements DependencyResolverInterface
         return new self($messageFactoryResolver, $psrClientResolver, $httpPlugClientResolver);
     }
 
+    #[\Override]
     public function resolveRequestFactory(): RequestFactoryInterface
     {
         return $this->messageFactoryResolver->resolveRequestFactory();
     }
 
+    #[\Override]
     public function resolveResponseFactory(): ResponseFactoryInterface
     {
         return $this->messageFactoryResolver->resolveResponseFactory();
     }
 
+    #[\Override]
     public function resolveServerRequestFactory(): ServerRequestFactoryInterface
     {
         return $this->messageFactoryResolver->resolveServerRequestFactory();
     }
 
+    #[\Override]
     public function resolveStreamFactory(): StreamFactoryInterface
     {
         return $this->messageFactoryResolver->resolveStreamFactory();
     }
 
+    #[\Override]
     public function resolveUploadedFileFactory(): UploadedFileFactoryInterface
     {
         return $this->messageFactoryResolver->resolveUploadedFileFactory();
     }
 
+    #[\Override]
     public function resolveUriFactory(): UriFactoryInterface
     {
         return $this->messageFactoryResolver->resolveUriFactory();
     }
 
+    #[\Override]
     public function resolveHttpPlugAsyncClient(): HttpAsyncClient
     {
         return $this->httpPlugClientResolver->resolveHttpPlugAsyncClient();
     }
 
+    #[\Override]
     public function resolvePsrClient(): ClientInterface
     {
         return $this->psrClientResolver->resolvePsrClient();

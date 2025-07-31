@@ -28,6 +28,9 @@ jobs:
           results_file: results.sarif
           results_format: sarif
           publish_results: true
+          # file_mode is needed in this repo because .gitattributes excludes the .github directory
+          # (see https://github.com/ossf/scorecard/issues/4679#issuecomment-3013550752)
+          file_mode: git
 
       # Upload the results as artifacts (optional). Commenting out will disable
       # uploads of run results in SARIF format to the repository Actions tab.
@@ -42,6 +45,6 @@ jobs:
       # Upload the results to GitHub's code scanning dashboard (optional).
       # Commenting out will disable upload of results to your repo's Code Scanning dashboard
       - name: "Upload to code-scanning"
-        uses: github/codeql-action/upload-sarif@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
+        uses: github/codeql-action/upload-sarif@d6bbdef45e766d081b84a2def353b0055f728d3e # v3.29.3
         with:
           sarif_file: results.sarif

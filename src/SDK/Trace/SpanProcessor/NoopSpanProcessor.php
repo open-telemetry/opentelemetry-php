@@ -24,22 +24,26 @@ class NoopSpanProcessor implements SpanProcessorInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
     } //@codeCoverageIgnore
 
     /** @inheritDoc */
+    #[\Override]
     public function onEnd(ReadableSpanInterface $span): void
     {
     } //@codeCoverageIgnore
 
     /** @inheritDoc */
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return $this->forceFlush();

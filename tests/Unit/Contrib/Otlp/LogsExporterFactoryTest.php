@@ -26,6 +26,7 @@ class LogsExporterFactoryTest extends TestCase
     /** @var TransportInterface&MockObject $record */
     private TransportInterface $transport;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->transportFactory = $this->createMock(TransportFactoryInterface::class);

@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
  */
 final class IdentityAttributeProcessor implements AttributeProcessorInterface
 {
+    #[\Override]
     public function process(AttributesInterface $attributes, ContextInterface $context): AttributesInterface
     {
         return $attributes;

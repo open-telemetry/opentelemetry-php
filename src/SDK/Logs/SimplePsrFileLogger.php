@@ -28,6 +28,7 @@ class SimplePsrFileLogger implements LoggerInterface
     /**
      * @psalm-suppress MoreSpecificImplementedParamType
      */
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         $level = strtolower((string) $level);

@@ -33,6 +33,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
      * @psalm-suppress ImplementedReturnTypeMismatch
      * @psalm-suppress NoValue
      */
+    #[\Override]
     public function create(
         string $endpoint,
         string $contentType = ContentTypes::PROTOBUF,
@@ -83,7 +84,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
             $opts,
             $method,
             $headers,
-            (int) ($timeout * self::MILLIS_PER_SECOND),
+            (int) ($timeout * (float) self::MILLIS_PER_SECOND),
         );
     }
 

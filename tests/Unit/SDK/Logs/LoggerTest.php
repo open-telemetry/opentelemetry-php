@@ -33,6 +33,7 @@ class LoggerTest extends TestCase
     private LogRecordProcessorInterface $processor;
     private InstrumentationScope $scope;
 
+    #[\Override]
     public function setUp(): void
     {
         $limits = (new LogRecordLimitsBuilder())->setAttributeCountLimit(1)->build();
@@ -46,6 +47,7 @@ class LoggerTest extends TestCase
         Logging::setLogWriter($this->logWriter);
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         Logging::reset();
@@ -69,7 +71,7 @@ class LoggerTest extends TestCase
     {
         $logger = new Logger($this->sharedState, $this->scope);
         $record = new LogRecord();
-        $time = microtime(true) * LogRecord::NANOS_PER_SECOND;
+        $time = microtime(true) * (float) LogRecord::NANOS_PER_SECOND;
 
         $this->processor->expects($this->once())->method('onEmit')
             ->with(

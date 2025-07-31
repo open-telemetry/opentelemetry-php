@@ -14,6 +14,7 @@ use Psr\Http\Client\ClientInterface;
 #[CoversClass(PsrClientResolver::class)]
 class PsrClientResolverTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         HttpClientDiscovery::prependStrategy(MockClientStrategy::class);

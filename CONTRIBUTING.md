@@ -291,13 +291,13 @@ For more information about the triager role, see the [community repository](http
 
 ## Emeritus maintainers/approvers/triagers
 
-- [Timo Michna](https://github.com/tidal/)
+- [Amber Zsistla](https://github.com/zsistla)
 - [Beniamin Calota](https://github.com/beniamin)
 - [Fahmy Mohammed](https://github.com/Fahmy-Mohammed)
-- [Levi Morrison](https://github.com/morrisonlevi)
-- [Amber Zsistla](https://github.com/zsistla)
 - [Jodee Varney](https://github.com/jodeev)
-- [Przemek Delewski](https://github.com/pdelewski), Sumo Logic
+- [Levi Morrison](https://github.com/morrisonlevi)
+- [Przemek Delewski](https://github.com/pdelewski)
+- [Timo Michna](https://github.com/tidal/)
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 

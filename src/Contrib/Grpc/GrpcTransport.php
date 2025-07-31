@@ -53,11 +53,13 @@ final class GrpcTransport implements TransportInterface
         $this->exportTimeout = new Timeval($timeoutMillis * self::MICROS_PER_MILLISECOND);
     }
 
+    #[\Override]
     public function contentType(): string
     {
         return ContentTypes::PROTOBUF;
     }
 
+    #[\Override]
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
         if ($this->closed) {
@@ -91,6 +93,7 @@ final class GrpcTransport implements TransportInterface
         return new ErrorFuture(new RuntimeException($event->status->details, $event->status->code));
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
@@ -103,6 +106,7 @@ final class GrpcTransport implements TransportInterface
         return true;
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return !$this->closed;

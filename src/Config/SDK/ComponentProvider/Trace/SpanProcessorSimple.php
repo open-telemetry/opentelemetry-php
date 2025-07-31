@@ -24,6 +24,7 @@ final class SpanProcessorSimple implements ComponentProvider
      *     exporter: ComponentPlugin<SpanExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface
     {
         return new SimpleSpanProcessor(
@@ -31,6 +32,7 @@ final class SpanProcessorSimple implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('simple');

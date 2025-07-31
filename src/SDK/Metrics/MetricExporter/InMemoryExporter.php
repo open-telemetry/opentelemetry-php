@@ -30,6 +30,7 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
     ) {
     }
 
+    #[\Override]
     public function temporality(MetricMetadataInterface $metric): string|Temporality|null
     {
         return $this->temporality ?? $metric->temporality();
@@ -48,6 +49,7 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
         return $metrics;
     }
 
+    #[\Override]
     public function export(iterable $batch): bool
     {
         if ($this->closed) {
@@ -61,6 +63,7 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
         return true;
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         if ($this->closed) {
@@ -72,6 +75,7 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
         return true;
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         return true;

@@ -41,6 +41,7 @@ final class ResourceCollection implements \OpenTelemetry\Config\SDK\Configuratio
     /**
      * @psalm-suppress PossiblyInvalidArgument
      */
+    #[\Override]
     public function addClassResource(object|string $class): void
     {
         try {
@@ -56,6 +57,7 @@ final class ResourceCollection implements \OpenTelemetry\Config\SDK\Configuratio
         }
     }
 
+    #[\Override]
     public function addResource(ResourceInterface $resource): void
     {
         $path = match (true) {

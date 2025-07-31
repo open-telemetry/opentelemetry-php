@@ -14,6 +14,7 @@ class AttributeValidatorTest extends TestCase
 {
     private AttributeValidator $validator;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->validator = new AttributeValidator();
