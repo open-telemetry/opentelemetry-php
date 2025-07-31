@@ -23,26 +23,16 @@ $envGetterSetter = EnvironmentGetterSetter::getInstance();
 $isChild = isset($argv[1]) && $argv[1] === 'child';
 
 if (!$isChild) {
-    echo 'Starting trace context environment carrier example' . PHP_EOL;
-
-    // Start parent span
     $span = $tracer->spanBuilder('root')->startSpan();
-    $spanContext = $span->getContext();
     $scope = $span->activate();
 
-    echo '------------- Parent process trace info -------------' . PHP_EOL;
-    echo 'Trace ID: ' . ($spanContext->getTraceId() ?: 'not set') . PHP_EOL;
-    echo 'Span ID: ' . ($spanContext->getSpanId() ?: 'not set') . PHP_EOL;
-
-    $carrier = [];
     // Inject trace context into environment variables
+    $carrier = [];
     $propagator->inject($carrier, $envGetterSetter);
 
     // Execute child process
-    $command = 'php ' . escapeshellarg(__FILE__) . ' child';
-    exec($command, $output, $return);
-
-    echo $return === 0 ? implode(PHP_EOL, $output) . PHP_EOL : "Child process failed with code $return" . PHP_EOL;
+    $command = sprintf('%s %s %s', PHP_BINARY, escapeshellarg(__FILE__), 'child');
+    pclose(popen($command, 'w'));
 
     $scope->detach();
     $span->end();
@@ -54,11 +44,6 @@ if (!$isChild) {
     // Start child span with parent context
     $span = $tracer->spanBuilder('child-span')->setParent($context)->startSpan();
     $spanContext = $span->getContext();
-    $span->addEvent('Processing in child');
-
-    echo '-------------- Child process trace info -------------' . PHP_EOL;
-    echo 'Trace ID: ' . ($spanContext->getTraceId() ?: 'not set') . PHP_EOL;
-    echo 'Span ID: ' . ($spanContext->getSpanId() ?: 'not set') . PHP_EOL;
 
     $scope->detach();
     $span->end();
