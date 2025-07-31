@@ -32,7 +32,12 @@ if (!$isChild) {
 
     // Execute child process
     $command = sprintf('%s %s %s', PHP_BINARY, escapeshellarg(__FILE__), 'child');
-    pclose(popen($command, 'w'));
+    $handle = popen($command, 'w');
+    if ($handle === false) {
+        echo 'Failed to execute child process.' . PHP_EOL;
+    } else {
+        pclose($handle);
+    }
 
     $scope->detach();
     $span->end();

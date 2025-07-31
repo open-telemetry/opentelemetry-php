@@ -22,16 +22,18 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
         return self::$instance ??= new self();
     }
 
+    #[\Override]
     public function keys($carrier): array
     {
         $envs = getenv();
-        if (!is_array($envs) || empty($envs)) {
+        if (!is_array($envs) || $envs === []) {
             return [];
         }
 
         return array_map('strtolower', array_keys($envs));
     }
 
+    #[\Override]
     public function get($carrier, string $key): ?string
     {
         $value = getenv(strtoupper($key));
@@ -39,6 +41,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
         return is_string($value) ? $value : null;
     }
 
+    #[\Override]
     public function getAll($carrier, string $key): array
     {
         $value = getenv(strtoupper($key));
@@ -46,6 +49,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
         return is_string($value) ? [$value] : [];
     }
 
+    #[\Override]
     public function set(&$carrier, string $key, string $value): void
     {
         if ($key === '') {

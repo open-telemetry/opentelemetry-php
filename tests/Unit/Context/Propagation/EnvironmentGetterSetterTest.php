@@ -15,6 +15,7 @@ class EnvironmentGetterSetterTest extends TestCase
 {
     use TestState;
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->restoreEnvironmentVariables();
