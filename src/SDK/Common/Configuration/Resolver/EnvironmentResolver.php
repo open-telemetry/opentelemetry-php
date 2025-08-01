@@ -25,12 +25,7 @@ class EnvironmentResolver implements ResolverInterface
         return !Configuration::isEmpty($env);
     }
 
-    /**
-     * @psalm-suppress InvalidReturnStatement
-     * @psalm-suppress InvalidReturnType
-     */
-    #[\Override]
-    public function retrieveValue(string $variableName)
+    public function retrieveValue(string $variableName): mixed
     {
         $value = getenv($variableName);
         if ($value === false) {

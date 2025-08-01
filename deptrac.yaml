@@ -117,7 +117,12 @@ deptrac:
                 value: deptrac/polyfills/.*
               - type: directory
                 value: vendor/symfony/polyfill-php83
-
+      -   name: DotenvProvider
+          collectors:
+            - type: className
+              regex: ^Symfony\\Component\\Dotenv\\*
+            - type: className
+              regex: ^Dotenv\\*
     ruleset:
       Context:
           - FFI
@@ -134,6 +139,7 @@ deptrac:
           - Contrib
           - Extension
           - Polyfills
+          - DotenvProvider
       API:
           - Context
           - PsrLog
