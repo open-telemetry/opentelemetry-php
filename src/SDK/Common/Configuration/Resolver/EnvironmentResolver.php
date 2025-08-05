@@ -25,6 +25,7 @@ class EnvironmentResolver implements ResolverInterface
         return !Configuration::isEmpty($env);
     }
 
+    #[\Override]
     public function retrieveValue(string $variableName): mixed
     {
         $value = getenv($variableName);

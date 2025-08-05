@@ -16,6 +16,7 @@ final class LazyEnvSource implements EnvSource
     ) {
     }
 
+    #[\Override]
     public function readRaw(string $name): mixed
     {
         if (!$this->env instanceof EnvSource) {
