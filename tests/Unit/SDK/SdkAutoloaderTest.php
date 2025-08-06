@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\LoggerHolder;
-use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
@@ -70,7 +69,6 @@ class SdkAutoloaderTest extends TestCase
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
-        $this->assertInstanceOf(NoopEventLoggerProvider::class, Globals::eventLoggerProvider());
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator(), 'propagator not initialized by disabled autoloader');
     }
 

@@ -34,7 +34,6 @@ use OpenTelemetry\SDK\Common\Configuration\EnvComponentLoaderRegistry;
 use OpenTelemetry\SDK\Common\Configuration\EnvResolver;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
-use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\SDK\Propagation\LateBindingTextMapPropagator;
@@ -102,8 +101,7 @@ class SdkAutoloader
             ->setSampler((new SamplerFactory())->create())
             ->build();
 
-        $loggerProvider = (new LoggerProviderFactory())->create($meterProvider);
-        $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);
+        $loggerProvider = (new LoggerProviderFactory())->create($meterProvider, $resource);
 
         ShutdownHandler::register($tracerProvider->shutdown(...));
         ShutdownHandler::register($meterProvider->shutdown(...));
@@ -113,7 +111,6 @@ class SdkAutoloader
             ->withTracerProvider($tracerProvider)
             ->withMeterProvider($meterProvider)
             ->withLoggerProvider($loggerProvider)
-            ->withEventLoggerProvider($eventLoggerProvider)
             ->withPropagator($propagator)
         ;
     }
@@ -143,7 +140,6 @@ class SdkAutoloader
             ->withMeterProvider($sdk->getMeterProvider())
             ->withLoggerProvider($sdk->getLoggerProvider())
             ->withPropagator($sdk->getPropagator())
-            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
         ;
     }
 

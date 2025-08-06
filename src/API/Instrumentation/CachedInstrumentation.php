@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Instrumentation;
 
 use OpenTelemetry\API\Globals;
-use OpenTelemetry\API\Logs\EventLoggerInterface;
-use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
@@ -31,8 +29,6 @@ final class CachedInstrumentation
     private WeakMap $meters;
     /** @var WeakMap<LoggerProviderInterface, LoggerInterface> */
     private WeakMap $loggers;
-    /** @var WeakMap<EventLoggerProviderInterface, EventLoggerInterface> */
-    private WeakMap $eventLoggers;
 
     /**
      * @psalm-suppress PropertyTypeCoercion
@@ -46,7 +42,6 @@ final class CachedInstrumentation
         $this->tracers = new \WeakMap();
         $this->meters = new \WeakMap();
         $this->loggers = new \WeakMap();
-        $this->eventLoggers = new \WeakMap();
     }
 
     public function tracer(): TracerInterface
@@ -67,16 +62,5 @@ final class CachedInstrumentation
         $loggerProvider = Globals::loggerProvider();
 
         return $this->loggers[$loggerProvider] ??= $loggerProvider->getLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
-    }
-
-    /**
-     * @deprecated
-     * @phan-suppress PhanDeprecatedFunction
-     */
-    public function eventLogger(): EventLoggerInterface
-    {
-        $eventLoggerProvider = Globals::eventLoggerProvider();
-
-        return $this->eventLoggers[$eventLoggerProvider] ??= $eventLoggerProvider->getEventLogger($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
 }
