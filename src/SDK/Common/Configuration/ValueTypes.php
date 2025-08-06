@@ -107,9 +107,9 @@ interface ValueTypes
      * Exporter Selection
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#exporter-selection
      */
-    public const OTEL_TRACES_EXPORTER = VariableTypes::LIST;
-    public const OTEL_METRICS_EXPORTER = VariableTypes::LIST;
-    public const OTEL_LOGS_EXPORTER = VariableTypes::LIST;
+    public const OTEL_TRACES_EXPORTER = VariableTypes::ENUM;
+    public const OTEL_METRICS_EXPORTER = VariableTypes::ENUM;
+    public const OTEL_LOGS_EXPORTER = VariableTypes::ENUM;
     /**
      * Metrics SDK Configuration
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration
@@ -123,7 +123,7 @@ interface ValueTypes
      * Language Specific Environment Variables
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#language-specific-environment-variables
      */
-    public const OTEL_PHP_TRACES_PROCESSOR = VariableTypes::ENUM;
+    public const OTEL_PHP_TRACES_PROCESSOR = VariableTypes::LIST;
     public const OTEL_PHP_LOGS_PROCESSOR = VariableTypes::LIST;
     public const OTEL_PHP_DETECTORS = VariableTypes::LIST;
     public const OTEL_PHP_AUTOLOAD_ENABLED = VariableTypes::BOOL;

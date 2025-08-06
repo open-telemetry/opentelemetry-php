@@ -6,11 +6,13 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 
 class TracerProviderBuilder
 {
     /** @var list<SpanProcessorInterface> */
-    private ?array $spanProcessors = [];
+    private array $spanProcessors = [];
     private ?ResourceInfo $resource = null;
     private ?SamplerInterface $sampler = null;
     private ?Configurator $configurator = null;
@@ -45,8 +47,14 @@ class TracerProviderBuilder
 
     public function build(): TracerProviderInterface
     {
+        $spanProcessor = match (count($this->spanProcessors)) {
+            0 => NoopSpanProcessor::getInstance(),
+            1 => $this->spanProcessors[0],
+            default => new MultiSpanProcessor(...$this->spanProcessors),
+        };
+
         return new TracerProvider(
-            $this->spanProcessors,
+            $spanProcessor,
             $this->sampler,
             $this->resource,
             configurator: $this->configurator ?? Configurator::tracer(),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics\MetricExporter;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
@@ -18,6 +19,8 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
+    use LogsMessagesTrait;
+
     public function __construct(private readonly ?Temporality $temporality = null)
     {
     }
@@ -51,7 +54,14 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
             'resource' => $resource,
             'scope' => $scope,
         ];
-        echo json_encode($output, JSON_PRETTY_PRINT) . PHP_EOL;
+        $encoded = json_encode($output, JSON_PRETTY_PRINT);
+        if ($encoded === false) {
+            self::logWarning('Failed to encode metrics to JSON: ' . json_last_error_msg());
+
+            return false;
+        }
+
+        echo $encoded . PHP_EOL;
 
         return true;
     }

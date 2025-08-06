@@ -14,8 +14,13 @@ class LoggerSharedState
     public function __construct(
         private readonly ResourceInfo $resource,
         private readonly LogRecordLimits $limits,
-        private readonly LogRecordProcessorInterface $processor,
+        private LogRecordProcessorInterface $processor,
     ) {
+    }
+
+    public function setLogRecordProcessor(LogRecordProcessorInterface $processor): void
+    {
+        $this->processor = $processor;
     }
 
     public function hasShutdown(): bool

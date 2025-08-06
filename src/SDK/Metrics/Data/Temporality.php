@@ -7,8 +7,8 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 /**
  * Metric aggregation temporality.
  */
-enum Temporality
+enum Temporality: string
 {
-    case DELTA;
-    case CUMULATIVE;
+    case DELTA = 'Delta';
+    case CUMULATIVE = 'Cumulative';
 }

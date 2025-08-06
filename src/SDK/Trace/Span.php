@@ -53,8 +53,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
      * End users should use a {@see API\TracerInterface} in order to create spans.
      *
      * @param non-empty-string $name
-     * @psalm-param API\SpanKind::KIND_* $kind
      * @param list<LinkInterface> $links
+     * @psalm-param API\SpanKind::KIND_* $kind
      *
      * @internal
      * @psalm-internal OpenTelemetry
@@ -318,7 +318,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     }
 
     /** @inheritDoc */
-    public function getAttribute(string $key)
+    public function getAttribute(string $key): mixed
     {
         return $this->attributesBuilder[$key];
     }
