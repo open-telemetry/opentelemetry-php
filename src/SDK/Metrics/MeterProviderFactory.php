@@ -28,6 +28,7 @@ class MeterProviderFactory
      * @todo https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md#general
      *       - "The exporter MUST configure the default aggregation on the basis of instrument kind using the
      *         OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION variable as described below if it is implemented."
+     * @phan-suppress PhanTypeMismatchArgumentSuperType
      */
     public function create(?ResourceInfo $resource = null): MeterProviderInterface
     {

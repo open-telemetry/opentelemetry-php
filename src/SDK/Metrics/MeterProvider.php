@@ -56,6 +56,9 @@ final class MeterProvider implements MeterProviderInterface
         $this->meters = new WeakMap();
     }
 
+    /**
+     * @phan-suppress PhanTypeMismatchArgumentSuperType
+     */
     public function setReaders(iterable $readers): void
     {
         $this->metricReaders = $readers;
