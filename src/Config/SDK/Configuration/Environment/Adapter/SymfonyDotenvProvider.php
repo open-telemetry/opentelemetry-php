@@ -17,6 +17,7 @@ use Symfony\Component\Dotenv\Exception\PathException;
 final class SymfonyDotenvProvider implements EnvSourceProvider
 {
     /** @psalm-suppress UndefinedClass */
+    #[\Override]
     public function getEnvSource(): EnvSource
     {
         $installPath = InstalledVersions::getRootPackage()['install_path'];

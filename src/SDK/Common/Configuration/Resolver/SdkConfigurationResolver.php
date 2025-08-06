@@ -36,11 +36,13 @@ class SdkConfigurationResolver implements ResolverInterface
         $this->reader = new EnvSourceReader($envSources);
     }
 
+    #[\Override]
     public function retrieveValue(string $variableName): mixed
     {
         return $this->reader->read($variableName);
     }
 
+    #[\Override]
     public function hasVariable(string $variableName): bool
     {
         return !Configuration::isEmpty($this->reader->read($variableName));

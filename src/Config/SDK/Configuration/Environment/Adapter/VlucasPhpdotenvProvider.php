@@ -16,6 +16,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceProvider;
 final class VlucasPhpdotenvProvider implements EnvSourceProvider
 {
     /** @psalm-suppress UndefinedClass */
+    #[\Override]
     public function getEnvSource(): EnvSource
     {
         $backup = [$_SERVER, $_ENV];

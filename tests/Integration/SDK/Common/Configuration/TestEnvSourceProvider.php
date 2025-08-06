@@ -10,6 +10,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceProvider;
 
 class TestEnvSourceProvider implements EnvSourceProvider
 {
+    #[\Override]
     public function getEnvSource(): EnvSource
     {
         return new ArrayEnvSource([
