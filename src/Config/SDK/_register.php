@@ -35,7 +35,6 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterOtlpGrpc;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterOtlpHttp;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterZipkin;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorBatch;
-use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorHttpMetrics;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
 
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorB3::class);
@@ -58,7 +57,6 @@ ServiceLoader::register(ComponentProvider::class, SpanExporterOtlpHttp::class);
 ServiceLoader::register(ComponentProvider::class, SpanExporterZipkin::class);
 ServiceLoader::register(ComponentProvider::class, SpanProcessorBatch::class);
 ServiceLoader::register(ComponentProvider::class, SpanProcessorSimple::class);
-ServiceLoader::register(ComponentProvider::class, SpanProcessorHttpMetrics::class);
 
 ServiceLoader::register(ComponentProvider::class, AggregationResolverDefault::class);
 ServiceLoader::register(ComponentProvider::class, MetricExporterConsole::class);
