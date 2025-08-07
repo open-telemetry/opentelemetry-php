@@ -13,7 +13,7 @@ namespace OpenTelemetry\SemConv\Unstable\Metrics;
 interface DbIncubatingMetrics
 {
     /**
-     * The number of connections that are currently in state described by the `state` attribute
+     * The number of connections that are currently in state described by the `state` attribute.
      *
      * Instrument: updowncounter
      * Unit: {connection}
@@ -22,7 +22,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_COUNT = 'db.client.connection.count';
 
     /**
-     * The time it took to create a new connection
+     * The time it took to create a new connection.
      *
      * Instrument: histogram
      * Unit: s
@@ -31,7 +31,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_CREATE_TIME = 'db.client.connection.create_time';
 
     /**
-     * The maximum number of idle open connections allowed
+     * The maximum number of idle open connections allowed.
      *
      * Instrument: updowncounter
      * Unit: {connection}
@@ -40,7 +40,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_IDLE_MAX = 'db.client.connection.idle.max';
 
     /**
-     * The minimum number of idle open connections allowed
+     * The minimum number of idle open connections allowed.
      *
      * Instrument: updowncounter
      * Unit: {connection}
@@ -49,7 +49,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_IDLE_MIN = 'db.client.connection.idle.min';
 
     /**
-     * The maximum number of open connections allowed
+     * The maximum number of open connections allowed.
      *
      * Instrument: updowncounter
      * Unit: {connection}
@@ -58,7 +58,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_MAX = 'db.client.connection.max';
 
     /**
-     * The number of current pending requests for an open connection
+     * The number of current pending requests for an open connection.
      *
      * Instrument: updowncounter
      * Unit: {request}
@@ -67,7 +67,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_PENDING_REQUESTS = 'db.client.connection.pending_requests';
 
     /**
-     * The number of connection timeouts that have occurred trying to obtain a connection from the pool
+     * The number of connection timeouts that have occurred trying to obtain a connection from the pool.
      *
      * Instrument: counter
      * Unit: {timeout}
@@ -76,7 +76,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_TIMEOUTS = 'db.client.connection.timeouts';
 
     /**
-     * The time between borrowing a connection and returning it to the pool
+     * The time between borrowing a connection and returning it to the pool.
      *
      * Instrument: histogram
      * Unit: s
@@ -85,7 +85,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTION_USE_TIME = 'db.client.connection.use_time';
 
     /**
-     * The time it took to obtain an open connection from the pool
+     * The time it took to obtain an open connection from the pool.
      *
      * Instrument: histogram
      * Unit: s
