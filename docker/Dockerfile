@@ -34,6 +34,7 @@ RUN apt-get install -y \
     php${PHP_VERSION}-amqp \
     php${PHP_VERSION}-rdkafka \
     php${PHP_VERSION}-mysqli \
+    php${PHP_VERSION}-pgsql \
     unzip
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
