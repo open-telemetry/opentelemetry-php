@@ -49,18 +49,18 @@ final class DebugScope implements ScopeInterface
         if (($flags & ScopeInterface::DETACHED) !== 0) {
             trigger_error(sprintf(
                 'Scope: unexpected call to Scope::detach() for scope #%d, scope was already detached %s',
-                spl_object_id($this),
+                spl_object_id($this->scope),
                 self::formatBacktrace($this->detachedAt),
             ));
         } elseif (($flags & ScopeInterface::MISMATCH) !== 0) {
             trigger_error(sprintf(
                 'Scope: unexpected call to Scope::detach() for scope #%d, scope successfully detached but another scope should have been detached first',
-                spl_object_id($this),
+                spl_object_id($this->scope),
             ));
         } elseif (($flags & ScopeInterface::INACTIVE) !== 0) {
             trigger_error(sprintf(
                 'Scope: unexpected call to Scope::detach() for scope #%d, scope successfully detached from different execution context',
-                spl_object_id($this),
+                spl_object_id($this->scope),
             ));
         }
 
