@@ -78,7 +78,7 @@ final class DebugScope implements ScopeInterface
 
             trigger_error(sprintf(
                 'Scope: missing call to Scope::detach() for scope #%d, created %s',
-                spl_object_id($this->scope),
+                spl_object_id($this),
                 self::formatBacktrace($this->createdAt),
             ));
         }
