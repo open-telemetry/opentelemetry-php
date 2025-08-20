@@ -35,7 +35,7 @@ jobs:
       run: |
         echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - uses: gacts/run-and-post-run@v1
       id: post-run-command
