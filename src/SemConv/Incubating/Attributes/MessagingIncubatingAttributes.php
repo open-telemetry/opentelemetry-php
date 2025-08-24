@@ -226,18 +226,6 @@ interface MessagingIncubatingAttributes
     public const MESSAGING_OPERATION_TYPE_VALUE_SETTLE = 'settle';
 
     /**
-     * Deprecated. Use `process` instead.
-     * @experimental
-     */
-    public const MESSAGING_OPERATION_TYPE_VALUE_DELIVER = 'deliver';
-
-    /**
-     * Deprecated. Use `send` instead.
-     * @experimental
-     */
-    public const MESSAGING_OPERATION_TYPE_VALUE_PUBLISH = 'publish';
-
-    /**
      * RabbitMQ message routing key.
      *
      * @experimental

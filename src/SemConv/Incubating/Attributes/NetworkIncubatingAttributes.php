@@ -49,67 +49,56 @@ interface NetworkIncubatingAttributes
     public const NETWORK_CONNECTION_STATE = 'network.connection.state';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_CLOSED = 'closed';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_CLOSE_WAIT = 'close_wait';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_CLOSING = 'closing';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_ESTABLISHED = 'established';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_FIN_WAIT_1 = 'fin_wait_1';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_FIN_WAIT_2 = 'fin_wait_2';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_LAST_ACK = 'last_ack';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_LISTEN = 'listen';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_SYN_RECEIVED = 'syn_received';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_SYN_SENT = 'syn_sent';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_STATE_VALUE_TIME_WAIT = 'time_wait';
@@ -255,31 +244,26 @@ interface NetworkIncubatingAttributes
     public const NETWORK_CONNECTION_TYPE = 'network.connection.type';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_TYPE_VALUE_WIFI = 'wifi';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_TYPE_VALUE_WIRED = 'wired';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_TYPE_VALUE_CELL = 'cell';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_TYPE_VALUE_UNAVAILABLE = 'unavailable';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_CONNECTION_TYPE_VALUE_UNKNOWN = 'unknown';
@@ -299,13 +283,11 @@ interface NetworkIncubatingAttributes
     public const NETWORK_IO_DIRECTION = 'network.io.direction';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_IO_DIRECTION_VALUE_TRANSMIT = 'transmit';
 
     /**
-     * none
      * @experimental
      */
     public const NETWORK_IO_DIRECTION_VALUE_RECEIVE = 'receive';

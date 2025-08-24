@@ -20,73 +20,61 @@ interface TelemetryAttributes
     public const TELEMETRY_SDK_LANGUAGE = 'telemetry.sdk.language';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_CPP = 'cpp';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_DOTNET = 'dotnet';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_ERLANG = 'erlang';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_GO = 'go';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_JAVA = 'java';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_NODEJS = 'nodejs';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_PHP = 'php';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_PYTHON = 'python';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_RUBY = 'ruby';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_RUST = 'rust';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_SWIFT = 'swift';
 
     /**
-     * none
      * @stable
      */
     public const TELEMETRY_SDK_LANGUAGE_VALUE_WEBJS = 'webjs';
