@@ -51,13 +51,11 @@ interface ProcessIncubatingAttributes
     public const PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch_type';
 
     /**
-     * none
      * @experimental
      */
     public const PROCESS_CONTEXT_SWITCH_TYPE_VALUE_VOLUNTARY = 'voluntary';
 
     /**
-     * none
      * @experimental
      */
     public const PROCESS_CONTEXT_SWITCH_TYPE_VALUE_INVOLUNTARY = 'involuntary';
@@ -170,13 +168,11 @@ interface ProcessIncubatingAttributes
     public const PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
 
     /**
-     * none
      * @experimental
      */
     public const PROCESS_PAGING_FAULT_TYPE_VALUE_MAJOR = 'major';
 
     /**
-     * none
      * @experimental
      */
     public const PROCESS_PAGING_FAULT_TYPE_VALUE_MINOR = 'minor';

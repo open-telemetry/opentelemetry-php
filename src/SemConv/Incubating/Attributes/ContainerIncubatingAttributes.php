@@ -112,10 +112,24 @@ interface ContainerIncubatingAttributes
     public const CONTAINER_NAME = 'container.name';
 
     /**
+     * A description about the runtime which could include, for example details about the CRI/API version being used or other customisations.
+     *
+     * @experimental
+     */
+    public const CONTAINER_RUNTIME_DESCRIPTION = 'container.runtime.description';
+
+    /**
      * The container runtime managing this container.
      *
      * @experimental
      */
-    public const CONTAINER_RUNTIME = 'container.runtime';
+    public const CONTAINER_RUNTIME_NAME = 'container.runtime.name';
+
+    /**
+     * The version of the runtime of this process, as returned by the runtime without modification.
+     *
+     * @experimental
+     */
+    public const CONTAINER_RUNTIME_VERSION = 'container.runtime.version';
 
 }

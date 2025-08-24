@@ -28,13 +28,11 @@ interface DbIncubatingAttributes
     public const DB_CLIENT_CONNECTION_STATE = 'db.client.connection.state';
 
     /**
-     * none
      * @experimental
      */
     public const DB_CLIENT_CONNECTION_STATE_VALUE_IDLE = 'idle';
 
     /**
-     * none
      * @experimental
      */
     public const DB_CLIENT_CONNECTION_STATE_VALUE_USED = 'used';

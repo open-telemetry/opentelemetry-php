@@ -102,12 +102,6 @@ interface OsIncubatingAttributes
     public const OS_TYPE_VALUE_SOLARIS = 'solaris';
 
     /**
-     * Deprecated. Use `zos` instead.
-     * @experimental
-     */
-    public const OS_TYPE_VALUE_Z_OS = 'z_os';
-
-    /**
      * IBM z/OS
      * @experimental
      */
