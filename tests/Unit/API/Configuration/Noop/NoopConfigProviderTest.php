@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\API\Configuration\Noop;
+nfinal amespace Unit\API\Configuration\Noop;
 
 use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;

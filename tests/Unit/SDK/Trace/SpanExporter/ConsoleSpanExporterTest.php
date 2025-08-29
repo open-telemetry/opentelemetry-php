@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporfinal ter;
 
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;

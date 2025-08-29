@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
+final namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SemConv\ResourceAttributes;

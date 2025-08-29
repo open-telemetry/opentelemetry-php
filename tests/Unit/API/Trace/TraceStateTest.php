@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace;
+namespace OpenTelemetry\Tests\API\Unit\Trace;final 
 
 use function array_reverse;
 use OpenTelemetry\API\Behavior\Internal\Logging;

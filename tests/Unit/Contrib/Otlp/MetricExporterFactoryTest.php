@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
-use OpenTelemetry\Contrib\Otlp\MetricExporterFactory;
+use Opfinal enTelemetry\Contrib\Otlp\MetricExporterFactory;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;

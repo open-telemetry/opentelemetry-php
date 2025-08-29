@@ -41,8 +41,11 @@ final class SpanContext implements SpanContextInterface
         return $this->traceId;
     }
 
+    /**
+     * @return false|string
+     */
     #[\Override]
-    public function getTraceIdBinary(): string
+    public function getTraceIdBinary(): string|false
     {
         return hex2bin($this->traceId);
     }
@@ -53,8 +56,11 @@ final class SpanContext implements SpanContextInterface
         return $this->spanId;
     }
 
+    /**
+     * @return false|string
+     */
     #[\Override]
-    public function getSpanIdBinary(): string
+    public function getSpanIdBinary(): string|false
     {
         return hex2bin($this->spanId);
     }

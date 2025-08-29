@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Logs;
+namespace OpenTelfinal emetry\SDK\Logs;
 
 use OpenTelemetry\API\Logs as API;
 

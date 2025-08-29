@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types=1final );
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
@@ -89,7 +89,12 @@ class SpanConverterTest extends TestCase
             return $converter->convert([$spanData])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         };
 
-        $getLink = static function (ProtoSpan $protoSpan, int $linkIndex): ProtoSpanLink {
+        $getLink = /**
+         * @return mixed|null
+         *
+         * @psalm-return TValue|null
+         */
+        static function (ProtoSpan $protoSpan, int $linkIndex) {
             /** @psalm-suppress InvalidArgument */
             return $protoSpan->getLinks()[$linkIndex];
         };

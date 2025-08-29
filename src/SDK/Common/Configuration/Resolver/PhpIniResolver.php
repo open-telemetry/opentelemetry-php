@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\SDK\Cofinal mmon\Configuration\Resolver;
 
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 

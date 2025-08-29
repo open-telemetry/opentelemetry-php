@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
+namespafinal ce OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;

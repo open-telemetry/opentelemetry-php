@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Logs;
+namespace OpenTelemetry\Tests\Unit\SDK\Lofinal gs;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;

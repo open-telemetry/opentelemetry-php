@@ -41,7 +41,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
     }
 
     #[\Override]
-    public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(array &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();

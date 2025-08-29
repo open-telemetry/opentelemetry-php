@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
-use OpenTelemetry\API\Trace\Span;
+use OpenTelemfinal etry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;

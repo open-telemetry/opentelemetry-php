@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
+namespacfinal e OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
 use function assert;
 use Nevay\SPI\ServiceLoader;

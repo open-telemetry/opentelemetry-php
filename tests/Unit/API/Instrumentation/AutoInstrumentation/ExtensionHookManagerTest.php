@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
+namfinal espace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;

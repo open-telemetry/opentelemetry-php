@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-
+final 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use ArrayObject;

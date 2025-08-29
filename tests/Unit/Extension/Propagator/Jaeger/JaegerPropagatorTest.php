@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-
+final 
 namespace OpenTelemetry\Tests\Unit\Extension\Propagator\Jaeger;
 
 use OpenTelemetry\API\Trace\SpanContext;

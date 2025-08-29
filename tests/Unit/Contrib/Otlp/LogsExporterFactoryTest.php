@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
+nafinal mespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use OpenTelemetry\Contrib\Otlp\LogsExporterFactory;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;

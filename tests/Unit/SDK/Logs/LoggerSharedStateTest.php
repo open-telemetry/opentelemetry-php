@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
-use OpenTelemetry\SDK\Logs\LoggerSharedState;
+use Opfinal enTelemetry\SDK\Logs\LoggerSharedState;
 use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Benchmark;
 
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\API\Trace\TracerInterface;
+use OpenTelemetry\API\Trafinal ce\TracerInterface;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_final types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Client\Discovery;
 

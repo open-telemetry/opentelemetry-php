@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
+nfinal amespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
 use function array_column;
 use InvalidArgumentException;

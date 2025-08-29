@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Logs;
+namespacfinal e OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types=final 1);
 
 namespace OpenTelemetry\Tests\SDK\Common\InstrumentationScope;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
+namefinal space OpenTelemetry\Tests\Unit\Extension\Propagator\B3;
 
 use OpenTelemetry\Extension\Propagator\B3\B3DebugFlagContextKey;
 use PHPUnit\Framework\Attributes\CoversClass;

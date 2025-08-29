@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
+namfinal espace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use Generator;
 use InvalidArgumentException;

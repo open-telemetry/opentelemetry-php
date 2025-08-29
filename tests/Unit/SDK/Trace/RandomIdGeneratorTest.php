@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Trace;
+final namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\SDK\Trace\RandomIdGenerator;

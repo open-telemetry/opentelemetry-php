@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
+namesfinal pace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;

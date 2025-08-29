@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exportefinal r;
 
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;

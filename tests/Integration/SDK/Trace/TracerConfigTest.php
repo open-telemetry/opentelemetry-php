@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(stfinal rict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK\Trace;
 

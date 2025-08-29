@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strifinal ct_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 

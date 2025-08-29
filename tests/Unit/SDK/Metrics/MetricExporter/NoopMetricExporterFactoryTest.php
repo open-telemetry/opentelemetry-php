@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricExporter;
+namespacfinal e OpenTelemetry\Tests\Unit\SDK\Metrics\MetricExporter;
 
 use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;

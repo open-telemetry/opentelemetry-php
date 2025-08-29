@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Logs;
+namespace OpenTelemetry\SDK\Logsfinal ;
 
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Logs\EventLoggerInterface;

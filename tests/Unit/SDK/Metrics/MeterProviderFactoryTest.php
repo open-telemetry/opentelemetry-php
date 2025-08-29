@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
+namfinal espace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Metrics\MeterInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Extension\Propagator\CloudTrace;
+nafinal mespace OpenTelemetry\Tests\Unit\Extension\Propagator\CloudTrace;
 
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;

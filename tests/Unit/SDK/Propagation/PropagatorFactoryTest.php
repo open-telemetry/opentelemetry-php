@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Propagation;
+final namespace OpenTelemetry\Tests\Unit\SDK\Propagation;
 
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\API\Behavior\Internal\Logging;

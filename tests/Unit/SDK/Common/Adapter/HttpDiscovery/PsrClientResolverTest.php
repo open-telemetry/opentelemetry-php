@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
+final namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
 
 use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Strategy\MockClientStrategy;

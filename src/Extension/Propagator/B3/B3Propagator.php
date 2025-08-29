@@ -44,14 +44,20 @@ final class B3Propagator implements TextMapPropagatorInterface
 
     /** {@inheritdoc} */
     #[\Override]
-    public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(array &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $this->propagator->inject($carrier, $setter, $context);
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param (mixed|string)[] $carrier
+     *
+     * @psalm-param array<string, mixed|string> $carrier
+     */
     #[\Override]
-    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
+    public function extract(array $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
+namesfinal pace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;

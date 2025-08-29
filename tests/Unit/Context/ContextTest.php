@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_tfinal ypes=1);
 
 namespace OpenTelemetry\Tests\Unit\Context;
 

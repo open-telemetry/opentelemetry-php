@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Instrumentation\General;
+namespace OpenTelemetry\Config\SDK\ComponentPfinal rovider\Instrumentation\General;
 
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;

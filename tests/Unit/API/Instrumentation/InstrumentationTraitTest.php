@@ -1,8 +1,8 @@
-<?php
+final <?php
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
+namfinal espace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use OpenTelemetry\API\Instrumentation\InstrumentationInterface;
 use OpenTelemetry\API\Instrumentation\InstrumentationTrait;

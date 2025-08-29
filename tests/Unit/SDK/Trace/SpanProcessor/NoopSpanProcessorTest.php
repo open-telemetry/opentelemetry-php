@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
+final namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use PHPUnit\Framework\Attributes\CoversClass;

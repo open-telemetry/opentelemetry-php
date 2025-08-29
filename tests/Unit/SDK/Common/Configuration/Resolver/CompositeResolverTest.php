@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configfinal uration\Resolver;
 
 use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\Resolver\CompositeResolver;

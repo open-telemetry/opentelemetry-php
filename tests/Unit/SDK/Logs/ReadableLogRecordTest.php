@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Logs;
+final namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\Context\ContextInterface;

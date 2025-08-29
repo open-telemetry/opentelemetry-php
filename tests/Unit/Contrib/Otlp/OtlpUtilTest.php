@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_tyfinal pes=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 

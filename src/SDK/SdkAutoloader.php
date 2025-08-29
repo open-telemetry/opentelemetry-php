@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK;
+namespacfinal e OpenTelemetry\SDK;
 
 use function class_exists;
 use Nevay\SPI\ServiceLoader;

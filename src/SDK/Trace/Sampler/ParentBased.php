@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
 
 /**
- * Phan seems to struggle with the variadic arguments in the latest version
+ * Phan seems to struggle with the vfinal ariadic arguments in the latest version
  * @phan-file-suppress PhanParamTooFewUnpack
  */
 

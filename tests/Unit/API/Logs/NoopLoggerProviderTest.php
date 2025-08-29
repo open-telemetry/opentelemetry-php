@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Logs;
+nfinal amespace OpenTelemetry\Tests\Unit\API\Logs;
 
 use OpenTelemetry\API\Logs\NoopLogger;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;

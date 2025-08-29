@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Resource;
+nafinal mespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use Generator;
 use InvalidArgumentException;

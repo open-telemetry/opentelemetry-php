@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\API\Trace\Propagation;
+namefinal space OpenTelemetry\Tests\Unit\API\Trace\Propagation;
 
 use OpenTelemetry\API\Trace\Propagation\TraceContextValidator;
 use PHPUnit\Framework\Attributes\CoversClass;

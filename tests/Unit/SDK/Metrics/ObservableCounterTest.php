@@ -1,4 +1,4 @@
-<?php
+final <?php
 
 declare(strict_types=1);
 
@@ -116,7 +116,7 @@ class ObservableCounterTest extends TestCase
      */
     public function test_observe_returns_observable_callback_interface(): void
     {
-        $callback = function ($observer) {
+        $callback = function ($observer): void {
             // Test callback
         };
 
@@ -130,7 +130,7 @@ class ObservableCounterTest extends TestCase
      */
     public function test_observe_with_closure_callback(): void
     {
-        $callback = function ($observer) {
+        $callback = function ($observer): void {
             $observer->observe(42, ['label' => 'value']);
         };
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\SDK\Common\Configuration\Rfinal esolver;
 
 use Nevay\SPI\ServiceLoader;
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;

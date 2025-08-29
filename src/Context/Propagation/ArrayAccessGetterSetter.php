@@ -154,12 +154,22 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         );
     }
 
-    private function isSupportedCarrier($carrier): bool
+    /**
+     * @param (string|string[])[]|\ArrayObject|\Countable|\stdClass|iterable $carrier
+     *
+     * @psalm-param \ArrayObject<'A'|'a'|'b', 'alpha'|'bravo'>|\Countable|\stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo'|list{'bravo'}, 1?: list{0: 'alpha', 1?: 'beta'}}|iterable $carrier
+     */
+    private function isSupportedCarrier(array|\ArrayObject|iterable|\stdClass|\Countable $carrier): bool
     {
         return is_array($carrier) || $carrier instanceof ArrayAccess && $carrier instanceof Traversable;
     }
 
-    private function resolveKey($carrier, string $key): string
+    /**
+     * @param (string|string[])[]|\ArrayObject|\Countable|\stdClass|iterable $carrier
+     *
+     * @psalm-param \ArrayObject<'A'|'a', 'alpha'>|\Countable|\stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo'|list{'bravo'}, 1?: list{0: 'alpha', 1?: 'beta'}}|iterable $carrier
+     */
+    private function resolveKey(array|\ArrayObject|iterable|\stdClass|\Countable $carrier, string $key): string
     {
         if (isset($carrier[$key])) {
             return $key;

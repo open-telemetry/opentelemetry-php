@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Logs;
+nafinal mespace Logs;
 
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use org\bovigo\vfs\vfsStream;
