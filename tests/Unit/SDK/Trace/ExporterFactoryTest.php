@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use OpenTelemetry\SDK\Registry;
 
 #[CoversClass(ExporterFactory::class)]
 class ExporterFactoryTest extends TestCase
@@ -25,6 +26,32 @@ class ExporterFactoryTest extends TestCase
     public function setUp(): void
     {
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);
+        
+        // Ensure all required factories are registered in the Registry
+        $this->ensureRequiredFactoriesRegistered();
+    }
+    
+    private function ensureRequiredFactoriesRegistered(): void
+    {
+        // Register OTLP factories if not already registered
+        try {
+            Registry::spanExporterFactory('otlp');
+        } catch (\RuntimeException $e) {
+            Registry::registerSpanExporterFactory('otlp', \OpenTelemetry\Contrib\Otlp\SpanExporterFactory::class);
+        }
+        
+        // Register transport factories if not already registered
+        try {
+            Registry::transportFactory('http');
+        } catch (\RuntimeException $e) {
+            Registry::registerTransportFactory('http', \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory::class);
+        }
+        
+        try {
+            Registry::transportFactory('grpc');
+        } catch (\RuntimeException $e) {
+            Registry::registerTransportFactory('grpc', \OpenTelemetry\Contrib\Grpc\GrpcTransportFactory::class);
+        }
     }
 
     #[Group('trace-compliance')]

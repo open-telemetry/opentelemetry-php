@@ -17,6 +17,30 @@ class ExporterFactoryTest extends TestCase
 {
     use TestState;
 
+    #[\Override]
+    public function setUp(): void
+    {
+        // Ensure all required factories are registered in the Registry
+        $this->ensureRequiredFactoriesRegistered();
+    }
+    
+    private function ensureRequiredFactoriesRegistered(): void
+    {
+        // Register console log record exporter factory if not already registered
+        try {
+            \OpenTelemetry\SDK\Registry::logRecordExporterFactory('console');
+        } catch (\RuntimeException $e) {
+            \OpenTelemetry\SDK\Registry::registerLogRecordExporterFactory('console', \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory::class);
+        }
+        
+        // Register stream transport factory if not already registered
+        try {
+            \OpenTelemetry\SDK\Registry::transportFactory('stream');
+        } catch (\RuntimeException $e) {
+            \OpenTelemetry\SDK\Registry::registerTransportFactory('stream', \OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory::class);
+        }
+    }
+
     /**
      * @param class-string $expected
      */
