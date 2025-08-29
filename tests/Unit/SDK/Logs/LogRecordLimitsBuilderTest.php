@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namesfinal pace OpenTelemetry\Tests\Unit\SDK\Logs;
+namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;

@@ -10,7 +10,6 @@ use Opentelemetry\Proto\Common\V1\KeyValue;
 use Opentelemetry\Proto\Logs\V1\LogRecord;
 use Opentelemetry\Proto\Logs\V1\ResourceLogs;
 use Opentelemetry\Proto\Logs\V1\ScopeLogs;
-use Opentelemetry\Proto\Resource\V1\Resource as Resource_;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;

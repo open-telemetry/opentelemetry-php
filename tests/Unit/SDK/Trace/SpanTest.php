@@ -1,6 +1,6 @@
 <?php
 
-declare(stricfinal t_types=1);
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
@@ -14,7 +14,6 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextValidator;

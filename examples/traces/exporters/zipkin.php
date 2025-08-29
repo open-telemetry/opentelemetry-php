@@ -6,7 +6,6 @@ namespace OpenTelemetry\Example;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 
-use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\SDK\Trace\TracerProvider;

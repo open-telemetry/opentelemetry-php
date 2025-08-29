@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namefinal space OpenTelemetry\Tests\Unit\API\Instrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use OpenTelemetry\API\Instrumentation\ConfigurationResolver;
 use OpenTelemetry\Tests\TestState;

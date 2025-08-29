@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namfinal espace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation\AutoInstrumentation;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ExtensionHookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;

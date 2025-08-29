@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namefinal space OpenTelemetry\Tests\Unit\Context\Propagation;
+namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;

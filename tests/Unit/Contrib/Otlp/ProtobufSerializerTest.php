@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nfinal amespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
+namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use OpenTelemetry\Contrib\Otlp\ProtobufSerializer;
 use Opentelemetry\Proto\Collector\Trace\V1\ExportTraceServiceResponse;

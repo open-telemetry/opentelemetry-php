@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namesfinal pace OpenTelemetry\Tests\Unit\SDK\Trace\Behavior;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\Behavior;
 
 use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;

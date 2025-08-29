@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespacfinal e OpenTelemetry\Tests\Unit\Extension\Propagator\Jaeger;
+namespace OpenTelemetry\Tests\Unit\Extension\Propagator\Jaeger;
 
 use OpenTelemetry\Extension\Propagator\Jaeger\JaegerDebugFlagContextKey;
 use PHPUnit\Framework\Attributes\CoversClass;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespacfinal e OpenTelemetry\SDK;
+namespace OpenTelemetry\SDK;
 
 use function class_exists;
 use Nevay\SPI\ServiceLoader;
@@ -11,7 +11,6 @@ use OpenTelemetry\API\Configuration\ConfigEnv\EnvComponentLoader;
 use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManager;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
@@ -25,8 +24,6 @@ use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
-use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;

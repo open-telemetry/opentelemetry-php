@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nfinal amespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
 use function array_column;
 use InvalidArgumentException;
@@ -14,7 +14,6 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;

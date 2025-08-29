@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Common\Configuration;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Configuration\Parfinal ser\BooleanParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;

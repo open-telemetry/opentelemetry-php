@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
-use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterfafinal ce;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#logrecord-limits

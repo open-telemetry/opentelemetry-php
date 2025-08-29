@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namesfinal pace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Adapter\HttpDiscovery;
 
 use Generator;
 use Http\Discovery\Psr18ClientDiscovery;

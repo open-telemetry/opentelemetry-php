@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namfinal espace Unit\API\Configuration\Noop;
+namespace Unit\API\Configuration\Noop;
 
 use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use PHPUnit\Framework\Attributes\CoversClass;

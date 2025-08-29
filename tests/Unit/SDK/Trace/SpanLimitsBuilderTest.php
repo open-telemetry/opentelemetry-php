@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-final namespace OpenTelemetry\Tests\Unit\SDK\Trace;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use Exception;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

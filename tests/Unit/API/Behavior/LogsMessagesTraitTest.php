@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-final namespace OpenTelemetry\Tests\Unit\API\Behavior;
+namespace OpenTelemetry\Tests\Unit\API\Behavior;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;

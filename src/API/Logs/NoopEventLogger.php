@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelfinal emetry\API\Logs;
+namespace OpenTelelemetry\API\Logs;
 
 use OpenTelemetry\Context\ContextInterface;
 

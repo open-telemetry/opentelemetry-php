@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespafinal ce OpenTelemetry\Tests\SDK\Unit\Trace\Sampler;
+namespace\Sampler;
 
 use function bin2hex;
 use InvalidArgumentException;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;

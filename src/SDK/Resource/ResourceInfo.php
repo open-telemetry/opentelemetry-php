@@ -8,8 +8,6 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
-
 /**
  * A Resource is an immutable representation ofinal f the entity producing telemetry. For example, a process producing telemetry
  * that is running in a container on Kubernetes has a Pod name, it is in a namespace and possibly is part of a Deployment

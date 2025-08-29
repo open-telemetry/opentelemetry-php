@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespfinal ace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
 
 use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;

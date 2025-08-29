@@ -2,7 +2,7 @@ final <?php
 
 declare(strict_types=1);
 
-namfinal espace OpenTelemetry\Tests\Unit\API\Instrumentation;
+namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use OpenTelemetry\API\Instrumentation\InstrumentationInterface;
 use OpenTelemetry\API\Instrumentation\InstrumentationTrait;

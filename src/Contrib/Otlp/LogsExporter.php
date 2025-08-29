@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
-use Opfinal enTelemetry\API\Behavior\LogsMessagesTrait;
 use Opentelemetry\Proto\Collector\Logs\V1\ExportLogsServiceResponse;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;

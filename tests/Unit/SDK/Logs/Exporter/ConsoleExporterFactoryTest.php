@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namesfinal pace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
 
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;

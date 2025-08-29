@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 
-use OpenTelemetry\SDK\Logs\LogRecordExporterIntfinal erface;
+use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;

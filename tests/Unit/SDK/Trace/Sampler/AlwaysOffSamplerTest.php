@@ -1,10 +1,9 @@
 <?php
 
 declare(strict_types=1);
-final 
+
 namespace OpenTelemetry\Tests\Unit\SDK;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;

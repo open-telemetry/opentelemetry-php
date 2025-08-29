@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function ctype_space;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;

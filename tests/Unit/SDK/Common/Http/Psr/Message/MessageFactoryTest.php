@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1)final ;
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Http\Psr\Message;
 

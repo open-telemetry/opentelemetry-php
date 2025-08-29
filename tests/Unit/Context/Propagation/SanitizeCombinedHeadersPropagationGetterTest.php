@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetryfinal \Tests\Unit\Context\Propagation;
+namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;

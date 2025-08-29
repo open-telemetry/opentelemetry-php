@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
-use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -157,7 +156,7 @@ final class PsrTransportTest extends TestCase
 
     public function test_send_retry_network_exception_returns_error(): void
     {
-        $e = new class('network error') extends \Exception implements NetworkExceptionInterface {
+        $e = new class('network error') extends \ExceptionimplementsNetworkExceptionInterface {
             #[\Override]
             public function getRequest(): RequestInterface
             {

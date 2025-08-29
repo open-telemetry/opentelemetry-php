@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nafinal mespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
+namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
 use OpenTelemetry\Contrib\Otlp\AttributesConverter;
 use PHPUnit\Framework\Attributes\CoversClass;

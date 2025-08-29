@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespacfinal e OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
+namespace\SpanProcessor;
 
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;

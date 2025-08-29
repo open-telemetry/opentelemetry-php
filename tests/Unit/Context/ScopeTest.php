@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nfinal amespace OpenTelemetry\Tests\Unit\Context;
+namespace OpenTelemetry\Tests\Unit\Context;
 
 use Fiber;
 use OpenTelemetry\Context\Context;

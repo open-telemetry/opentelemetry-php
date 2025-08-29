@@ -6,8 +6,6 @@ namespace OpenTelemetry\SDK\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nfinal amespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Time;
 
-use OpenTelfinal emetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 
 /**

@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-final 
+
 namespace OpenTelemetry\Tests\Unit\API\Behavior\Internal;
 
 use OpenTelemetry\API\Behavior\Internal\LogWriter\ErrorLogWriter;

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Baggage;
 
-use OpenTelemetry\API\Baggage as API;
-
 interface BaggageBuilderInterface
 {
     /**

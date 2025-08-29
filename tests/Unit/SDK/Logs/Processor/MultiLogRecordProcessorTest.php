@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespfinal ace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
+namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryTestCase;

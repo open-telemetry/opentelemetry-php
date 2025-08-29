@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-final namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\NullSpanConverter;

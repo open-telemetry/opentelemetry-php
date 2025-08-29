@@ -1,10 +1,9 @@
 <?php
 
-declare(stfinal rict_types=1);
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;

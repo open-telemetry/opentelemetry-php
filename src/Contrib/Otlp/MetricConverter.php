@@ -21,7 +21,6 @@ use Opentelemetry\Proto\Metrics\V1\NumberDataPoint;
 use Opentelemetry\Proto\Metrics\V1\ResourceMetrics;
 use Opentelemetry\Proto\Metrics\V1\ScopeMetrics;
 use Opentelemetry\Proto\Metrics\V1\Sum;
-use Opentelemetry\Proto\Resource\V1\Resource as Resource_;
 use OpenTelemetry\SDK;
 use function serialize;
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namefinal space OpenTelemetry\Tests\Unit\SDK\Trace;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;

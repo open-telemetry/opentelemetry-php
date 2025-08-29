@@ -1,6 +1,6 @@
 <?php
 
-declare(strictfinal _types=1);
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Common\Time;
 

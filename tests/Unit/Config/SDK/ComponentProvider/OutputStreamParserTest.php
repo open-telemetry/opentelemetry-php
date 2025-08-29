@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Unit\Config\SDK\ComponentProvider;
 
-use OpenTelfinal emetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

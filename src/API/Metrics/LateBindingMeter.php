@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace final OpenTelemetry\API\Metrics;
+namespace OpenTelemetry\API\Metrics;
 
 use Closure;
 

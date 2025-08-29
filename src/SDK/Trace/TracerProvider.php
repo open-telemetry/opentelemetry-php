@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function is_array;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;

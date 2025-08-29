@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\final SDK\Trace\SpanExporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanExporter;
 
 use Exception;
 use OpenTelemetry\SDK\Trace\SpanExporter\LoggerExporter;

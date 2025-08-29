@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespfinal ace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricExporter;
+namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricExporter;
 
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;

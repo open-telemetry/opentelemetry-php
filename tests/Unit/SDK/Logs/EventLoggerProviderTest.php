@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nafinal mespace Unit\SDK\Logs;
+namespace Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;

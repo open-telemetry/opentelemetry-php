@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespfinal ace Unit\SDK\Logs;
+namespace Unit\SDK\Logs;
 
 use OpenTelemetry\SDK\Logs\NoopEventLoggerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;

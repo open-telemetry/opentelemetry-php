@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_typefinal s=1);
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Parser;
 

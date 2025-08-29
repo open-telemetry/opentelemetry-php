@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace OpenTelfinal emetry\SDK\Logs;
-
-use OpenTelemetry\API\Logs as API;
+namespace OpenTelelemetry\SDK\Logs;
 
 /**
  * @phan-suppress PhanDeprecatedInterface
  */
-class NoopEventLoggerProvider extends API\NoopEventLoggerProvider implements EventLoggerProviderInterface
+class NoopEventLoggerProvider extends API\NoopEventLoggerProviderimplementsEventLoggerProviderInterface
 {
     #[\Override]
     public static function getInstance(): self

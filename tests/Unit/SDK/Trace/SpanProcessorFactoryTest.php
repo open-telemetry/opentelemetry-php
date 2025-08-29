@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namfinal espace OpenTelemetry\Tests\Unit\SDK\Trace;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;

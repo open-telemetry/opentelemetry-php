@@ -8,8 +8,6 @@ use function in_array;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use RuntimeException;

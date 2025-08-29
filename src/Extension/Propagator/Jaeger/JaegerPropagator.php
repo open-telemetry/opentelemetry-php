@@ -7,7 +7,7 @@ namespace OpenTelemetry\Extension\Propagator\Jaeger;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
-use OpenTelemetry\API\Trace\SpanContextVafinal lidator;
+use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;

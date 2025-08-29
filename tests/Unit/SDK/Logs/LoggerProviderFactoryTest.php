@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namefinal space OpenTelemetry\Tests\Unit\SDK\Logs;
+namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\LoggerProviderFactory;

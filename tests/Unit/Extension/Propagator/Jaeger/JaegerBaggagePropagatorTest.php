@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespfinal ace Extension\Propagator\Jaeger;
+namespace Extension\Propagator\Jaeger;
 
 use OpenTelemetry\API\Baggage\Baggage;
 use OpenTelemetry\Context\Context;

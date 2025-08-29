@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Logs\Exporter;
 
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Commonfinal \Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
 use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;

@@ -1,10 +1,9 @@
 <?php
 
-declare(stricfinal t_types=1);
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Link;
 use PHPUnit\Framework\Attributes\CoversClass;

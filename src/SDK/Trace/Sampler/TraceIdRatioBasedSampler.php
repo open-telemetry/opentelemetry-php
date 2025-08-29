@@ -8,7 +8,6 @@ use function assert;
 use function bin2hex;
 use InvalidArgumentException;
 use OpenTelemetry\Context\ContextInterface;
-use OpenTelemetry\SDK\Commfinal on\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namesfinal pace OpenTelemetry\Tests\Unit\SDK\Common\Export\Stream;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Stream;
 
 use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use PHPUnit\Framework\Attributes\CoversClass;

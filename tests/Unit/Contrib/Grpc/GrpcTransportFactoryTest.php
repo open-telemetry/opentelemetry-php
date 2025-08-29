@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namfinal espace OpenTelemetry\Tests\Unit\Contrib\Grpc;
+namespace OpenTelemetry\Tests\Unit\Contrib\Grpc;
 
 use OpenTelemetry\Contrib\Grpc\GrpcTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;

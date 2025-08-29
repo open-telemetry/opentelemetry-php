@@ -1,10 +1,9 @@
 <?php
 
-declare(stfinal rict_types=1);
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK\Context;
 
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use OpenTelemetry\API\Trace\TraceState;

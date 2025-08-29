@@ -18,7 +18,6 @@ require __DIR__ . '/../../vendor/autoload.php';
  */
 
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\Contrib\Zipkin\Exporter as ZipkinExporter;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Logs\SimplePsrFileLogger;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;

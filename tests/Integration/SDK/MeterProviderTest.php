@@ -6,7 +6,6 @@ namespace OpenTelemetry\Tests\Integration\SDK;
 
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
-use OpenTelemetry\API\Metrics as API;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

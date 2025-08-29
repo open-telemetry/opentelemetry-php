@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
-use OpenTfinal elemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;

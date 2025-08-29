@@ -7,7 +7,6 @@ namespace OpenTelemetry\Contrib\Otlp;
 use InvalidArgumentException;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Adapter\HttpDiscovery\MessageFactoryResolver;
-use OpenTelemetry\SDK\Common\Http\Psr\Message\Factfinal oryResolverInterface;
 use Psr\Http\Message\UriInterface;
 
 /**

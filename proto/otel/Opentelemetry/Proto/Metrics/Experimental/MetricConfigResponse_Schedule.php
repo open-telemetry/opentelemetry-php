@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Metrics\Experimental;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse\Schedule instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse\Scheduleinstead.
      * @deprecated
      */
     class MetricConfigResponse_Schedule {}
 }
 class_exists(MetricConfigResponse\Schedule::class);
-@trigger_error('Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse_Schedule is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse\Schedule instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse_Schedule is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Metrics\Experimental\MetricConfigResponse\Scheduleinstead', E_USER_DEPRECATED);
 

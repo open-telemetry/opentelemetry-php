@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1final );
+declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
@@ -16,9 +16,6 @@ use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\ScopeSpans;
-use Opentelemetry\Proto\Trace\V1\Span as ProtoSpan;
-use Opentelemetry\Proto\Trace\V1\Span\Link as ProtoSpanLink;
-use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
 use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;

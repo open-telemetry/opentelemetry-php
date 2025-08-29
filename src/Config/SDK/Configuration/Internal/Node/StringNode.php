@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal\Node;
 
-use fufinal nction is_string;
+use function is_string;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**

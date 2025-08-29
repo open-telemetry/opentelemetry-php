@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-nafinal mespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
+namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration\Resolver;
 
 use OpenTelemetry\SDK\Common\Configuration\Resolver\EnvironmentResolver;
 use OpenTelemetry\Tests\TestState;

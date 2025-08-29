@@ -8,7 +8,6 @@ use function max;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
-use OpenTelemetry\Contrib\Zipkin\SpanKind as ZipkinSpanKind;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
@@ -69,7 +68,7 @@ class SpanConverter implements SpanConverterInterface
         // is >=14 or >=17 digits, depending on PHP settings.
         // Can also throw E_RECOVERABLE_ERROR if $value is an object
         // without a __toString() method.
-        // This is possible because OpenTelemetry\API\Trace\Span does not verify
+        // This is possible because OpenTelemetry\API\Trace\Spandoesnot verify
         // setAttribute() $value input.
         return (string) $value;
     }

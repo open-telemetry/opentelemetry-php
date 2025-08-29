@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Metrics\V1;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Metrics\V1\SummaryDataPoint\ValueAtQuantile instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Metrics\V1\SummaryDataPoint\ValueAtQuantileinstead.
      * @deprecated
      */
     class SummaryDataPoint_ValueAtQuantile {}
 }
 class_exists(SummaryDataPoint\ValueAtQuantile::class);
-@trigger_error('Opentelemetry\Proto\Metrics\V1\SummaryDataPoint_ValueAtQuantile is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Metrics\V1\SummaryDataPoint\ValueAtQuantile instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Metrics\V1\SummaryDataPoint_ValueAtQuantile is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Metrics\V1\SummaryDataPoint\ValueAtQuantileinstead', E_USER_DEPRECATED);
 

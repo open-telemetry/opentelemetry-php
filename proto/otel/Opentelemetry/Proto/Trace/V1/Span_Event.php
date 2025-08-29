@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Trace\V1;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\Span\Event instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\Span\Eventinstead.
      * @deprecated
      */
     class Span_Event {}
 }
 class_exists(Span\Event::class);
-@trigger_error('Opentelemetry\Proto\Trace\V1\Span_Event is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\Span\Event instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Trace\V1\Span_Event is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\Span\Eventinstead', E_USER_DEPRECATED);
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespfinal ace OpenTelemetry\Tests\Unit\Context\Propagation;
+namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 
 use ArrayObject;
 use InvalidArgumentException;
