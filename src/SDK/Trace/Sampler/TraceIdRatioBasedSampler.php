@@ -68,7 +68,7 @@ class TraceIdRatioBasedSampler implements SamplerInterface
      * Computes the 56-bit rejection threshold (T-value) for a given probability.
      *
      * The T-value is computed as `2**56*(1-$probability)` with a precision of
-     * `2**-($wordSize*⌈-log2($probability)/$wordSize+$precision-1⌉)`.
+     * `2**-($wordSize*ceil(-log2($probability)/$wordSize+$precision-1))`.
      *
      * Values below `2**-56` will return `0`.
      *

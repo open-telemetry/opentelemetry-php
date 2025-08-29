@@ -27,13 +27,13 @@ final class NoopTextMapPropagator implements TextMapPropagatorInterface
     }
 
     #[\Override]
-    public function extract(array $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
+    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         return $context ?? Context::getCurrent();
     }
 
     #[\Override]
-    public function inject(array &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(mixed &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
     }
 }
