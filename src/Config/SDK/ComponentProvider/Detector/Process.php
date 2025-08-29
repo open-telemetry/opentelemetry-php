@@ -7,7 +7,6 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Detector;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Resource\Detectors\Process as ProcessDetector;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;

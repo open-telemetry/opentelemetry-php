@@ -57,7 +57,7 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
 
     /** {@inheritdoc} */
     #[\Override]
-    public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(array &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -79,9 +79,15 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         $setter->set($carrier, self::B3, $b3);
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param (mixed|string)[] $carrier
+     *
+     * @psalm-param array<mixed|string> $carrier
+     */
     #[\Override]
-    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
+    public function extract(array $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -94,7 +100,10 @@ final class B3SinglePropagator implements TextMapPropagatorInterface
         return $context->withContextValue(Span::wrap($spanContext));
     }
 
-    private static function processSampledValue($value): ?int
+    /**
+     * @param null|string $value
+     */
+    private static function processSampledValue(string|null $value): ?int
     {
         if ($value === null) {
             return null;

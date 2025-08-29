@@ -16,9 +16,6 @@ use Opentelemetry\Proto\Resource\V1\Resource;
 use Opentelemetry\Proto\Trace\V1;
 use Opentelemetry\Proto\Trace\V1\ResourceSpans;
 use Opentelemetry\Proto\Trace\V1\ScopeSpans;
-use Opentelemetry\Proto\Trace\V1\Span as ProtoSpan;
-use Opentelemetry\Proto\Trace\V1\Span\Link as ProtoSpanLink;
-use Opentelemetry\Proto\Trace\V1\Span\SpanKind as ProtoSpanKind;
 use Opentelemetry\Proto\Trace\V1\SpanFlags;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -89,7 +86,12 @@ class SpanConverterTest extends TestCase
             return $converter->convert([$spanData])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         };
 
-        $getLink = static function (ProtoSpan $protoSpan, int $linkIndex): ProtoSpanLink {
+        $getLink = /**
+         * @return mixed|null
+         *
+         * @psalm-return TValue|null
+         */
+        static function (ProtoSpan $protoSpan, int $linkIndex) {
             /** @psalm-suppress InvalidArgument */
             return $protoSpan->getLinks()[$linkIndex];
         };

@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Common\Configuration;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\SDK\Common\Configuration\Parser\BooleanParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\ListParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Configuration\Parser\RatioParser;
@@ -146,6 +145,9 @@ class Configuration
         return ClassConstantAccessor::getValue(ValueTypes::class, $variableName);
     }
 
+    /**
+     * @param array|null|scalar $value
+     */
     public static function isEmpty($value): bool
     {
         // don't use 'empty()', since '0' is not considered to be empty

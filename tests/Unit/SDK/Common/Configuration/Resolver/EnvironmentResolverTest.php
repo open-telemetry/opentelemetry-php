@@ -101,7 +101,12 @@ class EnvironmentResolverTest extends TestCase
         return self::RAW_VALUES;
     }
 
-    private function injectEnvironmentVariable(string $name, $value): void
+    /**
+     * @param string|string[] $value
+     *
+     * @psalm-param 'FOO'|'simple'|list{'foo', 'bar'} $value
+     */
+    private function injectEnvironmentVariable(string $name, array|string $value): void
     {
         $_SERVER[$name] = $value;
     }

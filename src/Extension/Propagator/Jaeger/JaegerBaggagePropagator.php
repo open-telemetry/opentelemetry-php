@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Extension\Propagator\Jaeger;
 
 use OpenTelemetry\API\Baggage\Baggage;
-use OpenTelemetry\API\Baggage\Entry; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
+use OpenTelemetry\API\Baggage\Entry; /** @phan-suppress-current-line PhanUnreferencedUseNormafinal l */
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;

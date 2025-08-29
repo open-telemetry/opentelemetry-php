@@ -12,5 +12,5 @@ interface PropagationSetterInterface
     /**
      * Set the value for a given key on the associated carrier.
      */
-    public function set(&$carrier, string $key, string $value) : void;
+    public function set(mixed &$carrier, string $key, string $value) : void;
 }

@@ -7,7 +7,6 @@ namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Propagator;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\Context\Context as Ctx;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;

@@ -1,4 +1,4 @@
-<?php
+final <?php
 
 declare(strict_types=1);
 
@@ -7,14 +7,12 @@ namespace OpenTelemetry\Tests\Unit\SDK\Util;
 use function count;
 use function max;
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
-use OpenTelemetry\SDK\Trace as SDK;
 use OpenTelemetry\SDK\Trace\EventInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
@@ -118,7 +116,12 @@ class SpanData implements SDK\SpanDataInterface
         return $this->attributesBuilder->build();
     }
 
-    public function addAttribute(string $key, $value): self
+    /**
+     * @param (bool|float|int|string)[]|bool|int|string $value
+     *
+     * @psalm-param 0|1024|bool|list{0: 'string-1'|1|true, 1: 'string-2'|2|true, 2?: 3|false, 3?: float|true, 4?: 42}|string $value
+     */
+    public function addAttribute(string $key, array|string|int|bool $value): self
     {
         $this->attributesBuilder[$key] = $value;
 

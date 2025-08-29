@@ -14,7 +14,6 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -536,14 +535,14 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $this->assertInstanceOf(BatchSpanProcessorBuilder::class, BatchSpanProcessor::builder($exporter));
     }
 
-    private function createSampledSpanMock()
+    private function createSampledSpanMock(): MockObject&ReadWriteSpanInterface
     {
         $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => true]);
 
         return $this->createConfiguredMock(ReadWriteSpanInterface::class, ['getContext' => $spanContext]);
     }
 
-    private function createNonSampledSpanMock()
+    private function createNonSampledSpanMock(): MockObject&ReadWriteSpanInterface
     {
         $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => false]);
 

@@ -44,7 +44,10 @@ class CompositeResolver
         return $this->resolvers;
     }
 
-    public function resolve(string $variableName, $default = '')
+    /**
+     * @param array|float|int|null|string $default
+     */
+    public function resolve(string $variableName, array|int|string|float|null $default = '')
     {
         foreach ($this->resolvers as $resolver) {
             if ($resolver->hasVariable($variableName)) {

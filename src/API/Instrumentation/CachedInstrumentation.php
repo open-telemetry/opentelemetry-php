@@ -49,21 +49,21 @@ final class CachedInstrumentation
         $this->eventLoggers = new \WeakMap();
     }
 
-    public function tracer(): TracerInterface
+    public function tracer(): TracerInterface|null
     {
         $tracerProvider = Globals::tracerProvider();
 
         return $this->tracers[$tracerProvider] ??= $tracerProvider->getTracer($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
 
-    public function meter(): MeterInterface
+    public function meter(): MeterInterface|null
     {
         $meterProvider = Globals::meterProvider();
 
         return $this->meters[$meterProvider] ??= $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
 
-    public function logger(): LoggerInterface
+    public function logger(): LoggerInterface|null
     {
         $loggerProvider = Globals::loggerProvider();
 
@@ -72,9 +72,10 @@ final class CachedInstrumentation
 
     /**
      * @deprecated
+     *
      * @phan-suppress PhanDeprecatedFunction
      */
-    public function eventLogger(): EventLoggerInterface
+    public function eventLogger(): EventLoggerInterface|null
     {
         $eventLoggerProvider = Globals::eventLoggerProvider();
 

@@ -35,9 +35,15 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         return self::$instance;
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $carrier
+     *
+     * @psalm-param \ArrayObject<'a'|'b', 'alpha'|'bravo'>|\stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo'|list{'bravo'}, 1?: list{0: 'alpha', 1?: 'beta'}} $carrier
+     */
     #[\Override]
-    public function keys($carrier): array
+    public function keys(mixed $carrier): array
     {
         if ($this->isSupportedCarrier($carrier)) {
             $keys = [];
@@ -56,9 +62,15 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $carrier
+     *
+     * @psalm-param \ArrayObject<'A', 'alpha'>|\stdClass|array{a?: 'alpha', b?: 'bravo'|list{'bravo'}, 1?: list{'alpha'}} $carrier
+     */
     #[\Override]
-    public function get($carrier, string $key): ?string
+    public function get(mixed $carrier, string $key): ?string
     {
         if ($this->isSupportedCarrier($carrier)) {
             $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
@@ -80,9 +92,15 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $carrier
+     *
+     * @psalm-param \stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo', 1?: list{'alpha', 'beta'}} $carrier
+     */
     #[\Override]
-    public function getAll($carrier, string $key): array
+    public function getAll(mixed $carrier, string $key): array
     {
         if ($this->isSupportedCarrier($carrier)) {
             $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
@@ -104,9 +122,15 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     *
+     * @param mixed $carrier
+     *
+     * @psalm-param \ArrayObject<'A'|'a', 'alpha'>|\Countable|\stdClass|array{a: 'alpha'}|iterable $carrier
+     */
     #[\Override]
-    public function set(&$carrier, string $key, string $value): void
+    public function set(mixed &$carrier, string $key, string $value): void
     {
         if ($key === '') {
             throw new InvalidArgumentException('Unable to set value with an empty key');
@@ -130,12 +154,22 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         );
     }
 
-    private function isSupportedCarrier($carrier): bool
+    /**
+     * @param (string|string[])[]|\ArrayObject|\Countable|\stdClass|iterable $carrier
+     *
+     * @psalm-param \ArrayObject<'A'|'a'|'b', 'alpha'|'bravo'>|\Countable|\stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo'|list{'bravo'}, 1?: list{0: 'alpha', 1?: 'beta'}}|iterable $carrier
+     */
+    private function isSupportedCarrier(array|\ArrayObject|iterable|\stdClass|\Countable $carrier): bool
     {
         return is_array($carrier) || $carrier instanceof ArrayAccess && $carrier instanceof Traversable;
     }
 
-    private function resolveKey($carrier, string $key): string
+    /**
+     * @param (string|string[])[]|\ArrayObject|\Countable|\stdClass|iterable $carrier
+     *
+     * @psalm-param \ArrayObject<'A'|'a', 'alpha'>|\Countable|\stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo'|list{'bravo'}, 1?: list{0: 'alpha', 1?: 'beta'}}|iterable $carrier
+     */
+    private function resolveKey(array|\ArrayObject|iterable|\stdClass|\Countable $carrier, string $key): string
     {
         if (isset($carrier[$key])) {
             return $key;

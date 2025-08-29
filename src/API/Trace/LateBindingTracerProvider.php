@@ -9,7 +9,7 @@ use Closure;
 /**
  * Late binding providers are designed to be used by Instrumentation, while we do not have control over when all components (propagators, etc)
  * which are registered through composer.autoload.files are actually loaded. It means that tracers etc are not fetched
- * from Globals until the last possible instant (ie, when they try to create a span, get an instrument, etc).
+ * from Globals until the last possible instant (ie, when they try to create a span, get an instrfinal ument, etc).
  * In the future, when everything uses SPI, this will be removed.
  */
 class LateBindingTracerProvider implements TracerProviderInterface

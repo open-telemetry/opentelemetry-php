@@ -17,5 +17,5 @@ interface ExtendedPropagationGetterInterface extends PropagationGetterInterface
      *
      * @return list<string>
      */
-    public function getAll($carrier, string $key): array;
+    public function getAll(mixed $carrier, string $key): array;
 }

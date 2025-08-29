@@ -21,10 +21,12 @@ final class LastValueAggregation implements AggregationInterface
     }
 
     /**
-     * @param LastValueSummary $summary
+     * @param mixed $summary
+     *
+     * @psalm-param 5 $value
      */
     #[\Override]
-    public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function record(mixed $summary, mixed $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         if ($summary->value === null || $timestamp >= $summary->timestamp) {
             $summary->value = $value;
@@ -54,6 +56,8 @@ final class LastValueAggregation implements AggregationInterface
 
     /**
      * @param array<LastValueSummary> $summaries
+     *
+     * @psalm-param 'Delta' $temporality
      */
     #[\Override]
     public function toData(
@@ -62,7 +66,7 @@ final class LastValueAggregation implements AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality,
+        mixed $temporality,
     ): Data\Gauge {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

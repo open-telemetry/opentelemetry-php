@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Trace\V1;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\ConstantSampler\ConstantDecision instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\ConstantSampler\ConstantDecisioninstead.
      * @deprecated
      */
     class ConstantSampler_ConstantDecision {}
 }
 class_exists(ConstantSampler\ConstantDecision::class);
-@trigger_error('Opentelemetry\Proto\Trace\V1\ConstantSampler_ConstantDecision is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\ConstantSampler\ConstantDecision instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Trace\V1\ConstantSampler_ConstantDecision is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\ConstantSampler\ConstantDecisioninstead', E_USER_DEPRECATED);
 

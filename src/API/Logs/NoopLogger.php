@@ -1,4 +1,4 @@
-<?php
+final <?php
 
 declare(strict_types=1);
 
@@ -28,9 +28,11 @@ class NoopLogger implements LoggerInterface
 
     /**
      * @codeCoverageIgnore
+     *
+     * @param \Stringable|string $message
      */
     #[\Override]
-    public function log($level, $message, array $context = []): void
+    public function log(string $level, string|\Stringable $message, array $context = []): void
     {
     }
 
