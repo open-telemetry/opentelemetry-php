@@ -13,11 +13,11 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithAllParameters(): void
+    public function test_constructor_with_all_parameters(): void
     {
         $mockAggregation = $this->createMock(AggregationInterface::class);
         $attributeKeys = ['key1', 'key2'];
-        
+
         $viewProjection = new ViewProjection(
             'test-view',
             'requests',
@@ -25,7 +25,7 @@ class ViewProjectionTest extends TestCase
             $attributeKeys,
             $mockAggregation
         );
-        
+
         $this->assertEquals('test-view', $viewProjection->name);
         $this->assertEquals('requests', $viewProjection->unit);
         $this->assertEquals('Test view description', $viewProjection->description);
@@ -36,7 +36,7 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithNullValues(): void
+    public function test_constructor_with_null_values(): void
     {
         $viewProjection = new ViewProjection(
             'test-view',
@@ -45,7 +45,7 @@ class ViewProjectionTest extends TestCase
             null,
             null
         );
-        
+
         $this->assertEquals('test-view', $viewProjection->name);
         $this->assertNull($viewProjection->unit);
         $this->assertNull($viewProjection->description);
@@ -56,7 +56,7 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithEmptyAttributeKeys(): void
+    public function test_constructor_with_empty_attribute_keys(): void
     {
         $viewProjection = new ViewProjection(
             'test-view',
@@ -65,7 +65,7 @@ class ViewProjectionTest extends TestCase
             [],
             null
         );
-        
+
         $this->assertEquals('test-view', $viewProjection->name);
         $this->assertEquals('requests', $viewProjection->unit);
         $this->assertEquals('Test view description', $viewProjection->description);
@@ -76,10 +76,10 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithSingleAttributeKey(): void
+    public function test_constructor_with_single_attribute_key(): void
     {
         $attributeKeys = ['single-key'];
-        
+
         $viewProjection = new ViewProjection(
             'test-view',
             'requests',
@@ -87,7 +87,7 @@ class ViewProjectionTest extends TestCase
             $attributeKeys,
             null
         );
-        
+
         $this->assertEquals('test-view', $viewProjection->name);
         $this->assertEquals('requests', $viewProjection->unit);
         $this->assertEquals('Test view description', $viewProjection->description);
@@ -98,7 +98,7 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithEmptyName(): void
+    public function test_constructor_with_empty_name(): void
     {
         $viewProjection = new ViewProjection(
             '',
@@ -107,7 +107,7 @@ class ViewProjectionTest extends TestCase
             null,
             null
         );
-        
+
         $this->assertEquals('', $viewProjection->name);
         $this->assertEquals('requests', $viewProjection->unit);
         $this->assertEquals('Test view description', $viewProjection->description);
@@ -118,7 +118,7 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithEmptyUnit(): void
+    public function test_constructor_with_empty_unit(): void
     {
         $viewProjection = new ViewProjection(
             'test-view',
@@ -127,7 +127,7 @@ class ViewProjectionTest extends TestCase
             null,
             null
         );
-        
+
         $this->assertEquals('test-view', $viewProjection->name);
         $this->assertEquals('', $viewProjection->unit);
         $this->assertEquals('Test view description', $viewProjection->description);
@@ -138,7 +138,7 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testConstructorWithEmptyDescription(): void
+    public function test_constructor_with_empty_description(): void
     {
         $viewProjection = new ViewProjection(
             'test-view',
@@ -147,7 +147,7 @@ class ViewProjectionTest extends TestCase
             null,
             null
         );
-        
+
         $this->assertEquals('test-view', $viewProjection->name);
         $this->assertEquals('requests', $viewProjection->unit);
         $this->assertEquals('', $viewProjection->description);
@@ -158,7 +158,7 @@ class ViewProjectionTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ViewProjection::__construct
      */
-    public function testPropertiesAreReadonly(): void
+    public function test_properties_are_readonly(): void
     {
         $viewProjection = new ViewProjection(
             'test-view',
@@ -167,13 +167,13 @@ class ViewProjectionTest extends TestCase
             null,
             null
         );
-        
+
         // Test that properties are readonly by attempting to modify them
         // This should not cause any errors, but the properties should remain unchanged
         $originalName = $viewProjection->name;
         $originalUnit = $viewProjection->unit;
         $originalDescription = $viewProjection->description;
-        
+
         // The properties are readonly, so we can't modify them
         // This test just ensures the constructor works correctly
         $this->assertEquals('test-view', $originalName);

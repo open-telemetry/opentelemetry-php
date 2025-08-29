@@ -12,7 +12,6 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceTrackable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\NodeInterface;
 
-
 class CompiledConfigurationFactoryTest extends TestCase
 {
     private $mockRootComponent;
@@ -25,7 +24,7 @@ class CompiledConfigurationFactoryTest extends TestCase
         $this->mockRootComponent = $this->createMock(ComponentProvider::class);
         $this->mockNode = $this->createMock(NodeInterface::class);
         $this->mockResourceTrackable = $this->createMock(ResourceTrackable::class);
-        
+
         // Set up basic node mock methods
         $this->mockNode->method('getName')->willReturn('root');
         $this->mockNode->method('normalize')->willReturnArgument(0);
@@ -33,7 +32,7 @@ class CompiledConfigurationFactoryTest extends TestCase
         $this->mockNode->method('finalize')->willReturnCallback(function ($value) {
             return is_array($value) ? $value : [];
         });
-        
+
         $this->factory = new CompiledConfigurationFactory(
             $this->mockRootComponent,
             $this->mockNode,
@@ -44,7 +43,7 @@ class CompiledConfigurationFactoryTest extends TestCase
     /**
      * @covers \OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory::__construct
      */
-    public function testConstructor(): void
+    public function test_constructor(): void
     {
         $this->assertInstanceOf(CompiledConfigurationFactory::class, $this->factory);
     }
@@ -52,11 +51,11 @@ class CompiledConfigurationFactoryTest extends TestCase
     /**
      * @covers \OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory::process
      */
-    public function testProcessWithResources(): void
+    public function test_process_with_resources(): void
     {
         $resources = $this->createMock(ResourceCollection::class);
         $configs = [];
-        
+
         $this->mockResourceTrackable->expects($this->exactly(2))
             ->method('trackResources')
             ->willReturnCallback(function ($arg) use ($resources) {
@@ -68,13 +67,13 @@ class CompiledConfigurationFactoryTest extends TestCase
                     $this->assertNull($arg);
                 }
             });
-        
+
         // Mock the node methods that Processor will call internally
         $this->mockNode->method('getName')->willReturn('root');
         $this->mockNode->method('normalize')->willReturnArgument(0);
         $this->mockNode->method('merge')->willReturnArgument(1);
         $this->mockNode->method('finalize')->willReturnArgument(0);
-            
+
         $result = $this->factory->process($configs, $resources);
         $this->assertInstanceOf(ComponentPlugin::class, $result);
     }
@@ -82,10 +81,10 @@ class CompiledConfigurationFactoryTest extends TestCase
     /**
      * @covers \OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory::process
      */
-    public function testProcessWithoutResources(): void
+    public function test_process_without_resources(): void
     {
         $configs = [];
-        
+
         $this->mockResourceTrackable->expects($this->exactly(2))
             ->method('trackResources')
             ->willReturnCallback(function ($arg) {
@@ -97,13 +96,13 @@ class CompiledConfigurationFactoryTest extends TestCase
                     $this->assertNull($arg);
                 }
             });
-        
+
         // Mock the node methods that Processor will call internally
         $this->mockNode->method('getName')->willReturn('root');
         $this->mockNode->method('normalize')->willReturnArgument(0);
         $this->mockNode->method('merge')->willReturnArgument(1);
         $this->mockNode->method('finalize')->willReturnArgument(0);
-            
+
         $result = $this->factory->process($configs);
         $this->assertInstanceOf(ComponentPlugin::class, $result);
     }
@@ -111,23 +110,23 @@ class CompiledConfigurationFactoryTest extends TestCase
     /**
      * @covers \OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory::process
      */
-    public function testProcessWithMultipleResourceTrackables(): void
+    public function test_process_with_multiple_resource_trackables(): void
     {
         $resources = $this->createMock(ResourceCollection::class);
         $configs = [];
         $trackable2 = $this->createMock(ResourceTrackable::class);
-        
+
         $this->mockResourceTrackable->expects($this->exactly(2))
             ->method('trackResources');
         $trackable2->expects($this->exactly(2))
             ->method('trackResources');
-        
+
         $mockNode = $this->createMock(NodeInterface::class);
         $mockNode->method('getName')->willReturn('root');
         $mockNode->method('normalize')->willReturnArgument(0);
         $mockNode->method('merge')->willReturnArgument(1);
         $mockNode->method('finalize')->willReturnArgument(0);
-        
+
         $factory = new CompiledConfigurationFactory(
             $this->mockRootComponent,
             $mockNode,
@@ -140,16 +139,16 @@ class CompiledConfigurationFactoryTest extends TestCase
     /**
      * @covers \OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory::process
      */
-    public function testProcessWithEmptyResourceTrackables(): void
+    public function test_process_with_empty_resource_trackables(): void
     {
         $configs = [];
-        
+
         $mockNode = $this->createMock(NodeInterface::class);
         $mockNode->method('getName')->willReturn('root');
         $mockNode->method('normalize')->willReturnArgument(0);
         $mockNode->method('merge')->willReturnArgument(1);
         $mockNode->method('finalize')->willReturnArgument(0);
-        
+
         $factory = new CompiledConfigurationFactory(
             $this->mockRootComponent,
             $mockNode,
@@ -162,16 +161,16 @@ class CompiledConfigurationFactoryTest extends TestCase
     /**
      * @covers \OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory::process
      */
-    public function testProcessWithComplexConfigs(): void
+    public function test_process_with_complex_configs(): void
     {
         $configs = [
             'nested' => [
                 'key1' => 'value1',
-                'key2' => 'value2'
+                'key2' => 'value2',
             ],
-            'simple' => 'value'
+            'simple' => 'value',
         ];
-        
+
         $this->mockResourceTrackable->expects($this->exactly(2))
             ->method('trackResources')
             ->willReturnCallback(function ($arg) {
@@ -179,7 +178,7 @@ class CompiledConfigurationFactoryTest extends TestCase
                 $callCount++;
                 $this->assertNull($arg);
             });
-            
+
         // Mock the node methods that Processor will call internally
         $this->mockNode->method('getName')->willReturn('root');
         $this->mockNode->method('normalize')->willReturnArgument(0);
@@ -187,7 +186,7 @@ class CompiledConfigurationFactoryTest extends TestCase
         $this->mockNode->method('finalize')->willReturnCallback(function ($value) use ($configs) {
             return is_array($value) ? $value : $configs;
         });
-            
+
         $result = $this->factory->process($configs);
         $this->assertInstanceOf(ComponentPlugin::class, $result);
     }

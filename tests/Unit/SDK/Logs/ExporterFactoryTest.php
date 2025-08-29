@@ -23,7 +23,7 @@ class ExporterFactoryTest extends TestCase
         // Ensure all required factories are registered in the Registry
         $this->ensureRequiredFactoriesRegistered();
     }
-    
+
     private function ensureRequiredFactoriesRegistered(): void
     {
         // Register console log record exporter factory if not already registered
@@ -32,7 +32,7 @@ class ExporterFactoryTest extends TestCase
         } catch (\RuntimeException $e) {
             \OpenTelemetry\SDK\Registry::registerLogRecordExporterFactory('console', \OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory::class);
         }
-        
+
         // Register stream transport factory if not already registered
         try {
             \OpenTelemetry\SDK\Registry::transportFactory('stream');

@@ -18,7 +18,7 @@ class ConsoleSpanExporterFactoryTest extends TestCase
         // Ensure required factories are registered in the Registry
         $this->ensureRequiredFactoriesRegistered();
     }
-    
+
     private function ensureRequiredFactoriesRegistered(): void
     {
         // Register stream transport factory if not already registered

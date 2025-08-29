@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs\Exporter;
 
-use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporter;
 use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -19,7 +18,7 @@ class ConsoleExporterFactoryTest extends TestCase
         // Ensure required factories are registered in the Registry
         $this->ensureRequiredFactoriesRegistered();
     }
-    
+
     private function ensureRequiredFactoriesRegistered(): void
     {
         // Register stream transport factory if not already registered

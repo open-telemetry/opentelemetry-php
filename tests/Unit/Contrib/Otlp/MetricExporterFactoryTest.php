@@ -33,11 +33,11 @@ class MetricExporterFactoryTest extends TestCase
     {
         $this->transportFactory = $this->createMock(TransportFactoryInterface::class);
         $this->transport = $this->createMock(TransportInterface::class);
-        
+
         // Ensure required transport factories are registered in the Registry
         $this->ensureRequiredFactoriesRegistered();
     }
-    
+
     private function ensureRequiredFactoriesRegistered(): void
     {
         // Register HTTP transport factory if not already registered
@@ -47,7 +47,7 @@ class MetricExporterFactoryTest extends TestCase
             // HTTP transport factory not registered, register it
             \OpenTelemetry\SDK\Registry::registerTransportFactory('http', \OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory::class);
         }
-        
+
         // Register gRPC transport factory if not already registered
         try {
             \OpenTelemetry\SDK\Registry::transportFactory('grpc');

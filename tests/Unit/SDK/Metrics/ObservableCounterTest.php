@@ -26,7 +26,7 @@ class ObservableCounterTest extends TestCase
         $this->mockInstrument = $this->createMock(Instrument::class);
         $this->mockReferenceCounter = $this->createMock(ReferenceCounterInterface::class);
         $this->mockDestructors = $this->createMock(ArrayAccess::class);
-        
+
         $this->observableCounter = new ObservableCounter(
             $this->mockWriter,
             $this->mockInstrument,
@@ -38,11 +38,11 @@ class ObservableCounterTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::__construct
      */
-    public function testConstructorCallsReferenceCounterAcquire(): void
+    public function test_constructor_calls_reference_counter_acquire(): void
     {
         $this->mockReferenceCounter->expects($this->once())
             ->method('acquire');
-            
+
         new ObservableCounter(
             $this->mockWriter,
             $this->mockInstrument,
@@ -54,18 +54,18 @@ class ObservableCounterTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::__destruct
      */
-    public function testDestructorCallsReferenceCounterRelease(): void
+    public function test_destructor_calls_reference_counter_release(): void
     {
         $this->mockReferenceCounter->expects($this->once())
             ->method('release');
-            
+
         $counter = new ObservableCounter(
             $this->mockWriter,
             $this->mockInstrument,
             $this->mockReferenceCounter,
             $this->mockDestructors
         );
-        
+
         // Trigger destructor
         unset($counter);
     }
@@ -73,99 +73,99 @@ class ObservableCounterTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::getHandle
      */
-    public function testGetHandleReturnsInstrument(): void
+    public function test_get_handle_returns_instrument(): void
     {
         $handle = $this->observableCounter->getHandle();
-        
+
         $this->assertSame($this->mockInstrument, $handle);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::isEnabled
      */
-    public function testIsEnabledDelegatesToWriter(): void
+    public function test_is_enabled_delegates_to_writer(): void
     {
         $this->mockWriter->expects($this->once())
             ->method('enabled')
             ->with($this->mockInstrument)
             ->willReturn(true);
-            
+
         $result = $this->observableCounter->isEnabled();
-        
+
         $this->assertTrue($result);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::isEnabled
      */
-    public function testIsEnabledReturnsFalseWhenWriterReturnsFalse(): void
+    public function test_is_enabled_returns_false_when_writer_returns_false(): void
     {
         $this->mockWriter->expects($this->once())
             ->method('enabled')
             ->with($this->mockInstrument)
             ->willReturn(false);
-            
+
         $result = $this->observableCounter->isEnabled();
-        
+
         $this->assertFalse($result);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::observe
      */
-    public function testObserveReturnsObservableCallbackInterface(): void
+    public function test_observe_returns_observable_callback_interface(): void
     {
         $callback = function ($observer) {
             // Test callback
         };
-        
+
         $result = $this->observableCounter->observe($callback);
-        
+
         $this->assertInstanceOf(ObservableCallbackInterface::class, $result);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::observe
      */
-    public function testObserveWithClosureCallback(): void
+    public function test_observe_with_closure_callback(): void
     {
         $callback = function ($observer) {
             $observer->observe(42, ['label' => 'value']);
         };
-        
+
         $result = $this->observableCounter->observe($callback);
-        
+
         $this->assertInstanceOf(ObservableCallbackInterface::class, $result);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::observe
      */
-    public function testObserveWithStaticCallback(): void
+    public function test_observe_with_static_callback(): void
     {
         $callback = [self::class, 'staticCallback'];
-        
+
         $result = $this->observableCounter->observe($callback);
-        
+
         $this->assertInstanceOf(ObservableCallbackInterface::class, $result);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter::observe
      */
-    public function testObserveWithArrayCallback(): void
+    public function test_observe_with_array_callback(): void
     {
         $callback = [$this, 'instanceCallback'];
-        
+
         $result = $this->observableCounter->observe($callback);
-        
+
         $this->assertInstanceOf(ObservableCallbackInterface::class, $result);
     }
 
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
      */
-    public function testImplementsInstrumentHandle(): void
+    public function test_implements_instrument_handle(): void
     {
         $this->assertInstanceOf(\OpenTelemetry\SDK\Metrics\InstrumentHandle::class, $this->observableCounter);
     }
@@ -173,7 +173,7 @@ class ObservableCounterTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
      */
-    public function testImplementsObservableCounterInterface(): void
+    public function test_implements_observable_counter_interface(): void
     {
         $this->assertInstanceOf(\OpenTelemetry\API\Metrics\ObservableCounterInterface::class, $this->observableCounter);
     }
@@ -181,7 +181,7 @@ class ObservableCounterTest extends TestCase
     /**
      * @covers \OpenTelemetry\SDK\Metrics\ObservableCounter
      */
-    public function testClassIsNotFinal(): void
+    public function test_class_is_not_final(): void
     {
         $reflection = new \ReflectionClass(ObservableCounter::class);
         $this->assertFalse($reflection->isFinal());
