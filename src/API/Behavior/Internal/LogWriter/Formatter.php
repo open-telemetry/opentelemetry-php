@@ -6,7 +6,10 @@ namespace OpenTelemetry\API\Behavior\Internal\LogWriter;
 
 class Formatter
 {
-    public static function format($level, string $message, array $context): string
+    /**
+     * @psalm-param 'error' $level
+     */
+    public static function format(string $level, string $message, array $context): string
     {
         $exception = (array_key_exists('exception', $context) && $context['exception'] instanceof \Throwable)
             ? $context['exception']

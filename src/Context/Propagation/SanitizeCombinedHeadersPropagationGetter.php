@@ -45,9 +45,13 @@ final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagat
 
     /**
      * @psalm-suppress PossiblyNullArgument
+     *
+     * @param (string|string[])[] $carrier
+     *
+     * @psalm-param array{a: 'alpha'|list{0: ',,alpha,beta'|'key1=value1;key2=value2', 1?: 'key3=value3'}} $carrier
      */
     #[\Override]
-    public function getAll($carrier, string $key): array
+    public function getAll(array $carrier, string $key): array
     {
         $value = $this->getter instanceof ExtendedPropagationGetterInterface
             ? $this->getter->getAll($carrier, $key)

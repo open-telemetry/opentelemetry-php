@@ -24,6 +24,7 @@ class RegistryTest extends TestCase
     private $mockTextMapPropagator;
     private $mockResourceDetector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mockTransportFactory = $this->createMock(TransportFactoryInterface::class);
@@ -37,6 +38,7 @@ class RegistryTest extends TestCase
         $this->resetRegistry();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         // Reset static properties after each test

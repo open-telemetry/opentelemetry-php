@@ -119,7 +119,11 @@ class ExtensionHookManagerTest extends TestCase
         }
     }
 
-    private function createInstrumentation(string $class, string $method, $pre, $post): Instrumentation
+    /**
+     * @psalm-param \Closure():void $pre
+     * @psalm-param \Closure():123|\Closure():99|\Closure():never $post
+     */
+    private function createInstrumentation(string $class, string $method, \Closure $pre, \Closure $post): Instrumentation
     {
         return new class($class, $method, $pre, $post) implements Instrumentation {
             private $pre;

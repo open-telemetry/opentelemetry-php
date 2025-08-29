@@ -19,6 +19,7 @@ class CompiledConfigurationFactoryTest extends TestCase
     private $mockResourceTrackable;
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mockRootComponent = $this->createMock(ComponentProvider::class);

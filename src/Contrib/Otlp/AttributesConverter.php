@@ -16,7 +16,12 @@ use Opentelemetry\Proto\Common\V1\KeyValueList;
 
 final class AttributesConverter
 {
-    public static function convertAnyValue($value): AnyValue
+    /**
+     * @param ((int|string|string[])[]|int)[]|string $value
+     *
+     * @psalm-param 'â'|array{0?: 1, 1?: 2, 2?: 3, 3?: 4, 4?: 5, nested?: list{0: 123, 1: 'abc'|456, 2?: array{sub: 'val'}}} $value
+     */
+    public static function convertAnyValue(array|string $value): AnyValue
     {
         $result = new AnyValue();
         if (is_array($value)) {

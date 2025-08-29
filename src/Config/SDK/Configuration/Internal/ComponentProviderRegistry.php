@@ -139,7 +139,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         });
     }
 
-    private function process(string $type, string $name, mixed $configs): ComponentPlugin
+    private function process(string $type, string $name, array $configs): ComponentPlugin
     {
         if (!$provider = $this->providers[$type][$name] ?? null) {
             throw new InvalidArgumentException(sprintf(

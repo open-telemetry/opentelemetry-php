@@ -13,6 +13,7 @@ class EnvSubstitutionNormalizationTest extends TestCase
     private $mockEnvReader;
     private $normalization;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mockEnvReader = $this->createMock(EnvReader::class);
@@ -176,7 +177,12 @@ class EnvSubstitutionNormalizationTest extends TestCase
         return $method->invoke($this->normalization, $value, $filter);
     }
 
-    private function callReplaceEnvVariablesRecursive(mixed $value): mixed
+    /**
+     * @param int|string $value
+     *
+     * @psalm-param '${env:TEST_VAR}'|42 $value
+     */
+    private function callReplaceEnvVariablesRecursive(string|int $value): mixed
     {
         $reflection = new \ReflectionClass($this->normalization);
         $method = $reflection->getMethod('replaceEnvVariablesRecursive');

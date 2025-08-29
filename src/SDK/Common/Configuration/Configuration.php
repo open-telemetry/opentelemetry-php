@@ -146,6 +146,9 @@ class Configuration
         return ClassConstantAccessor::getValue(ValueTypes::class, $variableName);
     }
 
+    /**
+     * @param array|null|scalar $value
+     */
     public static function isEmpty($value): bool
     {
         // don't use 'empty()', since '0' is not considered to be empty

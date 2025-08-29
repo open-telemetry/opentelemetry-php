@@ -111,8 +111,12 @@ final class PsrUtils
 
     /**
      * Resolve an array or CSV of compression types to a list
+     *
+     * @param null|string|string[] $compression
+     *
+     * @psalm-param array<string>|null|string $compression
      */
-    public static function compression($compression): array
+    public static function compression(array|string|null $compression): array
     {
         if (is_array($compression)) {
             return $compression;

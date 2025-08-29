@@ -20,6 +20,7 @@ class ObservableCounterTest extends TestCase
     private $mockDestructors;
     private $observableCounter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mockWriter = $this->createMock(MetricWriterInterface::class);

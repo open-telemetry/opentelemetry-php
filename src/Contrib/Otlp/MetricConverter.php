@@ -130,7 +130,10 @@ final class MetricConverter
         return $pMetric;
     }
 
-    private function convertTemporality($temporality): int
+    /**
+     * @param SDK\Metrics\Data\Temporality|string $temporality
+     */
+    private function convertTemporality(string|SDK\Metrics\Data\Temporality $temporality): int
     {
         return match ($temporality) {
             SDK\Metrics\Data\Temporality::DELTA => AggregationTemporality::AGGREGATION_TEMPORALITY_DELTA,

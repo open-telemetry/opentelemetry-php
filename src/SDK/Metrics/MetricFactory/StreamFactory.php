@@ -177,7 +177,7 @@ final class StreamFactory implements MetricFactoryInterface
         return $this->trySerialize($aggregation) . serialize($attributeKeys);
     }
 
-    private function trySerialize(object $object)
+    private function trySerialize(object $object): int|string
     {
         try {
             return serialize($object);

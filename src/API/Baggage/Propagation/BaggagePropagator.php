@@ -41,7 +41,7 @@ final class BaggagePropagator implements TextMapPropagatorInterface
     }
 
     #[\Override]
-    public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
+    public function inject(array &$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();
@@ -72,8 +72,13 @@ final class BaggagePropagator implements TextMapPropagatorInterface
         }
     }
 
+    /**
+     * @param string[] $carrier
+     *
+     * @psalm-param array{baggage?: string} $carrier
+     */
     #[\Override]
-    public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
+    public function extract(array $carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
         $context ??= Context::getCurrent();

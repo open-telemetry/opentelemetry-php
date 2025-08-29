@@ -11,7 +11,10 @@ class MapParser
     private const VARIABLE_SEPARATOR = ',';
     private const KEY_VALUE_SEPARATOR = '=';
 
-    public static function parse($value): array
+    /**
+     * @param null|string $value
+     */
+    public static function parse(string|null $value): array
     {
         if (is_array($value)) {
             return $value;
@@ -33,6 +36,9 @@ class MapParser
         return $result;
     }
 
+    /**
+     * @return void
+     */
     private static function validateKeyValuePair(string $pair)
     {
         if (!str_contains($pair, self::KEY_VALUE_SEPARATOR)) {

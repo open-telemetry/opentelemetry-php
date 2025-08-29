@@ -118,7 +118,12 @@ class SpanData implements SDK\SpanDataInterface
         return $this->attributesBuilder->build();
     }
 
-    public function addAttribute(string $key, $value): self
+    /**
+     * @param (bool|float|int|string)[]|bool|int|string $value
+     *
+     * @psalm-param 0|1024|bool|list{0: 'string-1'|1|true, 1: 'string-2'|2|true, 2?: 3|false, 3?: float|true, 4?: 42}|string $value
+     */
+    public function addAttribute(string $key, array|string|int|bool $value): self
     {
         $this->attributesBuilder[$key] = $value;
 

@@ -17,6 +17,7 @@ class ObservableCallbackDestructorTest extends TestCase
     private $mockReferenceCounter1;
     private $mockReferenceCounter2;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mockWriter = $this->createMock(MetricWriterInterface::class);

@@ -19,8 +19,12 @@ final class FilteredReservoir implements ExemplarReservoirInterface
     ) {
     }
 
+    /**
+     * @psalm-param 0 $index
+     * @psalm-param 5 $value
+     */
     #[\Override]
-    public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function offer(int $index, int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         if ($this->filter->accepts($value, $attributes, $context, $timestamp)) {
             $this->reservoir->offer($index, $value, $attributes, $context, $timestamp);

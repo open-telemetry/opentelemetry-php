@@ -536,14 +536,14 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $this->assertInstanceOf(BatchSpanProcessorBuilder::class, BatchSpanProcessor::builder($exporter));
     }
 
-    private function createSampledSpanMock()
+    private function createSampledSpanMock(): MockObject&ReadWriteSpanInterface
     {
         $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => true]);
 
         return $this->createConfiguredMock(ReadWriteSpanInterface::class, ['getContext' => $spanContext]);
     }
 
-    private function createNonSampledSpanMock()
+    private function createNonSampledSpanMock(): MockObject&ReadWriteSpanInterface
     {
         $spanContext = $this->createConfiguredMock(API\SpanContextInterface::class, ['isSampled' => false]);
 

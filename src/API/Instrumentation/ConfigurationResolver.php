@@ -75,6 +75,11 @@ class ConfigurationResolver implements ConfigurationResolverInterface
         return null;
     }
 
+    /**
+     * @param null|scalar|string[] $value
+     *
+     * @psalm-param non-empty-list<string>|null|scalar $value
+     */
     private static function isEmpty($value): bool
     {
         return $value === false || $value === null || $value === '';
