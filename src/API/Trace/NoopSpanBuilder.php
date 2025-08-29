@@ -34,7 +34,7 @@ final class NoopSpanBuilder implements SpanBuilderInterface
      * @psalm-param 'bar' $value
      */
     #[\Override]
-    public function setAttribute(string $key, string $value): SpanBuilderInterface
+    public function setAttribute(string $key, mixed $value): SpanBuilderInterface
     {
         return $this;
     }

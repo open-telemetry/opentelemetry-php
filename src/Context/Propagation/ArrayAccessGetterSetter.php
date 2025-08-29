@@ -38,12 +38,12 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     /**
      * {@inheritdoc}
      *
-     * @param (string|string[])[]|\ArrayObject|\stdClass $carrier
+     * @param mixed $carrier
      *
      * @psalm-param \ArrayObject<'a'|'b', 'alpha'|'bravo'>|\stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo'|list{'bravo'}, 1?: list{0: 'alpha', 1?: 'beta'}} $carrier
      */
     #[\Override]
-    public function keys(array|\ArrayObject|\stdClass $carrier): array
+    public function keys(mixed $carrier): array
     {
         if ($this->isSupportedCarrier($carrier)) {
             $keys = [];
@@ -65,12 +65,12 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     /**
      * {@inheritdoc}
      *
-     * @param (string|string[])[]|\ArrayObject|\stdClass $carrier
+     * @param mixed $carrier
      *
      * @psalm-param \ArrayObject<'A', 'alpha'>|\stdClass|array{a?: 'alpha', b?: 'bravo'|list{'bravo'}, 1?: list{'alpha'}} $carrier
      */
     #[\Override]
-    public function get(array|\ArrayObject|\stdClass $carrier, string $key): ?string
+    public function get(mixed $carrier, string $key): ?string
     {
         if ($this->isSupportedCarrier($carrier)) {
             $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
@@ -95,12 +95,12 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     /**
      * {@inheritdoc}
      *
-     * @param (string|string[])[]|\stdClass $carrier
+     * @param mixed $carrier
      *
      * @psalm-param \stdClass|array{a?: 'alpha'|list{'alpha', 'beta'}, b?: 'bravo', 1?: list{'alpha', 'beta'}} $carrier
      */
     #[\Override]
-    public function getAll(array|\stdClass $carrier, string $key): array
+    public function getAll(mixed $carrier, string $key): array
     {
         if ($this->isSupportedCarrier($carrier)) {
             $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
@@ -125,12 +125,12 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
     /**
      * {@inheritdoc}
      *
-     * @param \ArrayObject|\Countable|\stdClass|iterable|string[] $carrier
+     * @param mixed $carrier
      *
      * @psalm-param \ArrayObject<'A'|'a', 'alpha'>|\Countable|\stdClass|array{a: 'alpha'}|iterable $carrier
      */
     #[\Override]
-    public function set(array|\ArrayObject|iterable|\Countable|\stdClass &$carrier, string $key, string $value): void
+    public function set(mixed &$carrier, string $key, string $value): void
     {
         if ($key === '') {
             throw new InvalidArgumentException('Unable to set value with an empty key');

@@ -97,7 +97,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
      * @psalm-param 5 $value
      */
     #[\Override]
-    public function record(Instrument $instrument, int $value, iterable $attributes = [], $context = null): void
+    public function record(Instrument $instrument, mixed $value, iterable $attributes = [], mixed $context = null): void
     {
         $context = Context::resolve($context, $this->contextStorage);
         $attributes = $this->attributesFactory->builder($attributes)->build();

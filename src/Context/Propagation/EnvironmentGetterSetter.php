@@ -23,7 +23,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     #[\Override]
-    public function keys(array $carrier): array
+    public function keys(mixed $carrier): array
     {
         $envs = getenv();
         if (!is_array($envs) || $envs === []) {
@@ -34,7 +34,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     #[\Override]
-    public function get(array $carrier, string $key): ?string
+    public function get(mixed $carrier, string $key): ?string
     {
         $value = getenv(strtoupper($key));
 
@@ -42,7 +42,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     #[\Override]
-    public function getAll(array $carrier, string $key): array
+    public function getAll(mixed $carrier, string $key): array
     {
         $value = getenv(strtoupper($key));
 
@@ -50,7 +50,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
     }
 
     #[\Override]
-    public function set(array &$carrier, string $key, string $value): void
+    public function set(mixed &$carrier, string $key, string $value): void
     {
         if ($key === '') {
             throw new InvalidArgumentException('Unable to set value with an empty key');

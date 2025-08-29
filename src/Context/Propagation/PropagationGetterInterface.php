@@ -16,10 +16,10 @@ interface PropagationGetterInterface
      *
      * @return list<string>
      */
-    public function keys($carrier): array;
+    public function keys(mixed $carrier): array;
 
     /**
      * Gets the value of a given key from a carrier.
      */
-    public function get($carrier, string $key) : ?string;
+    public function get(mixed $carrier, string $key) : ?string;
 }

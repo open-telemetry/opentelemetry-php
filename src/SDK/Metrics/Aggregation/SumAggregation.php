@@ -25,12 +25,12 @@ final class SumAggregation implements AggregationInterface
     }
 
     /**
-     * @param SumSummary $summary
+     * @param mixed $summary
      *
      * @psalm-param 5 $value
      */
     #[\Override]
-    public function record($summary, int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function record(mixed $summary, mixed $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $summary->value += $value;
     }
@@ -71,7 +71,7 @@ final class SumAggregation implements AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        string $temporality,
+        mixed $temporality,
     ): Data\Sum {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

@@ -25,7 +25,7 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
      * @psalm-param 5 $value
      */
     #[\Override]
-    public function offer(int $index, int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function offer(int|string $index, float|int $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $bucket = random_int(0, $this->measurements);
         $this->measurements++;
