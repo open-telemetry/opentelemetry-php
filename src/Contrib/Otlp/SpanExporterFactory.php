@@ -1,5 +1,4 @@
-final <?php
-
+<?php
 declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
