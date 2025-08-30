@@ -7,7 +7,7 @@ params:
     geo, go, graphql, heroku, ios, k8s, linux, mainframe, message,
     oci, openai, opentracing, other, pool, rpc, security_rule, source, system, test,
     useragent, v8js, vcs, webengine, zos, az, session, thread, destination,
-    cicd, cloud, cloudevents, cpu, cpython, deployment, aspnetcore,
+    cicd, cloud, cloudevents, cpu, cpython, aspnetcore,
     cloudfoundry, dotnet, hw, jvm, nodejs, profile, signalr
   ]
   excluded_metrics_namespaces: [
