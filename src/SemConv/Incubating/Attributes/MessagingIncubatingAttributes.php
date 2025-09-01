@@ -391,6 +391,12 @@ interface MessagingIncubatingAttributes
     public const MESSAGING_SYSTEM_VALUE_ACTIVEMQ = 'activemq';
 
     /**
+     * Amazon Simple Notification Service (SNS)
+     * @experimental
+     */
+    public const MESSAGING_SYSTEM_VALUE_AWS_SNS = 'aws.sns';
+
+    /**
      * Amazon Simple Queue Service (SQS)
      * @experimental
      */
