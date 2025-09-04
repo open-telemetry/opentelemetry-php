@@ -17,12 +17,13 @@ class Resource
         \GPBMetadata\Opentelemetry\Proto\Common\V1\Common::initOnce();
         $pool->internalAddGeneratedFile(
             '
-Ê
-.opentelemetry/proto/resource/v1/resource.protoopentelemetry.proto.resource.v1"i
+Š
+.opentelemetry/proto/resource/v1/resource.protoopentelemetry.proto.resource.v1"¨
 Resource;
 
 attributes (2\'.opentelemetry.proto.common.v1.KeyValue 
-dropped_attributes_count (Bƒ
+dropped_attributes_count (=
+entity_refs (2(.opentelemetry.proto.common.v1.EntityRefBƒ
 "io.opentelemetry.proto.resource.v1BResourceProtoPZ*go.opentelemetry.io/proto/otlp/resource/v1ªOpenTelemetry.Proto.Resource.V1bproto3'
         , true);
 

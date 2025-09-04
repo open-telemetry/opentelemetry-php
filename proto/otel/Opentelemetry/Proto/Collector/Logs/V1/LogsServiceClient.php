@@ -35,8 +35,6 @@ class LogsServiceClient extends \Grpc\BaseStub {
     }
 
     /**
-     * For performance reasons, it is recommended to keep this RPC
-     * alive for the entire life of the application.
      * @param \Opentelemetry\Proto\Collector\Logs\V1\ExportLogsServiceRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options

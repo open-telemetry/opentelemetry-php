@@ -19,6 +19,15 @@ class Resource extends \Google\Protobuf\Internal\Message
      * Set of attributes that describe the resource.
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
+     * The attribute values SHOULD NOT contain empty values.
+     * The attribute values SHOULD NOT contain bytes values.
+     * The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     * double values.
+     * The attribute values SHOULD NOT contain kvlist values.
+     * The behavior of software that receives attributes containing such values can be unpredictable.
+     * These restrictions can change in a minor release.
+     * The restrictions take origin from the OpenTelemetry specification:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      */
@@ -30,6 +39,14 @@ class Resource extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>uint32 dropped_attributes_count = 2;</code>
      */
     protected $dropped_attributes_count = 0;
+    /**
+     * Set of entities that participate in this Resource.
+     * Note: keys in the references MUST exist in attributes of this message.
+     * Status: [Development]
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.EntityRef entity_refs = 3;</code>
+     */
+    private $entity_refs;
 
     /**
      * Constructor.
@@ -41,9 +58,22 @@ class Resource extends \Google\Protobuf\Internal\Message
      *           Set of attributes that describe the resource.
      *           Attribute keys MUST be unique (it is not allowed to have more than one
      *           attribute with the same key).
+     *           The attribute values SHOULD NOT contain empty values.
+     *           The attribute values SHOULD NOT contain bytes values.
+     *           The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     *           double values.
+     *           The attribute values SHOULD NOT contain kvlist values.
+     *           The behavior of software that receives attributes containing such values can be unpredictable.
+     *           These restrictions can change in a minor release.
+     *           The restrictions take origin from the OpenTelemetry specification:
+     *           https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of dropped attributes. If the value is 0, then
      *           no attributes were dropped.
+     *     @type \Opentelemetry\Proto\Common\V1\EntityRef[]|\Google\Protobuf\Internal\RepeatedField $entity_refs
+     *           Set of entities that participate in this Resource.
+     *           Note: keys in the references MUST exist in attributes of this message.
+     *           Status: [Development]
      * }
      */
     public function __construct($data = NULL) {
@@ -55,6 +85,15 @@ class Resource extends \Google\Protobuf\Internal\Message
      * Set of attributes that describe the resource.
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
+     * The attribute values SHOULD NOT contain empty values.
+     * The attribute values SHOULD NOT contain bytes values.
+     * The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     * double values.
+     * The attribute values SHOULD NOT contain kvlist values.
+     * The behavior of software that receives attributes containing such values can be unpredictable.
+     * These restrictions can change in a minor release.
+     * The restrictions take origin from the OpenTelemetry specification:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -68,6 +107,15 @@ class Resource extends \Google\Protobuf\Internal\Message
      * Set of attributes that describe the resource.
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
+     * The attribute values SHOULD NOT contain empty values.
+     * The attribute values SHOULD NOT contain bytes values.
+     * The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     * double values.
+     * The attribute values SHOULD NOT contain kvlist values.
+     * The behavior of software that receives attributes containing such values can be unpredictable.
+     * These restrictions can change in a minor release.
+     * The restrictions take origin from the OpenTelemetry specification:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 1;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -105,6 +153,36 @@ class Resource extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkUint32($var);
         $this->dropped_attributes_count = $var;
+
+        return $this;
+    }
+
+    /**
+     * Set of entities that participate in this Resource.
+     * Note: keys in the references MUST exist in attributes of this message.
+     * Status: [Development]
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.EntityRef entity_refs = 3;</code>
+     * @return \Google\Protobuf\Internal\RepeatedField
+     */
+    public function getEntityRefs()
+    {
+        return $this->entity_refs;
+    }
+
+    /**
+     * Set of entities that participate in this Resource.
+     * Note: keys in the references MUST exist in attributes of this message.
+     * Status: [Development]
+     *
+     * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.EntityRef entity_refs = 3;</code>
+     * @param \Opentelemetry\Proto\Common\V1\EntityRef[]|\Google\Protobuf\Internal\RepeatedField $var
+     * @return $this
+     */
+    public function setEntityRefs($var)
+    {
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Common\V1\EntityRef::class);
+        $this->entity_refs = $arr;
 
         return $this;
     }

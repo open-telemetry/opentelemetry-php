@@ -18,7 +18,6 @@ class Buckets extends \Google\Protobuf\Internal\Message
 {
     /**
      * Offset is the bucket index of the first entry in the bucket_counts array.
-     * 
      * Note: This uses a varint encoding as a simple form of compression.
      *
      * Generated from protobuf field <code>sint32 offset = 1;</code>
@@ -46,7 +45,6 @@ class Buckets extends \Google\Protobuf\Internal\Message
      *
      *     @type int $offset
      *           Offset is the bucket index of the first entry in the bucket_counts array.
-     *           
      *           Note: This uses a varint encoding as a simple form of compression.
      *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $bucket_counts
      *           bucket_counts is an array of count values, where bucket_counts[i] carries
@@ -66,7 +64,6 @@ class Buckets extends \Google\Protobuf\Internal\Message
 
     /**
      * Offset is the bucket index of the first entry in the bucket_counts array.
-     * 
      * Note: This uses a varint encoding as a simple form of compression.
      *
      * Generated from protobuf field <code>sint32 offset = 1;</code>
@@ -79,7 +76,6 @@ class Buckets extends \Google\Protobuf\Internal\Message
 
     /**
      * Offset is the bucket index of the first entry in the bucket_counts array.
-     * 
      * Note: This uses a varint encoding as a simple form of compression.
      *
      * Generated from protobuf field <code>sint32 offset = 1;</code>
