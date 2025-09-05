@@ -123,7 +123,6 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      * Presence of event_name on the log record identifies this record
      * as an event.
      * [Optional].
-     * Status: [Development]
      *
      * Generated from protobuf field <code>string event_name = 12;</code>
      */
@@ -203,7 +202,6 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      *           Presence of event_name on the log record identifies this record
      *           as an event.
      *           [Optional].
-     *           Status: [Development]
      * }
      */
     public function __construct($data = NULL) {
@@ -567,7 +565,6 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      * Presence of event_name on the log record identifies this record
      * as an event.
      * [Optional].
-     * Status: [Development]
      *
      * Generated from protobuf field <code>string event_name = 12;</code>
      * @return string
@@ -585,7 +582,6 @@ class LogRecord extends \Google\Protobuf\Internal\Message
      * Presence of event_name on the log record identifies this record
      * as an event.
      * [Optional].
-     * Status: [Development]
      *
      * Generated from protobuf field <code>string event_name = 12;</code>
      * @param string $var

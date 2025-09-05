@@ -99,7 +99,7 @@ class Metric extends \Google\Protobuf\Internal\Message
     protected $description = '';
     /**
      * unit in which the metric value is reported. Follows the format
-     * described by http://unitsofmeasure.org/ucum.html.
+     * described by https://unitsofmeasure.org/ucum.html.
      *
      * Generated from protobuf field <code>string unit = 3;</code>
      */
@@ -130,7 +130,7 @@ class Metric extends \Google\Protobuf\Internal\Message
      *           description of the metric, which can be used in documentation.
      *     @type string $unit
      *           unit in which the metric value is reported. Follows the format
-     *           described by http://unitsofmeasure.org/ucum.html.
+     *           described by https://unitsofmeasure.org/ucum.html.
      *     @type \Opentelemetry\Proto\Metrics\V1\Gauge $gauge
      *     @type \Opentelemetry\Proto\Metrics\V1\Sum $sum
      *     @type \Opentelemetry\Proto\Metrics\V1\Histogram $histogram
@@ -205,7 +205,7 @@ class Metric extends \Google\Protobuf\Internal\Message
 
     /**
      * unit in which the metric value is reported. Follows the format
-     * described by http://unitsofmeasure.org/ucum.html.
+     * described by https://unitsofmeasure.org/ucum.html.
      *
      * Generated from protobuf field <code>string unit = 3;</code>
      * @return string
@@ -217,7 +217,7 @@ class Metric extends \Google\Protobuf\Internal\Message
 
     /**
      * unit in which the metric value is reported. Follows the format
-     * described by http://unitsofmeasure.org/ucum.html.
+     * described by https://unitsofmeasure.org/ucum.html.
      *
      * Generated from protobuf field <code>string unit = 3;</code>
      * @param string $var

@@ -23,6 +23,12 @@ class ExportProfilesServiceRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>repeated .opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;</code>
      */
     private $resource_profiles;
+    /**
+     * The reference table containing all data shared by profiles across the message being sent.
+     *
+     * Generated from protobuf field <code>.opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;</code>
+     */
+    protected $dictionary = null;
 
     /**
      * Constructor.
@@ -36,6 +42,8 @@ class ExportProfilesServiceRequest extends \Google\Protobuf\Internal\Message
      *           element. Intermediary nodes (such as OpenTelemetry Collector) that receive
      *           data from multiple origins typically batch the data before forwarding further and
      *           in that case this array will contain multiple elements.
+     *     @type \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary $dictionary
+     *           The reference table containing all data shared by profiles across the message being sent.
      * }
      */
     public function __construct($data = NULL) {
@@ -73,6 +81,42 @@ class ExportProfilesServiceRequest extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Profiles\V1development\ResourceProfiles::class);
         $this->resource_profiles = $arr;
+
+        return $this;
+    }
+
+    /**
+     * The reference table containing all data shared by profiles across the message being sent.
+     *
+     * Generated from protobuf field <code>.opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;</code>
+     * @return \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary|null
+     */
+    public function getDictionary()
+    {
+        return $this->dictionary;
+    }
+
+    public function hasDictionary()
+    {
+        return isset($this->dictionary);
+    }
+
+    public function clearDictionary()
+    {
+        unset($this->dictionary);
+    }
+
+    /**
+     * The reference table containing all data shared by profiles across the message being sent.
+     *
+     * Generated from protobuf field <code>.opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;</code>
+     * @param \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary $var
+     * @return $this
+     */
+    public function setDictionary($var)
+    {
+        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary::class);
+        $this->dictionary = $var;
 
         return $this;
     }

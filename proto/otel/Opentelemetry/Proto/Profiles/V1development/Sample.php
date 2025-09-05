@@ -9,56 +9,58 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * Each Sample records values encountered in some program
- * context. The program context is typically a stack trace, perhaps
- * augmented with auxiliary information like the thread-id, some
- * indicator of a higher level request being handled etc.
+ * Each Sample records values encountered in some program context. The program
+ * context is typically a stack trace, perhaps augmented with auxiliary
+ * information like the thread-id, some indicator of a higher level request
+ * being handled etc.
+ * A Sample MUST have have at least one values or timestamps_unix_nano entry. If
+ * both fields are populated, they MUST contain the same number of elements, and
+ * the elements at the same index MUST refer to the same event.
+ * Examples of different ways of representing a sample with the total value of 10:
+ * Report of a stacktrace at 10 timestamps (consumers must assume the value is 1 for each point):
+ *    values: []
+ *    timestamps_unix_nano: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+ * Report of a stacktrace with an aggregated value without timestamps:
+ *   values: [10]
+ *    timestamps_unix_nano: []
+ * Report of a stacktrace at 4 timestamps where each point records a specific value:
+ *    values: [2, 2, 3, 3]
+ *    timestamps_unix_nano: [1, 2, 3, 4]
  *
  * Generated from protobuf message <code>opentelemetry.proto.profiles.v1development.Sample</code>
  */
 class Sample extends \Google\Protobuf\Internal\Message
 {
     /**
-     * locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
+     * Reference to stack in ProfilesDictionary.stack_table.
      *
-     * Generated from protobuf field <code>int32 locations_start_index = 1;</code>
+     * Generated from protobuf field <code>int32 stack_index = 1;</code>
      */
-    protected $locations_start_index = 0;
+    protected $stack_index = 0;
     /**
-     * locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
-     * Supersedes location_index.
+     * The type and unit of each value is defined by Profile.sample_type.
      *
-     * Generated from protobuf field <code>int32 locations_length = 2;</code>
+     * Generated from protobuf field <code>repeated int64 values = 2;</code>
      */
-    protected $locations_length = 0;
+    private $values;
     /**
-     * The type and unit of each value is defined by the corresponding
-     * entry in Profile.sample_type. All samples must have the same
-     * number of values, the same as the length of Profile.sample_type.
-     * When aggregating multiple samples into a single sample, the
-     * result has a list of values that is the element-wise sum of the
-     * lists of the originals.
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
-     * Generated from protobuf field <code>repeated int64 value = 3;</code>
-     */
-    private $value;
-    /**
-     * References to attributes in Profile.attribute_table. [optional]
-     *
-     * Generated from protobuf field <code>repeated int32 attribute_indices = 4;</code>
+     * Generated from protobuf field <code>repeated int32 attribute_indices = 3;</code>
      */
     private $attribute_indices;
     /**
-     * Reference to link in Profile.link_table. [optional]
+     * Reference to link in ProfilesDictionary.link_table. [optional]
+     * It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
      *
-     * Generated from protobuf field <code>optional int32 link_index = 5;</code>
+     * Generated from protobuf field <code>int32 link_index = 4;</code>
      */
-    protected $link_index = null;
+    protected $link_index = 0;
     /**
-     * Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
-     * to fall within the Profile's time range. [optional]
+     * Timestamps associated with Sample represented in nanoseconds. These
+     * timestamps should fall within the Profile's time range.
      *
-     * Generated from protobuf field <code>repeated uint64 timestamps_unix_nano = 6;</code>
+     * Generated from protobuf field <code>repeated fixed64 timestamps_unix_nano = 5;</code>
      */
     private $timestamps_unix_nano;
 
@@ -68,25 +70,18 @@ class Sample extends \Google\Protobuf\Internal\Message
      * @param array $data {
      *     Optional. Data for populating the Message object.
      *
-     *     @type int $locations_start_index
-     *           locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
-     *     @type int $locations_length
-     *           locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
-     *           Supersedes location_index.
-     *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $value
-     *           The type and unit of each value is defined by the corresponding
-     *           entry in Profile.sample_type. All samples must have the same
-     *           number of values, the same as the length of Profile.sample_type.
-     *           When aggregating multiple samples into a single sample, the
-     *           result has a list of values that is the element-wise sum of the
-     *           lists of the originals.
+     *     @type int $stack_index
+     *           Reference to stack in ProfilesDictionary.stack_table.
+     *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $values
+     *           The type and unit of each value is defined by Profile.sample_type.
      *     @type int[]|\Google\Protobuf\Internal\RepeatedField $attribute_indices
-     *           References to attributes in Profile.attribute_table. [optional]
+     *           References to attributes in ProfilesDictionary.attribute_table. [optional]
      *     @type int $link_index
-     *           Reference to link in Profile.link_table. [optional]
+     *           Reference to link in ProfilesDictionary.link_table. [optional]
+     *           It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
      *     @type int[]|string[]|\Google\Protobuf\Internal\RepeatedField $timestamps_unix_nano
-     *           Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
-     *           to fall within the Profile's time range. [optional]
+     *           Timestamps associated with Sample represented in nanoseconds. These
+     *           timestamps should fall within the Profile's time range.
      * }
      */
     public function __construct($data = NULL) {
@@ -95,99 +90,61 @@ class Sample extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
+     * Reference to stack in ProfilesDictionary.stack_table.
      *
-     * Generated from protobuf field <code>int32 locations_start_index = 1;</code>
+     * Generated from protobuf field <code>int32 stack_index = 1;</code>
      * @return int
      */
-    public function getLocationsStartIndex()
+    public function getStackIndex()
     {
-        return $this->locations_start_index;
+        return $this->stack_index;
     }
 
     /**
-     * locations_start_index along with locations_length refers to to a slice of locations in Profile.location_indices.
+     * Reference to stack in ProfilesDictionary.stack_table.
      *
-     * Generated from protobuf field <code>int32 locations_start_index = 1;</code>
+     * Generated from protobuf field <code>int32 stack_index = 1;</code>
      * @param int $var
      * @return $this
      */
-    public function setLocationsStartIndex($var)
+    public function setStackIndex($var)
     {
         GPBUtil::checkInt32($var);
-        $this->locations_start_index = $var;
+        $this->stack_index = $var;
 
         return $this;
     }
 
     /**
-     * locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
-     * Supersedes location_index.
+     * The type and unit of each value is defined by Profile.sample_type.
      *
-     * Generated from protobuf field <code>int32 locations_length = 2;</code>
-     * @return int
-     */
-    public function getLocationsLength()
-    {
-        return $this->locations_length;
-    }
-
-    /**
-     * locations_length along with locations_start_index refers to a slice of locations in Profile.location_indices.
-     * Supersedes location_index.
-     *
-     * Generated from protobuf field <code>int32 locations_length = 2;</code>
-     * @param int $var
-     * @return $this
-     */
-    public function setLocationsLength($var)
-    {
-        GPBUtil::checkInt32($var);
-        $this->locations_length = $var;
-
-        return $this;
-    }
-
-    /**
-     * The type and unit of each value is defined by the corresponding
-     * entry in Profile.sample_type. All samples must have the same
-     * number of values, the same as the length of Profile.sample_type.
-     * When aggregating multiple samples into a single sample, the
-     * result has a list of values that is the element-wise sum of the
-     * lists of the originals.
-     *
-     * Generated from protobuf field <code>repeated int64 value = 3;</code>
+     * Generated from protobuf field <code>repeated int64 values = 2;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
-    public function getValue()
+    public function getValues()
     {
-        return $this->value;
+        return $this->values;
     }
 
     /**
-     * The type and unit of each value is defined by the corresponding
-     * entry in Profile.sample_type. All samples must have the same
-     * number of values, the same as the length of Profile.sample_type.
-     * When aggregating multiple samples into a single sample, the
-     * result has a list of values that is the element-wise sum of the
-     * lists of the originals.
+     * The type and unit of each value is defined by Profile.sample_type.
      *
-     * Generated from protobuf field <code>repeated int64 value = 3;</code>
+     * Generated from protobuf field <code>repeated int64 values = 2;</code>
      * @param int[]|string[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
-    public function setValue($var)
+    public function setValues($var)
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::INT64);
-        $this->value = $arr;
+        $this->values = $arr;
 
         return $this;
     }
 
     /**
-     * References to attributes in Profile.attribute_table. [optional]
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
-     * Generated from protobuf field <code>repeated int32 attribute_indices = 4;</code>
+     * Generated from protobuf field <code>repeated int32 attribute_indices = 3;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getAttributeIndices()
@@ -196,9 +153,9 @@ class Sample extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * References to attributes in Profile.attribute_table. [optional]
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
-     * Generated from protobuf field <code>repeated int32 attribute_indices = 4;</code>
+     * Generated from protobuf field <code>repeated int32 attribute_indices = 3;</code>
      * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
@@ -211,30 +168,22 @@ class Sample extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reference to link in Profile.link_table. [optional]
+     * Reference to link in ProfilesDictionary.link_table. [optional]
+     * It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
      *
-     * Generated from protobuf field <code>optional int32 link_index = 5;</code>
+     * Generated from protobuf field <code>int32 link_index = 4;</code>
      * @return int
      */
     public function getLinkIndex()
     {
-        return isset($this->link_index) ? $this->link_index : 0;
-    }
-
-    public function hasLinkIndex()
-    {
-        return isset($this->link_index);
-    }
-
-    public function clearLinkIndex()
-    {
-        unset($this->link_index);
+        return $this->link_index;
     }
 
     /**
-     * Reference to link in Profile.link_table. [optional]
+     * Reference to link in ProfilesDictionary.link_table. [optional]
+     * It can be unset / set to 0 if no link exists, as link_table[0] is always a 'null' default value.
      *
-     * Generated from protobuf field <code>optional int32 link_index = 5;</code>
+     * Generated from protobuf field <code>int32 link_index = 4;</code>
      * @param int $var
      * @return $this
      */
@@ -247,10 +196,10 @@ class Sample extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
-     * to fall within the Profile's time range. [optional]
+     * Timestamps associated with Sample represented in nanoseconds. These
+     * timestamps should fall within the Profile's time range.
      *
-     * Generated from protobuf field <code>repeated uint64 timestamps_unix_nano = 6;</code>
+     * Generated from protobuf field <code>repeated fixed64 timestamps_unix_nano = 5;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getTimestampsUnixNano()
@@ -259,16 +208,16 @@ class Sample extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Timestamps associated with Sample represented in nanoseconds. These timestamps are expected
-     * to fall within the Profile's time range. [optional]
+     * Timestamps associated with Sample represented in nanoseconds. These
+     * timestamps should fall within the Profile's time range.
      *
-     * Generated from protobuf field <code>repeated uint64 timestamps_unix_nano = 6;</code>
+     * Generated from protobuf field <code>repeated fixed64 timestamps_unix_nano = 5;</code>
      * @param int[]|string[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */
     public function setTimestampsUnixNano($var)
     {
-        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::UINT64);
+        $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::FIXED64);
         $this->timestamps_unix_nano = $arr;
 
         return $this;

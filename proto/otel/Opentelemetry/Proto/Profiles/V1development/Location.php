@@ -16,13 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class Location extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Reference to mapping in Profile.mapping_table.
-     * It can be unset if the mapping is unknown or not applicable for
-     * this profile type.
+     * Reference to mapping in ProfilesDictionary.mapping_table.
+     * It can be unset / set to 0 if the mapping is unknown or not applicable for
+     * this profile type, as mapping_table[0] is always a 'null' default mapping.
      *
-     * Generated from protobuf field <code>optional int32 mapping_index = 1;</code>
+     * Generated from protobuf field <code>int32 mapping_index = 1;</code>
      */
-    protected $mapping_index = null;
+    protected $mapping_index = 0;
     /**
      * The instruction address for this location, if available.  It
      * should be within [Mapping.memory_start...Mapping.memory_limit]
@@ -45,19 +45,9 @@ class Location extends \Google\Protobuf\Internal\Message
      */
     private $line;
     /**
-     * Provides an indication that multiple symbols map to this location's
-     * address, for example due to identical code folding by the linker. In that
-     * case the line information above represents one of the multiple
-     * symbols. This field must be recomputed when the symbolization state of the
-     * profile changes.
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
-     * Generated from protobuf field <code>bool is_folded = 4;</code>
-     */
-    protected $is_folded = false;
-    /**
-     * References to attributes in Profile.attribute_table. [optional]
-     *
-     * Generated from protobuf field <code>repeated int32 attribute_indices = 5;</code>
+     * Generated from protobuf field <code>repeated int32 attribute_indices = 4;</code>
      */
     private $attribute_indices;
 
@@ -68,9 +58,9 @@ class Location extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $mapping_index
-     *           Reference to mapping in Profile.mapping_table.
-     *           It can be unset if the mapping is unknown or not applicable for
-     *           this profile type.
+     *           Reference to mapping in ProfilesDictionary.mapping_table.
+     *           It can be unset / set to 0 if the mapping is unknown or not applicable for
+     *           this profile type, as mapping_table[0] is always a 'null' default mapping.
      *     @type int|string $address
      *           The instruction address for this location, if available.  It
      *           should be within [Mapping.memory_start...Mapping.memory_limit]
@@ -84,14 +74,8 @@ class Location extends \Google\Protobuf\Internal\Message
      *           E.g., if memcpy() is inlined into printf:
      *              line[0].function_name == "memcpy"
      *              line[1].function_name == "printf"
-     *     @type bool $is_folded
-     *           Provides an indication that multiple symbols map to this location's
-     *           address, for example due to identical code folding by the linker. In that
-     *           case the line information above represents one of the multiple
-     *           symbols. This field must be recomputed when the symbolization state of the
-     *           profile changes.
      *     @type int[]|\Google\Protobuf\Internal\RepeatedField $attribute_indices
-     *           References to attributes in Profile.attribute_table. [optional]
+     *           References to attributes in ProfilesDictionary.attribute_table. [optional]
      * }
      */
     public function __construct($data = NULL) {
@@ -100,34 +84,24 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reference to mapping in Profile.mapping_table.
-     * It can be unset if the mapping is unknown or not applicable for
-     * this profile type.
+     * Reference to mapping in ProfilesDictionary.mapping_table.
+     * It can be unset / set to 0 if the mapping is unknown or not applicable for
+     * this profile type, as mapping_table[0] is always a 'null' default mapping.
      *
-     * Generated from protobuf field <code>optional int32 mapping_index = 1;</code>
+     * Generated from protobuf field <code>int32 mapping_index = 1;</code>
      * @return int
      */
     public function getMappingIndex()
     {
-        return isset($this->mapping_index) ? $this->mapping_index : 0;
-    }
-
-    public function hasMappingIndex()
-    {
-        return isset($this->mapping_index);
-    }
-
-    public function clearMappingIndex()
-    {
-        unset($this->mapping_index);
+        return $this->mapping_index;
     }
 
     /**
-     * Reference to mapping in Profile.mapping_table.
-     * It can be unset if the mapping is unknown or not applicable for
-     * this profile type.
+     * Reference to mapping in ProfilesDictionary.mapping_table.
+     * It can be unset / set to 0 if the mapping is unknown or not applicable for
+     * this profile type, as mapping_table[0] is always a 'null' default mapping.
      *
-     * Generated from protobuf field <code>optional int32 mapping_index = 1;</code>
+     * Generated from protobuf field <code>int32 mapping_index = 1;</code>
      * @param int $var
      * @return $this
      */
@@ -210,43 +184,9 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Provides an indication that multiple symbols map to this location's
-     * address, for example due to identical code folding by the linker. In that
-     * case the line information above represents one of the multiple
-     * symbols. This field must be recomputed when the symbolization state of the
-     * profile changes.
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
-     * Generated from protobuf field <code>bool is_folded = 4;</code>
-     * @return bool
-     */
-    public function getIsFolded()
-    {
-        return $this->is_folded;
-    }
-
-    /**
-     * Provides an indication that multiple symbols map to this location's
-     * address, for example due to identical code folding by the linker. In that
-     * case the line information above represents one of the multiple
-     * symbols. This field must be recomputed when the symbolization state of the
-     * profile changes.
-     *
-     * Generated from protobuf field <code>bool is_folded = 4;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setIsFolded($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->is_folded = $var;
-
-        return $this;
-    }
-
-    /**
-     * References to attributes in Profile.attribute_table. [optional]
-     *
-     * Generated from protobuf field <code>repeated int32 attribute_indices = 5;</code>
+     * Generated from protobuf field <code>repeated int32 attribute_indices = 4;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
      */
     public function getAttributeIndices()
@@ -255,9 +195,9 @@ class Location extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * References to attributes in Profile.attribute_table. [optional]
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
-     * Generated from protobuf field <code>repeated int32 attribute_indices = 5;</code>
+     * Generated from protobuf field <code>repeated int32 attribute_indices = 4;</code>
      * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
      * @return $this
      */

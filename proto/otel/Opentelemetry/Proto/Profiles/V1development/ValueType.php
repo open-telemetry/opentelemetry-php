@@ -16,13 +16,13 @@ use Google\Protobuf\Internal\GPBUtil;
 class ValueType extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Index into string table.
+     * Index into ProfilesDictionary.string_table.
      *
      * Generated from protobuf field <code>int32 type_strindex = 1;</code>
      */
     protected $type_strindex = 0;
     /**
-     * Index into string table.
+     * Index into ProfilesDictionary.string_table.
      *
      * Generated from protobuf field <code>int32 unit_strindex = 2;</code>
      */
@@ -39,9 +39,9 @@ class ValueType extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $type_strindex
-     *           Index into string table.
+     *           Index into ProfilesDictionary.string_table.
      *     @type int $unit_strindex
-     *           Index into string table.
+     *           Index into ProfilesDictionary.string_table.
      *     @type int $aggregation_temporality
      * }
      */
@@ -51,7 +51,7 @@ class ValueType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Index into string table.
+     * Index into ProfilesDictionary.string_table.
      *
      * Generated from protobuf field <code>int32 type_strindex = 1;</code>
      * @return int
@@ -62,7 +62,7 @@ class ValueType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Index into string table.
+     * Index into ProfilesDictionary.string_table.
      *
      * Generated from protobuf field <code>int32 type_strindex = 1;</code>
      * @param int $var
@@ -77,7 +77,7 @@ class ValueType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Index into string table.
+     * Index into ProfilesDictionary.string_table.
      *
      * Generated from protobuf field <code>int32 unit_strindex = 2;</code>
      * @return int
@@ -88,7 +88,7 @@ class ValueType extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Index into string table.
+     * Index into ProfilesDictionary.string_table.
      *
      * Generated from protobuf field <code>int32 unit_strindex = 2;</code>
      * @param int $var

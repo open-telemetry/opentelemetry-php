@@ -41,6 +41,15 @@ class Link extends \Google\Protobuf\Internal\Message
      * attributes is a collection of attribute key/value pairs on the link.
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
+     * The attribute values SHOULD NOT contain empty values.
+     * The attribute values SHOULD NOT contain bytes values.
+     * The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     * double values.
+     * The attribute values SHOULD NOT contain kvlist values.
+     * The behavior of software that receives attributes containing such values can be unpredictable.
+     * These restrictions can change in a minor release.
+     * The restrictions take origin from the OpenTelemetry specification:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 4;</code>
      */
@@ -87,6 +96,15 @@ class Link extends \Google\Protobuf\Internal\Message
      *           attributes is a collection of attribute key/value pairs on the link.
      *           Attribute keys MUST be unique (it is not allowed to have more than one
      *           attribute with the same key).
+     *           The attribute values SHOULD NOT contain empty values.
+     *           The attribute values SHOULD NOT contain bytes values.
+     *           The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     *           double values.
+     *           The attribute values SHOULD NOT contain kvlist values.
+     *           The behavior of software that receives attributes containing such values can be unpredictable.
+     *           These restrictions can change in a minor release.
+     *           The restrictions take origin from the OpenTelemetry specification:
+     *           https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *     @type int $dropped_attributes_count
      *           dropped_attributes_count is the number of dropped attributes. If the value is 0,
      *           then no attributes were dropped.
@@ -194,6 +212,15 @@ class Link extends \Google\Protobuf\Internal\Message
      * attributes is a collection of attribute key/value pairs on the link.
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
+     * The attribute values SHOULD NOT contain empty values.
+     * The attribute values SHOULD NOT contain bytes values.
+     * The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     * double values.
+     * The attribute values SHOULD NOT contain kvlist values.
+     * The behavior of software that receives attributes containing such values can be unpredictable.
+     * These restrictions can change in a minor release.
+     * The restrictions take origin from the OpenTelemetry specification:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 4;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -207,6 +234,15 @@ class Link extends \Google\Protobuf\Internal\Message
      * attributes is a collection of attribute key/value pairs on the link.
      * Attribute keys MUST be unique (it is not allowed to have more than one
      * attribute with the same key).
+     * The attribute values SHOULD NOT contain empty values.
+     * The attribute values SHOULD NOT contain bytes values.
+     * The attribute values SHOULD NOT contain array values different than array of string values, bool values, int values,
+     * double values.
+     * The attribute values SHOULD NOT contain kvlist values.
+     * The behavior of software that receives attributes containing such values can be unpredictable.
+     * These restrictions can change in a minor release.
+     * The restrictions take origin from the OpenTelemetry specification:
+     * https://github.com/open-telemetry/opentelemetry-specification/blob/v1.47.0/specification/common/README.md#attribute.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.common.v1.KeyValue attributes = 4;</code>
      * @param \Opentelemetry\Proto\Common\V1\KeyValue[]|\Google\Protobuf\Internal\RepeatedField $var

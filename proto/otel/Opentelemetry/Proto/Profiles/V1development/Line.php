@@ -16,19 +16,19 @@ use Google\Protobuf\Internal\GPBUtil;
 class Line extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Reference to function in Profile.function_table.
+     * Reference to function in ProfilesDictionary.function_table.
      *
      * Generated from protobuf field <code>int32 function_index = 1;</code>
      */
     protected $function_index = 0;
     /**
-     * Line number in source code.
+     * Line number in source code. 0 means unset.
      *
      * Generated from protobuf field <code>int64 line = 2;</code>
      */
     protected $line = 0;
     /**
-     * Column number in source code.
+     * Column number in source code. 0 means unset.
      *
      * Generated from protobuf field <code>int64 column = 3;</code>
      */
@@ -41,11 +41,11 @@ class Line extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $function_index
-     *           Reference to function in Profile.function_table.
+     *           Reference to function in ProfilesDictionary.function_table.
      *     @type int|string $line
-     *           Line number in source code.
+     *           Line number in source code. 0 means unset.
      *     @type int|string $column
-     *           Column number in source code.
+     *           Column number in source code. 0 means unset.
      * }
      */
     public function __construct($data = NULL) {
@@ -54,7 +54,7 @@ class Line extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reference to function in Profile.function_table.
+     * Reference to function in ProfilesDictionary.function_table.
      *
      * Generated from protobuf field <code>int32 function_index = 1;</code>
      * @return int
@@ -65,7 +65,7 @@ class Line extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Reference to function in Profile.function_table.
+     * Reference to function in ProfilesDictionary.function_table.
      *
      * Generated from protobuf field <code>int32 function_index = 1;</code>
      * @param int $var
@@ -80,7 +80,7 @@ class Line extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Line number in source code.
+     * Line number in source code. 0 means unset.
      *
      * Generated from protobuf field <code>int64 line = 2;</code>
      * @return int|string
@@ -91,7 +91,7 @@ class Line extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Line number in source code.
+     * Line number in source code. 0 means unset.
      *
      * Generated from protobuf field <code>int64 line = 2;</code>
      * @param int|string $var
@@ -106,7 +106,7 @@ class Line extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Column number in source code.
+     * Column number in source code. 0 means unset.
      *
      * Generated from protobuf field <code>int64 column = 3;</code>
      * @return int|string
@@ -117,7 +117,7 @@ class Line extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Column number in source code.
+     * Column number in source code. 0 means unset.
      *
      * Generated from protobuf field <code>int64 column = 3;</code>
      * @param int|string $var

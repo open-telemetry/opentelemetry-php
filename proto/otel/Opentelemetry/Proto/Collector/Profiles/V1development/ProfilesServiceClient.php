@@ -34,8 +34,6 @@ class ProfilesServiceClient extends \Grpc\BaseStub {
     }
 
     /**
-     * For performance reasons, it is recommended to keep this RPC
-     * alive for the entire life of the application.
      * @param \Opentelemetry\Proto\Collector\Profiles\V1development\ExportProfilesServiceRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
