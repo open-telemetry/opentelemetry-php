@@ -1,4 +1,4 @@
-<?php
+final <?php
 
 declare(strict_types=1);
 
@@ -7,8 +7,6 @@ namespace OpenTelemetry\SDK\Trace;
 use InvalidArgumentException;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;

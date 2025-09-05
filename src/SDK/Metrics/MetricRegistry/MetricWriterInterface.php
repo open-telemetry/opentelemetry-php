@@ -12,7 +12,7 @@ use OpenTelemetry\SDK\Metrics\Instrument;
  */
 interface MetricWriterInterface
 {
-    public function record(Instrument $instrument, $value, iterable $attributes = [], $context = null): void;
+    public function record(Instrument $instrument, mixed $value, iterable $attributes = [], mixed $context = null): void;
 
     public function registerCallback(Closure $callback, Instrument $instrument, Instrument ...$instruments): int;
 

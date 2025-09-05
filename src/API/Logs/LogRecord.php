@@ -74,7 +74,12 @@ class LogRecord
         return $this;
     }
 
-    public function setAttribute(string $name, mixed $value): self
+    /**
+     * @param ((float|string)[]|float|int|string|true)[]|string $value
+     *
+     * @psalm-param array{0?: 'one'|1, 1?: 2, 2?: 3|float, 3?: 4|true, 4?: 5, foo?: array{bar: 'baz', bat: float}}|string $value
+     */
+    public function setAttribute(string $name, array|string $value): self
     {
         $this->attributes[$name] = $value;
 

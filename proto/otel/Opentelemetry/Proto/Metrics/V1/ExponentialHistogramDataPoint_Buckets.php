@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Metrics\V1;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Bucketsinstead.
      * @deprecated
      */
     class ExponentialHistogramDataPoint_Buckets {}
 }
 class_exists(ExponentialHistogramDataPoint\Buckets::class);
-@trigger_error('Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint_Buckets is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Buckets instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint_Buckets is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Metrics\V1\ExponentialHistogramDataPoint\Bucketsinstead', E_USER_DEPRECATED);
 

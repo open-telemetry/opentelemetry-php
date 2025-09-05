@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Example;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
-use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation;
 use OpenTelemetry\API\Trace\Span;

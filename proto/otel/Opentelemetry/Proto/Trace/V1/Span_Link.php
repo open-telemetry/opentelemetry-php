@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Trace\V1;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\Span\Link instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\Span\Linkinstead.
      * @deprecated
      */
     class Span_Link {}
 }
 class_exists(Span\Link::class);
-@trigger_error('Opentelemetry\Proto\Trace\V1\Span_Link is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\Span\Link instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Trace\V1\Span_Link is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\Span\Linkinstead', E_USER_DEPRECATED);
 

@@ -43,7 +43,7 @@ class CompositeTest extends TestCase
         $this->assertNull($resource->getSchemaUrl());
     }
 
-    public function test_composite_get_resource_with_service_instance_id_from_resource_attributes()
+    public function test_composite_get_resource_with_service_instance_id_from_resource_attributes(): void
     {
         $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.instance.id=manual-id');
         $resouceDetector = new Composite([

@@ -6,9 +6,6 @@ namespace OpenTelemetry\SDK\Common\Adapter\HttpDiscovery;
 
 use Http\Client\HttpAsyncClient;
 use OpenTelemetry\SDK\Common\Http\DependencyResolverInterface;
-use OpenTelemetry\SDK\Common\Http\HttpPlug\Client\ResolverInterface as HttpPlugClientResolverInterface;
-use OpenTelemetry\SDK\Common\Http\Psr\Client\ResolverInterface as PsrClientResolverInterface;
-use OpenTelemetry\SDK\Common\Http\Psr\Message\FactoryResolverInterface as MessageFactoryResolverInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;

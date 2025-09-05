@@ -1,4 +1,4 @@
-<?php
+final <?php
 
 declare(strict_types=1);
 
@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
 use const PHP_INT_MAX;
 
 class SpanLimitsBuilder

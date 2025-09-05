@@ -6,11 +6,11 @@ namespace Opentelemetry\Proto\Trace\V1;
 
 if (false) {
     /**
-     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\Status\StatusCode instead.
+     * This class is deprecated. Use Opentelemetry\Proto\Trace\V1\Status\StatusCodeinstead.
      * @deprecated
      */
     class Status_StatusCode {}
 }
 class_exists(Status\StatusCode::class);
-@trigger_error('Opentelemetry\Proto\Trace\V1\Status_StatusCode is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\Status\StatusCode instead', E_USER_DEPRECATED);
+@trigger_error('Opentelemetry\Proto\Trace\V1\Status_StatusCode is deprecated and will be removed in the next major release. Use Opentelemetry\Proto\Trace\V1\Status\StatusCodeinstead', E_USER_DEPRECATED);
 

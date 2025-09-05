@@ -24,7 +24,7 @@ interface AggregationInterface
      * @psalm-param T $summary
      * @psalm-param float|int $value
      */
-    public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
+    public function record(mixed $summary, mixed $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
 
     /**
      * @psalm-param T $left
@@ -43,7 +43,7 @@ interface AggregationInterface
     /**
      * @param array<AttributesInterface> $attributes
      * @param array<list<Exemplar>> $exemplars
-     * @param string|Temporality $temporality
+     * @param string|Temporality|mixed $temporality
      * @psalm-param array<T> $summaries
      */
     public function toData(
@@ -52,6 +52,6 @@ interface AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality,
+        mixed $temporality,
     ): DataInterface;
 }

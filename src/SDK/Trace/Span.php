@@ -6,17 +6,15 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
-use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
 use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use Throwable;
 
-final class Span extends API\Span implements ReadWriteSpanInterface
+final class Span extends API\SpanimplementsReadWriteSpanInterface
 {
     use LogsMessagesTrait;
 

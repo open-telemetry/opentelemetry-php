@@ -39,10 +39,12 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
     }
 
     /**
-     * @param ExplicitBucketHistogramSummary $summary
+     * @param mixed $summary
+     *
+     * @psalm-param 5 $value
      */
     #[\Override]
-    public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
+    public function record(mixed $summary, mixed $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $boundariesCount = count($this->boundaries);
         for ($i = 0; $i < $boundariesCount && $this->boundaries[$i] < $value; $i++) {
@@ -106,6 +108,8 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
 
     /**
      * @param array<ExplicitBucketHistogramSummary> $summaries
+     *
+     * @psalm-param 'Delta' $temporality
      */
     #[\Override]
     public function toData(
@@ -114,7 +118,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
         array $exemplars,
         int $startTimestamp,
         int $timestamp,
-        $temporality,
+        mixed $temporality,
     ): Data\Histogram {
         $dataPoints = [];
         foreach ($attributes as $key => $dataPointAttributes) {

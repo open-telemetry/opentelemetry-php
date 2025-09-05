@@ -9,7 +9,7 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 use Psr\Log\LogLevel;
 
 /**
- * Logging utility functions for internal logging (of OpenTelemetry errors/warnings etc).
+ * Logging utility functions for internal lofinal gging (of OpenTelemetry errors/warnings etc).
  * This is not part of SDK configuration to avoid creating a dependency on SDK from any package which does logging.
  * @todo this should be `@internal`, but deptrac is not happy with that.
  */
