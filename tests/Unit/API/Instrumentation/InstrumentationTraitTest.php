@@ -12,7 +12,9 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeter;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -96,6 +98,22 @@ class InstrumentationTraitTest extends TestCase
         $this->assertSame(
             $logger,
             $instrumentation->getLogger()
+        );
+    }
+
+    public function test_response_propagator(): void
+    {
+        $instrumentation = $this->createValidImplementation();
+
+        $this->assertInstanceOf(NoopResponsePropagator::class, $instrumentation->getResponsePropagator());
+
+        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+
+        $instrumentation->setResponsePropagator($responsePropagator);
+
+        $this->assertSame(
+            $responsePropagator,
+            $instrumentation->getResponsePropagator()
         );
     }
 

@@ -11,7 +11,9 @@ use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -68,6 +70,7 @@ trait InstrumentationTrait
     private TracerInterface $tracer;
     private MeterInterface $meter;
     private LoggerInterface $logger;
+    private ResponsePropagatorInterface $responsePropagator;
 
     public function __construct()
     {
@@ -171,6 +174,16 @@ trait InstrumentationTrait
         return $this->logger;
     }
 
+    public function setResponsePropagator(ResponsePropagatorInterface $responsePropagator): void
+    {
+        $this->responsePropagator = $responsePropagator;
+    }
+
+    public function getResponsePropagator(): ResponsePropagatorInterface
+    {
+        return $this->responsePropagator;
+    }
+
     private function validateImplementation(): void
     {
         if (!$this instanceof InstrumentationInterface) {
@@ -190,5 +203,6 @@ trait InstrumentationTrait
         /** @phan-suppress-next-line PhanAccessMethodInternal */
         $this->meter = new NoopMeter();
         $this->logger = new NullLogger();
+        $this->responsePropagator = new NoopResponsePropagator();
     }
 }

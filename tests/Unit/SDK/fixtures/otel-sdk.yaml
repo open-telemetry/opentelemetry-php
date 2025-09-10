@@ -11,6 +11,9 @@ tracer_provider:
 propagator:
   composite: []
 
+response_propagator:
+  composite: []
+
 instrumentation/development:
   php:
     example_instrumentation:
