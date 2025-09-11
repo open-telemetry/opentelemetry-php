@@ -3,7 +3,7 @@ file_format: '0.4'
 propagators:
   composite: [ tracecontext, baggage ]
 
-experimental_response_propagator:
+response_propagator/development:
   composite: []
 
 exporters:

@@ -184,7 +184,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $sdkBuilder->setPropagator($propagator);
 
         $responsePropagators = [];
-        foreach ($properties['experimental_response_propagator']['composite'] as $plugin) {
+        foreach ($properties['response_propagator/development']['composite'] as $plugin) {
             $responsePropagators[] = $plugin->create($context);
         }
         $responsePropagator = ($responsePropagators === []) ? NoopResponsePropagator::getInstance() : new MultiResponsePropagator($responsePropagators);
@@ -701,7 +701,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
     private function getExperimentalResponsePropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('experimental_response_propagator');
+        $node = $builder->arrayNode('response_propagator/development');
         $node
             ->beforeNormalization()
             ->ifArray()

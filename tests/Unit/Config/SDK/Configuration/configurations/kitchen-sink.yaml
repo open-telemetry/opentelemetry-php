@@ -235,7 +235,7 @@ propagator:
 # Configure response propagators.
 #
 # Environment variable: OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS
-experimental_response_propagator:
+response_propagator/development:
   composite: [servertiming, traceresponse]
 
 # Configure tracer provider.

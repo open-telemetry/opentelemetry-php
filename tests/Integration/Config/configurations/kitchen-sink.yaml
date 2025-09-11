@@ -559,7 +559,7 @@ propagator:
   composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
 # Configure response propagators.
 # If omitted, a noop response propagator is used.
-experimental_response_propagator:
+response_propagator/development:
   # Configure the experimental response propagators in the composite experimental response propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.
   # Built-in experimental response propagator keys include: N/A. Known third party keys include: servertiming, traceresponse.
   # If the resolved list of experimental response propagators (from .composite and .composite_list) is empty, a noop response propagator is used.

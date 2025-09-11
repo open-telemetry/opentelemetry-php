@@ -1,6 +1,6 @@
 file_format: '0.4'
 
-experimental_response_propagator:
+response_propagator/development:
   composite_list: "servertiming,servertiming"
 
 tracer_provider:

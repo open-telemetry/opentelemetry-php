@@ -36,7 +36,7 @@ final class OpenTelemetryConfiguration implements ComponentProvider
      *         attribute_count_limit: int<0, max>,
      *     },
      *     propagator: ?ComponentPlugin<TextMapPropagatorInterface>,
-     *     experimental_response_propagator: ?ComponentPlugin<ResponsePropagatorInterface>,
+     *     response_propagator/development: ?ComponentPlugin<ResponsePropagatorInterface>,
      *     tracer_provider: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
@@ -104,7 +104,7 @@ final class OpenTelemetryConfiguration implements ComponentProvider
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
-                ->append($registry->component('experimental_response_propagator', ResponsePropagatorInterface::class))
+                ->append($registry->component('response_propagator/development', ResponsePropagatorInterface::class))
             ->end();
 
         return $node;

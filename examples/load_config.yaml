@@ -9,7 +9,7 @@ resource:
 propagators:
   composite: [ tracecontext, baggage ]
 
-experimental_response_propagator:
+response_propagator/development:
   composite: [ servertiming, traceresponse ]
 
 exporters:
