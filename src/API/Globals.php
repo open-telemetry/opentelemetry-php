@@ -55,6 +55,9 @@ final class Globals
         return Context::getCurrent()->get(ContextKeys::propagator()) ?? self::globals()->propagator;
     }
 
+    /**
+     * @experimental
+     */
     public static function responsePropagator(): ResponsePropagatorInterface
     {
         return Context::getCurrent()->get(ContextKeys::responsePropagator()) ?? self::globals()->responsePropagator;
