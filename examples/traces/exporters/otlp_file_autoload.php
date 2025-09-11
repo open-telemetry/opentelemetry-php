@@ -8,9 +8,7 @@ use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Logs\LogRecord;
 
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
-putenv('OTEL_TRACES_EXPORTER=otlp/stdout');
-putenv('OTEL_LOGS_EXPORTER=otlp/stdout');
-putenv('OTEL_METRICS_EXPORTER=otlp/stdout');
+putenv('OTEL_EXPORTER_OTLP_PROTOCOL=stdout/ndjson');
 
 require __DIR__ . '/../../../vendor/autoload.php';
 

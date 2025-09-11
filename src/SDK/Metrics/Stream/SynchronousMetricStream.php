@@ -41,7 +41,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
 
     public function temporality(): Temporality
     {
-        return Temporality::DELTA;
+        return Temporality::CUMULATIVE;
     }
 
     public function timestamp(): int

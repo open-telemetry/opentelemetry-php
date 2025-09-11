@@ -111,6 +111,9 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         if ($protocol === Protocols::GRPC) {
             return $endpoint . OtlpUtil::method(Signals::METRICS);
         }
+        if ($endpoint === 'stdout') {
+            return $endpoint;
+        }
 
         return HttpEndpointResolver::create()->resolveToString($endpoint, Signals::METRICS);
     }

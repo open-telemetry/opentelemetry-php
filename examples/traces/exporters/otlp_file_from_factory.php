@@ -8,7 +8,8 @@ require __DIR__ . '/../../../vendor/autoload.php';
 
 use OpenTelemetry\SDK\Trace\TracerProviderFactory;
 
-putenv('OTEL_TRACES_EXPORTER=otlp/stdout');
+putenv('OTEL_TRACES_EXPORTER=otlp');
+putenv('OTEL_EXPORTER_OTLP_PROTOCOL=stdout/ndjson');
 $factory = new TracerProviderFactory();
 $tracerProvider = $factory->create();
 

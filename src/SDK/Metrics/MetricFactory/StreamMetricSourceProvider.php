@@ -59,6 +59,6 @@ final class StreamMetricSourceProvider implements MetricSourceProviderInterface,
 
     public function temporality(): Temporality
     {
-        return $this->stream->temporality();
+        return $this->instrument->temporality ?? $this->stream->temporality();
     }
 }

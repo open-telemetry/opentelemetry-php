@@ -25,6 +25,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use function OpenTelemetry\SDK\Common\Util\closure;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
@@ -165,6 +166,7 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
+            Temporality::DELTA,
         );
 
         return new Counter($this->writer, $instrument, $referenceCounter);
@@ -182,6 +184,7 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
+            Temporality::CUMULATIVE,
         );
 
         foreach ($callbacks as $callback) {
@@ -200,6 +203,7 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
+            Temporality::DELTA,
         );
 
         return new Histogram($this->writer, $instrument, $referenceCounter);
@@ -230,6 +234,7 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
+            null,
         );
 
         foreach ($callbacks as $callback) {
@@ -248,6 +253,7 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
+            Temporality::CUMULATIVE,
         );
 
         return new UpDownCounter($this->writer, $instrument, $referenceCounter);
@@ -265,6 +271,7 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
+            Temporality::CUMULATIVE,
         );
 
         foreach ($callbacks as $callback) {
@@ -294,9 +301,9 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @return array{Instrument, ReferenceCounterInterface, RegisteredInstrument}
      */
-    private function createSynchronousWriter(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = []): array
+    private function createSynchronousWriter(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = [], ?Temporality $temporality = null): array
     {
-        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
+        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory, $temporality);
 
         $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
         $instrumentId = $this->instrumentId($instrument);
@@ -340,9 +347,9 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @return array{Instrument, ReferenceCounterInterface, RegisteredInstrument}
      */
-    private function createAsynchronousObserver(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory): array
+    private function createAsynchronousObserver(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory, ?Temporality $temporality): array
     {
-        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
+        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory, $temporality);
 
         $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
         $instrumentId = $this->instrumentId($instrument);
