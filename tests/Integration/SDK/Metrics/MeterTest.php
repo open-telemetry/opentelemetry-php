@@ -26,7 +26,7 @@ class MeterTest extends TestCase
     }
 
     #[DataProvider('temporality_preference_provider')]
-    public function test_temporality_hints(string $preference, Temporality $expected): void
+    public function test_temporality_preference(string $preference, Temporality $expected): void
     {
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE', $preference);
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'memory/json');
