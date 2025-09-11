@@ -11,7 +11,9 @@ use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
@@ -73,6 +75,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
         $this->assertInstanceOf(NoopEventLoggerProvider::class, Globals::eventLoggerProvider());
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator(), 'propagator not initialized by disabled autoloader');
+        $this->assertInstanceOf(NoopResponsePropagator::class, Globals::responsePropagator(), 'response propagator not initialized by disabled autoloader');
     }
 
     public function test_sdk_disabled_does_not_disable_propagator(): void
@@ -83,6 +86,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
         $this->assertInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        $this->assertInstanceOf(NoopResponsePropagator::class, Globals::responsePropagator());
     }
 
     public function test_enabled_by_configuration(): void
@@ -93,6 +97,7 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopMeterProvider::class, Globals::meterProvider());
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
         $this->assertNotInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
+        $this->assertInstanceOf(NoopResponsePropagator::class, Globals::responsePropagator());
     }
 
     public function test_exclude_urls_without_request_uri(): void
@@ -175,10 +180,12 @@ class SdkAutoloaderTest extends TestCase
         $this->assertTrue(SdkAutoloader::autoload());
         //SDK is configured, but globals have not been initialized yet, so we can add more initializers
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        Globals::registerInitializer(function (Configurator $configurator) use ($propagator) {
-            return $configurator->withPropagator($propagator);
+        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        Globals::registerInitializer(function (Configurator $configurator) use ($propagator, $responsePropagator) {
+            return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
         });
 
         $this->assertSame($propagator, Globals::propagator());
+        $this->assertSame($responsePropagator, Globals::responsePropagator());
     }
 }

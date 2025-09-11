@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
@@ -103,6 +104,20 @@ class FactoryRegistryTest extends TestCase
             ['cloudtrace-oneway'],
             ['jaeger'],
             ['jaeger-baggage'],
+        ];
+    }
+
+    #[DataProvider('responsePropagator')]
+    public function test_default_response_propagator(string $name): void
+    {
+        $responsePropagator = Registry::responsePropagator($name);
+        $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagator);
+    }
+
+    public static function responsePropagator(): array
+    {
+        return [
+            ['none'],
         ];
     }
 

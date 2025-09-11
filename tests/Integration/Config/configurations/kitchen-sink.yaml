@@ -557,6 +557,18 @@ propagator:
   # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
   composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
+# Configure response propagators.
+# If omitted, a noop response propagator is used.
+response_propagator/development:
+  # Configure the experimental response propagators in the composite experimental response propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.
+  # Built-in experimental response propagator keys include: N/A. Known third party keys include: servertiming, traceresponse.
+  # If the resolved list of experimental response propagators (from .composite and .composite_list) is empty, a noop response propagator is used.
+  composite:
+  # Configure the experimental response propagators in the composite experimental response propagator. Entries are appended to .composite with duplicates filtered out.
+  # The value is a comma separated list of experimental response propagator identifiers matching the format of OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
+  # Built-in experimental propagator identifiers include: N/A. Known third party identifiers include: servertiming, traceresponse.
+  # If the resolved list of experimental propagators (from .composite and .composite_list) is empty, a noop response propagator is used.
+  composite_list: "servertiming,traceresponse"
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:

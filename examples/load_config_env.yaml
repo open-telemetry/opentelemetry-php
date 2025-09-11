@@ -10,6 +10,9 @@ resource:
 propagators:
   composite: [ tracecontext, baggage ]
 
+response_propagator/development:
+  composite: [ servertiming, traceresponse ]
+
 attribute_limits:
   attribute_value_length_limit: ${OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}
   attribute_count_limit: ${OTEL_ATTRIBUTE_COUNT_LIMIT}

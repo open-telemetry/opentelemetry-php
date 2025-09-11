@@ -40,6 +40,7 @@
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\ResponsePropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",

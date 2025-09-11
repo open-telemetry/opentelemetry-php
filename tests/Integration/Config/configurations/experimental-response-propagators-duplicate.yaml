@@ -1,0 +1,12 @@
+file_format: '0.4'
+
+response_propagator/development:
+  composite_list: "servertiming,servertiming"
+
+tracer_provider:
+  processors:
+
+meter_provider:
+  readers:
+logger_provider:
+  processors:

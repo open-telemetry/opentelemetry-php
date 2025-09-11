@@ -129,6 +129,7 @@
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\ResponsePropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
@@ -179,6 +180,8 @@
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\ResponsePropagatorServerTiming",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\ResponsePropagatorTraceResponse",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
             ],

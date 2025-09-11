@@ -218,4 +218,8 @@ interface KnownValues
         self::VALUE_EMPTY,
         self::VALUE_NONE,
     ];
+
+    public const OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS = [
+        self::VALUE_NONE, // No automatically configured propagator.
+    ];
 }

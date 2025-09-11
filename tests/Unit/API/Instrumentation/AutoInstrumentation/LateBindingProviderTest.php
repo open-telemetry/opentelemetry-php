@@ -26,6 +26,7 @@ use OpenTelemetry\API\Trace\LateBindingTracer;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
@@ -90,6 +91,12 @@ class LateBindingProviderTest extends TestCase
 
                 return self::$context->propagator;
             }
+            public function getResponsePropagator(): ResponsePropagatorInterface
+            {
+                assert(self::$context !== null);
+
+                return self::$context->responsePropagator;
+            }
         };
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $tracer_accessed = false;
@@ -115,16 +122,18 @@ class LateBindingProviderTest extends TestCase
             return $this->createMock(LoggerInterface::class);
         });
         $propagator = $this->prophesize(TextMapPropagatorInterface::class);
+        $responsePropagator = $this->prophesize(ResponsePropagatorInterface::class);
 
         ServiceLoader::register(Instrumentation::class, $instrumentation::class);
         $this->assertTrue(SdkAutoloader::autoload());
         //initializer added _after_ autoloader has run and instrumentation registered
-        Globals::registerInitializer(function (Configurator $configurator) use ($tracerProvider, $loggerProvider, $meterProvider, $propagator): Configurator {
+        Globals::registerInitializer(function (Configurator $configurator) use ($tracerProvider, $loggerProvider, $meterProvider, $propagator, $responsePropagator): Configurator {
             return $configurator
                 ->withTracerProvider($tracerProvider)
                 ->withMeterProvider($meterProvider)
                 ->withLoggerProvider($loggerProvider)
                 ->withPropagator($propagator->reveal())
+                ->withResponsePropagator($responsePropagator->reveal())
             ;
         });
 

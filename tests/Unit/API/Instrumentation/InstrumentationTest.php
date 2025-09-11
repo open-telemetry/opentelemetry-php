@@ -24,7 +24,9 @@ use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -59,6 +61,7 @@ final class InstrumentationTest extends TestCase
         $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
         $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
         $this->assertInstanceOf(NoopEventLoggerProvider::class, Globals::eventLoggerProvider());
+        $this->assertInstanceOf(NoopResponsePropagator::class, Globals::responsePropagator());
     }
 
     public function test_globals_returns_configured_instances(): void
@@ -68,6 +71,7 @@ final class InstrumentationTest extends TestCase
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
         $loggerProvider = $this->createMock(LoggerProviderInterface::class);
         $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
+        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
@@ -75,6 +79,7 @@ final class InstrumentationTest extends TestCase
             ->withPropagator($propagator)
             ->withLoggerProvider($loggerProvider)
             ->withEventLoggerProvider($eventLoggerProvider)
+            ->withResponsePropagator($responsePropagator)
             ->activate();
 
         try {
@@ -83,6 +88,7 @@ final class InstrumentationTest extends TestCase
             $this->assertSame($propagator, Globals::propagator());
             $this->assertSame($loggerProvider, Globals::loggerProvider());
             $this->assertSame($eventLoggerProvider, Globals::eventLoggerProvider());
+            $this->assertSame($responsePropagator, Globals::responsePropagator());
         } finally {
             $scope->detach();
         }
@@ -113,6 +119,7 @@ final class InstrumentationTest extends TestCase
         $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
         $eventLoggerProvider->method('getEventLogger')->willReturn($eventLogger);
         $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
@@ -120,6 +127,7 @@ final class InstrumentationTest extends TestCase
             ->withLoggerProvider($loggerProvider)
             ->withEventLoggerProvider($eventLoggerProvider)
             ->withPropagator($propagator)
+            ->withResponsePropagator($responsePropagator)
             ->activate();
 
         try {

@@ -8,7 +8,9 @@ use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
@@ -26,6 +28,7 @@ class SdkBuilder
     private ?LoggerProviderInterface $loggerProvider = null;
     private ?EventLoggerProviderInterface $eventLoggerProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
+    private ?ResponsePropagatorInterface $responsePropagator = null;
     private bool $autoShutdown = false;
 
     /**
@@ -76,6 +79,14 @@ class SdkBuilder
         return $this;
     }
 
+    // @experimental
+    public function setResponsePropagator(ResponsePropagatorInterface $responsePropagator): self
+    {
+        $this->responsePropagator = $responsePropagator;
+
+        return $this;
+    }
+
     public function build(): Sdk
     {
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
@@ -95,6 +106,7 @@ class SdkBuilder
             $loggerProvider,
             $eventLoggerProvider,
             $this->propagator ?? NoopTextMapPropagator::getInstance(),
+            $this->responsePropagator ?? NoopResponsePropagator::getInstance(),
         );
     }
 
@@ -110,6 +122,7 @@ class SdkBuilder
             ->withMeterProvider($sdk->getMeterProvider())
             ->withLoggerProvider($sdk->getLoggerProvider())
             ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+            ->withResponsePropagator($sdk->getResponsePropagator())
             ->storeInContext();
 
         return Context::storage()->attach($context);

@@ -267,6 +267,9 @@ final class ConfigurationFactoryTest extends TestCase
     {
         return new ConfigurationFactory(
             [
+                new ComponentProvider\Propagator\ResponsePropagatorComposite(),
+                new ComponentProvider\Propagator\ResponsePropagatorServerTiming(),
+                new ComponentProvider\Propagator\ResponsePropagatorTraceResponse(),
                 new ComponentProvider\Propagator\TextMapPropagatorB3(),
                 new ComponentProvider\Propagator\TextMapPropagatorB3Multi(),
                 new ComponentProvider\Propagator\TextMapPropagatorBaggage(),

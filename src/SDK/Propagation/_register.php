@@ -14,3 +14,8 @@ declare(strict_types=1);
     \OpenTelemetry\SDK\Common\Configuration\KnownValues::VALUE_NONE,
     \OpenTelemetry\Context\Propagation\NoopTextMapPropagator::getInstance()
 );
+
+\OpenTelemetry\SDK\Registry::registerResponsePropagator(
+    \OpenTelemetry\SDK\Common\Configuration\KnownValues::VALUE_NONE,
+    \OpenTelemetry\Context\Propagation\NoopResponsePropagator::getInstance()
+);
