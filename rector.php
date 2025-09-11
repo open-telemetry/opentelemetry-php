@@ -6,6 +6,7 @@ use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRe
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
+use Rector\Php71\Rector\FuncCall\RemoveExtraParametersRector;
 use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
@@ -31,5 +32,6 @@ return static function (RectorConfig $rectorConfig): void {
         ExplicitBoolCompareRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
         ReadOnlyClassRector::class,
+        RemoveExtraParametersRector::class
     ]);
 };

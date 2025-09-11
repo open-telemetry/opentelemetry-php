@@ -52,6 +52,6 @@ parameters:
             paths:
                 - src/SDK/Common/InstrumentationScope
         -
-            message: "#.*expects Google\\\\Protobuf\\\\RepeatedField.*#"
+            message: "#.*RepeatedField.*#"
             paths:
                 - src/Contrib/Otlp

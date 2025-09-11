@@ -42,6 +42,7 @@ interface KnownValues
     public const VALUE_HTTP_PROTOBUF = 'http/protobuf';
     public const VALUE_HTTP_JSON = 'http/json';
     public const VALUE_HTTP_NDJSON = 'http/ndjson';
+    public const VALUE_STDOUT_NDJSON = 'stdout/ndjson';
     public const VALUE_OTLP = 'otlp';
     public const VALUE_OTLP_STDOUT = 'otlp/stdout';
     public const VALUE_ZIPKIN = 'zipkin';
@@ -149,19 +150,16 @@ interface KnownValues
      */
     public const OTEL_TRACES_EXPORTER = [
         self::VALUE_OTLP,
-        self::VALUE_OTLP_STDOUT,
         self::VALUE_ZIPKIN,
         self::VALUE_NONE,
     ];
     public const OTEL_METRICS_EXPORTER = [
         self::VALUE_OTLP,
-        self::VALUE_OTLP_STDOUT,
         self::VALUE_PROMETHEUS,
         self::VALUE_NONE,
     ];
     public const OTEL_LOGS_EXPORTER = [
         self::VALUE_OTLP,
-        self::VALUE_OTLP_STDOUT,
         self::VALUE_NONE,
     ];
     /**

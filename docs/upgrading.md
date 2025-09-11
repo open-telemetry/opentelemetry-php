@@ -29,3 +29,13 @@ providing a higher priority for the same type).
 #### Metrics: InstrumentType, Temporality, advisory
 Methods which previously accepted `Temporality|string`, or `InstrumentType|string` no longer accept strings.
 `$advisory` is now a required parameter for `OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface`.
+
+If the SDK is configured via autoloading (using environment variables or declarative (yaml) config), the default temporality
+is `Cumulative` for all instruments, per [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.48.0/specification/metrics/sdk_exporters/otlp.md#general).
+This can be changed by setting the temporality preference via `OTEL_METRIC_TEMPORALITY_PREFERENCE` environment variable. Possible
+values are `cumulative`, `delta`, or `lowmemory`.
+
+If creating instruments programmatically, and no explicit temporality is provided, the default temporality will match the `LowMemory`
+settings described in [the spec](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.48.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration).
+- Synchronous Counter and Histogram will use `Temporality::DELTA`
+- Synchronous UpDownCounter, Asynchronous Counters and UpDownCounters will use `Temporality::CUMULATIVE`

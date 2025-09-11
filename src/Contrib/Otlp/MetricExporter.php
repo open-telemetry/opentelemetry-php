@@ -29,7 +29,7 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
      */
     public function __construct(
         private readonly TransportInterface $transport,
-        private readonly ?Temporality $temporality = null,
+        private readonly ?Temporality $temporality = Temporality::CUMULATIVE,
     ) {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');

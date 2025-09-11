@@ -105,7 +105,7 @@ final class StreamFactoryTest extends TestCase
 
         $clock = new TestClock();
         $registry = new MetricRegistry(null, Attributes::factory(), $clock);
-        $instrument = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description');
+        $instrument = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description', temporality: Temporality::DELTA);
         $sourceRegistry = new CollectingSourceRegistry();
         $streamIds = (new StreamFactory())->createSynchronousWriter(
             $registry,
