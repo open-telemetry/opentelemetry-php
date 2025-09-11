@@ -21,6 +21,7 @@ use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MeterConfig;
@@ -43,6 +44,8 @@ use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
+use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -168,6 +171,8 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $sdkBuilder = new SdkBuilder();
 
+        // <editor-fold desc="propagators">
+
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
             $propagators[] = $plugin->create($context);
@@ -175,9 +180,13 @@ final class OpenTelemetrySdk implements ComponentProvider
         $propagator = ($propagators === []) ? NoopTextMapPropagator::getInstance() : new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
+        // </editor-fold>
+
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
+
+        // <editor-fold desc="resource">
 
         //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
         $schemaUrl = $properties['resource']['schema_url'];
@@ -213,10 +222,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             ))
             ->merge($mandatory);
 
-        $spanProcessors = [];
-        foreach ($properties['tracer_provider']['processors'] as $processor) {
-            $spanProcessors[] = $processor->create($context);
-        }
+        // </editor-fold>
+
+        // <editor-fold desc="tracer_provider">
 
         $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
         $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
@@ -229,10 +237,8 @@ final class OpenTelemetrySdk implements ComponentProvider
             );
         }
 
-        // <editor-fold desc="tracer_provider">
-
         $tracerProvider = new TracerProvider(
-            spanProcessors: $spanProcessors,
+            spanProcessor: new NoopSpanProcessor(), //initialize later
             sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
             resource: $resource,
             spanLimits: new SpanLimits(
@@ -265,11 +271,6 @@ final class OpenTelemetrySdk implements ComponentProvider
         // </editor-fold>
 
         // <editor-fold desc="meter_provider">
-
-        $metricReaders = [];
-        foreach ($properties['meter_provider']['readers'] as $reader) {
-            $metricReaders[] = $reader->create($context);
-        }
 
         $viewRegistry = new CriteriaViewRegistry();
         foreach ($properties['meter_provider']['views'] as $view) {
@@ -335,7 +336,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             clock: Clock::getDefault(),
             attributesFactory: Attributes::factory(),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            metricReaders: $metricReaders, // @phpstan-ignore-line
+            metricReaders: [], //initialize later
             viewRegistry: $viewRegistry,
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
@@ -345,11 +346,6 @@ final class OpenTelemetrySdk implements ComponentProvider
         // </editor-fold>
 
         // <editor-fold desc="logger_provider">
-
-        $logRecordProcessors = [];
-        foreach ($properties['logger_provider']['processors'] as $processor) {
-            $logRecordProcessors[] = $processor->create($context);
-        }
 
         $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
         $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
@@ -363,11 +359,39 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         // TODO Allow injecting log record attributes factory
         $loggerProvider = new LoggerProvider(
-            processor: new MultiLogRecordProcessor($logRecordProcessors),
+            processor: new NoopLogRecordProcessor(), //initialize later
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             resource: $resource,
             configurator: $configurator,
         );
+
+        // </editor-fold>
+
+        // <editor-fold desc="provider initialization">
+        $context = new Context($tracerProvider, $meterProvider, $loggerProvider, $context->logger);
+        $metricReaders = [];
+        foreach ($properties['meter_provider']['readers'] as $reader) {
+            $metricReaders[] = $reader->create($context);
+        }
+        $meterProvider->setReaders($metricReaders);
+
+        $spanProcessors = [];
+        foreach ($properties['tracer_provider']['processors'] as $processor) {
+            $spanProcessors[] = $processor->create($context);
+        }
+        $spanProcessor = match (count($spanProcessors)) {
+            0 => NoopSpanProcessor::getInstance(),
+            1 => $spanProcessors[0],
+            default => new MultiSpanProcessor(...$spanProcessors),
+        };
+
+        $tracerProvider->setSpanProcessor($spanProcessor);
+
+        $logRecordProcessors = [];
+        foreach ($properties['logger_provider']['processors'] as $processor) {
+            $logRecordProcessors[] = $processor->create($context);
+        }
+        $loggerProvider->setLogRecordProcessor(new MultiLogRecordProcessor($logRecordProcessors));
 
         // </editor-fold>
 

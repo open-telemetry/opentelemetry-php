@@ -14,6 +14,7 @@ use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -95,7 +96,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             return;
         }
 
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+        $meter = $meterProvider->getMeter(MeterConfig::SELF_DIAGNOSTICS);
         $meter
             ->createObservableUpDownCounter(
                 'otel.trace.span_processor.spans',

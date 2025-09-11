@@ -370,8 +370,8 @@ class ConfigurationTest extends TestCase
         );
 
         $this->assertSame(
-            $value,
-            Configuration::getEnum($variable, $value)
+            [$value],
+            Configuration::getList($variable, [$value])
         );
     }
 

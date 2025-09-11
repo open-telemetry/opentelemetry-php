@@ -66,7 +66,7 @@ class TracerProviderTest extends TestCase
     #[Group('trace-compliance')]
     public function test_force_flush(): void
     {
-        $provider = new TracerProvider([]);
+        $provider = new TracerProvider();
 
         $this->assertTrue($provider->forceFlush());
         // test additional forceFlush
@@ -76,7 +76,7 @@ class TracerProviderTest extends TestCase
     public function test_get_sampler(): void
     {
         $sampler = $this->createMock(SamplerInterface::class);
-        $provider = new TracerProvider([], $sampler);
+        $provider = new TracerProvider(sampler: $sampler);
 
         $this->assertSame(
             $sampler,
@@ -87,7 +87,7 @@ class TracerProviderTest extends TestCase
     #[Group('trace-compliance')]
     public function test_get_tracer_returns_noop_tracer_after_shutdown(): void
     {
-        $provider = new TracerProvider([]);
+        $provider = new TracerProvider();
         $provider->shutdown();
 
         $this->assertInstanceOf(

@@ -13,6 +13,9 @@ use OpenTelemetry\SDK\Propagation\TextMapPropagatorFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanProcessorContext;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SpanProcessorFactoryInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use RuntimeException;
 
 /**
@@ -95,5 +98,13 @@ class Loader
         $factories = iterator_to_array(ServiceLoader::load(ResourceDetectorFactoryInterface::class));
 
         return array_map(fn (ResourceDetectorFactoryInterface $factory) => $factory->create(), $factories);
+    }
+
+    public static function spanProcessor(string $name, SpanProcessorContext $context): SpanProcessorInterface
+    {
+        $factory = self::getFactory(SpanProcessorFactoryInterface::class, $name)
+            ?? throw new RuntimeException('Span processor not registered for: ' . $name);
+
+        return $factory->create($context);
     }
 }

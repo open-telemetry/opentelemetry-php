@@ -10,6 +10,8 @@ use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporter\NoopMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
@@ -19,6 +21,7 @@ use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryUnregisterInterface;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use function spl_object_id;
@@ -36,8 +39,15 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    public function __construct(private readonly MetricExporterInterface $exporter)
+    public function __construct(
+        private MetricExporterInterface $exporter = new NoopMetricExporter(),
+        private readonly MeterProviderInterface $meterProvider = new NoopMeterProvider(), //@phpstan-ignore-line
+    ) {
+    }
+
+    public function setExporter(MetricExporterInterface $exporter): void
     {
+        $this->exporter = $exporter;
     }
 
     public function defaultAggregation(InstrumentType $instrumentType, array $advisory = []): ?AggregationInterface
@@ -96,6 +106,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         }
     }
 
+    /**
+     * @todo create otel.sdk.metric_reader.collection.duration etc
+     */
     private function doCollect(): bool
     {
         foreach ($this->registries as $registryId => $registry) {

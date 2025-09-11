@@ -39,3 +39,8 @@ If creating instruments programmatically, and no explicit temporality is provide
 settings described in [the spec](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.48.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration).
 - Synchronous Counter and Histogram will use `Temporality::DELTA`
 - Synchronous UpDownCounter, Asynchronous Counters and UpDownCounters will use `Temporality::CUMULATIVE`
+
+#### TracerProvider
+`TracerProvider` constructor now accepts a `SpanProcessorInterface` as the first argument, rather than an array of
+`SpanProcessorInterface`s. If multiple processors are required, they should be added to a `MultiSpanProcessor` (which
+is what happened internally in 1.x anyway).

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use InvalidArgumentException;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Services\Loader;
+use OpenTelemetry\SDK\Trace\SpanExporter\NoopSpanExporter;
 use RuntimeException;
 
 class ExporterFactory
@@ -15,15 +15,11 @@ class ExporterFactory
     /**
      * @throws RuntimeException
      */
-    public function create(): ?SpanExporterInterface
+    public function create(): SpanExporterInterface
     {
-        $exporters = Configuration::getList(Variables::OTEL_TRACES_EXPORTER);
-        if (1 !== count($exporters)) {
-            throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_TRACES_EXPORTER));
-        }
-        $exporter = $exporters[0];
+        $exporter = Configuration::getEnum(Variables::OTEL_TRACES_EXPORTER, 'none');
         if ($exporter === 'none') {
-            return null;
+            return new NoopSpanExporter();
         }
         $factory = Loader::spanExporterFactory($exporter);
 
