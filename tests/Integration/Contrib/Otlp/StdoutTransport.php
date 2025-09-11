@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\Otlp;
+namespace OpenTelemetry\Tests\Integration\Contrib\Otlp;
 
-use ArrayObject;
-use OpenTelemetry\SDK\Common\Export\InMemoryStorageManager;
+use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -14,31 +13,42 @@ use OpenTelemetry\SDK\Common\Future\FutureInterface;
 /**
  * @internal
  *
- * @template-implements TransportInterface<"memory/json">
+ * @template-implements TransportInterface<"stdout/nd-json">
  */
-class MemoryTransport implements TransportInterface
+class StdoutTransport implements TransportInterface
 {
-    private ArrayObject $storage;
+    private $stream;
+    private bool $closed = false;
 
     public function __construct()
     {
-        $this->storage = InMemoryStorageManager::metrics();
+        $this->stream = fopen('php://stdout', 'w');
+        if ($this->stream === false) {
+            throw new \RuntimeException('Failed to open stdout stream');
+        }
     }
 
     public function contentType(): string
     {
-        return ContentTypes::JSON;
+        return ContentTypes::NDJSON;
     }
 
     public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
     {
-        $this->storage->append($payload);
+        fwrite($this->stream, $payload);
 
         return new CompletedFuture(null);
     }
 
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
+        if ($this->closed) {
+            return false;
+        }
+
+        $this->closed = true;
+        fclose($this->stream);
+
         return true;
     }
 

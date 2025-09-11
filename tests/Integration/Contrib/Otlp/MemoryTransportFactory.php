@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Contrib\Otlp;
+namespace OpenTelemetry\Tests\Integration\Contrib\Otlp;
 
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 
-class StdoutTransportFactory implements TransportFactoryInterface
+class MemoryTransportFactory implements TransportFactoryInterface
 {
     public function type(): string
     {
-        return 'stdout';
+        return 'memory';
     }
 
     public function priority(): int
@@ -20,11 +20,11 @@ class StdoutTransportFactory implements TransportFactoryInterface
     }
 
     /**
-     * @psalm-return TransportInterface<"stdout/nd-json">
+     * @psalm-return TransportInterface<"memory/json">
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
     public function create(string $endpoint, string $contentType, array $headers = [], $compression = null, float $timeout = 10., int $retryDelay = 100, int $maxRetries = 3, ?string $cacert = null, ?string $cert = null, ?string $key = null): TransportInterface
     {
-        return new StdoutTransport();
+        return new MemoryTransport();
     }
 }
