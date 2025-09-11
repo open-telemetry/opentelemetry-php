@@ -3,7 +3,7 @@ file_format: '0.4'
 propagator:
   composite: []
 
-response_propagator:
+experimental_response_propagator:
   composite: []
 
 tracer_provider:

@@ -11,7 +11,7 @@ tracer_provider:
 propagator:
   composite: []
 
-response_propagator:
+experimental_response_propagator:
   composite: []
 
 instrumentation/development:

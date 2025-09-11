@@ -90,7 +90,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     propagator: array{
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
-     *     response_propagator: array{
+     *     experimental_response_propagator: array{
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
      *     tracer_provider: array{
@@ -184,7 +184,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $sdkBuilder->setPropagator($propagator);
 
         $responsePropagators = [];
-        foreach ($properties['response_propagator']['composite'] as $plugin) {
+        foreach ($properties['experimental_response_propagator']['composite'] as $plugin) {
             $responsePropagators[] = $plugin->create($context);
         }
         $responsePropagator = ($responsePropagators === []) ? NoopResponsePropagator::getInstance() : new MultiResponsePropagator($responsePropagators);
@@ -416,7 +416,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
-                ->append($this->getResponsePropagatorConfig($registry, $builder))
+                ->append($this->getExperimentalResponsePropagatorConfig($registry, $builder))
             ->end();
 
         return $node;
@@ -699,9 +699,9 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $node;
     }
 
-    private function getResponsePropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    private function getExperimentalResponsePropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('response_propagator');
+        $node = $builder->arrayNode('experimental_response_propagator');
         $node
             ->beforeNormalization()
             ->ifArray()

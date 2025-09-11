@@ -79,6 +79,7 @@ class SdkBuilder
         return $this;
     }
 
+    // @experimental
     public function setResponsePropagator(ResponsePropagatorInterface $responsePropagator): self
     {
         $this->responsePropagator = $responsePropagator;

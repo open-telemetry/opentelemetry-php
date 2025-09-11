@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Integration\Config;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use org\bovigo\vfs\vfsStream;
@@ -184,6 +185,19 @@ final class ConfigurationTest extends TestCase
         $this->assertCount(2, $propagator->fields());
         $this->assertContains('traceparent', $propagator->fields());
         $this->assertContains('tracestate', $propagator->fields());
+    }
+
+    public function test_duplicate_response_propagators(): void
+    {
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/experimental-response-propagators-duplicate.yaml')->create()->build();
+        $responsePropagator = $sdk->getResponsePropagator();
+        $responsePropagatorReflection = new \ReflectionClass($responsePropagator);
+        $responsePropagatorsProperty = $responsePropagatorReflection->getProperty('responsePropagators');
+        $responsePropagatorsProperty->setAccessible(true);
+        $responsePropagators = $responsePropagatorsProperty->getValue($responsePropagator);
+        $this->assertIsArray($responsePropagators);
+        $this->assertCount(1, $responsePropagators, 'duplicate was removed');
+        $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
     }
 
     private function getResource(Sdk $sdk): ResourceInfo
