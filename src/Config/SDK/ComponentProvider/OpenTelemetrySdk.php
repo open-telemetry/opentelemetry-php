@@ -90,7 +90,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     propagator: array{
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
-     *     experimental_response_propagator: array{
+     *     "response_propagator/development": array{
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
      *     tracer_provider: array{
