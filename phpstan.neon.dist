@@ -55,3 +55,7 @@ parameters:
             message: "#.*RepeatedField.*#"
             paths:
                 - src/Contrib/Otlp
+        -
+            message: "#Access to an undefined property .*#"
+            paths:
+                - tests/Integration/SDK/Metrics
