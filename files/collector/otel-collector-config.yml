@@ -31,11 +31,9 @@ service:
     traces:
       receivers: [otlp, zipkin]
       exporters: [debug]
-      processors: []
     metrics:
       receivers: [otlp]
       exporters: [debug]
     logs:
       receivers: [ otlp ]
-      processors: []
       exporters: [ debug ]
