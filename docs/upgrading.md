@@ -35,10 +35,7 @@ is `Cumulative` for all instruments, per [spec](https://github.com/open-telemetr
 This can be changed by setting the temporality preference via `OTEL_METRIC_TEMPORALITY_PREFERENCE` environment variable. Possible
 values are `cumulative`, `delta`, or `lowmemory`.
 
-If creating instruments programmatically, and no explicit temporality is provided, the default temporality will match the `LowMemory`
-settings described in [the spec](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.48.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration).
-- Synchronous Counter and Histogram will use `Temporality::DELTA`
-- Synchronous UpDownCounter, Asynchronous Counters and UpDownCounters will use `Temporality::CUMULATIVE`
+If the SDK is configured programmatically, the default temporality is `Cumulative`.
 
 #### TracerProvider
 `TracerProvider` constructor now accepts a `SpanProcessorInterface` as the first argument, rather than an array of
