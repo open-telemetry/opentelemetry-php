@@ -70,7 +70,6 @@ final class StreamFactoryTest extends TestCase
         $this->assertSame('view-name', $metadata->name());
         $this->assertSame('view-unit', $metadata->unit());
         $this->assertSame('view-description', $metadata->description());
-        $this->assertSame(Temporality::CUMULATIVE, $metadata->temporality());
 
         $source = $provider->create(Temporality::CUMULATIVE);
         $registry->registerCallback(static fn (ObserverInterface $observer) => $observer->observe(5), $instrument);
@@ -132,7 +131,6 @@ final class StreamFactoryTest extends TestCase
         $this->assertSame('view-name', $metadata->name());
         $this->assertSame('view-unit', $metadata->unit());
         $this->assertSame('view-description', $metadata->description());
-        $this->assertSame(Temporality::CUMULATIVE, $metadata->temporality());
 
         $source = $provider->create(Temporality::DELTA);
         $registry->record($instrument, 5);

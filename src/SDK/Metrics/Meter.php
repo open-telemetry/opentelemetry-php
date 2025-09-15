@@ -25,7 +25,6 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use function OpenTelemetry\SDK\Common\Util\closure;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
