@@ -105,7 +105,7 @@ final class StreamFactoryTest extends TestCase
 
         $clock = new TestClock();
         $registry = new MetricRegistry(null, Attributes::factory(), $clock);
-        $instrument = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description', temporality: Temporality::DELTA);
+        $instrument = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', '{unit}', 'description');
         $sourceRegistry = new CollectingSourceRegistry();
         $streamIds = (new StreamFactory())->createSynchronousWriter(
             $registry,
@@ -132,7 +132,7 @@ final class StreamFactoryTest extends TestCase
         $this->assertSame('view-name', $metadata->name());
         $this->assertSame('view-unit', $metadata->unit());
         $this->assertSame('view-description', $metadata->description());
-        $this->assertSame(Temporality::DELTA, $metadata->temporality());
+        $this->assertSame(Temporality::CUMULATIVE, $metadata->temporality());
 
         $source = $provider->create(Temporality::DELTA);
         $registry->record($instrument, 5);

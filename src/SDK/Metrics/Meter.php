@@ -166,7 +166,6 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
-            Temporality::DELTA,
         );
 
         return new Counter($this->writer, $instrument, $referenceCounter);
@@ -184,7 +183,6 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
-            Temporality::CUMULATIVE,
         );
 
         foreach ($callbacks as $callback) {
@@ -203,7 +201,6 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
-            Temporality::DELTA,
         );
 
         return new Histogram($this->writer, $instrument, $referenceCounter);
@@ -234,7 +231,6 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
-            null,
         );
 
         foreach ($callbacks as $callback) {
@@ -253,7 +249,6 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
-            Temporality::CUMULATIVE,
         );
 
         return new UpDownCounter($this->writer, $instrument, $referenceCounter);
@@ -271,7 +266,6 @@ final class Meter implements MeterInterface, Configurable
             $unit,
             $description,
             $advisory,
-            Temporality::CUMULATIVE,
         );
 
         foreach ($callbacks as $callback) {
@@ -301,9 +295,9 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @return array{Instrument, ReferenceCounterInterface, RegisteredInstrument}
      */
-    private function createSynchronousWriter(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = [], ?Temporality $temporality = null): array
+    private function createSynchronousWriter(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory = []): array
     {
-        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory, $temporality);
+        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
 
         $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
         $instrumentId = $this->instrumentId($instrument);
@@ -347,9 +341,9 @@ final class Meter implements MeterInterface, Configurable
     /**
      * @return array{Instrument, ReferenceCounterInterface, RegisteredInstrument}
      */
-    private function createAsynchronousObserver(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory, ?Temporality $temporality): array
+    private function createAsynchronousObserver(InstrumentType $instrumentType, string $name, ?string $unit, ?string $description, array $advisory): array
     {
-        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory, $temporality);
+        $instrument = new Instrument($instrumentType, $name, $unit, $description, $advisory);
 
         $instrumentationScopeId = $this->instrumentationScopeId($this->instrumentationScope);
         $instrumentId = $this->instrumentId($instrument);

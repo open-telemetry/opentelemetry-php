@@ -9,6 +9,7 @@ use Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceResponse;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use RuntimeException;
@@ -29,7 +30,7 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
      */
     public function __construct(
         private readonly TransportInterface $transport,
-        private readonly ?Temporality $temporality = Temporality::CUMULATIVE,
+        private readonly ?Temporality $temporalityPreference = Temporality::CUMULATIVE,
     ) {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
@@ -37,9 +38,24 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
         $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
+    /**
+     * Determine the temporality for a given instrument type, based on the temporality preference.
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.48.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration
+     */
     public function temporality(MetricMetadataInterface $metric): ?Temporality
     {
-        return $this->temporality ?? $metric->temporality();
+        return match ($this->temporalityPreference) {
+            Temporality::CUMULATIVE => Temporality::CUMULATIVE,
+            Temporality::DELTA => match ($metric->instrumentType()) {
+                InstrumentType::UP_DOWN_COUNTER, InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER => Temporality::CUMULATIVE,
+                default => Temporality::DELTA,
+            },
+            default => match ($metric->instrumentType()) {
+                //low-memory preference
+                InstrumentType::COUNTER, InstrumentType::HISTOGRAM => Temporality::DELTA,
+                default => Temporality::CUMULATIVE,
+            },
+        };
     }
 
     public function export(iterable $batch): bool

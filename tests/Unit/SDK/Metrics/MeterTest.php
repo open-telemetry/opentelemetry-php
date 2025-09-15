@@ -11,7 +11,6 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
@@ -45,7 +44,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description', temporality: Temporality::DELTA),
+                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
@@ -65,7 +64,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::HISTOGRAM, 'name', 'unit', 'description', temporality: Temporality::DELTA),
+                new Instrument(InstrumentType::HISTOGRAM, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
@@ -91,7 +90,6 @@ final class MeterTest extends TestCase
                     's',
                     'Measures the duration of inbound HTTP requests.',
                     ['ExplicitBucketBoundaries' => [0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10]],
-                    temporality: Temporality::DELTA,
                 ),
                 $this->anything(),
                 $this->anything(),
@@ -137,7 +135,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', 'unit', 'description', temporality: Temporality::CUMULATIVE),
+                new Instrument(InstrumentType::UP_DOWN_COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
@@ -157,7 +155,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description', temporality: Temporality::CUMULATIVE),
+                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
             )
@@ -195,7 +193,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', 'unit', 'description', temporality: Temporality::CUMULATIVE),
+                new Instrument(InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
             )
@@ -215,7 +213,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description', temporality: Temporality::DELTA),
+                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
@@ -236,7 +234,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description', temporality: Temporality::DELTA),
+                new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
                 $this->anything(),
@@ -258,7 +256,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description', temporality: Temporality::CUMULATIVE),
+                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
             )
@@ -278,7 +276,7 @@ final class MeterTest extends TestCase
                 $this->anything(),
                 $this->anything(),
                 new InstrumentationScope('test', null, null, Attributes::create([])),
-                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description', temporality: Temporality::CUMULATIVE),
+                new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'name', 'unit', 'description'),
                 $this->anything(),
                 $this->anything(),
             )
