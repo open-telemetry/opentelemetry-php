@@ -728,9 +728,6 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->addDefaultsIfNotSet()
             ->children()
             ->append($registry->componentList('composite', ResponsePropagatorInterface::class))
-//                ->arrayNode('composite_list')
-//                    ->scalarPrototype()->end()
-//                ->end()
             ->end()
         ;
 
