@@ -14,7 +14,6 @@ exporters:
     verbosity: detailed
 
 processors:
-  batch:
 
 extensions:
   health_check:
