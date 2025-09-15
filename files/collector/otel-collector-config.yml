@@ -10,11 +10,12 @@ receivers:
 exporters:
   zipkin:
     endpoint: "http://zipkin:9411/api/v2/spans"
+    sending_queue:
+      batch:
   debug:
     verbosity: detailed
 
 processors:
-  batch:
 
 extensions:
   health_check:
@@ -30,11 +31,9 @@ service:
     traces:
       receivers: [otlp, zipkin]
       exporters: [debug]
-      processors: [batch]
     metrics:
       receivers: [otlp]
       exporters: [debug]
     logs:
       receivers: [ otlp ]
-      processors: [ batch ]
       exporters: [ debug ]
