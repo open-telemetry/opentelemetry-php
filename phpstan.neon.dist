@@ -59,3 +59,7 @@ parameters:
             message: "#Access to an undefined property .*#"
             paths:
                 - tests/Integration/SDK/Metrics
+        -
+            message: "#.*assertSame.*will always evaluate to false.#"
+            paths:
+                - tests/Unit/SDK/Metrics/MetricRegistry/MetricRegistryTest.php

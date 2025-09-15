@@ -22,7 +22,6 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactory;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function printf;
 
 #[CoversClass(MetricRegistry::class)]
 #[CoversClass(MultiObserver::class)]
@@ -68,7 +67,7 @@ final class MetricRegistryTest extends TestCase
      */
     public function test_collect_and_push_invokes_requested_callback_only_once(): void
     {
-        $this->expectOutputString('0');
+        $called = 0;
 
         $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
         $stream0 = new AsynchronousMetricStream(new SumAggregation(true), 0);
@@ -78,9 +77,13 @@ final class MetricRegistryTest extends TestCase
         $streamId0 = $registry->registerAsynchronousStream($instrument, $stream0, new MetricAggregatorFactory(null, new SumAggregation(true)));
         $streamId1 = $registry->registerAsynchronousStream($instrument, $stream1, new MetricAggregatorFactory(null, new SumAggregation(true)));
 
-        $registry->registerCallback(fn (ObserverInterface $o) => printf('0'), $instrument);
+        $registry->registerCallback(function () use (&$called) {
+            $called++;
+        }, $instrument);
 
+        $this->assertSame(0, $called);
         $registry->collectAndPush([$streamId0, $streamId1]);
+        $this->assertSame(1, $called);
     }
 
     /**
@@ -88,7 +91,8 @@ final class MetricRegistryTest extends TestCase
      */
     public function test_collect_and_push_invokes_only_requested_callbacks(): void
     {
-        $this->expectOutputString('0011');
+        $called_0 = 0;
+        $called_1 = 0;
 
         $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
         $stream0 = new AsynchronousMetricStream(new SumAggregation(true), 0);
@@ -99,12 +103,23 @@ final class MetricRegistryTest extends TestCase
         $streamId0 = $registry->registerAsynchronousStream($instrument0, $stream0, new MetricAggregatorFactory(null, new SumAggregation(true)));
         $streamId1 = $registry->registerAsynchronousStream($instrument1, $stream1, new MetricAggregatorFactory(null, new SumAggregation(true)));
 
-        $registry->registerCallback(fn (ObserverInterface $o) => printf('0'), $instrument0);
-        $registry->registerCallback(fn (ObserverInterface $o) => printf('1'), $instrument1);
+        $registry->registerCallback(function () use (&$called_0) {$called_0++;}, $instrument0);
+        $registry->registerCallback(function () use (&$called_1) {$called_1++;}, $instrument1);
+
+        $this->assertSame(0, $called_0);
+        $this->assertSame(0, $called_1);
 
         $registry->collectAndPush([$streamId0]);
+        $this->assertSame(1, $called_0);
+        $this->assertSame(0, $called_1);
+
         $registry->collectAndPush([$streamId0, $streamId1]);
+        $this->assertSame(2, $called_0);
+        $this->assertSame(1, $called_1);
+
         $registry->collectAndPush([$streamId1]);
+        $this->assertSame(2, $called_0);
+        $this->assertSame(2, $called_1);
     }
 
     public function test_collect_and_push_multi_instrument_callback_collects_only_specified_streams(): void
