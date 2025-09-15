@@ -12,7 +12,6 @@ use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics\MetricReade
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Propagator\TextMapPropagatorOtTrace;
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Propagator\TextMapPropagatorXray;
 use OpenTelemetry\Tests\Integration\Contrib\Otlp\MemoryTransportFactory;
-use OpenTelemetry\Tests\Integration\Contrib\Otlp\StdoutTransportFactory;
 
 ServiceLoader::register(ComponentProvider::class, ExampleConfigProvider::class);
 ServiceLoader::register(ComponentProvider::class, AggregationResolverExplicitBucketHistogram::class);
@@ -21,5 +20,4 @@ ServiceLoader::register(ComponentProvider::class, MetricReaderPull::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorXray::class);
 ServiceLoader::register(ComponentProvider::class, TextMapPropagatorOtTrace::class);
 
-ServiceLoader::register(TransportFactoryInterface::class, StdoutTransportFactory::class);
 ServiceLoader::register(TransportFactoryInterface::class, MemoryTransportFactory::class);
