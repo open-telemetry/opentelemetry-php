@@ -18,6 +18,7 @@ final class AsynchronousInstruments
     /**
      * @param ArrayAccess<object, ObservableCallbackDestructor> $destructors
      * @param non-empty-list<Instrument> $instruments
+     * @psalm-suppress PossiblyNullArgument,PossiblyNullPropertyAssignment,PossiblyNullPropertyFetch
      */
     public static function observe(
         MetricWriterInterface $writer,

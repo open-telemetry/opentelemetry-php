@@ -6,27 +6,27 @@ on:
       - "main"
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
   documentation:
+    permissions:
+      pages: write # required for GitHub Pages deployment
+      id-token: write # required for GitHub Pages deployment
     name: "Documentation"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v5"
       - name: "Build"
-        uses: "phpDocumentor/phpDocumentor@v3.8.0"
+        uses: "phpDocumentor/phpDocumentor@v3.8.1"
         with:
           target: "docs/build"
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: 'docs/build'
       - name: Deploy to GitHub Pages

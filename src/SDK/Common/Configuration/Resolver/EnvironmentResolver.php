@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
  */
 class EnvironmentResolver implements ResolverInterface
 {
+    #[\Override]
     public function hasVariable(string $variableName): bool
     {
         if (!Configuration::isEmpty($_SERVER[$variableName] ?? null)) {
@@ -24,11 +25,8 @@ class EnvironmentResolver implements ResolverInterface
         return !Configuration::isEmpty($env);
     }
 
-    /**
-     * @psalm-suppress InvalidReturnStatement
-     * @psalm-suppress InvalidReturnType
-     */
-    public function retrieveValue(string $variableName)
+    #[\Override]
+    public function retrieveValue(string $variableName): mixed
     {
         $value = getenv($variableName);
         if ($value === false) {

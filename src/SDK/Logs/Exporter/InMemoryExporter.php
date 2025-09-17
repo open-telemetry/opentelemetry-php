@@ -19,6 +19,7 @@ class InMemoryExporter implements LogRecordExporterInterface
     /**
      * @inheritDoc
      */
+    #[\Override]
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         foreach ($batch as $record) {
@@ -28,11 +29,13 @@ class InMemoryExporter implements LogRecordExporterInterface
         return new CompletedFuture(true);
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return true;

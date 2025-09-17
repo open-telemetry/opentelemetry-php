@@ -13,6 +13,7 @@ class NoopExporterTest extends TestCase
 {
     private NoopExporter $exporter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->exporter = new NoopExporter();

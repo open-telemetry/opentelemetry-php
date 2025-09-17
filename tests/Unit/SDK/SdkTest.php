@@ -28,6 +28,7 @@ class SdkTest extends TestCase
     private LoggerProviderInterface $loggerProvider;
     private EventLoggerProviderInterface $eventLoggerProvider;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->propagator = $this->createMock(TextMapPropagatorInterface::class);
@@ -37,6 +38,7 @@ class SdkTest extends TestCase
         $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         self::restoreEnvironmentVariables();

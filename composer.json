@@ -20,6 +20,8 @@
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php82": "^1.26",
+        "symfony/polyfill-php83": "^1.32",
+        "symfony/polyfill-php84": "^1.32",
         "tbachert/spi": "^1.0.1"
     },
     "config": {
@@ -86,9 +88,9 @@
     },
     "require-dev": {
         "ext-grpc": "*",
-        "grpc/grpc": "^1.30",
         "bamarni/composer-bin-plugin": "^1.8",
         "dg/bypass-finals": "^1.4",
+        "grpc/grpc": "^1.30",
         "guzzlehttp/guzzle": "^7.4",
         "guzzlehttp/psr7": "^2.1",
         "mikey179/vfsstream": "^1.6.11",
@@ -98,7 +100,7 @@
         "open-telemetry/dev-tools": "dev-main",
         "php-http/mock-client": "^1.5",
         "phpdocumentor/reflection-docblock": "^5.3",
-        "phpspec/prophecy": "^1.17.0",
+        "phpspec/prophecy": "^1.22",
         "phpspec/prophecy-phpunit": "^2",
         "phpstan/phpstan": "^1.10.13",
         "phpstan/phpstan-mockery": "^1.1",
@@ -191,6 +193,15 @@
             ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
                 "OpenTelemetry\\Example\\ExampleInstrumentation"
+            ],
+            "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
+                "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\SdkConfigurationResolver"
+            ],
+            "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
+                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",
+                "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\VlucasPhpdotenvProvider",
+
+                "OpenTelemetry\\Tests\\Integration\\SDK\\Common\\Configuration\\TestEnvSourceProvider"
             ]
         }
     }

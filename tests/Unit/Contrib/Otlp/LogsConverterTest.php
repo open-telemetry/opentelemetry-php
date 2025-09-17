@@ -24,6 +24,7 @@ class LogsConverterTest extends TestCase
     private $record;
     private LogsConverter $converter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->converter = new LogsConverter();

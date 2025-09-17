@@ -27,10 +27,14 @@
     {{to_const_name(attribute.name)}}
 {%- endmacro -%}
 
-{%- macro attribute_value_name(member) -%}
-    {{to_const_name(member.id)}}
+{%- macro attribute_value_name(attribute, member) -%}
+    {{ to_const_name(attribute.name) ~ "_VALUE_" ~ to_const_name(member.id) }}
 {%- endmacro -%}
 
-{%- macro attribute_stability(attribute) -%}
-    {% if attribute.deprecated %}deprecated{% else %}{{attribute.stability}}{%endif%}
+{%- macro stability(member) -%}
+    {%- if member is stable -%}
+        {{ "@stable" }}
+    {%- else -%}
+        {{ "@experimental" }}
+    {%- endif -%}
 {%- endmacro -%}

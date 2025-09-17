@@ -21,15 +21,18 @@ class NoopLogRecordProcessor implements LogRecordProcessorInterface
     /**
      * @codeCoverageIgnore
      */
+    #[\Override]
     public function onEmit(ReadWriteLogRecord $record, ?ContextInterface $context = null): void
     {
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;

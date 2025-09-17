@@ -36,6 +36,7 @@ class B3PropagatorTest extends TestCase
     /**
      * @psalm-suppress PossiblyUndefinedArrayOffset
      */
+    #[\Override]
     public function setUp(): void
     {
         [$this->b3] = B3SinglePropagator::getInstance()->fields();

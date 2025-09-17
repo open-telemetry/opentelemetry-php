@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         // set up mock file system with /var/log directory, for otlp_file exporter.
@@ -26,6 +27,7 @@ final class ConfigurationTest extends TestCase
         OutputStreamParser::setRoot($root);
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         OutputStreamParser::reset();

@@ -27,11 +27,13 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
         $this->fields = $this->extractFields($this->propagators);
     }
 
+    #[\Override]
     public function fields(): array
     {
         return $this->fields;
     }
 
+    #[\Override]
     public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         foreach ($this->propagators as $propagator) {
@@ -39,6 +41,7 @@ final class MultiTextMapPropagator implements TextMapPropagatorInterface
         }
     }
 
+    #[\Override]
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();

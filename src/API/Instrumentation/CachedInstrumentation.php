@@ -62,6 +62,7 @@ final class CachedInstrumentation
 
         return $this->meters[$meterProvider] ??= $meterProvider->getMeter($this->name, $this->version, $this->schemaUrl, $this->attributes);
     }
+
     public function logger(): LoggerInterface
     {
         $loggerProvider = Globals::loggerProvider();

@@ -16,7 +16,8 @@ class PhpIniResolver implements ResolverInterface
     {
     }
 
-    public function retrieveValue(string $variableName)
+    #[\Override]
+    public function retrieveValue(string $variableName): mixed
     {
         $value = $this->accessor->get($variableName) ?: '';
         if (is_array($value)) {
@@ -26,6 +27,7 @@ class PhpIniResolver implements ResolverInterface
         return $value;
     }
 
+    #[\Override]
     public function hasVariable(string $variableName): bool
     {
         $value = $this->accessor->get($variableName);

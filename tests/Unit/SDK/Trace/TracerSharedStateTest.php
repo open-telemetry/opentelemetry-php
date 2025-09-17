@@ -23,6 +23,7 @@ class TracerSharedStateTest extends TestCase
     private SamplerInterface $sampler;
     private SpanLimits $spanLimits;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->idGenerator = $this->createMock(IdGeneratorInterface::class);

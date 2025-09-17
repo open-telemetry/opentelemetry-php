@@ -46,6 +46,7 @@ final class ShutdownHandler
      * @param callable $shutdownFunction function to register
      *
      * @see register_shutdown_function
+     * @psalm-suppress PossiblyNullArgument,PossiblyNullPropertyFetch
      */
     public static function register(callable $shutdownFunction): void
     {

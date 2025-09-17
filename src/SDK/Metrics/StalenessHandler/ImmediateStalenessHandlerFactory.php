@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 
 final class ImmediateStalenessHandlerFactory implements StalenessHandlerFactoryInterface
 {
+    #[\Override]
     public function create(): ReferenceCounterInterface&StalenessHandlerInterface
     {
         return new ImmediateStalenessHandler();

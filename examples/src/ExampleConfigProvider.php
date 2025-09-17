@@ -24,6 +24,7 @@ final class ExampleConfigProvider implements ComponentProvider
      *     enabled: bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): InstrumentationConfiguration
     {
         return new ExampleConfig(
@@ -35,6 +36,7 @@ final class ExampleConfigProvider implements ComponentProvider
     /**
      * @psalm-suppress UndefinedInterfaceMethod,PossiblyNullReference
      */
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('example_instrumentation');

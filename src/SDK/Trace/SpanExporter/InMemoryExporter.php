@@ -16,6 +16,7 @@ class InMemoryExporter implements SpanExporterInterface
     {
     }
 
+    #[\Override]
     protected function doExport(iterable $spans): bool
     {
         foreach ($spans as $span) {

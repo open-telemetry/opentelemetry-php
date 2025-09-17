@@ -21,6 +21,7 @@ final class TextMapPropagatorComposite implements ComponentProvider
     /**
      * @param list<ComponentPlugin<TextMapPropagatorInterface>> $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
         $propagators = [];
@@ -31,6 +32,7 @@ final class TextMapPropagatorComposite implements ComponentProvider
         return new MultiTextMapPropagator($propagators);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $registry->componentNames('composite', TextMapPropagatorInterface::class);

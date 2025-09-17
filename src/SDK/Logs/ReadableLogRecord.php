@@ -31,7 +31,7 @@ class ReadableLogRecord extends LogRecord
         parent::__construct($logRecord->body);
         $this->timestamp = $logRecord->timestamp;
         $this->observedTimestamp = $logRecord->observedTimestamp
-            ?? (int) (microtime(true) * LogRecord::NANOS_PER_SECOND);
+            ?? (int) (microtime(true) * (float) LogRecord::NANOS_PER_SECOND);
         $this->context = $logRecord->context;
         $context = $this->context ?? Context::getCurrent();
         $this->spanContext = Span::fromContext($context)->getContext();

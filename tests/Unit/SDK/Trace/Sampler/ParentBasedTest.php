@@ -24,6 +24,7 @@ class ParentBasedTest extends MockeryTestCase
 {
     private SamplerInterface $rootSampler;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->rootSampler = $this->createMock(SamplerInterface::class);

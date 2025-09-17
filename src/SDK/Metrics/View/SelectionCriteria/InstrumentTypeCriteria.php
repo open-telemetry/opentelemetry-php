@@ -22,6 +22,7 @@ final class InstrumentTypeCriteria implements SelectionCriteriaInterface
         $this->instrumentTypes = (array) $instrumentType;
     }
 
+    #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return in_array($instrument->type, $this->instrumentTypes, true);

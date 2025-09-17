@@ -27,11 +27,13 @@ final class LogRecordExporterOtlp implements ComponentProvider
      *     timeout: int<0, max>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporter
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp');

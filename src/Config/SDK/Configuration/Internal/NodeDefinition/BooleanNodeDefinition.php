@@ -13,6 +13,7 @@ final class BooleanNodeDefinition extends \Symfony\Component\Config\Definition\B
 {
     use NodeDefinitionTrait;
 
+    #[\Override]
     protected function instantiateNode(): BooleanNode
     {
         return new BooleanNode($this->name, $this->parent, $this->pathSeparator);

@@ -18,9 +18,11 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class Container implements ComponentProvider
 {
+    #[\Override]
     public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
         return new class() implements ResourceDetectorInterface {
+            #[\Override]
             public function getResource(): ResourceInfo
             {
                 return ResourceInfoFactory::emptyResource();
@@ -28,6 +30,7 @@ final class Container implements ComponentProvider
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('container');

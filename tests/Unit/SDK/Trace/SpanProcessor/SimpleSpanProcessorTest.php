@@ -44,6 +44,7 @@ class SimpleSpanProcessorTest extends MockeryTestCase
     private SpanContextInterface $sampledSpanContext;
     private SpanContextInterface $nonSampledSpanContext;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logWriter = $this->createMock(LogWriterInterface::class);

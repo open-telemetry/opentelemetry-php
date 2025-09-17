@@ -19,6 +19,7 @@ class EventLoggerProvider implements EventLoggerProviderInterface
     /**
      * @phan-suppress PhanDeprecatedClass
      */
+    #[\Override]
     public function getEventLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): EventLoggerInterface
     {
         return new EventLogger(
@@ -27,6 +28,7 @@ class EventLoggerProvider implements EventLoggerProviderInterface
         );
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         return $this->loggerProvider->forceFlush();

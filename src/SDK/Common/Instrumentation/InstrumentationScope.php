@@ -19,21 +19,25 @@ final class InstrumentationScope implements InstrumentationScopeInterface
     ) {
     }
 
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
+    #[\Override]
     public function getVersion(): ?string
     {
         return $this->version;
     }
 
+    #[\Override]
     public function getSchemaUrl(): ?string
     {
         return $this->schemaUrl;
     }
 
+    #[\Override]
     public function getAttributes(): AttributesInterface
     {
         return $this->attributes;

@@ -182,7 +182,7 @@ class ZipkinSpanConverterTest extends TestCase
         $row = $converter->convert([$span])[0];
 
         $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
-        $this->assertSame(pow(2, 32)-1, $row['remoteEndpoint']['ipv4']);
+        $this->assertSame((int) pow(2, 32)-1, (int) $row['remoteEndpoint']['ipv4']);
         $this->assertSame(80, $row['remoteEndpoint']['port']);
     }
 

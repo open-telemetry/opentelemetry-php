@@ -17,6 +17,7 @@ class ServiceTest extends TestCase
 
     private Detectors\Service $detector;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->detector = new Detectors\Service();

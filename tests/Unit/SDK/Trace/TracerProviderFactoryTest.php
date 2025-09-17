@@ -24,6 +24,7 @@ class TracerProviderFactoryTest extends TestCase
     /** @var LogWriterInterface&MockObject $logWriter */
     private LogWriterInterface $logWriter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->logWriter = $this->createMock(LogWriterInterface::class);
