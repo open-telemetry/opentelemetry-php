@@ -7,9 +7,10 @@ namespace OpenTelemetry\Contrib\Otlp;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceResponse;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelector;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use OpenTelemetry\SDK\Metrics\MetricExporter\TemporalitySelectorTrait;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use RuntimeException;
 use Throwable;
@@ -22,21 +23,26 @@ use Throwable;
 final class MetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
     use LogsMessagesTrait;
-    use TemporalitySelectorTrait;
     private ProtobufSerializer $serializer;
+    private readonly AggregationTemporalitySelectorInterface $selector;
 
     /**
      * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
     public function __construct(
         private readonly TransportInterface $transport,
-        ?Temporality $temporality = Temporality::CUMULATIVE,
+        ?AggregationTemporalitySelectorInterface $selector = null,
     ) {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
         }
-        $this->temporality = $temporality;
         $this->serializer = ProtobufSerializer::forTransport($this->transport);
+        $this->selector = $selector ?? AggregationTemporalitySelector::alwaysCumulative();
+    }
+
+    public function temporality(MetricMetadataInterface $metric): ?Temporality
+    {
+        return $this->selector->temporality($metric);
     }
 
     public function export(iterable $batch): bool

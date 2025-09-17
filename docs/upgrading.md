@@ -35,7 +35,9 @@ is `Cumulative` for all instruments, per [spec](https://github.com/open-telemetr
 This can be changed by setting the temporality preference via `OTEL_METRIC_TEMPORALITY_PREFERENCE` environment variable. Possible
 values are `cumulative`, `delta`, or `lowmemory`.
 
-If the SDK is configured programmatically, the default temporality is `Cumulative`.
+If the SDK is configured programmatically, an exporter should provide an `AggregationTemporalitySelectorInterface`. The SDK-provided
+implementations are `AggregationTemporalitySelector::alwaysCumulative()`, `::deltaPreferred()`, and `::lowMemory()`. The default
+selector is `cumulative`.
 
 #### TracerProvider
 `TracerProvider` constructor now accepts a `SpanProcessorInterface` as the first argument, rather than an array of

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricExporter;
 
 use ArrayObject;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelector;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 
 /**
@@ -16,19 +18,24 @@ use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
  */
 final class InMemoryExporter implements MetricExporterInterface, AggregationTemporalitySelectorInterface, PushMetricExporterInterface
 {
-    use TemporalitySelectorTrait;
     private bool $closed = false;
+    private readonly AggregationTemporalitySelectorInterface $selector;
 
     /**
      * @template-implements ArrayObject<Metric> $storage
      * @param ArrayObject $storage
-     * @param Temporality|null $temporality
+     * @param AggregationTemporalitySelectorInterface|null $selector
      */
     public function __construct(
         private ArrayObject $storage = new ArrayObject(),
-        ?Temporality $temporality = Temporality::CUMULATIVE,
+        ?AggregationTemporalitySelectorInterface $selector = null,
     ) {
-        $this->temporality = $temporality;
+        $this->selector = $selector ?? AggregationTemporalitySelector::alwaysCumulative();
+    }
+
+    public function temporality(MetricMetadataInterface $metric): ?Temporality
+    {
+        return $this->selector->temporality($metric);
     }
 
     /**

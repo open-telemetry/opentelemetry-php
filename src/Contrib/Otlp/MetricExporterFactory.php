@@ -11,7 +11,8 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Services\Loader;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelector;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 
@@ -31,9 +32,9 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         $protocol = Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)
             ? Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL)
             : Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_PROTOCOL);
-        $temporality = $this->getTemporality();
+        $selector = $this->getTemporalitySelector();
 
-        return new MetricExporter($this->buildTransport($protocol), $temporality);
+        return new MetricExporter($this->buildTransport($protocol), $selector);
     }
 
     public function type(): string
@@ -72,14 +73,14 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         );
     }
 
-    private function getTemporality(): ?Temporality
+    private function getTemporalitySelector(): AggregationTemporalitySelectorInterface
     {
         $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
 
         return match (strtolower($value)) {
-            'cumulative' => Temporality::CUMULATIVE,
-            'delta' => Temporality::DELTA,
-            'lowmemory' => null,
+            'cumulative' => AggregationTemporalitySelector::alwaysCumulative(),
+            'delta' => AggregationTemporalitySelector::deltaPreferred(),
+            'lowmemory' => AggregationTemporalitySelector::lowMemory(),
             default => throw new \UnexpectedValueException('Unknown temporality: ' . $value),
         };
     }
