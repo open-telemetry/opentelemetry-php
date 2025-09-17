@@ -13,13 +13,6 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 interface MetricStreamInterface
 {
     /**
-     * Returns the internal temporality of this stream.
-     *
-     * @return Temporality internal temporality
-     */
-    public function temporality(): Temporality;
-
-    /**
      * Returns the last metric timestamp.
      *
      * @return int metric timestamp

@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,7 +44,7 @@ class MetricExporterFactoryTest extends TestCase
     }
 
     #[DataProvider('temporalityProvider')]
-    public function test_create_with_temporality(array $env, ?Temporality $expected): void
+    public function test_create_with_temporality_preference(array $env, ?Temporality $expected): void
     {
         // @phpstan-ignore-next-line
         $this->transportFactory->method('create')->willReturn($this->transport);
@@ -58,7 +59,7 @@ class MetricExporterFactoryTest extends TestCase
 
         $this->assertInstanceOf(AggregationTemporalitySelectorInterface::class, $exporter);
         $metric = $this->createMock(MetricMetadataInterface::class);
-        $metric->method('temporality')->willReturn(Temporality::DELTA);
+        $metric->method('instrumentType')->willReturn(InstrumentType::ASYNCHRONOUS_COUNTER);
         $this->assertSame($expected, $exporter->temporality($metric));
     }
 
@@ -85,7 +86,7 @@ class MetricExporterFactoryTest extends TestCase
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'lowmemory',
                 ],
-                Temporality::DELTA,
+                Temporality::CUMULATIVE,
             ],
             'CuMuLaTiVe (mixed case)' => [
                 [

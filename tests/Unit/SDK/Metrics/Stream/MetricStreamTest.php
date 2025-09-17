@@ -196,18 +196,6 @@ final class MetricStreamTest extends TestCase
         ], Temporality::CUMULATIVE, false), $s->collect($c));
     }
 
-    public function test_asynchronous_temporality(): void
-    {
-        $s = new AsynchronousMetricStream(new SumAggregation(), 3);
-        $this->assertSame(Temporality::CUMULATIVE, $s->temporality());
-    }
-
-    public function test_synchronous_temporality(): void
-    {
-        $s = new SynchronousMetricStream(new SumAggregation(), 3);
-        $this->assertSame(Temporality::DELTA, $s->temporality());
-    }
-
     public function test_asynchronous_timestamp_returns_last_metric_timestamp(): void
     {
         $s = new AsynchronousMetricStream(new SumAggregation(), 3);

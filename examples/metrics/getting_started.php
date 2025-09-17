@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use OpenTelemetry\API\Metrics\ObserverInterface;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelector;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
  */
 
 $reader = new ExportingReader(
-    new ConsoleMetricExporter(Temporality::DELTA)
+    new ConsoleMetricExporter(AggregationTemporalitySelector::deltaPreferred())
 );
 
 $meterProvider = MeterProvider::builder()

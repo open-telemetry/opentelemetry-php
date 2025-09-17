@@ -8,7 +8,6 @@ use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MeterConfig;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
@@ -105,7 +104,7 @@ class MeterConfigTest extends TestCase
         $clock = new TestClock(self::T0);
         $disabledConfigurator = Configurator::meter()
             ->with(static fn (MeterConfig $config) => $config->setDisabled(true), name: '*');
-        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
         $meterProvider = MeterProvider::builder()
             ->addReader($reader)

@@ -13,11 +13,13 @@ class Protocols
     public const HTTP_PROTOBUF = KnownValues::VALUE_HTTP_PROTOBUF;
     public const HTTP_JSON = KnownValues::VALUE_HTTP_JSON;
     public const HTTP_NDJSON = KnownValues::VALUE_HTTP_NDJSON;
+    public const MEMORY_JSON = 'memory/json';
     private const PROTOCOLS = [
         self::GRPC => ContentTypes::PROTOBUF,
         self::HTTP_PROTOBUF => ContentTypes::PROTOBUF,
         self::HTTP_JSON => ContentTypes::JSON,
         self::HTTP_NDJSON => ContentTypes::NDJSON,
+        self::MEMORY_JSON => ContentTypes::JSON,
     ];
 
     public static function validate(string $protocol): void

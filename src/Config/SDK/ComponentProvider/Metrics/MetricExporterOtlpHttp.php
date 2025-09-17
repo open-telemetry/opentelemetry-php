@@ -14,7 +14,7 @@ use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Services\Loader;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelector;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -44,10 +44,10 @@ final class MetricExporterOtlpHttp implements ComponentProvider
     {
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
 
-        $temporality = match ($properties['temporality_preference']) {
-            'cumulative' => Temporality::CUMULATIVE,
-            'delta' => Temporality::DELTA,
-            'lowmemory' => null,
+        $selector = match ($properties['temporality_preference']) {
+            'cumulative' => AggregationTemporalitySelector::alwaysCumulative(),
+            'delta' => AggregationTemporalitySelector::deltaPreferred(),
+            'lowmemory' => AggregationTemporalitySelector::lowMemory(),
         };
 
         return new MetricExporter(Loader::transportFactory('http')->create(
@@ -62,7 +62,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
             cacert: $properties['certificate_file'],
             cert: $properties['client_certificate_file'],
             key: $properties['client_certificate_file'],
-        ), $temporality);
+        ), $selector);
     }
 
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
