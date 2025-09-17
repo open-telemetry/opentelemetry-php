@@ -43,29 +43,11 @@ class Mapping extends \Google\Protobuf\Internal\Message
      */
     protected $filename_strindex = 0;
     /**
-     * References to attributes in Profile.attribute_table. [optional]
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
      * Generated from protobuf field <code>repeated int32 attribute_indices = 5;</code>
      */
     private $attribute_indices;
-    /**
-     * The following fields indicate the resolution of symbolic info.
-     *
-     * Generated from protobuf field <code>bool has_functions = 6;</code>
-     */
-    protected $has_functions = false;
-    /**
-     * Generated from protobuf field <code>bool has_filenames = 7;</code>
-     */
-    protected $has_filenames = false;
-    /**
-     * Generated from protobuf field <code>bool has_line_numbers = 8;</code>
-     */
-    protected $has_line_numbers = false;
-    /**
-     * Generated from protobuf field <code>bool has_inline_frames = 9;</code>
-     */
-    protected $has_inline_frames = false;
 
     /**
      * Constructor.
@@ -84,12 +66,7 @@ class Mapping extends \Google\Protobuf\Internal\Message
      *           disk for the main binary and shared libraries, or virtual
      *           abstractions like "[vdso]".
      *     @type int[]|\Google\Protobuf\Internal\RepeatedField $attribute_indices
-     *           References to attributes in Profile.attribute_table. [optional]
-     *     @type bool $has_functions
-     *           The following fields indicate the resolution of symbolic info.
-     *     @type bool $has_filenames
-     *     @type bool $has_line_numbers
-     *     @type bool $has_inline_frames
+     *           References to attributes in ProfilesDictionary.attribute_table. [optional]
      * }
      */
     public function __construct($data = NULL) {
@@ -206,7 +183,7 @@ class Mapping extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * References to attributes in Profile.attribute_table. [optional]
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
      * Generated from protobuf field <code>repeated int32 attribute_indices = 5;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -217,7 +194,7 @@ class Mapping extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * References to attributes in Profile.attribute_table. [optional]
+     * References to attributes in ProfilesDictionary.attribute_table. [optional]
      *
      * Generated from protobuf field <code>repeated int32 attribute_indices = 5;</code>
      * @param int[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -227,98 +204,6 @@ class Mapping extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::INT32);
         $this->attribute_indices = $arr;
-
-        return $this;
-    }
-
-    /**
-     * The following fields indicate the resolution of symbolic info.
-     *
-     * Generated from protobuf field <code>bool has_functions = 6;</code>
-     * @return bool
-     */
-    public function getHasFunctions()
-    {
-        return $this->has_functions;
-    }
-
-    /**
-     * The following fields indicate the resolution of symbolic info.
-     *
-     * Generated from protobuf field <code>bool has_functions = 6;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setHasFunctions($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->has_functions = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool has_filenames = 7;</code>
-     * @return bool
-     */
-    public function getHasFilenames()
-    {
-        return $this->has_filenames;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool has_filenames = 7;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setHasFilenames($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->has_filenames = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool has_line_numbers = 8;</code>
-     * @return bool
-     */
-    public function getHasLineNumbers()
-    {
-        return $this->has_line_numbers;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool has_line_numbers = 8;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setHasLineNumbers($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->has_line_numbers = $var;
-
-        return $this;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool has_inline_frames = 9;</code>
-     * @return bool
-     */
-    public function getHasInlineFrames()
-    {
-        return $this->has_inline_frames;
-    }
-
-    /**
-     * Generated from protobuf field <code>bool has_inline_frames = 9;</code>
-     * @param bool $var
-     * @return $this
-     */
-    public function setHasInlineFrames($var)
-    {
-        GPBUtil::checkBool($var);
-        $this->has_inline_frames = $var;
 
         return $this;
     }
