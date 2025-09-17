@@ -43,21 +43,27 @@ class MeterTest extends TestCase
         $upDownCounter->add(1);
         $histogram = $meter->createHistogram('sync.histogram');
         $histogram->record(2);
+        $gauge = $meter->createGauge('sync.gauge');
+        $gauge->record(1);
         $meter->createObservableCounter('async.observableCounter', callbacks: fn (ObserverInterface $observer) => $observer->observe(1));
         $meter->createObservableUpDownCounter('async.observableUpDownCounter', callbacks: fn (ObserverInterface $observer) => $observer->observe(1));
+        $meter->createObservableGauge('async.observableGauge', callbacks: fn (ObserverInterface $observer) => $observer->observe(1));
         $meterProvider->forceFlush();
 
         $storage = InMemoryStorageManager::metrics();
         $this->assertCount(1, $storage);
         $metrics = $storage[0];
         $data = json_decode($metrics);
-        $this->assertCount(5, $data->resourceMetrics[0]->scopeMetrics[0]->metrics);
+        $this->assertCount(7, $data->resourceMetrics[0]->scopeMetrics[0]->metrics);
         foreach ($data->resourceMetrics[0]->scopeMetrics[0]->metrics as $metric) {
             if (isset($metric->sum)) {
                 $this->assertSame($this->mapEnumToValue($expected[$metric->name]), $metric->sum->aggregationTemporality, $metric->name);
             }
             if (isset($metric->histogram)) {
                 $this->assertSame($this->mapEnumToValue($expected[$metric->name]), $metric->histogram->aggregationTemporality, $metric->name);
+            }
+            if (isset($metric->gauge)) {
+                $this->assertObjectNotHasProperty('aggregationTemporality', $metric->gauge, $metric->name);
             }
         }
     }
