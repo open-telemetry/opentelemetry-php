@@ -14,6 +14,7 @@ use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use function sprintf;
 use Throwable;
@@ -35,6 +36,7 @@ final class Globals
         private readonly LoggerProviderInterface $loggerProvider,
         private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
+        private readonly ResponsePropagatorInterface $responsePropagator,
     ) {
     }
 
@@ -51,6 +53,14 @@ final class Globals
     public static function propagator(): TextMapPropagatorInterface
     {
         return Context::getCurrent()->get(ContextKeys::propagator()) ?? self::globals()->propagator;
+    }
+
+    /**
+     * @experimental
+     */
+    public static function responsePropagator(): ResponsePropagatorInterface
+    {
+        return Context::getCurrent()->get(ContextKeys::responsePropagator()) ?? self::globals()->responsePropagator;
     }
 
     public static function loggerProvider(): LoggerProviderInterface
@@ -107,12 +117,13 @@ final class Globals
         $tracerProvider = $context->get(ContextKeys::tracerProvider());
         $meterProvider = $context->get(ContextKeys::meterProvider());
         $propagator = $context->get(ContextKeys::propagator());
+        $responsePropagator = $context->get(ContextKeys::responsePropagator());
         $loggerProvider = $context->get(ContextKeys::loggerProvider());
         $eventLoggerProvider = $context->get(ContextKeys::eventLoggerProvider());
 
-        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator));
+        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator));
 
-        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator);
+        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator);
     }
 
     /**

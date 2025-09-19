@@ -18,9 +18,9 @@
     ],
     "require": {
         "php": "^8.1",
-        "open-telemetry/api": "~1.4.0",
-        "open-telemetry/context": "^1.0",
-        "open-telemetry/sdk": "^1.0",
+        "open-telemetry/api": "^1.6",
+        "open-telemetry/context": "^1.4",
+        "open-telemetry/sdk": "^1.8",
         "symfony/config": "^5.4 || ^6.4 || ^7.0",
         "tbachert/spi": "^1.0.5"
     },
@@ -40,6 +40,7 @@
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\ResponsePropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",

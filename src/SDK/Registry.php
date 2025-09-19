@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
@@ -26,6 +27,7 @@ class Registry
     private static array $textMapPropagators = [];
     private static array $logRecordExporterFactories = [];
     private static array $resourceDetectors = [];
+    private static array $responsePropagators = [];
 
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
@@ -124,6 +126,14 @@ class Registry
         self::$resourceDetectors[$name] = $detector;
     }
 
+    public static function registerResponsePropagator(string $name, ResponsePropagatorInterface $responsePropagator, bool $clobber = false): void
+    {
+        if (!$clobber && array_key_exists($name, self::$responsePropagators)) {
+            return;
+        }
+        self::$responsePropagators[$name] = $responsePropagator;
+    }
+
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
         if (!array_key_exists($exporter, self::$spanExporterFactories)) {
@@ -193,6 +203,15 @@ class Registry
         }
 
         return self::$resourceDetectors[$name];
+    }
+
+    public static function responsePropagator(string $name): ResponsePropagatorInterface
+    {
+        if (!array_key_exists($name, self::$responsePropagators)) {
+            throw new RuntimeException('Response propagator not registered for: ' . $name);
+        }
+
+        return self::$responsePropagators[$name];
     }
 
     /**

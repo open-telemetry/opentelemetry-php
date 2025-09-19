@@ -9,6 +9,9 @@ resource:
 propagators:
   composite: [ tracecontext, baggage ]
 
+response_propagator/development:
+  composite: [ servertiming, traceresponse ]
+
 exporters:
   otlp: &otlp-exporter
     protocol: http/protobuf
