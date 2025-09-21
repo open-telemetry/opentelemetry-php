@@ -18,6 +18,7 @@ use Ramsey\Uuid\Uuid;
  */
 final class ServiceInstance implements ResourceDetectorInterface
 {
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         static $serviceInstanceId;

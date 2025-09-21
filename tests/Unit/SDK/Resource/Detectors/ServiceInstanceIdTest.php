@@ -19,6 +19,7 @@ class ServiceInstanceIdTest extends TestCase
 
     private Detectors\ServiceInstance $detector;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->detector = new Detectors\ServiceInstance();
