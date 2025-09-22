@@ -19,10 +19,7 @@ class AggregationTemporalitySelector
         return new class() implements AggregationTemporalitySelectorInterface {
             public function temporality(MetricMetadataInterface $metric): ?Temporality
             {
-                return match ($metric->instrumentType()) {
-                    InstrumentType::GAUGE, InstrumentType::ASYNCHRONOUS_GAUGE => Temporality::DELTA,
-                    default => Temporality::CUMULATIVE,
-                };
+                return Temporality::CUMULATIVE;
             }
         };
     }
