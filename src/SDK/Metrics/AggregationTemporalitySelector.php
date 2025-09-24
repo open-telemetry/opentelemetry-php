@@ -43,7 +43,7 @@ class AggregationTemporalitySelector
             public function temporality(MetricMetadataInterface $metric): ?Temporality
             {
                 return match ($metric->instrumentType()) {
-                    InstrumentType::COUNTER, InstrumentType::HISTOGRAM, InstrumentType::GAUGE, InstrumentType::ASYNCHRONOUS_GAUGE => Temporality::DELTA,
+                    InstrumentType::COUNTER, InstrumentType::HISTOGRAM, InstrumentType::GAUGE => Temporality::DELTA,
                     default => Temporality::CUMULATIVE,
                 };
             }
