@@ -101,7 +101,7 @@ class AggregationTemporalitySelectorTest extends TestCase
 
         $observableGauge = $this->createMock(MetricMetadataInterface::class);
         $observableGauge->method('instrumentType')->willReturn(InstrumentType::ASYNCHRONOUS_GAUGE);
-        $this->assertSame(Temporality::DELTA, $selector->temporality($observableGauge));
+        $this->assertSame(Temporality::CUMULATIVE, $selector->temporality($observableGauge));
 
         $upDownCounter = $this->createMock(MetricMetadataInterface::class);
         $upDownCounter->method('instrumentType')->willReturn(InstrumentType::UP_DOWN_COUNTER);
