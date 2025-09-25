@@ -421,6 +421,12 @@ interface MessagingIncubatingAttributes
     public const MESSAGING_SYSTEM_VALUE_SERVICEBUS = 'servicebus';
 
     /**
+     * Azure Queue
+     * @experimental
+     */
+    public const MESSAGING_SYSTEM_VALUE_AZURE_QUEUE = 'azurequeue';
+
+    /**
      * Google Cloud Pub/Sub
      * @experimental
      */
