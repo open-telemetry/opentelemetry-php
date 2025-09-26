@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\MetricExporter;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelector;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
@@ -20,16 +21,19 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
     use LogsMessagesTrait;
+    private AggregationTemporalitySelectorInterface $selector;
 
-    public function __construct(private readonly ?Temporality $temporality = null)
+    public function __construct(?AggregationTemporalitySelectorInterface $selector = null)
     {
+        $this->selector = $selector ?? AggregationTemporalitySelector::alwaysCumulative();
     }
+
     /**
      * @inheritDoc
      */
     public function temporality(MetricMetadataInterface $metric): ?Temporality
     {
-        return $this->temporality ?? $metric->temporality();
+        return $this->selector->temporality($metric);
     }
 
     /**

@@ -35,7 +35,7 @@ class MeterProviderFactory
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
         }
-        $name = Configuration::getEnum(Variables::OTEL_METRICS_EXPORTER, 'none');
+        $name = Configuration::getEnum(Variables::OTEL_METRICS_EXPORTER);
 
         try {
             $factory = Loader::metricExporterFactory($name);

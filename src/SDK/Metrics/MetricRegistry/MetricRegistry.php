@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
 use function array_key_last;
 use Closure;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
@@ -21,6 +22,8 @@ use function spl_object_id;
  */
 final class MetricRegistry implements MetricRegistryInterface, MetricWriterInterface
 {
+    use LogsMessagesTrait;
+
     /** @var array<int, MetricStreamInterface> */
     private array $streams = [];
     /** @var array<int, MetricAggregatorInterface> */
@@ -167,7 +170,10 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
             $callbacks[] = static fn () => $callback(...$args);
         }
         foreach ($callbacks as $callback) {
-            $callback();
+            $return = $callback();
+            if ($return !== null) {
+                self::logWarning('async metric callback should not return a value');
+            }
         }
 
         $timestamp = $this->clock->now();

@@ -30,8 +30,16 @@ providing a higher priority for the same type).
 Methods which previously accepted `Temporality|string`, or `InstrumentType|string` no longer accept strings.
 `$advisory` is now a required parameter for `OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface`.
 
+If the SDK is configured via autoloading (using environment variables or declarative (yaml) config), the default temporality
+is `Cumulative` for all instruments, per [spec](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.48.0/specification/metrics/sdk_exporters/otlp.md#general).
+This can be changed by setting the temporality preference via `OTEL_METRIC_TEMPORALITY_PREFERENCE` environment variable. Possible
+values are `cumulative`, `delta`, or `lowmemory`.
+
+If the SDK is configured programmatically, an exporter should be configured with an `AggregationTemporalitySelectorInterface`.
+The SDK-provided implementations are `AggregationTemporalitySelector::alwaysCumulative()`, `::deltaPreferred()`,
+and `::lowMemory()`. The default selector is cumulative.
+
 #### TracerProvider
 `TracerProvider` constructor now accepts a `SpanProcessorInterface` as the first argument, rather than an array of
 `SpanProcessorInterface`s. If multiple processors are required, they should be added to a `MultiSpanProcessor` (which
 is what happened internally in 1.x anyway).
-

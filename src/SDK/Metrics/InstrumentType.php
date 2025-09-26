@@ -12,7 +12,6 @@ enum InstrumentType
     case COUNTER;
     case UP_DOWN_COUNTER;
     case HISTOGRAM;
-    /** @experimental */
     case GAUGE;
 
     case ASYNCHRONOUS_COUNTER;

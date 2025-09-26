@@ -75,12 +75,13 @@ final class ExportingReaderTest extends TestCase
 
     public function test_add_creates_metric_source_with_exporter_temporality(): void
     {
-        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->once())->method('create')->with(Temporality::CUMULATIVE);
         $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $metricMetadata->method('instrumentType')->willReturn(InstrumentType::COUNTER);
         $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
         $stalenessHandler->expects($this->once())->method('onStale');
 
@@ -103,7 +104,7 @@ final class ExportingReaderTest extends TestCase
 
     public function test_add_does_not_create_metric_source_if_reader_closed(): void
     {
-        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
@@ -118,11 +119,12 @@ final class ExportingReaderTest extends TestCase
 
     public function test_staleness_handler_clears_source(): void
     {
-        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $metricMetadata->method('instrumentType')->willReturn(InstrumentType::COUNTER);
         $stalenessHandler = new ImmediateStalenessHandler();
         $stalenessHandler->acquire();
         $reader->add($provider, $metricMetadata, $stalenessHandler);
@@ -134,7 +136,7 @@ final class ExportingReaderTest extends TestCase
 
     public function test_collect_collects_sources_with_current_timestamp(): void
     {
-        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $exporter = new InMemoryExporter();
         $reader = new ExportingReader($exporter);
 
         $metric = new Metric(
@@ -151,6 +153,7 @@ final class ExportingReaderTest extends TestCase
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->once())->method('create')->willReturn($source);
         $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $metricMetadata->method('instrumentType')->willReturn(InstrumentType::COUNTER);
         $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
 
         $reader->add($provider, $metricMetadata, $stalenessHandler);

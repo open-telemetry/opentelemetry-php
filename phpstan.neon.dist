@@ -52,6 +52,14 @@ parameters:
             paths:
                 - src/SDK/Common/InstrumentationScope
         -
-            message: "#.*expects Google\\\\Protobuf\\\\RepeatedField.*#"
+            message: "#.*RepeatedField.*#"
             paths:
                 - src/Contrib/Otlp
+        -
+            message: "#Access to an undefined property .*#"
+            paths:
+                - tests/Integration/SDK/Metrics
+        -
+            message: "#.*assertSame.*will always evaluate to false.#"
+            paths:
+                - tests/Unit/SDK/Metrics/MetricRegistry/MetricRegistryTest.php
