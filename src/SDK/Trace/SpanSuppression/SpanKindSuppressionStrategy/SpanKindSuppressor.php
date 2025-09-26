@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
  */
 final class SpanKindSuppressor implements SpanSuppressor
 {
+    #[\Override]
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
     {
         return match ($spanKind) {

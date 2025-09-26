@@ -18,11 +18,13 @@ final class SpanKindSuppression implements SpanSuppression
     ) {
     }
 
+    #[\Override]
     public function isSuppressed(ContextInterface $context): bool
     {
         return $context->get($this->contextKey) === true;
     }
 
+    #[\Override]
     public function suppress(ContextInterface $context): ContextInterface
     {
         return $context->with($this->contextKey, true);

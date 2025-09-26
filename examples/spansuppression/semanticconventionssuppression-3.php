@@ -23,6 +23,7 @@ $tp = (new TracerProviderBuilder())
     ->addSpanProcessor(new BatchSpanProcessor(new SpanExporter((new StreamTransportFactory())->create('php://stdout', 'application/x-ndjson')), Clock::getDefault()))
     ->setSpanSuppressionStrategy(new SemanticConventionSuppressionStrategy([
         new class() implements \OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver {
+            #[\Override]
             public function resolveSemanticConventions(string $name, ?string $version, ?string $schemaUrl): array
             {
                 if ($name !== 'io.open-telemetry.php.twig') {

@@ -22,6 +22,7 @@ final class SemanticConventionSuppressionStrategy implements SpanSuppressionStra
     ) {
     }
 
+    #[\Override]
     public function getSuppressor(string $name, ?string $version, ?string $schemaUrl): SpanSuppressor
     {
         $semanticConventions = [];

@@ -25,6 +25,7 @@ final class SemanticConventionSuppressor implements SpanSuppressor
     ) {
     }
 
+    #[\Override]
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
     {
         $semanticConventions = [];

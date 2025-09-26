@@ -19,6 +19,7 @@ final class SemanticConventionSuppression implements SpanSuppression
     ) {
     }
 
+    #[\Override]
     public function isSuppressed(ContextInterface $context): bool
     {
         $suppressedConventions = $context->get($this->contextKey);
@@ -35,6 +36,7 @@ final class SemanticConventionSuppression implements SpanSuppression
         return true;
     }
 
+    #[\Override]
     public function suppress(ContextInterface $context): ContextInterface
     {
         $suppressedConventions = $context->get($this->contextKey) ?? [];

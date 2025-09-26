@@ -9,6 +9,7 @@ use OpenTelemetry\API\Trace\SpanSuppression\SemanticConvention;
 
 final class SemanticConventionResolver implements \OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver
 {
+    #[\Override]
     public function resolveSemanticConventions(string $name, ?string $version, ?string $schemaUrl): array
     {
         if ($schemaUrl === null || !\str_starts_with($schemaUrl, 'https://opentelemetry.io/schemas/')) {

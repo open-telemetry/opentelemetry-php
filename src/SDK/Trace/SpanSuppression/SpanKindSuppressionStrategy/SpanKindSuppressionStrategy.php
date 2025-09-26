@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
  */
 final class SpanKindSuppressionStrategy implements SpanSuppressionStrategy
 {
+    #[\Override]
     public function getSuppressor(string $name, ?string $version, ?string $schemaUrl): SpanSuppressor
     {
         return new SpanKindSuppressor();

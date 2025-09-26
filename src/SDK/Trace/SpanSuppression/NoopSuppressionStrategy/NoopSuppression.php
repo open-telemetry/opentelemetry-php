@@ -12,11 +12,13 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
  */
 final class NoopSuppression implements SpanSuppression
 {
+    #[\Override]
     public function isSuppressed(ContextInterface $context): bool
     {
         return false;
     }
 
+    #[\Override]
     public function suppress(ContextInterface $context): ContextInterface
     {
         return $context;
