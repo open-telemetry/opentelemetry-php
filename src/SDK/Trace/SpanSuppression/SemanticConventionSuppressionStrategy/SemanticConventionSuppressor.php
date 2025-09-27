@@ -16,7 +16,7 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 final class SemanticConventionSuppressor implements SpanSuppressor
 {
     /**
-     * @param array<int, list<CompiledSemanticConvention>> $semanticConventions
+     * @param array<int, list<string>> $semanticConventions
      * @param array<int, list<CompiledSemanticConventionAttribute>> $attributeMap
      */
     public function __construct(
@@ -42,13 +42,8 @@ final class SemanticConventionSuppressor implements SpanSuppressor
             if ($excluded >> $i & 1) {
                 continue;
             }
-            foreach ($attributes as $attribute => $_) {
-                if (!$semanticConvention->attributes->matches($attribute)) {
-                    continue 2;
-                }
-            }
 
-            $semanticConventions[] = $semanticConvention->name;
+            $semanticConventions[] = $semanticConvention;
         }
 
         if (!$semanticConventions && $spanKind === SpanKind::KIND_INTERNAL) {

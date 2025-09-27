@@ -53,10 +53,7 @@ final class SemanticConventionSuppressionStrategy implements SpanSuppressionStra
                 $attributes->add($attribute);
             }
 
-            $compiledSemanticConventions[$semanticConvention->spanKind][] = new CompiledSemanticConvention(
-                $semanticConvention->name,
-                $attributes,
-            );
+            $compiledSemanticConventions[$semanticConvention->spanKind][] = $semanticConvention->name;
             $i = array_key_last($compiledSemanticConventions[$semanticConvention->spanKind]);
 
             foreach ($semanticConvention->samplingAttributes as $attribute) {
