@@ -170,4 +170,12 @@ class SpanSuppressionTest extends TestCase
         $this->assertFalse($httpSuppression->isSuppressed($context));
         $this->assertTrue($clientSuppression->isSuppressed($context));
     }
+
+    public function test_semantic_convention_suppression_strategy_does_not_fail_on_empty_semantic_conventions(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $strategy = new SemanticConventionSuppressionStrategy([]);
+        $strategy->getSuppressor('test', null, null)->resolveSuppression(SpanKind::KIND_CLIENT, []);
+    }
 }
