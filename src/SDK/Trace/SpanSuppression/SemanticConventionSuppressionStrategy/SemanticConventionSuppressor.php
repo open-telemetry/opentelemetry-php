@@ -28,22 +28,20 @@ final class SemanticConventionSuppressor implements SpanSuppressor
     #[\Override]
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
     {
-        $excluded = 0;
+        $candidates = (1 << count($this->semanticConventions[$spanKind])) - 1;
         foreach ($this->attributeMap[$spanKind] ?? [] as $attribute) {
             // If attribute is present: exclude all semconvs not containing this attribute
             // If attribute is not present: exclude all semconvs containing this attribute as sampling relevant attribute
-            $excluded |= array_key_exists($attribute->name, $attributes)
-                ? $attribute->notIncludedIn
-                : $attribute->samplingRelevantIn;
+            $candidates &= array_key_exists($attribute->name, $attributes)
+                ? $attribute->includedIn
+                : $attribute->notSamplingRelevantIn;
         }
 
         $semanticConventions = [];
         foreach ($this->semanticConventions[$spanKind] ?? [] as $i => $semanticConvention) {
-            if ($excluded >> $i & 1) {
-                continue;
+            if ($candidates >> $i & 1) {
+                $semanticConventions[] = $semanticConvention;
             }
-
-            $semanticConventions[] = $semanticConvention;
         }
 
         if (!$semanticConventions && $spanKind === SpanKind::KIND_INTERNAL) {

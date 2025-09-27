@@ -11,8 +11,8 @@ final class CompiledSemanticConventionAttribute
 {
     public function __construct(
         public readonly string $name,
-        public readonly int $samplingRelevantIn,
-        public readonly int $notIncludedIn,
+        public readonly int $notSamplingRelevantIn,
+        public readonly int $includedIn,
     ) {
     }
 }

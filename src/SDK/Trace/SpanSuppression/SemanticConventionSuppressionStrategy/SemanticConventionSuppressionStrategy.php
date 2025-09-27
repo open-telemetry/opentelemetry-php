@@ -69,7 +69,7 @@ final class SemanticConventionSuppressionStrategy implements SpanSuppressionStra
         $compiledLookupAttributes = [];
         foreach ($lookup as $spanKind => $attributes) {
             foreach ($attributes as $attribute => $masks) {
-                $compiledLookupAttributes[$spanKind][] = new CompiledSemanticConventionAttribute($attribute, $masks[0], $masks[1]);
+                $compiledLookupAttributes[$spanKind][] = new CompiledSemanticConventionAttribute($attribute, ~$masks[0], ~$masks[1]);
             }
         }
 
