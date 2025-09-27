@@ -15,6 +15,8 @@ final class SpanKindSuppressionStrategy implements SpanSuppressionStrategy
     #[\Override]
     public function getSuppressor(string $name, ?string $version, ?string $schemaUrl): SpanSuppressor
     {
-        return new SpanKindSuppressor();
+        static $suppressor = new SpanKindSuppressor();
+
+        return $suppressor;
     }
 }

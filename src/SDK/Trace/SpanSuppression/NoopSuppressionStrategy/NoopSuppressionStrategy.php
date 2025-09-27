@@ -15,6 +15,8 @@ final class NoopSuppressionStrategy implements SpanSuppressionStrategy
     #[\Override]
     public function getSuppressor(string $name, ?string $version, ?string $schemaUrl): SpanSuppressor
     {
-        return new NoopSuppressor();
+        static $suppressor = new NoopSuppressor();
+
+        return $suppressor;
     }
 }

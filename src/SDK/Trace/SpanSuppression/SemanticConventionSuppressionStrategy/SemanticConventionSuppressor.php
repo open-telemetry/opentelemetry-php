@@ -39,6 +39,12 @@ final class SemanticConventionSuppressor implements SpanSuppressor
             }
         }
 
+        if (!$candidates && $spanKind === SpanKind::KIND_INTERNAL) {
+            static $suppression = new NoopSuppression();
+
+            return $suppression;
+        }
+
         if ($candidates & $filter) {
             $candidates &= $filter;
         }
@@ -48,10 +54,6 @@ final class SemanticConventionSuppressor implements SpanSuppressor
             if ($candidates >> $i & 1) {
                 $semanticConventions[] = $semanticConvention;
             }
-        }
-
-        if (!$semanticConventions && $spanKind === SpanKind::KIND_INTERNAL) {
-            return new NoopSuppression();
         }
 
         return new SemanticConventionSuppression(

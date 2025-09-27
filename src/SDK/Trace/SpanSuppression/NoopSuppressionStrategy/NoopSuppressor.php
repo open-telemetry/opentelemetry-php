@@ -15,6 +15,8 @@ final class NoopSuppressor implements SpanSuppressor
     #[\Override]
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
     {
-        return new NoopSuppression();
+        static $suppression = new NoopSuppression();
+
+        return $suppression;
     }
 }

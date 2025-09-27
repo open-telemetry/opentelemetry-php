@@ -17,7 +17,9 @@ final class SpanKindSuppressor implements SpanSuppressor
     #[\Override]
     public function resolveSuppression(int $spanKind, array $attributes): SpanSuppression
     {
-        return match ($spanKind) {
+        static $suppressions = [];
+
+        return $suppressions[$spanKind] ??= match ($spanKind) {
             SpanKind::KIND_INTERNAL => new NoopSuppression(),
             SpanKind::KIND_CLIENT => new SpanKindSuppression(SpanKindSuppressionContextKey::Client),
             SpanKind::KIND_SERVER => new SpanKindSuppression(SpanKindSuppressionContextKey::Server),
