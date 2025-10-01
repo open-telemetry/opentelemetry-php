@@ -86,7 +86,7 @@ final class Apache implements ResourceDetectorInterface
         ];
 
         // Create a stable UUID v5 using a namespace UUID and deterministic name
-        $namespace = Uuid::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8'); // DNS namespace UUID
+        $namespace = Uuid::fromString('4d63009a-8d0f-11ee-aad7-4c796ed8e320');
         $name = implode('-', $components);
 
         return Uuid::uuid5($namespace, $name)->toString();
