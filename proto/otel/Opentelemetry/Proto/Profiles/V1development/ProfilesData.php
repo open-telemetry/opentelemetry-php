@@ -24,14 +24,24 @@ class ProfilesData extends \Google\Protobuf\Internal\Message
 {
     /**
      * An array of ResourceProfiles.
-     * For data coming from a single resource this array will typically contain
-     * one element. Intermediary nodes that receive data from multiple origins
-     * typically batch the data before forwarding further and in that case this
-     * array will contain multiple elements.
+     * For data coming from an SDK profiler, this array will typically contain one
+     * element. Host-level profilers will usually create one ResourceProfile per
+     * container, as well as one additional ResourceProfile grouping all samples
+     * from non-containerized processes.
+     * Other resource groupings are possible as well and clarified via
+     * Resource.attributes and semantic conventions.
+     * Tools that visualize profiles should prefer displaying
+     * resources_profiles[0].scope_profiles[0].profiles[0] by default.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;</code>
      */
     private $resource_profiles;
+    /**
+     * One instance of ProfilesDictionary
+     *
+     * Generated from protobuf field <code>.opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;</code>
+     */
+    protected $dictionary = null;
 
     /**
      * Constructor.
@@ -41,10 +51,16 @@ class ProfilesData extends \Google\Protobuf\Internal\Message
      *
      *     @type \Opentelemetry\Proto\Profiles\V1development\ResourceProfiles[]|\Google\Protobuf\Internal\RepeatedField $resource_profiles
      *           An array of ResourceProfiles.
-     *           For data coming from a single resource this array will typically contain
-     *           one element. Intermediary nodes that receive data from multiple origins
-     *           typically batch the data before forwarding further and in that case this
-     *           array will contain multiple elements.
+     *           For data coming from an SDK profiler, this array will typically contain one
+     *           element. Host-level profilers will usually create one ResourceProfile per
+     *           container, as well as one additional ResourceProfile grouping all samples
+     *           from non-containerized processes.
+     *           Other resource groupings are possible as well and clarified via
+     *           Resource.attributes and semantic conventions.
+     *           Tools that visualize profiles should prefer displaying
+     *           resources_profiles[0].scope_profiles[0].profiles[0] by default.
+     *     @type \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary $dictionary
+     *           One instance of ProfilesDictionary
      * }
      */
     public function __construct($data = NULL) {
@@ -54,10 +70,14 @@ class ProfilesData extends \Google\Protobuf\Internal\Message
 
     /**
      * An array of ResourceProfiles.
-     * For data coming from a single resource this array will typically contain
-     * one element. Intermediary nodes that receive data from multiple origins
-     * typically batch the data before forwarding further and in that case this
-     * array will contain multiple elements.
+     * For data coming from an SDK profiler, this array will typically contain one
+     * element. Host-level profilers will usually create one ResourceProfile per
+     * container, as well as one additional ResourceProfile grouping all samples
+     * from non-containerized processes.
+     * Other resource groupings are possible as well and clarified via
+     * Resource.attributes and semantic conventions.
+     * Tools that visualize profiles should prefer displaying
+     * resources_profiles[0].scope_profiles[0].profiles[0] by default.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;</code>
      * @return \Google\Protobuf\Internal\RepeatedField
@@ -69,10 +89,14 @@ class ProfilesData extends \Google\Protobuf\Internal\Message
 
     /**
      * An array of ResourceProfiles.
-     * For data coming from a single resource this array will typically contain
-     * one element. Intermediary nodes that receive data from multiple origins
-     * typically batch the data before forwarding further and in that case this
-     * array will contain multiple elements.
+     * For data coming from an SDK profiler, this array will typically contain one
+     * element. Host-level profilers will usually create one ResourceProfile per
+     * container, as well as one additional ResourceProfile grouping all samples
+     * from non-containerized processes.
+     * Other resource groupings are possible as well and clarified via
+     * Resource.attributes and semantic conventions.
+     * Tools that visualize profiles should prefer displaying
+     * resources_profiles[0].scope_profiles[0].profiles[0] by default.
      *
      * Generated from protobuf field <code>repeated .opentelemetry.proto.profiles.v1development.ResourceProfiles resource_profiles = 1;</code>
      * @param \Opentelemetry\Proto\Profiles\V1development\ResourceProfiles[]|\Google\Protobuf\Internal\RepeatedField $var
@@ -82,6 +106,42 @@ class ProfilesData extends \Google\Protobuf\Internal\Message
     {
         $arr = GPBUtil::checkRepeatedField($var, \Google\Protobuf\Internal\GPBType::MESSAGE, \Opentelemetry\Proto\Profiles\V1development\ResourceProfiles::class);
         $this->resource_profiles = $arr;
+
+        return $this;
+    }
+
+    /**
+     * One instance of ProfilesDictionary
+     *
+     * Generated from protobuf field <code>.opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;</code>
+     * @return \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary|null
+     */
+    public function getDictionary()
+    {
+        return $this->dictionary;
+    }
+
+    public function hasDictionary()
+    {
+        return isset($this->dictionary);
+    }
+
+    public function clearDictionary()
+    {
+        unset($this->dictionary);
+    }
+
+    /**
+     * One instance of ProfilesDictionary
+     *
+     * Generated from protobuf field <code>.opentelemetry.proto.profiles.v1development.ProfilesDictionary dictionary = 2;</code>
+     * @param \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary $var
+     * @return $this
+     */
+    public function setDictionary($var)
+    {
+        GPBUtil::checkMessage($var, \Opentelemetry\Proto\Profiles\V1development\ProfilesDictionary::class);
+        $this->dictionary = $var;
 
         return $this;
     }

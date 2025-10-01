@@ -17,26 +17,26 @@ use Google\Protobuf\Internal\GPBUtil;
 class PBFunction extends \Google\Protobuf\Internal\Message
 {
     /**
-     * Name of the function, in human-readable form if available.
+     * Function name. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 name_strindex = 1;</code>
      */
     protected $name_strindex = 0;
     /**
-     * Name of the function, as identified by the system.
-     * For instance, it can be a C++ mangled name.
+     * Function name, as identified by the system. For instance,
+     * it can be a C++ mangled name. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 system_name_strindex = 2;</code>
      */
     protected $system_name_strindex = 0;
     /**
-     * Source file containing the function.
+     * Source file containing the function. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 filename_strindex = 3;</code>
      */
     protected $filename_strindex = 0;
     /**
-     * Line number in source file.
+     * Line number in source file. 0 means unset.
      *
      * Generated from protobuf field <code>int64 start_line = 4;</code>
      */
@@ -49,14 +49,14 @@ class PBFunction extends \Google\Protobuf\Internal\Message
      *     Optional. Data for populating the Message object.
      *
      *     @type int $name_strindex
-     *           Name of the function, in human-readable form if available.
+     *           Function name. Empty string if not available.
      *     @type int $system_name_strindex
-     *           Name of the function, as identified by the system.
-     *           For instance, it can be a C++ mangled name.
+     *           Function name, as identified by the system. For instance,
+     *           it can be a C++ mangled name. Empty string if not available.
      *     @type int $filename_strindex
-     *           Source file containing the function.
+     *           Source file containing the function. Empty string if not available.
      *     @type int|string $start_line
-     *           Line number in source file.
+     *           Line number in source file. 0 means unset.
      * }
      */
     public function __construct($data = NULL) {
@@ -65,7 +65,7 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the function, in human-readable form if available.
+     * Function name. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 name_strindex = 1;</code>
      * @return int
@@ -76,7 +76,7 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the function, in human-readable form if available.
+     * Function name. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 name_strindex = 1;</code>
      * @param int $var
@@ -91,8 +91,8 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the function, as identified by the system.
-     * For instance, it can be a C++ mangled name.
+     * Function name, as identified by the system. For instance,
+     * it can be a C++ mangled name. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 system_name_strindex = 2;</code>
      * @return int
@@ -103,8 +103,8 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Name of the function, as identified by the system.
-     * For instance, it can be a C++ mangled name.
+     * Function name, as identified by the system. For instance,
+     * it can be a C++ mangled name. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 system_name_strindex = 2;</code>
      * @param int $var
@@ -119,7 +119,7 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Source file containing the function.
+     * Source file containing the function. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 filename_strindex = 3;</code>
      * @return int
@@ -130,7 +130,7 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Source file containing the function.
+     * Source file containing the function. Empty string if not available.
      *
      * Generated from protobuf field <code>int32 filename_strindex = 3;</code>
      * @param int $var
@@ -145,7 +145,7 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Line number in source file.
+     * Line number in source file. 0 means unset.
      *
      * Generated from protobuf field <code>int64 start_line = 4;</code>
      * @return int|string
@@ -156,7 +156,7 @@ class PBFunction extends \Google\Protobuf\Internal\Message
     }
 
     /**
-     * Line number in source file.
+     * Line number in source file. 0 means unset.
      *
      * Generated from protobuf field <code>int64 start_line = 4;</code>
      * @param int|string $var

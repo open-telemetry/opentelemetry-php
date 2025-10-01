@@ -232,6 +232,12 @@ meter_provider:
 propagator:
   composite: [tracecontext, baggage, b3, b3multi, jaeger, xray, ottrace]
 
+# Configure response propagators.
+#
+# Environment variable: OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS
+response_propagator/development:
+  composite: [servertiming, traceresponse]
+
 # Configure tracer provider.
 tracer_provider:
   # Configure span processors.

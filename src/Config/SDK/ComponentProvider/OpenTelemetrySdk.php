@@ -11,8 +11,11 @@ use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
+use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
@@ -86,6 +89,9 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     },
      *     propagator: array{
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
+     *     },
+     *     "response_propagator/development": array{
+     *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
      *     tracer_provider: array{
      *         limits: array{
@@ -176,6 +182,13 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
         $propagator = ($propagators === []) ? NoopTextMapPropagator::getInstance() : new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
+
+        $responsePropagators = [];
+        foreach ($properties['response_propagator/development']['composite'] as $plugin) {
+            $responsePropagators[] = $plugin->create($context);
+        }
+        $responsePropagator = ($responsePropagators === []) ? NoopResponsePropagator::getInstance() : new MultiResponsePropagator($responsePropagators);
+        $sdkBuilder->setResponsePropagator($responsePropagator);
 
         if ($properties['disabled']) {
             return $sdkBuilder;
@@ -403,6 +416,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
+                ->append($this->getExperimentalResponsePropagatorConfig($registry, $builder))
             ->end();
 
         return $node;
@@ -679,6 +693,41 @@ final class OpenTelemetrySdk implements ComponentProvider
 //                ->arrayNode('composite_list')
 //                    ->scalarPrototype()->end()
 //                ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    private function getExperimentalResponsePropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        $node = $builder->arrayNode('response_propagator/development');
+        $node
+            ->beforeNormalization()
+            ->ifArray()
+            ->then(static function (array $value): array {
+                $existing = [];
+                foreach ($value['composite'] ?? [] as $item) {
+                    $existing[] = key($item);
+                }
+                foreach (explode(',', $value['composite_list'] ?? '') as $name) {
+                    $name = trim($name);
+                    if ($name !== '' && !in_array($name, $existing)) {
+                        $value['composite'][][$name] = null;
+                        $existing[] = $name;
+                    }
+                }
+
+                unset($value['composite_list']);
+
+                return $value;
+            })
+            ->end();
+
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->append($registry->componentList('composite', ResponsePropagatorInterface::class))
             ->end()
         ;
 
