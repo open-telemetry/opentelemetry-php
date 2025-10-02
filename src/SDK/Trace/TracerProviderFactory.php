@@ -12,11 +12,10 @@ final class TracerProviderFactory
     use LogsMessagesTrait;
 
     public function __construct(
-        private readonly ExporterFactory $exporterFactory = new ExporterFactory(),
-        private readonly SamplerFactory $samplerFactory = new SamplerFactory(),
-        private readonly SpanProcessorFactory $spanProcessorFactory = new SpanProcessorFactory(),
-    ) {
-    }
+        private readonly ComponentProviderBasedExporterFactory $exporterFactory = new ComponentProviderBasedExporterFactory(),
+        private readonly ComponentProviderBasedSamplerFactory $samplerFactory = new ComponentProviderBasedSamplerFactory(),
+        private readonly ComponentProviderBasedSpanProcessorFactory $spanProcessorFactory = new ComponentProviderBasedSpanProcessorFactory(),
+    ) {}
 
     public function create(): TracerProviderInterface
     {
