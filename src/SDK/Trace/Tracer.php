@@ -10,6 +10,8 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 
 class Tracer implements API\TracerInterface
 {
@@ -20,6 +22,7 @@ class Tracer implements API\TracerInterface
         private readonly TracerSharedState $tracerSharedState,
         private readonly InstrumentationScopeInterface $instrumentationScope,
         ?Configurator $configurator = null,
+        private readonly SpanSuppressor $spanSuppressor = new NoopSuppressor(),
     ) {
         $this->config = $configurator ? $configurator->resolve($this->instrumentationScope) : TracerConfig::default();
     }
@@ -40,6 +43,7 @@ class Tracer implements API\TracerInterface
             $spanName,
             $this->instrumentationScope,
             $this->tracerSharedState,
+            $this->spanSuppressor,
         );
     }
 

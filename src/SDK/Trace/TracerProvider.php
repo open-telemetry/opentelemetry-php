@@ -16,6 +16,8 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
 use WeakMap;
 
 final class TracerProvider implements TracerProviderInterface
@@ -33,6 +35,7 @@ final class TracerProvider implements TracerProviderInterface
         ?IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
         private ?Configurator $configurator = null,
+        private SpanSuppressionStrategy $spanSuppressionStrategy = new NoopSuppressionStrategy(),
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -77,6 +80,7 @@ final class TracerProvider implements TracerProviderInterface
             $this->tracerSharedState,
             $scope,
             $this->configurator,
+            $this->spanSuppressionStrategy->getSuppressor($name, $version, $schemaUrl),
         );
         $this->tracers->offsetSet($tracer, null);
 
