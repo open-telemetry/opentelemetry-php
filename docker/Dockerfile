@@ -35,6 +35,7 @@ RUN apt-get install -y \
     php${PHP_VERSION}-rdkafka \
     php${PHP_VERSION}-mysqli \
     php${PHP_VERSION}-pgsql \
+    php${PHP_VERSION}-sqlite3 \
     unzip
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
