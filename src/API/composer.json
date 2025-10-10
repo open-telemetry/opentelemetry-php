@@ -30,6 +30,7 @@
             "OpenTelemetry\\API\\": "."
         },
         "files": [
+            "_compat.php",
             "Trace/functions.php"
         ]
     },

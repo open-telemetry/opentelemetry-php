@@ -14,6 +14,7 @@
         <directory name="./examples"/>
         <ignoreFiles>
             <directory name="./examples/traces/demo/"/>
+            <directory name="src/API/Common/Compatibility/"/>
             <directory name="tests/Unit/Config/SDK/Configuration/ExampleSdk"/>
             <directory name="tests/TraceContext/W3CTestService"/>
             <directory name="vendor"/>
