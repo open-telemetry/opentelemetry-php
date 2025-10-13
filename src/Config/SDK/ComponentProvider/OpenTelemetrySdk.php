@@ -221,12 +221,12 @@ final class OpenTelemetrySdk implements ComponentProvider
         $attributes = AttributesParser::parseAttributesList($properties['resource']['attributes_list']);
         $attributes = array_merge($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
 
-        $resource = $resource
+        $resource = $mandatory
+            ->merge($resource)
             ->merge(ResourceInfo::create(
                 attributes: Attributes::create($attributes),
                 schemaUrl: $schemaUrl,
-            ))
-            ->merge($mandatory);
+            ));
 
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {

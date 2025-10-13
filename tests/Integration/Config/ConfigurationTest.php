@@ -4,17 +4,24 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config;
 
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
+use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
+use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
+use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector\ServiceName;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Yaml;
 
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
@@ -196,6 +203,69 @@ final class ConfigurationTest extends TestCase
         $this->assertIsArray($responsePropagators);
         $this->assertCount(1, $responsePropagators, 'duplicate was removed');
         $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
+    }
+
+    public function test_resource_attributes_take_precedence_over_default_attributes(): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "0.4"
+            resource:
+              attributes:
+              - { name: service.name, value: test-service }
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
+    }
+
+    public function test_resource_detectors_take_precedence_over_default_attributes(): void
+    {
+        $factory = new ConfigurationFactory(
+            [new ServiceName('test-service')],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "0.4"
+            resource:
+              detection/development:
+                detectors:
+                - service_name:
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
+    }
+
+    #[Depends('test_resource_attributes_take_precedence_over_default_attributes')]
+    #[Depends('test_resource_detectors_take_precedence_over_default_attributes')]
+    public function test_resource_attributes_take_precedence_over_resource_detectors(): void
+    {
+        $factory = new ConfigurationFactory(
+            [new ServiceName('should-be-overridden')],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "0.4"
+            resource:
+              attributes:
+              - { name: service.name, value: test-service }
+              detection/development:
+                detectors:
+                - service_name:
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
     }
 
     private function getResource(Sdk $sdk): ResourceInfo
