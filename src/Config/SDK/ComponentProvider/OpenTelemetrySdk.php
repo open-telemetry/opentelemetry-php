@@ -228,6 +228,8 @@ final class OpenTelemetrySdk implements ComponentProvider
                 schemaUrl: $schemaUrl,
             ));
 
+        $context = $context->withExtension($resource, ResourceInfo::class);
+
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
             $spanProcessors[] = $processor->create($context);
