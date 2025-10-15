@@ -155,10 +155,15 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $samplingDecision = $samplingResult->getDecision();
         $samplingResultTraceState = $samplingResult->getTraceState();
 
+        $flags = $parentSpanContext->getTraceFlags() & 0x2;
+        if ($samplingDecision === SamplingResult::RECORD_AND_SAMPLE) {
+            $flags |= API\TraceFlags::SAMPLED;
+        }
+
         $spanContext = API\SpanContext::create(
             $traceId,
             $spanId,
-            SamplingResult::RECORD_AND_SAMPLE === $samplingDecision ? API\TraceFlags::SAMPLED : API\TraceFlags::DEFAULT,
+            $flags,
             $samplingResultTraceState,
         );
 

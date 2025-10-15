@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\TraceFlags;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -84,5 +88,18 @@ class SpanBuilderTest extends TestCase
         $this->assertSame(self::SPAN_ID, $span->toSpanData()->getSpanId());
         $this->assertSame(123456, $span->toSpanData()->getStartEpochNanos());
         $this->assertCount(1, $span->toSpanData()->getLinks());
+    }
+
+    public function test_start_span_keeps_trace_random_flag(): void
+    {
+        $this->sampler->method('shouldSample')->willReturn(new SamplingResult(SamplingResult::DROP));
+        $this->idGenerator->method('generateSpanId')->willReturn(self::SPAN_ID);
+
+        $parent = SpanContext::create('4bf92f3577b34da6a3ce929d0e0e4736', '00f067aa0ba902b7', TraceFlags::SAMPLED | TraceFlags::RANDOM);
+        $span = $this->builder
+            ->setParent(Span::wrap($parent)->storeInContext(Context::getCurrent()))
+            ->startSpan();
+
+        $this->assertSame(TraceFlags::RANDOM, $span->getContext()->getTraceFlags());
     }
 }
