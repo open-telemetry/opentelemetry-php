@@ -288,6 +288,18 @@ class TraceContextPropagatorTest extends TestCase
         );
     }
 
+    public function test_trace_context_level2_random_flag(): void
+    {
+        $traceparent = '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-03';
+
+        $context = $this->traceContextPropagator->extract([TraceContextPropagator::TRACEPARENT => $traceparent]);
+        $this->assertSame(TraceFlags::SAMPLED | TraceFlags::RANDOM, Span::fromContext($context)->getContext()->getTraceFlags());
+
+        $carrier = [];
+        $this->traceContextPropagator->inject($carrier, context: $context);
+        $this->assertSame($traceparent, $carrier[TraceContextPropagator::TRACEPARENT]);
+    }
+
     public function test_invalid_traceparent_version_0xff(): void
     {
         $this->assertInvalid([
