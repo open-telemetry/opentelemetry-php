@@ -70,6 +70,7 @@ final class MetricExporterPrometheus implements ComponentProvider
                         ->end()
                     ->end()
                 ->end()
+                ->scalarNode('translation_strategy')->defaultValue('UnderscoreEscapingWithSuffixes')->end()
             ->end()
         ;
 

@@ -62,7 +62,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 {
     /**
      * @param array{
-     *     file_format: '0.4',
+     *     file_format: '1.0-rc.2',
      *     disabled: bool,
      *     resource: array{
      *         attributes: array{
@@ -409,7 +409,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->isRequired()
                     ->example('0.1')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['0.4'])->thenInvalid('unsupported version')->end()
+                    ->validate()->ifNotInArray(['1.0-rc.2'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
                 ->append($this->getResourceConfig($registry, $builder))
@@ -510,11 +510,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->arrayNode('tracers')
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('name')->end()
                                     ->arrayNode('config')
                                         ->addDefaultsIfNotSet()
                                         ->children()
-                                            ->booleanNode('disabled')->isRequired()->end()
+                                            ->booleanNode('disabled')->end()
                                         ->end()
                                     ->end()
                                 ->end()
