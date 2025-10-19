@@ -33,7 +33,7 @@ use PHPUnit\Framework\TestCase;
 class SpanConverterTest extends TestCase
 {
     /**
-     * @psalm-suppress InvalidArgument
+     * @psalm-suppress InvalidArgument,PossiblyNullReference
      */
     public function test_convert_span_to_payload(): void
     {
@@ -85,12 +85,13 @@ class SpanConverterTest extends TestCase
         $convertSpanData = static function (SpanData $spanData): ProtoSpan {
             $converter = new SpanConverter();
 
-            /** @psalm-suppress InvalidArgument */
+            /** @psalm-suppress InvalidArgument,PossiblyNullReference */
             return $converter->convert([$spanData])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         };
 
+        /** @psalm-suppress InvalidNullableReturnType */
         $getLink = static function (ProtoSpan $protoSpan, int $linkIndex): ProtoSpanLink {
-            /** @psalm-suppress InvalidArgument */
+            /** @psalm-suppress InvalidArgument,NullableReturnStatement */
             return $protoSpan->getLinks()[$linkIndex];
         };
 
@@ -130,6 +131,7 @@ class SpanConverterTest extends TestCase
         $converter = new SpanConverter();
         /** @psalm-suppress InvalidArgument */
         $converted = $converter->convert([$span])->getResourceSpans()[0];
+        /** @psalm-suppress PossiblyNullReference */
         $attributes = $converted->getScopeSpans()[0]->getSpans()[0]->getAttributes();
 
         // Check that we can convert all attributes to tags
@@ -308,7 +310,7 @@ class SpanConverterTest extends TestCase
         $resource->method('getAttributes')->willReturn($attributes);
         $converter = new SpanConverter();
         $result = $converter->convert([$span, $span, $span])->getResourceSpans();
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $this->assertCount(2, $result[0]->getResource()->getAttributes());
     }
 
@@ -339,7 +341,7 @@ class SpanConverterTest extends TestCase
     public function test_span_kind($kind, $expected): void
     {
         $span = (new SpanData())->setKind($kind);
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $row = (new SpanConverter())->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         $this->assertSame($expected, $row->getKind());
     }
@@ -359,7 +361,7 @@ class SpanConverterTest extends TestCase
     public function test_span_with_error_status(): void
     {
         $span = (new SpanData())->setStatus(StatusData::error());
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $row = (new SpanConverter())->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
         $this->assertSame(V1\Status\StatusCode::STATUS_CODE_ERROR, $row->getStatus()->getCode());
     }
