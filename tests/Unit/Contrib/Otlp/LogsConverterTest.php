@@ -36,7 +36,7 @@ class LogsConverterTest extends TestCase
         $this->record->method('getBody')->willReturn('body');
 
         $request = $this->converter->convert([$this->record]);
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $row = $request->getResourceLogs()[0]->getScopeLogs()[0]->getLogRecords()[0];
         $this->assertSame('body', $row->getBody()->getStringValue());
     }
@@ -49,7 +49,7 @@ class LogsConverterTest extends TestCase
         $span->method('getContext')->willReturn($spanContext);
         $this->record->method('getSpanContext')->willReturn($spanContext);
         $request = $this->converter->convert([$this->record]);
-        /** @psalm-suppress InvalidArgument */
+        /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $row = $request->getResourceLogs()[0]->getScopeLogs()[0]->getLogRecords()[0];
         $this->assertSame(self::TRACE_ID_BASE16, bin2hex((string) $row->getTraceId()));
         $this->assertSame(self::SPAN_ID_BASE16, bin2hex((string) $row->getSpanId()));

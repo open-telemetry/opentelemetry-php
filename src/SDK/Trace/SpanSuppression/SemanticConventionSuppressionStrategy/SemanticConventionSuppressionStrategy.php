@@ -59,7 +59,7 @@ final class SemanticConventionSuppressionStrategy implements SpanSuppressionStra
             foreach ($semanticConvention->samplingAttributes as $attribute) {
                 $lookup[$semanticConvention->spanKind][$attribute][0] |= 1 << $i;
             }
-            foreach ($lookup[$semanticConvention->spanKind] as $attribute => $_) {
+            foreach (array_keys($lookup[$semanticConvention->spanKind]) as $attribute) {
                 if (!$attributes->matches($attribute)) {
                     $lookup[$semanticConvention->spanKind][$attribute][1] |= 1 << $i;
                 }

@@ -35,7 +35,7 @@ final class TracerProvider implements TracerProviderInterface
         ?IdGeneratorInterface $idGenerator = null,
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
         private ?Configurator $configurator = null,
-        private SpanSuppressionStrategy $spanSuppressionStrategy = new NoopSuppressionStrategy(),
+        private readonly SpanSuppressionStrategy $spanSuppressionStrategy = new NoopSuppressionStrategy(),
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
