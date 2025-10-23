@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   web:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:61e01287e546aac28a3f56839c136b31f590273f3b41187a36f46f6a03bbfe22
     ports:
       - '8080:80'
     depends_on:

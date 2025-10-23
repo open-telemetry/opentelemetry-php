@@ -1,5 +1,5 @@
-FROM composer:2.8 AS composer
-FROM debian:bullseye
+FROM composer:2.8@sha256:3ca62a8176c743eebef305ac2b93094a733dd5a34b5c1e3d3cf6cbbbd0792649 AS composer
+FROM debian:bullseye@sha256:5e2b4654ea0dc0bc22434199dace15adf9799f292857679fa79f9395e6d4dafd
 WORKDIR /usr/src/myapp
 
 RUN apt-get update  \
