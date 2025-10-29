@@ -23,7 +23,10 @@ final class ComposerHandler
             return true;
         }
 
-        if (in_array(basename($_SERVER['argv'][0] ?? ''), ['composer', 'composer.phar'], true)) {
+        if (
+            ($entrypoint = $_SERVER['argv'][0] ?? '') === getenv('COMPOSER_BINARY')
+            || in_array(basename($entrypoint), ['composer', 'composer.phar'], true)
+        ) {
             return true;
         }
 
