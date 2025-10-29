@@ -13,6 +13,6 @@ declare(strict_types=1);
  *
  * @see https://github.com/open-telemetry/opentelemetry-php/issues/1673
  */
-if (getenv('COMPOSER_DEV_MODE') === false) {
+if (\OpenTelemetry\SDK\Common\Util\ComposerHandler::isRunning() === false) {
     \OpenTelemetry\SDK\SdkAutoloader::autoload();
 }
