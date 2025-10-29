@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   gitsplit:
-    image: jderusse/gitsplit
+    image: jderusse/gitsplit@sha256:ca619e08d0608d7ab8067be02db13409ec63a0e241c6308be42593f0c0ac705d
     volumes:
     - ../../:/srv
     - ../../var/cache/gitsplit:/cache/gitsplit
