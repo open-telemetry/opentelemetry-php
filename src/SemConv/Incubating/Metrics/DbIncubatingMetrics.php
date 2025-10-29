@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SemConv\Unstable\Metrics;
+namespace OpenTelemetry\SemConv\Incubating\Metrics;
 
 /**
  * Metrics for db.
