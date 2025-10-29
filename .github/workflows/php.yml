@@ -35,9 +35,9 @@ jobs:
       run: |
         echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-    - uses: gacts/run-and-post-run@v1
+    - uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1
       id: post-run-command
       with:
         post: |
@@ -58,7 +58,7 @@ jobs:
 
     - name: Setup cache environment
       id: extcache
-      uses: shivammathur/cache-extensions@v1
+      uses: shivammathur/cache-extensions@4595bea7d6630821b0a3a4894f816402faaf324c # v1
       with:
         php-version: ${{ matrix.php-version }}
         extensions: ${{ env.extensions }}
@@ -72,7 +72,7 @@ jobs:
         restore-keys: ${{ steps.extcache.outputs.key }}
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f # v2
       with:
         php-version: ${{ matrix.php-version }}
         coverage: xdebug
@@ -159,7 +159,7 @@ jobs:
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Code Coverage
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.clover
