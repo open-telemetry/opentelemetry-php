@@ -77,7 +77,7 @@ templates:
       }) | map({
         root_namespace: .root_namespace,
         metrics: .metrics,
-        namespace: "OpenTelemetry\\SemConv\\Unstable\\Metrics",
+        namespace: "OpenTelemetry\\SemConv\\Incubating\\Metrics",
         incubating: true,
       })
     application_mode: each
