@@ -20,6 +20,7 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
         $this->size = $size;
     }
 
+    #[\Override]
     public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {
         $bucket = random_int(0, $this->measurements);
@@ -29,6 +30,7 @@ final class FixedSizeReservoir implements ExemplarReservoirInterface
         }
     }
 
+    #[\Override]
     public function collect(array $dataPointAttributes): array
     {
         $this->measurements = 0;

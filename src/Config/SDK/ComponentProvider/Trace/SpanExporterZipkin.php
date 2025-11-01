@@ -6,9 +6,9 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Common\Time\ClockInterface;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Zipkin;
 use OpenTelemetry\SDK\Registry;
@@ -28,6 +28,7 @@ final class SpanExporterZipkin implements ComponentProvider
      *     timeout: int<0, max>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         return new Zipkin\Exporter(Registry::transportFactory('http')->create(
@@ -37,6 +38,7 @@ final class SpanExporterZipkin implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('zipkin');

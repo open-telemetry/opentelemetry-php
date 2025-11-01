@@ -9,6 +9,9 @@ on:
   create:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   gitsplit:
     runs-on: ubuntu-latest
@@ -16,7 +19,7 @@ jobs:
       - name: checkout
         run: git clone "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "$GITHUB_WORKSPACE" && cd "$GITHUB_WORKSPACE" && git checkout $GITHUB_SHA
       - name: Split repositories
-        uses: docker://jderusse/gitsplit:latest
+        uses: docker://jderusse/gitsplit:latest@sha256:ca619e08d0608d7ab8067be02db13409ec63a0e241c6308be42593f0c0ac705d
         with:
           args: gitsplit
         env:

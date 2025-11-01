@@ -36,18 +36,21 @@ final class B3Propagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function fields(): array
     {
         return $this->propagator->fields();
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $this->propagator->inject($carrier, $setter, $context);
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();

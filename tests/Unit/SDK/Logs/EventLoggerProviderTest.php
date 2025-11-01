@@ -19,6 +19,7 @@ class EventLoggerProviderTest extends TestCase
     private LoggerProviderInterface $loggerProvider;
     private LoggerInterface $logger;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);

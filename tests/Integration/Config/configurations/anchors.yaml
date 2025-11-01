@@ -47,3 +47,6 @@ tracer_provider:
 
 propagator:
   composite: []
+
+response_propagator/development:
+  composite: []

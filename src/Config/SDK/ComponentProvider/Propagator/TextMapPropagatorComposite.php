@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Propagator;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -21,6 +21,7 @@ final class TextMapPropagatorComposite implements ComponentProvider
     /**
      * @param list<ComponentPlugin<TextMapPropagatorInterface>> $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
     {
         $propagators = [];
@@ -31,6 +32,7 @@ final class TextMapPropagatorComposite implements ComponentProvider
         return new MultiTextMapPropagator($propagators);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $registry->componentNames('composite', TextMapPropagatorInterface::class);

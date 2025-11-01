@@ -64,21 +64,25 @@ class OtlpBench
                 $this->contentType = $contentType;
             }
 
+            #[\Override]
             public function contentType(): string
             {
                 return $this->contentType;
             }
 
+            #[\Override]
             public function send(string $payload, ?CancellationInterface $cancellation = null): FutureInterface
             {
                 return new CompletedFuture('');
             }
 
+            #[\Override]
             public function shutdown(?CancellationInterface $cancellation = null): bool
             {
                 return true;
             }
 
+            #[\Override]
             public function forceFlush(?CancellationInterface $cancellation = null): bool
             {
                 return true;

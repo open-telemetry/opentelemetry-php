@@ -1,17 +1,39 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions
+// DO NOT EDIT, this is archived and left for backward compatibility.
 
 declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
+/**
+ * @deprecated Use {@see OpenTelemetry\SemConv\Attributes}\* or {@see OpenTelemetry\SemConv\Unstable\Attributes}\* instead.
+ */
 interface TraceAttributes
 {
     /**
      * The URL of the OpenTelemetry schema for these keys and values.
      */
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
+
+    /**
+     * This attribute represents the state of the application.
+     *
+     * The Android lifecycle states are defined in [Activity lifecycle callbacks](https://developer.android.com/guide/components/activities/activity-lifecycle#lc), and from which the `OS identifiers` are derived.
+     */
+    public const ANDROID_APP_STATE = 'android.app.state';
+
+    /**
+     * Uniquely identifies the framework API revision offered by a version (`os.version`) of the android operating system. More information can be found [here](https://developer.android.com/guide/topics/manifest/uses-sdk-element#ApiLevels).
+     */
+    public const ANDROID_OS_API_LEVEL = 'android.os.api_level';
+
+    /**
+     * Deprecated. Use `android.app.state` body field instead.
+     *
+     * @deprecated {"note": "Use `android.app.state` body field instead.", "reason": "uncategorized"}
+     */
+    public const ANDROID_STATE = 'android.state';
 
     /**
      * A unique identifier representing the installation of an application on a specific device
@@ -142,6 +164,16 @@ interface TraceAttributes
      * Match result - success or failure
      */
     public const ASPNETCORE_ROUTING_MATCH_STATUS = 'aspnetcore.routing.match_status';
+
+    /**
+     * The unique identifier of the AWS Bedrock Guardrail. A [guardrail](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html) helps safeguard and prevent unwanted behavior from model responses or user messages.
+     */
+    public const AWS_BEDROCK_GUARDRAIL_ID = 'aws.bedrock.guardrail.id';
+
+    /**
+     * The unique identifier of the AWS Bedrock Knowledge base. A [knowledge base](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html) is a bank of information that can be queried by models to generate more relevant responses and augment prompts.
+     */
+    public const AWS_BEDROCK_KNOWLEDGE_BASE_ID = 'aws.bedrock.knowledge_base.id';
 
     /**
      * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
@@ -299,11 +331,21 @@ interface TraceAttributes
     public const AWS_EXTENDED_REQUEST_ID = 'aws.extended_request_id';
 
     /**
+     * The name of the AWS Kinesis [stream](https://docs.aws.amazon.com/streams/latest/dev/introduction.html) the request refers to. Corresponds to the `--stream-name` parameter of the Kinesis [describe-stream](https://docs.aws.amazon.com/cli/latest/reference/kinesis/describe-stream.html) operation.
+     */
+    public const AWS_KINESIS_STREAM_NAME = 'aws.kinesis.stream_name';
+
+    /**
      * The full invoked ARN as provided on the `Context` passed to the function (`Lambda-Runtime-Invoked-Function-Arn` header on the `/runtime/invocation/next` applicable).
      *
      * This may be different from `cloud.resource_id` if an alias is involved.
      */
     public const AWS_LAMBDA_INVOKED_ARN = 'aws.lambda.invoked_arn';
+
+    /**
+     * The UUID of the [AWS Lambda EvenSource Mapping](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-eventsourcemapping.html). An event source is mapped to a lambda function. It's contents are read by Lambda and used to trigger a function. This isn't available in the lambda execution context or the lambda runtime environtment. This is going to be populated by the AWS SDK for each language when that UUID is present. Some of these operations are Create/Delete/Get/List/Update EventSourceMapping.
+     */
+    public const AWS_LAMBDA_RESOURCE_MAPPING_ID = 'aws.lambda.resource_mapping.id';
 
     /**
      * The Amazon Resource Name(s) (ARN) of the AWS log group(s).
@@ -405,6 +447,31 @@ interface TraceAttributes
      * - [upload-part-copy](https://docs.aws.amazon.com/cli/latest/reference/s3api/upload-part-copy.html)
      */
     public const AWS_S3_UPLOAD_ID = 'aws.s3.upload_id';
+
+    /**
+     * The ARN of the Secret stored in the Secrets Mangger
+     */
+    public const AWS_SECRETSMANAGER_SECRET_ARN = 'aws.secretsmanager.secret.arn';
+
+    /**
+     * The ARN of the AWS SNS Topic. An Amazon SNS [topic](https://docs.aws.amazon.com/sns/latest/dg/sns-create-topic.html) is a logical access point that acts as a communication channel.
+     */
+    public const AWS_SNS_TOPIC_ARN = 'aws.sns.topic.arn';
+
+    /**
+     * The URL of the AWS SQS Queue. It's a unique identifier for a queue in Amazon Simple Queue Service (SQS) and is used to access the queue and perform actions on it.
+     */
+    public const AWS_SQS_QUEUE_URL = 'aws.sqs.queue.url';
+
+    /**
+     * The ARN of the AWS Step Functions Activity.
+     */
+    public const AWS_STEP_FUNCTIONS_ACTIVITY_ARN = 'aws.step_functions.activity.arn';
+
+    /**
+     * The ARN of the AWS Step Functions State Machine.
+     */
+    public const AWS_STEP_FUNCTIONS_STATE_MACHINE_ARN = 'aws.step_functions.state_machine.arn';
 
     /**
      * [Azure Resource Provider Namespace](https://learn.microsoft.com/azure/azure-resource-manager/management/azure-services-resource-providers) as recognized by the client.
@@ -509,6 +576,11 @@ interface TraceAttributes
     public const CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'cassandra.speculative_execution.count';
 
     /**
+     * The kind of action a pipeline run is performing.
+     */
+    public const CICD_PIPELINE_ACTION_NAME = 'cicd.pipeline.action.name';
+
+    /**
      * The human readable name of the pipeline within a CI/CD system.
      */
     public const CICD_PIPELINE_NAME = 'cicd.pipeline.name';
@@ -544,6 +616,11 @@ interface TraceAttributes
     public const CICD_PIPELINE_TASK_RUN_ID = 'cicd.pipeline.task.run.id';
 
     /**
+     * The result of a task run.
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT = 'cicd.pipeline.task.run.result';
+
+    /**
      * The [URL](https://wikipedia.org/wiki/URL) of the pipeline task run, providing the complete address in order to locate and identify the pipeline task run.
      */
     public const CICD_PIPELINE_TASK_RUN_URL_FULL = 'cicd.pipeline.task.run.url.full';
@@ -559,9 +636,24 @@ interface TraceAttributes
     public const CICD_SYSTEM_COMPONENT = 'cicd.system.component';
 
     /**
+     * The unique identifier of a worker within a CICD system.
+     */
+    public const CICD_WORKER_ID = 'cicd.worker.id';
+
+    /**
+     * The name of a worker within a CICD system.
+     */
+    public const CICD_WORKER_NAME = 'cicd.worker.name';
+
+    /**
      * The state of a CICD worker / agent.
      */
     public const CICD_WORKER_STATE = 'cicd.worker.state';
+
+    /**
+     * The [URL](https://wikipedia.org/wiki/URL) of the worker, providing the complete address in order to locate and identify the worker.
+     */
+    public const CICD_WORKER_URL_FULL = 'cicd.worker.url.full';
 
     /**
      * Client address - domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
@@ -600,7 +692,7 @@ interface TraceAttributes
     public const CLOUD_PROVIDER = 'cloud.provider';
 
     /**
-     * The geographical region the resource is running.
+     * The geographical region within a cloud provider. When associated with a resource, this attribute specifies the region where the resource operates. When calling services or APIs deployed on a cloud, this attribute identifies the region where the called destination is deployed.
      *
      * Refer to your provider's docs to see the available regions, for example [Alibaba Cloud regions](https://www.alibabacloud.com/help/doc-detail/40654.htm), [AWS regions](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/), [Azure regions](https://azure.microsoft.com/global-infrastructure/geographies/), [Google Cloud regions](https://cloud.google.com/about/locations), or [Tencent Cloud regions](https://www.tencentcloud.com/document/product/213/6091).
      */
@@ -657,7 +749,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `code.column.number`
      *
-     * @deprecated {"note": "Replaced by `code.column.number`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `code.column.number`.", "reason": "renamed", "renamed_to": "code.column.number"}
      */
     public const CODE_COLUMN = 'code.column';
 
@@ -674,14 +766,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `code.file.path` instead
      *
-     * @deprecated {"note": "Replaced by `code.file.path`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `code.file.path`.", "reason": "renamed", "renamed_to": "code.file.path"}
      */
     public const CODE_FILEPATH = 'code.filepath';
 
     /**
      * Deprecated, use `code.function.name` instead
      *
-     * @deprecated {"note": "Replaced by `code.function.name`", "reason": "uncategorized"}
+     * @deprecated {"note": "Value should be included in `code.function.name` which is expected to be a fully-qualified name.\n", "reason": "uncategorized"}
      */
     public const CODE_FUNCTION = 'code.function';
 
@@ -714,14 +806,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `code.line.number` instead
      *
-     * @deprecated {"note": "Replaced by `code.line.number`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `code.line.number`.", "reason": "renamed", "renamed_to": "code.line.number"}
      */
     public const CODE_LINENO = 'code.lineno';
 
     /**
      * Deprecated, namespace is now included into `code.function.name`
      *
-     * @deprecated {"note": "Value should be included in `code.function.name` which is expected to be a fully-qualified name.", "reason": "uncategorized"}
+     * @deprecated {"note": "Value should be included in `code.function.name` which is expected to be a fully-qualified name.\n", "reason": "uncategorized"}
      */
     public const CODE_NAMESPACE = 'code.namespace';
 
@@ -750,7 +842,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `cpu.mode` instead.
      *
-     * @deprecated {"note": "Replaced by `cpu.mode`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cpu.mode`.", "reason": "renamed", "renamed_to": "cpu.mode"}
      */
     public const CONTAINER_CPU_STATE = 'container.cpu.state';
 
@@ -809,7 +901,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `container.label` instead.
      *
-     * @deprecated {"note": "Replaced by `container.label`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `container.label`.", "reason": "renamed", "renamed_to": "container.label"}
      */
     public const CONTAINER_LABELS = 'container.labels';
 
@@ -834,51 +926,56 @@ interface TraceAttributes
     public const CPU_MODE = 'cpu.mode';
 
     /**
+     * Value of the garbage collector collection generation.
+     */
+    public const CPYTHON_GC_GENERATION = 'cpython.gc.generation';
+
+    /**
      * Deprecated, use `cassandra.consistency.level` instead.
      *
-     * @deprecated {"note": "Replaced by `cassandra.consistency.level`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cassandra.consistency.level`.", "reason": "renamed", "renamed_to": "cassandra.consistency.level"}
      */
     public const DB_CASSANDRA_CONSISTENCY_LEVEL = 'db.cassandra.consistency_level';
 
     /**
      * Deprecated, use `cassandra.coordinator.dc` instead.
      *
-     * @deprecated {"note": "Replaced by `cassandra.coordinator.dc`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cassandra.coordinator.dc`.", "reason": "renamed", "renamed_to": "cassandra.coordinator.dc"}
      */
     public const DB_CASSANDRA_COORDINATOR_DC = 'db.cassandra.coordinator.dc';
 
     /**
      * Deprecated, use `cassandra.coordinator.id` instead.
      *
-     * @deprecated {"note": "Replaced by `cassandra.coordinator.id`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cassandra.coordinator.id`.", "reason": "renamed", "renamed_to": "cassandra.coordinator.id"}
      */
     public const DB_CASSANDRA_COORDINATOR_ID = 'db.cassandra.coordinator.id';
 
     /**
      * Deprecated, use `cassandra.query.idempotent` instead.
      *
-     * @deprecated {"note": "Replaced by `cassandra.query.idempotent`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cassandra.query.idempotent`.", "reason": "renamed", "renamed_to": "cassandra.query.idempotent"}
      */
     public const DB_CASSANDRA_IDEMPOTENCE = 'db.cassandra.idempotence';
 
     /**
      * Deprecated, use `cassandra.page.size` instead.
      *
-     * @deprecated {"note": "Replaced by `cassandra.page.size`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cassandra.page.size`.", "reason": "renamed", "renamed_to": "cassandra.page.size"}
      */
     public const DB_CASSANDRA_PAGE_SIZE = 'db.cassandra.page_size';
 
     /**
      * Deprecated, use `cassandra.speculative_execution.count` instead.
      *
-     * @deprecated {"note": "Replaced by `cassandra.speculative_execution.count`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cassandra.speculative_execution.count`.", "reason": "renamed", "renamed_to": "cassandra.speculative_execution.count"}
      */
     public const DB_CASSANDRA_SPECULATIVE_EXECUTION_COUNT = 'db.cassandra.speculative_execution_count';
 
     /**
      * Deprecated, use `db.collection.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "renamed", "renamed_to": "db.collection.name"}
      */
     public const DB_CASSANDRA_TABLE = 'db.cassandra.table';
 
@@ -895,14 +992,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.client.connection.pool.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.client.connection.pool.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.client.connection.pool.name`.", "reason": "renamed", "renamed_to": "db.client.connection.pool.name"}
      */
     public const DB_CLIENT_CONNECTIONS_POOL_NAME = 'db.client.connections.pool.name';
 
     /**
      * Deprecated, use `db.client.connection.state` instead.
      *
-     * @deprecated {"note": "Replaced by `db.client.connection.state`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.client.connection.state`.", "reason": "renamed", "renamed_to": "db.client.connection.state"}
      */
     public const DB_CLIENT_CONNECTIONS_STATE = 'db.client.connections.state';
 
@@ -923,133 +1020,133 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address`, `server.port` attributes instead.
      *
-     * @deprecated {"note": "Replaced by `server.address` and `server.port`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `server.address` and `server.port`.\n", "reason": "uncategorized"}
      */
     public const DB_CONNECTION_STRING = 'db.connection_string';
 
     /**
      * Deprecated, use `azure.client.id` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.client.id`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.client.id`.", "reason": "renamed", "renamed_to": "azure.client.id"}
      */
     public const DB_COSMOSDB_CLIENT_ID = 'db.cosmosdb.client_id';
 
     /**
      * Deprecated, use `azure.cosmosdb.connection.mode` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.cosmosdb.connection.mode`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.connection.mode`.", "reason": "renamed", "renamed_to": "azure.cosmosdb.connection.mode"}
      */
     public const DB_COSMOSDB_CONNECTION_MODE = 'db.cosmosdb.connection_mode';
 
     /**
      * Deprecated, use `cosmosdb.consistency.level` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.cosmosdb.consistency.level`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.consistency.level`.", "reason": "renamed", "renamed_to": "azure.cosmosdb.consistency.level"}
      */
     public const DB_COSMOSDB_CONSISTENCY_LEVEL = 'db.cosmosdb.consistency_level';
 
     /**
      * Deprecated, use `db.collection.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "renamed", "renamed_to": "db.collection.name"}
      */
     public const DB_COSMOSDB_CONTAINER = 'db.cosmosdb.container';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.\n", "reason": "obsoleted"}
      */
     public const DB_COSMOSDB_OPERATION_TYPE = 'db.cosmosdb.operation_type';
 
     /**
      * Deprecated, use `azure.cosmosdb.operation.contacted_regions` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.cosmosdb.operation.contacted_regions`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.operation.contacted_regions`.", "reason": "renamed", "renamed_to": "azure.cosmosdb.operation.contacted_regions"}
      */
     public const DB_COSMOSDB_REGIONS_CONTACTED = 'db.cosmosdb.regions_contacted';
 
     /**
      * Deprecated, use `azure.cosmosdb.operation.request_charge` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.cosmosdb.operation.request_charge`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.operation.request_charge`.", "reason": "renamed", "renamed_to": "azure.cosmosdb.operation.request_charge"}
      */
     public const DB_COSMOSDB_REQUEST_CHARGE = 'db.cosmosdb.request_charge';
 
     /**
      * Deprecated, use `azure.cosmosdb.request.body.size` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.cosmosdb.request.body.size`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.request.body.size`.", "reason": "renamed", "renamed_to": "azure.cosmosdb.request.body.size"}
      */
     public const DB_COSMOSDB_REQUEST_CONTENT_LENGTH = 'db.cosmosdb.request_content_length';
 
     /**
      * Deprecated, use `db.response.status_code` instead.
      *
-     * @deprecated {"note": "Replaced by `db.response.status_code`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.response.status_code`.", "reason": "renamed", "renamed_to": "db.response.status_code"}
      */
     public const DB_COSMOSDB_STATUS_CODE = 'db.cosmosdb.status_code';
 
     /**
      * Deprecated, use `azure.cosmosdb.response.sub_status_code` instead.
      *
-     * @deprecated {"note": "Replaced by `azure.cosmosdb.response.sub_status_code`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `azure.cosmosdb.response.sub_status_code`.", "reason": "renamed", "renamed_to": "azure.cosmosdb.response.sub_status_code"}
      */
     public const DB_COSMOSDB_SUB_STATUS_CODE = 'db.cosmosdb.sub_status_code';
 
     /**
      * Deprecated, use `db.namespace` instead.
      *
-     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "renamed", "renamed_to": "db.namespace"}
      */
     public const DB_ELASTICSEARCH_CLUSTER_NAME = 'db.elasticsearch.cluster.name';
 
     /**
      * Deprecated, use `elasticsearch.node.name` instead.
      *
-     * @deprecated {"note": "Replaced by `elasticsearch.node.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `elasticsearch.node.name`.", "reason": "renamed", "renamed_to": "elasticsearch.node.name"}
      */
     public const DB_ELASTICSEARCH_NODE_NAME = 'db.elasticsearch.node.name';
 
     /**
      * Deprecated, use `db.operation.parameter` instead.
      *
-     * @deprecated {"note": "Replaced by `db.operation.parameter`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.operation.parameter`.", "reason": "renamed", "renamed_to": "db.operation.parameter"}
      */
     public const DB_ELASTICSEARCH_PATH_PARTS = 'db.elasticsearch.path_parts';
 
     /**
      * Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.
      *
-     * @deprecated {"note": "Deprecated, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no general replacement at this time. For Elasticsearch, use `db.elasticsearch.node.name` instead.\n", "reason": "obsoleted"}
      */
     public const DB_INSTANCE_ID = 'db.instance.id';
 
     /**
      * Removed, no replacement at this time.
      *
-     * @deprecated {"note": "Removed as not used.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.\n", "reason": "obsoleted"}
      */
     public const DB_JDBC_DRIVER_CLASSNAME = 'db.jdbc.driver_classname';
 
     /**
      * Deprecated, use `db.collection.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.collection.name`.", "reason": "renamed", "renamed_to": "db.collection.name"}
      */
     public const DB_MONGODB_COLLECTION = 'db.mongodb.collection';
 
     /**
      * Deprecated, SQL Server instance is now populated as a part of `db.namespace` attribute.
      *
-     * @deprecated {"note": "Deprecated, no replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
      */
     public const DB_MSSQL_INSTANCE_NAME = 'db.mssql.instance_name';
 
     /**
      * Deprecated, use `db.namespace` instead.
      *
-     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "renamed", "renamed_to": "db.namespace"}
      */
     public const DB_NAME = 'db.name';
 
@@ -1065,7 +1162,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.operation.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.operation.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.operation.name`.", "reason": "renamed", "renamed_to": "db.operation.name"}
      */
     public const DB_OPERATION = 'db.operation';
 
@@ -1153,7 +1250,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.namespace` instead.
      *
-     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.namespace`.", "reason": "renamed", "renamed_to": "db.namespace"}
      */
     public const DB_REDIS_DATABASE_INDEX = 'db.redis.database_index';
 
@@ -1170,7 +1267,7 @@ interface TraceAttributes
     public const DB_RESPONSE_STATUS_CODE = 'db.response.status_code';
 
     /**
-     * Deprecated, use `db.collection.name` instead, but only if not extracting the value from `db.query.text`.
+     * Deprecated, use `db.collection.name` instead.
      *
      * @deprecated {"note": "Replaced by `db.collection.name`, but only if not extracting the value from `db.query.text`.", "reason": "uncategorized"}
      */
@@ -1179,7 +1276,7 @@ interface TraceAttributes
     /**
      * The database statement being executed.
      *
-     * @deprecated {"note": "Replaced by `db.query.text`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.query.text`.", "reason": "renamed", "renamed_to": "db.query.text"}
      */
     public const DB_STATEMENT = 'db.statement';
 
@@ -1196,7 +1293,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.system.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.system.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.system.name`.", "reason": "renamed", "renamed_to": "db.system.name"}
      */
     public const DB_SYSTEM = 'db.system';
 
@@ -1209,14 +1306,14 @@ interface TraceAttributes
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
      */
     public const DB_USER = 'db.user';
 
     /**
      * 'Deprecated, use `deployment.environment.name` instead.'
      *
-     * @deprecated {"note": "Deprecated, use `deployment.environment.name` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `deployment.environment.name`.", "reason": "renamed", "renamed_to": "deployment.environment.name"}
      */
     public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
 
@@ -1271,7 +1368,7 @@ interface TraceAttributes
      * > [!WARNING]> This attribute may contain sensitive (PII) information. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply,
      * > ensure you do your own due diligence.> Due to these reasons, this identifier is not recommended for consumer applications and will likely result in rejection from both Google Play and App Store.
      * > However, it may be appropriate for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with appropriate compliance clearance.
-     * > Any instrumentation providing this identifier MUST implement it as an opt-in feature.> See [`app.installation.id`](/docs/attributes-registry/app.md#app-installation-id)>  for a more privacy-preserving alternative.
+     * > Any instrumentation providing this identifier MUST implement it as an opt-in feature.> See [`app.installation.id`](/docs/registry/attributes/app.md#app-installation-id)>  for a more privacy-preserving alternative.
      */
     public const DEVICE_ID = 'device.id';
 
@@ -1334,14 +1431,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `user.roles` instead.
      *
-     * @deprecated {"note": "Replaced by `user.roles` attribute.", "reason": "uncategorized"}
+     * @deprecated {"note": "Use `user.roles` attribute instead.", "reason": "uncategorized"}
      */
     public const ENDUSER_ROLE = 'enduser.role';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated {"note": "Removed.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
      */
     public const ENDUSER_SCOPE = 'enduser.scope';
 
@@ -1383,14 +1480,14 @@ interface TraceAttributes
     /**
      * Identifies the class / type of event.
      *
-     * @deprecated {"note": "Replaced by EventName top-level field on the LogRecord", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by EventName top-level field on the LogRecord.\n", "reason": "uncategorized"}
      */
     public const EVENT_NAME = 'event.name';
 
     /**
      * Indicates that the exception is escaping the scope of the span.
      *
-     * @deprecated {"note": "It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.", "reason": "uncategorized"}
+     * @deprecated {"note": "It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.\n", "reason": "obsoleted"}
      */
     public const EXCEPTION_ESCAPED = 'exception.escaped';
 
@@ -1533,14 +1630,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `error.message` instead.
      *
-     * @deprecated {"note": "Replaced by `error.message`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `error.message`.", "reason": "renamed", "renamed_to": "error.message"}
      */
     public const FEATURE_FLAG_EVALUATION_ERROR_MESSAGE = 'feature_flag.evaluation.error.message';
 
     /**
      * Deprecated, use `feature_flag.result.reason` instead.
      *
-     * @deprecated {"note": "Replaced by `feature_flag.result.reason`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `feature_flag.result.reason`.", "reason": "renamed", "renamed_to": "feature_flag.result.reason"}
      */
     public const FEATURE_FLAG_EVALUATION_REASON = 'feature_flag.evaluation.reason';
 
@@ -1560,6 +1657,16 @@ interface TraceAttributes
     public const FEATURE_FLAG_RESULT_REASON = 'feature_flag.result.reason';
 
     /**
+     * The evaluated value of the feature flag.
+     * With some feature flag providers, feature flag results can be quite large or contain private or sensitive details.
+     * Because of this, `feature_flag.result.variant` is often the preferred attribute if it is available.
+     *
+     * It may be desirable to redact or otherwise limit the size and scope of `feature_flag.result.value` if possible.
+     * Because the evaluated flag value is unstructured and may be any type, it is left to the instrumentation author to determine how best to achieve this.
+     */
+    public const FEATURE_FLAG_RESULT_VALUE = 'feature_flag.result.value';
+
+    /**
      * A semantic identifier for an evaluated flag value.
      *
      * A semantic identifier, commonly referred to as a variant, provides a means
@@ -1577,7 +1684,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `feature_flag.result.variant` instead.
      *
-     * @deprecated {"note": "Replaced by `feature_flag.result.variant`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `feature_flag.result.variant`.", "reason": "renamed", "renamed_to": "feature_flag.result.variant"}
      */
     public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
@@ -1788,21 +1895,32 @@ interface TraceAttributes
     /**
      * Deprecated, use Event API to report completions contents.
      *
-     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
      */
     public const GEN_AI_COMPLETION = 'gen_ai.completion';
 
     /**
+     * The unique identifier for a conversation (session, thread), used to store and correlate messages within this conversation.
+     */
+    public const GEN_AI_CONVERSATION_ID = 'gen_ai.conversation.id';
+
+    /**
+     * The data source identifier.
+     * Data sources are used by AI agents and RAG applications to store grounding data. A data source may be an external database, object store, document collection, website, or any other storage system used by the GenAI agent or application. The `gen_ai.data_source.id` SHOULD match the identifier used by the GenAI system rather than a name specific to the external storage, such as a database or object store. Semantic conventions referencing `gen_ai.data_source.id` MAY also leverage additional attributes, such as `db.*`, to further identify and describe the data source.
+     */
+    public const GEN_AI_DATA_SOURCE_ID = 'gen_ai.data_source.id';
+
+    /**
      * Deprecated, use `gen_ai.output.type`.
      *
-     * @deprecated {"note": "Replaced by `gen_ai.output.type`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `gen_ai.output.type`.", "reason": "renamed", "renamed_to": "gen_ai.output.type"}
      */
     public const GEN_AI_OPENAI_REQUEST_RESPONSE_FORMAT = 'gen_ai.openai.request.response_format';
 
     /**
      * Deprecated, use `gen_ai.request.seed`.
      *
-     * @deprecated {"note": "Replaced by `gen_ai.request.seed` attribute.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `gen_ai.request.seed`.", "reason": "renamed", "renamed_to": "gen_ai.request.seed"}
      */
     public const GEN_AI_OPENAI_REQUEST_SEED = 'gen_ai.openai.request.seed';
 
@@ -1838,7 +1956,7 @@ interface TraceAttributes
     /**
      * Deprecated, use Event API to report prompt contents.
      *
-     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed, no replacement at this time.", "reason": "obsoleted"}
      */
     public const GEN_AI_PROMPT = 'gen_ai.prompt';
 
@@ -1962,7 +2080,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `gen_ai.usage.output_tokens` instead.
      *
-     * @deprecated {"note": "Replaced by `gen_ai.usage.output_tokens` attribute.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `gen_ai.usage.output_tokens`.", "reason": "renamed", "renamed_to": "gen_ai.usage.output_tokens"}
      */
     public const GEN_AI_USAGE_COMPLETION_TOKENS = 'gen_ai.usage.completion_tokens';
 
@@ -1979,7 +2097,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `gen_ai.usage.input_tokens` instead.
      *
-     * @deprecated {"note": "Replaced by `gen_ai.usage.input_tokens` attribute.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `gen_ai.usage.input_tokens`.", "reason": "renamed", "renamed_to": "gen_ai.usage.input_tokens"}
      */
     public const GEN_AI_USAGE_PROMPT_TOKENS = 'gen_ai.usage.prompt_tokens';
 
@@ -2138,7 +2256,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `client.address` instead.
      *
-     * @deprecated {"note": "Replaced by `client.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `client.address`.", "reason": "renamed", "renamed_to": "client.address"}
      */
     public const HTTP_CLIENT_IP = 'http.client_ip';
 
@@ -2150,21 +2268,21 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.protocol.name` instead.
      *
-     * @deprecated {"note": "Replaced by `network.protocol.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.protocol.name`.", "reason": "renamed", "renamed_to": "network.protocol.name"}
      */
     public const HTTP_FLAVOR = 'http.flavor';
 
     /**
      * Deprecated, use one of `server.address`, `client.address` or `http.request.header.host` instead, depending on the usage.
      *
-     * @deprecated {"note": "Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.\n", "reason": "uncategorized"}
      */
     public const HTTP_HOST = 'http.host';
 
     /**
      * Deprecated, use `http.request.method` instead.
      *
-     * @deprecated {"note": "Replaced by `http.request.method`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `http.request.method`.", "reason": "renamed", "renamed_to": "http.request.method"}
      */
     public const HTTP_METHOD = 'http.method';
 
@@ -2232,16 +2350,16 @@ interface TraceAttributes
     public const HTTP_REQUEST_SIZE = 'http.request.size';
 
     /**
-     * Deprecated, use `http.request.header.<key>` instead.
+     * Deprecated, use `http.request.header.content-length` instead.
      *
-     * @deprecated {"note": "Replaced by `http.request.header.<key>`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `http.request.header.content-length`.", "reason": "uncategorized"}
      */
     public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
 
     /**
      * Deprecated, use `http.request.body.size` instead.
      *
-     * @deprecated {"note": "Replaced by `http.request.body.size`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `http.request.body.size`.", "reason": "renamed", "renamed_to": "http.request.body.size"}
      */
     public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
 
@@ -2282,16 +2400,16 @@ interface TraceAttributes
     public const HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 
     /**
-     * Deprecated, use `http.response.header.<key>` instead.
+     * Deprecated, use `http.response.header.content-length` instead.
      *
-     * @deprecated {"note": "Replaced by `http.response.header.<key>`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `http.response.header.content-length`.", "reason": "uncategorized"}
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
 
     /**
      * Deprecated, use `http.response.body.size` instead.
      *
-     * @deprecated {"note": "Replace by `http.response.body.size`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `http.response.body.size`.", "reason": "renamed", "renamed_to": "http.response.body.size"}
      */
     public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
 
@@ -2306,44 +2424,58 @@ interface TraceAttributes
     /**
      * Deprecated, use `url.scheme` instead.
      *
-     * @deprecated {"note": "Replaced by `url.scheme` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `url.scheme`.", "reason": "renamed", "renamed_to": "url.scheme"}
      */
     public const HTTP_SCHEME = 'http.scheme';
 
     /**
      * Deprecated, use `server.address` instead.
      *
-     * @deprecated {"note": "Replaced by `server.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `server.address`.", "reason": "renamed", "renamed_to": "server.address"}
      */
     public const HTTP_SERVER_NAME = 'http.server_name';
 
     /**
      * Deprecated, use `http.response.status_code` instead.
      *
-     * @deprecated {"note": "Replaced by `http.response.status_code`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `http.response.status_code`.", "reason": "renamed", "renamed_to": "http.response.status_code"}
      */
     public const HTTP_STATUS_CODE = 'http.status_code';
 
     /**
      * Deprecated, use `url.path` and `url.query` instead.
      *
-     * @deprecated {"note": "Split to `url.path` and `url.query.", "reason": "uncategorized"}
+     * @deprecated {"note": "Split to `url.path` and `url.query`.", "reason": "obsoleted"}
      */
     public const HTTP_TARGET = 'http.target';
 
     /**
      * Deprecated, use `url.full` instead.
      *
-     * @deprecated {"note": "Replaced by `url.full`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `url.full`.", "reason": "renamed", "renamed_to": "url.full"}
      */
     public const HTTP_URL = 'http.url';
 
     /**
      * Deprecated, use `user_agent.original` instead.
      *
-     * @deprecated {"note": "Replaced by `user_agent.original`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `user_agent.original`.", "reason": "renamed", "renamed_to": "user_agent.original"}
      */
     public const HTTP_USER_AGENT = 'http.user_agent';
+
+    /**
+     * This attribute represents the state of the application.
+     *
+     * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate), and from which the `OS terminology` column values are derived.
+     */
+    public const IOS_APP_STATE = 'ios.app.state';
+
+    /**
+     * The iOS lifecycle states are defined in the [UIApplicationDelegate documentation](https://developer.apple.com/documentation/uikit/uiapplicationdelegate), and from which the `OS terminology` column values are derived.
+     *
+     * @deprecated {"note": "Replaced by the `ios.app.state` event body field.", "reason": "uncategorized"}
+     */
+    public const IOS_STATE = 'ios.state';
 
     /**
      * Name of the buffer pool.
@@ -2439,6 +2571,16 @@ interface TraceAttributes
     public const K8S_CONTAINER_STATUS_LAST_TERMINATED_REASON = 'k8s.container.status.last_terminated_reason';
 
     /**
+     * The reason for the container state. Corresponds to the `reason` field of the: [K8s ContainerStateWaiting](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstatewaiting-v1-core) or [K8s ContainerStateTerminated](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstateterminated-v1-core)
+     */
+    public const K8S_CONTAINER_STATUS_REASON = 'k8s.container.status.reason';
+
+    /**
+     * The state of the container. [K8s ContainerState](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.30/#containerstate-v1-core)
+     */
+    public const K8S_CONTAINER_STATUS_STATE = 'k8s.container.status.state';
+
+    /**
      * The cronjob annotation placed on the CronJob, the `<key>` being the annotation name, the value being the annotation value.
      *
      * Examples:
@@ -2524,6 +2666,27 @@ interface TraceAttributes
      * The name of the horizontal pod autoscaler.
      */
     public const K8S_HPA_NAME = 'k8s.hpa.name';
+
+    /**
+     * The API version of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `apiVersion` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_API_VERSION = 'k8s.hpa.scaletargetref.api_version';
+
+    /**
+     * The kind of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `kind` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_KIND = 'k8s.hpa.scaletargetref.kind';
+
+    /**
+     * The name of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `name` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_NAME = 'k8s.hpa.scaletargetref.name';
 
     /**
      * The UID of the horizontal pod autoscaler.
@@ -2646,7 +2809,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `k8s.pod.label` instead.
      *
-     * @deprecated {"note": "Replaced by `k8s.pod.label`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `k8s.pod.label`.", "reason": "renamed", "renamed_to": "k8s.pod.label"}
      */
     public const K8S_POD_LABELS = 'k8s.pod.labels';
 
@@ -2784,30 +2947,35 @@ interface TraceAttributes
     public const LOG_RECORD_UID = 'log.record.uid';
 
     /**
+     * Name of the logical partition that hosts a systems with a mainframe operating system.
+     */
+    public const MAINFRAME_LPAR_NAME = 'mainframe.lpar.name';
+
+    /**
      * Deprecated, use `rpc.message.compressed_size` instead.
      *
-     * @deprecated {"note": "Replaced by `rpc.message.compressed_size`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `rpc.message.compressed_size`.", "reason": "renamed", "renamed_to": "rpc.message.compressed_size"}
      */
     public const MESSAGE_COMPRESSED_SIZE = 'message.compressed_size';
 
     /**
      * Deprecated, use `rpc.message.id` instead.
      *
-     * @deprecated {"note": "Replaced by `rpc.message.id`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `rpc.message.id`.", "reason": "renamed", "renamed_to": "rpc.message.id"}
      */
     public const MESSAGE_ID = 'message.id';
 
     /**
      * Deprecated, use `rpc.message.type` instead.
      *
-     * @deprecated {"note": "Replaced by `rpc.message.type`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `rpc.message.type`.", "reason": "renamed", "renamed_to": "rpc.message.type"}
      */
     public const MESSAGE_TYPE = 'message.type';
 
     /**
      * Deprecated, use `rpc.message.uncompressed_size` instead.
      *
-     * @deprecated {"note": "Replaced by `rpc.message.uncompressed_size`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `rpc.message.uncompressed_size`.", "reason": "renamed", "renamed_to": "rpc.message.uncompressed_size"}
      */
     public const MESSAGE_UNCOMPRESSED_SIZE = 'message.uncompressed_size';
 
@@ -2866,21 +3034,21 @@ interface TraceAttributes
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed. No replacement at this time.", "reason": "obsoleted"}
      */
     public const MESSAGING_DESTINATION_PUBLISH_ANONYMOUS = 'messaging.destination_publish.anonymous';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated {"note": "No replacement at this time.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed. No replacement at this time.", "reason": "obsoleted"}
      */
     public const MESSAGING_DESTINATION_PUBLISH_NAME = 'messaging.destination_publish.name';
 
     /**
      * Deprecated, use `messaging.consumer.group.name` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.consumer.group.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.consumer.group.name`.", "reason": "renamed", "renamed_to": "messaging.consumer.group.name"}
      */
     public const MESSAGING_EVENTHUBS_CONSUMER_GROUP = 'messaging.eventhubs.consumer.group';
 
@@ -2912,14 +3080,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.consumer.group.name` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.consumer.group.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.consumer.group.name`.", "reason": "renamed", "renamed_to": "messaging.consumer.group.name"}
      */
     public const MESSAGING_KAFKA_CONSUMER_GROUP = 'messaging.kafka.consumer.group';
 
     /**
      * Deprecated, use `messaging.destination.partition.id` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.destination.partition.id`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.destination.partition.id`.", "reason": "renamed", "renamed_to": "messaging.destination.partition.id"}
      */
     public const MESSAGING_KAFKA_DESTINATION_PARTITION = 'messaging.kafka.destination.partition';
 
@@ -2933,7 +3101,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.kafka.offset` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.kafka.offset`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.kafka.offset`.", "reason": "renamed", "renamed_to": "messaging.kafka.offset"}
      */
     public const MESSAGING_KAFKA_MESSAGE_OFFSET = 'messaging.kafka.message.offset';
 
@@ -2976,7 +3144,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.operation.type` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.operation.type`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.operation.type`.", "reason": "renamed", "renamed_to": "messaging.operation.type"}
      */
     public const MESSAGING_OPERATION = 'messaging.operation';
 
@@ -3005,7 +3173,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.consumer.group.name` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.consumer.group.name` on the consumer spans. No replacement for producer spans.\n", "reason": "uncategorized"}
      */
     public const MESSAGING_ROCKETMQ_CLIENT_GROUP = 'messaging.rocketmq.client_group';
 
@@ -3052,7 +3220,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `messaging.destination.subscription.name` instead.
      *
-     * @deprecated {"note": "Replaced by `messaging.destination.subscription.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `messaging.destination.subscription.name`.", "reason": "renamed", "renamed_to": "messaging.destination.subscription.name"}
      */
     public const MESSAGING_SERVICEBUS_DESTINATION_SUBSCRIPTION_NAME = 'messaging.servicebus.destination.subscription_name';
 
@@ -3080,28 +3248,28 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.local.address`.
      *
-     * @deprecated {"note": "Replaced by `network.local.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.local.address`.", "reason": "renamed", "renamed_to": "network.local.address"}
      */
     public const NET_HOST_IP = 'net.host.ip';
 
     /**
      * Deprecated, use `server.address`.
      *
-     * @deprecated {"note": "Replaced by `server.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `server.address`.", "reason": "renamed", "renamed_to": "server.address"}
      */
     public const NET_HOST_NAME = 'net.host.name';
 
     /**
      * Deprecated, use `server.port`.
      *
-     * @deprecated {"note": "Replaced by `server.port`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `server.port`.", "reason": "renamed", "renamed_to": "server.port"}
      */
     public const NET_HOST_PORT = 'net.host.port';
 
     /**
      * Deprecated, use `network.peer.address`.
      *
-     * @deprecated {"note": "Replaced by `network.peer.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.peer.address`.", "reason": "renamed", "renamed_to": "network.peer.address"}
      */
     public const NET_PEER_IP = 'net.peer.ip';
 
@@ -3122,14 +3290,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.protocol.name`.
      *
-     * @deprecated {"note": "Replaced by `network.protocol.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.protocol.name`.", "reason": "renamed", "renamed_to": "network.protocol.name"}
      */
     public const NET_PROTOCOL_NAME = 'net.protocol.name';
 
     /**
      * Deprecated, use `network.protocol.version`.
      *
-     * @deprecated {"note": "Replaced by `network.protocol.version`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.protocol.version`.", "reason": "renamed", "renamed_to": "network.protocol.version"}
      */
     public const NET_PROTOCOL_VERSION = 'net.protocol.version';
 
@@ -3143,42 +3311,42 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.local.address`.
      *
-     * @deprecated {"note": "Replaced by `network.local.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.local.address`.", "reason": "renamed", "renamed_to": "network.local.address"}
      */
     public const NET_SOCK_HOST_ADDR = 'net.sock.host.addr';
 
     /**
      * Deprecated, use `network.local.port`.
      *
-     * @deprecated {"note": "Replaced by `network.local.port`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.local.port`.", "reason": "renamed", "renamed_to": "network.local.port"}
      */
     public const NET_SOCK_HOST_PORT = 'net.sock.host.port';
 
     /**
      * Deprecated, use `network.peer.address`.
      *
-     * @deprecated {"note": "Replaced by `network.peer.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.peer.address`.", "reason": "renamed", "renamed_to": "network.peer.address"}
      */
     public const NET_SOCK_PEER_ADDR = 'net.sock.peer.addr';
 
     /**
      * Deprecated, no replacement at this time.
      *
-     * @deprecated {"note": "Removed.", "reason": "uncategorized"}
+     * @deprecated {"note": "Removed. No replacement at this time.", "reason": "obsoleted"}
      */
     public const NET_SOCK_PEER_NAME = 'net.sock.peer.name';
 
     /**
      * Deprecated, use `network.peer.port`.
      *
-     * @deprecated {"note": "Replaced by `network.peer.port`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.peer.port`.", "reason": "renamed", "renamed_to": "network.peer.port"}
      */
     public const NET_SOCK_PEER_PORT = 'net.sock.peer.port';
 
     /**
      * Deprecated, use `network.transport`.
      *
-     * @deprecated {"note": "Replaced by `network.transport`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.transport`.", "reason": "renamed", "renamed_to": "network.transport"}
      */
     public const NET_TRANSPORT = 'net.transport';
 
@@ -3346,14 +3514,14 @@ interface TraceAttributes
     /**
      * Deprecated. Use the `otel.scope.name` attribute
      *
-     * @deprecated {"note": "Use the `otel.scope.name` attribute.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `otel.scope.name`.", "reason": "renamed", "renamed_to": "otel.scope.name"}
      */
     public const OTEL_LIBRARY_NAME = 'otel.library.name';
 
     /**
      * Deprecated. Use the `otel.scope.version` attribute.
      *
-     * @deprecated {"note": "Use the `otel.scope.version` attribute.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `otel.scope.version`.", "reason": "renamed", "renamed_to": "otel.scope.version"}
      */
     public const OTEL_LIBRARY_VERSION = 'otel.library.version';
 
@@ -3385,7 +3553,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.client.connection.state` instead.
      *
-     * @deprecated {"note": "Replaced by `db.client.connection.state`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.client.connection.state`.", "reason": "renamed", "renamed_to": "db.client.connection.state"}
      */
     public const STATE = 'state';
 
@@ -3397,7 +3565,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `db.client.connection.pool.name` instead.
      *
-     * @deprecated {"note": "Replaced by `db.client.connection.pool.name`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `db.client.connection.pool.name`.", "reason": "renamed", "renamed_to": "db.client.connection.pool.name"}
      */
     public const POOL_NAME = 'pool.name';
 
@@ -3414,12 +3582,12 @@ interface TraceAttributes
     public const PROCESS_COMMAND = 'process.command';
 
     /**
-     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
+     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`. SHOULD NOT be collected by default unless there is sanitization that excludes sensitive data.
      */
     public const PROCESS_COMMAND_ARGS = 'process.command_args';
 
     /**
-     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
+     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead. SHOULD NOT be collected by default unless there is sanitization that excludes sensitive data.
      */
     public const PROCESS_COMMAND_LINE = 'process.command_line';
 
@@ -3431,7 +3599,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `cpu.mode` instead.
      *
-     * @deprecated {"note": "Replaced by `cpu.mode`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cpu.mode`.", "reason": "renamed", "renamed_to": "cpu.mode"}
      */
     public const PROCESS_CPU_STATE = 'process.cpu.state';
 
@@ -3441,7 +3609,7 @@ interface TraceAttributes
     public const PROCESS_CREATION_TIME = 'process.creation.time';
 
     /**
-     * Process environment variables, <key> being the environment variable name, the value being the environment variable value.
+     * Process environment variables, `<key>` being the environment variable name, the value being the environment variable value.
      *
      * Examples:
      *
@@ -3471,7 +3639,7 @@ interface TraceAttributes
     /**
      * "Deprecated, use `process.executable.build_id.htlhash` instead."
      *
-     * @deprecated {"note": "Replaced by `process.executable.build_id.htlhash`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `process.executable.build_id.htlhash`.", "reason": "renamed", "renamed_to": "process.executable.build_id.htlhash"}
      */
     public const PROCESS_EXECUTABLE_BUILD_ID_PROFILING = 'process.executable.build_id.profiling';
 
@@ -3856,7 +4024,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `cpu.mode` instead.
      *
-     * @deprecated {"note": "Replaced by `cpu.mode`", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `cpu.mode`.", "reason": "renamed", "renamed_to": "cpu.mode"}
      */
     public const SYSTEM_CPU_STATE = 'system.cpu.state';
 
@@ -3893,7 +4061,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `network.connection.state` instead.
      *
-     * @deprecated {"note": "Removed, report network connection state with `network.connection.state` attribute", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `network.connection.state`.", "reason": "renamed", "renamed_to": "network.connection.state"}
      */
     public const SYSTEM_NETWORK_STATE = 'system.network.state';
 
@@ -3920,7 +4088,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `system.process.status` instead.
      *
-     * @deprecated {"note": "Replaced by `system.process.status`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `system.process.status`.", "reason": "renamed", "renamed_to": "system.process.status"}
      */
     public const SYSTEM_PROCESSES_STATUS = 'system.processes.status';
 
@@ -4044,7 +4212,7 @@ interface TraceAttributes
     /**
      * Deprecated, use `server.address` instead.
      *
-     * @deprecated {"note": "Replaced by `server.address`.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `server.address`.", "reason": "renamed", "renamed_to": "server.address"}
      */
     public const TLS_CLIENT_SERVER_NAME = 'tls.client.server_name';
 
@@ -4446,14 +4614,14 @@ interface TraceAttributes
     /**
      * Deprecated, use `vcs.change.id` instead.
      *
-     * @deprecated {"note": "Deprecated, use `vcs.change.id` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `vcs.change.id`.", "reason": "renamed", "renamed_to": "vcs.change.id"}
      */
     public const VCS_REPOSITORY_CHANGE_ID = 'vcs.repository.change.id';
 
     /**
      * Deprecated, use `vcs.change.title` instead.
      *
-     * @deprecated {"note": "Deprecated, use `vcs.change.title` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `vcs.change.title`.", "reason": "renamed", "renamed_to": "vcs.change.title"}
      */
     public const VCS_REPOSITORY_CHANGE_TITLE = 'vcs.repository.change.title';
 
@@ -4469,21 +4637,21 @@ interface TraceAttributes
     /**
      * Deprecated, use `vcs.ref.head.name` instead.
      *
-     * @deprecated {"note": "Deprecated, use `vcs.ref.head.name` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `vcs.ref.head.name`.", "reason": "renamed", "renamed_to": "vcs.ref.head.name"}
      */
     public const VCS_REPOSITORY_REF_NAME = 'vcs.repository.ref.name';
 
     /**
      * Deprecated, use `vcs.ref.head.revision` instead.
      *
-     * @deprecated {"note": "Deprecated, use `vcs.ref.head.revision` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `vcs.ref.head.revision`.", "reason": "renamed", "renamed_to": "vcs.ref.head.revision"}
      */
     public const VCS_REPOSITORY_REF_REVISION = 'vcs.repository.ref.revision';
 
     /**
      * Deprecated, use `vcs.ref.head.type` instead.
      *
-     * @deprecated {"note": "Deprecated, use `vcs.ref.head.type` instead.", "reason": "uncategorized"}
+     * @deprecated {"note": "Replaced by `vcs.ref.head.type`.", "reason": "renamed", "renamed_to": "vcs.ref.head.type"}
      */
     public const VCS_REPOSITORY_REF_TYPE = 'vcs.repository.ref.type';
 
@@ -4514,5 +4682,15 @@ interface TraceAttributes
      * The version of the web engine.
      */
     public const WEBENGINE_VERSION = 'webengine.version';
+
+    /**
+     * The System Management Facility (SMF) Identifier uniquely identified a z/OS system within a SYSPLEX or mainframe environment and is used for system and performance analysis.
+     */
+    public const ZOS_SMF_ID = 'zos.smf.id';
+
+    /**
+     * The name of the SYSPLEX to which the z/OS system belongs too.
+     */
+    public const ZOS_SYSPLEX_NAME = 'zos.sysplex.name';
 
 }

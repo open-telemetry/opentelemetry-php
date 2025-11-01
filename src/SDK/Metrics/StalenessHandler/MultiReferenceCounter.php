@@ -18,6 +18,7 @@ final class MultiReferenceCounter implements ReferenceCounterInterface
     {
     }
 
+    #[\Override]
     public function acquire(bool $persistent = false): void
     {
         foreach ($this->referenceCounters as $referenceCounter) {
@@ -25,6 +26,7 @@ final class MultiReferenceCounter implements ReferenceCounterInterface
         }
     }
 
+    #[\Override]
     public function release(): void
     {
         foreach ($this->referenceCounters as $referenceCounter) {

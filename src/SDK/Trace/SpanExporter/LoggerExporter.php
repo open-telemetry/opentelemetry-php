@@ -42,6 +42,7 @@ class LoggerExporter implements SpanExporterInterface, LoggerAwareInterface
     }
 
     /** @inheritDoc */
+    #[\Override]
     public function doExport(iterable $spans): bool
     {
         try {

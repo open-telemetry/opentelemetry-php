@@ -1,11 +1,14 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions
+// DO NOT EDIT, this is archived and left for backward compatibility.
 
 declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
+/**
+ * @deprecated Use {@see OpenTelemetry\SemConv\Attributes}\* or {@see OpenTelemetry\SemConv\Unstable\Attributes}\* instead.
+ */
 interface ResourceAttributes
 {
     /**
@@ -133,6 +136,36 @@ interface ResourceAttributes
     public const BROWSER_PLATFORM = 'browser.platform';
 
     /**
+     * The human readable name of the pipeline within a CI/CD system.
+     */
+    public const CICD_PIPELINE_NAME = 'cicd.pipeline.name';
+
+    /**
+     * The unique identifier of a pipeline run within a CI/CD system.
+     */
+    public const CICD_PIPELINE_RUN_ID = 'cicd.pipeline.run.id';
+
+    /**
+     * The [URL](https://wikipedia.org/wiki/URL) of the pipeline run, providing the complete address in order to locate and identify the pipeline run.
+     */
+    public const CICD_PIPELINE_RUN_URL_FULL = 'cicd.pipeline.run.url.full';
+
+    /**
+     * The unique identifier of a worker within a CICD system.
+     */
+    public const CICD_WORKER_ID = 'cicd.worker.id';
+
+    /**
+     * The name of a worker within a CICD system.
+     */
+    public const CICD_WORKER_NAME = 'cicd.worker.name';
+
+    /**
+     * The [URL](https://wikipedia.org/wiki/URL) of the worker, providing the complete address in order to locate and identify the worker.
+     */
+    public const CICD_WORKER_URL_FULL = 'cicd.worker.url.full';
+
+    /**
      * The cloud account ID the resource is assigned to.
      */
     public const CLOUD_ACCOUNT_ID = 'cloud.account.id';
@@ -157,7 +190,7 @@ interface ResourceAttributes
     public const CLOUD_PROVIDER = 'cloud.provider';
 
     /**
-     * The geographical region the resource is running.
+     * The geographical region within a cloud provider. When associated with a resource, this attribute specifies the region where the resource operates. When calling services or APIs deployed on a cloud, this attribute identifies the region where the called destination is deployed.
      *
      * Refer to your provider's docs to see the available regions, for example [Alibaba Cloud regions](https://www.alibabacloud.com/help/doc-detail/40654.htm), [AWS regions](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/), [Azure regions](https://azure.microsoft.com/global-infrastructure/geographies/), [Google Cloud regions](https://cloud.google.com/about/locations), or [Tencent Cloud regions](https://www.tencentcloud.com/document/product/213/6091).
      */
@@ -377,7 +410,7 @@ interface ResourceAttributes
      * > [!WARNING]> This attribute may contain sensitive (PII) information. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply,
      * > ensure you do your own due diligence.> Due to these reasons, this identifier is not recommended for consumer applications and will likely result in rejection from both Google Play and App Store.
      * > However, it may be appropriate for specific enterprise scenarios, such as kiosk devices or enterprise-managed devices, with appropriate compliance clearance.
-     * > Any instrumentation providing this identifier MUST implement it as an opt-in feature.> See [`app.installation.id`](/docs/attributes-registry/app.md#app-installation-id)>  for a more privacy-preserving alternative.
+     * > Any instrumentation providing this identifier MUST implement it as an opt-in feature.> See [`app.installation.id`](/docs/registry/attributes/app.md#app-installation-id)>  for a more privacy-preserving alternative.
      */
     public const DEVICE_ID = 'device.id';
 
@@ -783,6 +816,27 @@ interface ResourceAttributes
     public const K8S_HPA_NAME = 'k8s.hpa.name';
 
     /**
+     * The API version of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `apiVersion` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_API_VERSION = 'k8s.hpa.scaletargetref.api_version';
+
+    /**
+     * The kind of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `kind` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_KIND = 'k8s.hpa.scaletargetref.kind';
+
+    /**
+     * The name of the target resource to scale for the HorizontalPodAutoscaler.
+     *
+     * This maps to the `name` field in the `scaleTargetRef` of the HPA spec.
+     */
+    public const K8S_HPA_SCALETARGETREF_NAME = 'k8s.hpa.scaletargetref.name';
+
+    /**
      * The UID of the horizontal pod autoscaler.
      */
     public const K8S_HPA_UID = 'k8s.hpa.uid';
@@ -971,6 +1025,11 @@ interface ResourceAttributes
     public const K8S_STATEFULSET_UID = 'k8s.statefulset.uid';
 
     /**
+     * Name of the logical partition that hosts a systems with a mainframe operating system.
+     */
+    public const MAINFRAME_LPAR_NAME = 'mainframe.lpar.name';
+
+    /**
      * The digest of the OCI image manifest. For container images specifically is the digest by which the container image is known.
      *
      * Follows [OCI Image Manifest Specification](https://github.com/opencontainers/image-spec/blob/main/manifest.md), and specifically the [Digest property](https://github.com/opencontainers/image-spec/blob/main/descriptor.md#digests).
@@ -1026,12 +1085,12 @@ interface ResourceAttributes
     public const PROCESS_COMMAND = 'process.command';
 
     /**
-     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`.
+     * All the command arguments (including the command/executable itself) as received by the process. On Linux-based systems (and some other Unixoid systems supporting procfs), can be set according to the list of null-delimited strings extracted from `proc/[pid]/cmdline`. For libc-based executables, this would be the full argv vector passed to `main`. SHOULD NOT be collected by default unless there is sanitization that excludes sensitive data.
      */
     public const PROCESS_COMMAND_ARGS = 'process.command_args';
 
     /**
-     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead.
+     * The full command used to launch the process as a single string representing the full command. On Windows, can be set to the result of `GetCommandLineW`. Do not set this if you have to assemble it just for monitoring; use `process.command_args` instead. SHOULD NOT be collected by default unless there is sanitization that excludes sensitive data.
      */
     public const PROCESS_COMMAND_LINE = 'process.command_line';
 
@@ -1174,6 +1233,53 @@ interface ResourceAttributes
     public const USER_AGENT_ORIGINAL = 'user_agent.original';
 
     /**
+     * The name of the [reference](https://git-scm.com/docs/gitglossary#def_ref) such as **branch** or **tag** in the repository.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.
+     */
+    public const VCS_REF_HEAD_NAME = 'vcs.ref.head.name';
+
+    /**
+     * The revision, literally [revised version](https://www.merriam-webster.com/dictionary/revision), The revision most often refers to a commit object in Git, or a revision number in SVN.
+     *
+     * `head` refers to where you are right now; the current reference at a
+     * given time.The revision can be a full [hash value (see
+     * glossary)](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-5.pdf),
+     * of the recorded change to a ref within a repository pointing to a
+     * commit [commit](https://git-scm.com/docs/git-commit) object. It does
+     * not necessarily have to be a hash; it can simply define a [revision
+     * number](https://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html)
+     * which is an integer that is monotonically increasing. In cases where
+     * it is identical to the `ref.head.name`, it SHOULD still be included.
+     * It is up to the implementer to decide which value to set as the
+     * revision based on the VCS system and situational context.
+     */
+    public const VCS_REF_HEAD_REVISION = 'vcs.ref.head.revision';
+
+    /**
+     * The type of the [reference](https://git-scm.com/docs/gitglossary#def_ref) in the repository.
+     */
+    public const VCS_REF_TYPE = 'vcs.ref.type';
+
+    /**
+     * The human readable name of the repository. It SHOULD NOT include any additional identifier like Group/SubGroup in GitLab or organization in GitHub.
+     *
+     * Due to it only being the name, it can clash with forks of the same
+     * repository if collecting telemetry across multiple orgs or groups in
+     * the same backends.
+     */
+    public const VCS_REPOSITORY_NAME = 'vcs.repository.name';
+
+    /**
+     * The [canonical URL](https://support.google.com/webmasters/answer/10347851?hl=en#:~:text=A%20canonical%20URL%20is%20the,Google%20chooses%20one%20as%20canonical.) of the repository providing the complete HTTP(S) address in order to locate and identify the repository through a browser.
+     *
+     * In Git Version Control Systems, the canonical URL SHOULD NOT include
+     * the `.git` extension.
+     */
+    public const VCS_REPOSITORY_URL_FULL = 'vcs.repository.url.full';
+
+    /**
      * Additional description of the web engine (e.g. detailed version and edition information).
      */
     public const WEBENGINE_DESCRIPTION = 'webengine.description';
@@ -1187,5 +1293,15 @@ interface ResourceAttributes
      * The version of the web engine.
      */
     public const WEBENGINE_VERSION = 'webengine.version';
+
+    /**
+     * The System Management Facility (SMF) Identifier uniquely identified a z/OS system within a SYSPLEX or mainframe environment and is used for system and performance analysis.
+     */
+    public const ZOS_SMF_ID = 'zos.smf.id';
+
+    /**
+     * The name of the SYSPLEX to which the z/OS system belongs too.
+     */
+    public const ZOS_SYSPLEX_NAME = 'zos.sysplex.name';
 
 }

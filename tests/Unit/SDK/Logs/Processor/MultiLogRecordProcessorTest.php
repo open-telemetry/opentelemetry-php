@@ -19,6 +19,7 @@ class MultiLogRecordProcessorTest extends MockeryTestCase
     private array $processors;
     private MultiLogRecordProcessor $multi;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->processors = [

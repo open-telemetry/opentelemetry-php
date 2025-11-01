@@ -19,6 +19,7 @@ use OpenTelemetry\Context\Propagation\ArrayAccessGetterSetter;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationSetterInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use function sprintf;
 
 /**
  * TraceContext is a propagator that supports the W3C Trace Context format
@@ -34,7 +35,8 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
 {
     public const TRACEPARENT = 'traceparent';
     public const TRACESTATE = 'tracestate';
-    private const VERSION = '00'; // Currently, only '00' is supported
+    private const VERSION = 0x00; // Currently, only '00' is supported
+    private const SUPPORTED_FLAGS = TraceFlags::SAMPLED | TraceFlags::RANDOM;
 
     public const FIELDS = [
         self::TRACEPARENT,
@@ -53,12 +55,14 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function fields(): array
     {
         return self::FIELDS;
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function inject(&$carrier, ?PropagationSetterInterface $setter = null, ?ContextInterface $context = null): void
     {
         $setter ??= ArrayAccessGetterSetter::getInstance();
@@ -70,7 +74,13 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         }
 
         // Build and inject the traceparent header
-        $traceparent = self::VERSION . '-' . $spanContext->getTraceId() . '-' . $spanContext->getSpanId() . '-' . ($spanContext->isSampled() ? '01' : '00');
+        $traceparent = sprintf(
+            '%02x-%s-%s-%02x',
+            self::VERSION,
+            $spanContext->getTraceId(),
+            $spanContext->getSpanId(),
+            $spanContext->getTraceFlags() & self::SUPPORTED_FLAGS,
+        );
         $setter->set($carrier, self::TRACEPARENT, $traceparent);
 
         // Build and inject the tracestate header
@@ -81,6 +91,7 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
     }
 
     /** {@inheritdoc} */
+    #[\Override]
     public function extract($carrier, ?PropagationGetterInterface $getter = null, ?ContextInterface $context = null): ContextInterface
     {
         $getter ??= ArrayAccessGetterSetter::getInstance();
@@ -125,33 +136,22 @@ final class TraceContextPropagator implements TextMapPropagatorInterface
         }
 
         // Return invalid if the trace version is not a future version but still has > 4 pieces.
-        $versionIsFuture = hexdec($version) > hexdec(self::VERSION);
+        $versionIsFuture = hexdec($version) > self::VERSION;
         if (count($pieces) > 4 && !$versionIsFuture) {
             return SpanContext::getInvalid();
         }
 
-        // Only the sampled flag is extracted from the traceFlags (00000001)
-        $convertedTraceFlags = hexdec($traceFlags);
-        $isSampled = ($convertedTraceFlags & TraceFlags::SAMPLED) === TraceFlags::SAMPLED;
-
         // Tracestate = 'Vendor1=Value1,...,VendorN=ValueN'
         $rawTracestate = $getter->get($carrier, self::TRACESTATE);
-        if ($rawTracestate !== null) {
-            $tracestate = new TraceState($rawTracestate);
+        $tracestate = $rawTracestate !== null
+            ? new TraceState($rawTracestate)
+            : null;
 
-            return SpanContext::createFromRemoteParent(
-                $traceId,
-                $spanId,
-                $isSampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT,
-                $tracestate
-            );
-        }
-
-        // Only traceparent header is extracted. No tracestate.
         return SpanContext::createFromRemoteParent(
             $traceId,
             $spanId,
-            $isSampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT
+            hexdec($traceFlags) & self::SUPPORTED_FLAGS,
+            $tracestate,
         );
     }
 }

@@ -6,10 +6,10 @@ namespace OpenTelemetry\Test\Unit\Config\SDK\Configuration;
 
 use BadMethodCallException;
 use ExampleSDK\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
@@ -30,11 +30,13 @@ final class ConfigurationFactoryTest extends TestCase
     public string $cacheDir;
     public $properties;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->cacheDir = __DIR__ . '/configurations';
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         array_map('unlink', array_filter((array) glob($this->cacheDir . '/*cache*')));
@@ -48,7 +50,8 @@ final class ConfigurationFactoryTest extends TestCase
         // see example https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/file-configuration.md#environment-variable-substitution
         $factory = new ConfigurationFactory(
             [],
-            new class() implements \OpenTelemetry\Config\SDK\Configuration\ComponentProvider {
+            new class() implements \OpenTelemetry\API\Configuration\Config\ComponentProvider {
+                #[\Override]
                 public function createPlugin(array $properties, Context $context): mixed
                 {
                     throw new BadMethodCallException();
@@ -57,6 +60,7 @@ final class ConfigurationFactoryTest extends TestCase
                 /**
                  * @psalm-suppress UndefinedInterfaceMethod,PossiblyNullReference
                  */
+                #[\Override]
                 public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
                 {
                     $node = new ArrayNodeDefinition('env_substitution');
@@ -263,6 +267,9 @@ final class ConfigurationFactoryTest extends TestCase
     {
         return new ConfigurationFactory(
             [
+                new ComponentProvider\Propagator\ResponsePropagatorComposite(),
+                new ComponentProvider\Propagator\ResponsePropagatorServerTiming(),
+                new ComponentProvider\Propagator\ResponsePropagatorTraceResponse(),
                 new ComponentProvider\Propagator\TextMapPropagatorB3(),
                 new ComponentProvider\Propagator\TextMapPropagatorB3Multi(),
                 new ComponentProvider\Propagator\TextMapPropagatorBaggage(),

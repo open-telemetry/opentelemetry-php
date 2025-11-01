@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
@@ -29,6 +29,7 @@ final class SamplerParentBased implements ComponentProvider
      *     local_parent_not_sampled: ?ComponentPlugin<SamplerInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
         return new ParentBased(
@@ -40,6 +41,7 @@ final class SamplerParentBased implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('parent_based');

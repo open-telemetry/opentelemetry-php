@@ -1,17 +1,62 @@
 <?php
 
-// DO NOT EDIT, this is an Auto-generated file from script/semantic-conventions/
+// DO NOT EDIT, this is archived and left for backward compatibility.
 
 declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
+/**
+ * @deprecated Use {@see OpenTelemetry\SemConv\Attributes}\* or {@see OpenTelemetry\SemConv\Unstable\Attributes}\* instead.
+ */
 interface TraceAttributeValues
 {
     /**
      * The URL of the OpenTelemetry schema for these values.
      */
     public const SCHEMA_URL = 'https://opentelemetry.io/schemas/1.32.0';
+    /**
+     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
+     *
+     * @see TraceAttributes::ANDROID_APP_STATE
+     */
+    public const ANDROID_APP_STATE_CREATED = 'created';
+
+    /**
+     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
+     *
+     * @see TraceAttributes::ANDROID_APP_STATE
+     */
+    public const ANDROID_APP_STATE_BACKGROUND = 'background';
+
+    /**
+     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
+     *
+     * @see TraceAttributes::ANDROID_APP_STATE
+     */
+    public const ANDROID_APP_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * Any time before Activity.onResume() or, if the app has no Activity, Context.startService() has been called in the app for the first time.
+     *
+     * @see TraceAttributes::ANDROID_STATE
+     */
+    public const ANDROID_STATE_CREATED = 'created';
+
+    /**
+     * Any time after Activity.onPause() or, if the app has no Activity, Context.stopService() has been called when the app was in the foreground state.
+     *
+     * @see TraceAttributes::ANDROID_STATE
+     */
+    public const ANDROID_STATE_BACKGROUND = 'background';
+
+    /**
+     * Any time after Activity.onResume() or, if the app has no Activity, Context.startService() has been called when the app was in either the created or background states.
+     *
+     * @see TraceAttributes::ANDROID_STATE
+     */
+    public const ANDROID_STATE_FOREGROUND = 'foreground';
+
     /**
      * Exception was handled by the exception handling middleware.
      *
@@ -223,6 +268,27 @@ interface TraceAttributeValues
     public const CASSANDRA_CONSISTENCY_LEVEL_LOCAL_SERIAL = 'local_serial';
 
     /**
+     * The pipeline run is executing a build.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_ACTION_NAME
+     */
+    public const CICD_PIPELINE_ACTION_NAME_BUILD = 'BUILD';
+
+    /**
+     * The pipeline run is executing.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_ACTION_NAME
+     */
+    public const CICD_PIPELINE_ACTION_NAME_RUN = 'RUN';
+
+    /**
+     * The pipeline run is executing a sync.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_ACTION_NAME
+     */
+    public const CICD_PIPELINE_ACTION_NAME_SYNC = 'SYNC';
+
+    /**
      * The pipeline run finished successfully.
      *
      * @see TraceAttributes::CICD_PIPELINE_RESULT
@@ -284,6 +350,48 @@ interface TraceAttributeValues
      * @see TraceAttributes::CICD_PIPELINE_RUN_STATE
      */
     public const CICD_PIPELINE_RUN_STATE_FINALIZING = 'finalizing';
+
+    /**
+     * The task run finished successfully.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_SUCCESS = 'success';
+
+    /**
+     * The task run did not finish successfully, eg. due to a compile error or a failing test. Such failures are usually detected by non-zero exit codes of the tools executed in the task run.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_FAILURE = 'failure';
+
+    /**
+     * The task run failed due to an error in the CICD system, eg. due to the worker being killed.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_ERROR = 'error';
+
+    /**
+     * A timeout caused the task run to be interrupted.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_TIMEOUT = 'timeout';
+
+    /**
+     * The task run was cancelled, eg. by a user manually cancelling the task run.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_CANCELLATION = 'cancellation';
+
+    /**
+     * The task run was skipped, eg. due to a precondition not being met.
+     *
+     * @see TraceAttributes::CICD_PIPELINE_TASK_RUN_RESULT
+     */
+    public const CICD_PIPELINE_TASK_RUN_RESULT_SKIP = 'skip';
 
     /**
      * build
@@ -669,6 +777,27 @@ interface TraceAttributeValues
      * @see TraceAttributes::CPU_MODE
      */
     public const CPU_MODE_KERNEL = 'kernel';
+
+    /**
+     * Generation 0
+     *
+     * @see TraceAttributes::CPYTHON_GC_GENERATION
+     */
+    public const CPYTHON_GC_GENERATION_GENERATION_0 = '0';
+
+    /**
+     * Generation 1
+     *
+     * @see TraceAttributes::CPYTHON_GC_GENERATION
+     */
+    public const CPYTHON_GC_GENERATION_GENERATION_1 = '1';
+
+    /**
+     * Generation 2
+     *
+     * @see TraceAttributes::CPYTHON_GC_GENERATION
+     */
+    public const CPYTHON_GC_GENERATION_GENERATION_2 = '2';
 
     /**
      * all
@@ -2485,6 +2614,76 @@ interface TraceAttributeValues
     public const HTTP_REQUEST_METHOD_OTHER = '_OTHER';
 
     /**
+     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_ACTIVE = 'active';
+
+    /**
+     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_INACTIVE = 'inactive';
+
+    /**
+     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_BACKGROUND = 'background';
+
+    /**
+     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
+     *
+     * @see TraceAttributes::IOS_APP_STATE
+     */
+    public const IOS_APP_STATE_TERMINATE = 'terminate';
+
+    /**
+     * The app has become `active`. Associated with UIKit notification `applicationDidBecomeActive`.
+     *
+     * @see TraceAttributes::IOS_STATE
+     */
+    public const IOS_STATE_ACTIVE = 'active';
+
+    /**
+     * The app is now `inactive`. Associated with UIKit notification `applicationWillResignActive`.
+     *
+     * @see TraceAttributes::IOS_STATE
+     */
+    public const IOS_STATE_INACTIVE = 'inactive';
+
+    /**
+     * The app is now in the background. This value is associated with UIKit notification `applicationDidEnterBackground`.
+     *
+     * @see TraceAttributes::IOS_STATE
+     */
+    public const IOS_STATE_BACKGROUND = 'background';
+
+    /**
+     * The app is now in the foreground. This value is associated with UIKit notification `applicationWillEnterForeground`.
+     *
+     * @see TraceAttributes::IOS_STATE
+     */
+    public const IOS_STATE_FOREGROUND = 'foreground';
+
+    /**
+     * The app is about to terminate. Associated with UIKit notification `applicationWillTerminate`.
+     *
+     * @see TraceAttributes::IOS_STATE
+     */
+    public const IOS_STATE_TERMINATE = 'terminate';
+
+    /**
      * Heap memory.
      *
      * @see TraceAttributes::JVM_MEMORY_TYPE
@@ -2539,6 +2738,90 @@ interface TraceAttributeValues
      * @see TraceAttributes::JVM_THREAD_STATE
      */
     public const JVM_THREAD_STATE_TERMINATED = 'terminated';
+
+    /**
+     * The container is being created.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CONTAINER_CREATING = 'ContainerCreating';
+
+    /**
+     * The container is in a crash loop back off state.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CRASH_LOOP_BACK_OFF = 'CrashLoopBackOff';
+
+    /**
+     * There was an error creating the container configuration.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CREATE_CONTAINER_CONFIG_ERROR = 'CreateContainerConfigError';
+
+    /**
+     * There was an error pulling the container image.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_ERR_IMAGE_PULL = 'ErrImagePull';
+
+    /**
+     * The container image pull is in back off state.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_IMAGE_PULL_BACK_OFF = 'ImagePullBackOff';
+
+    /**
+     * The container was killed due to out of memory.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_OOM_KILLED = 'OOMKilled';
+
+    /**
+     * The container has completed execution.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_COMPLETED = 'Completed';
+
+    /**
+     * There was an error with the container.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_ERROR = 'Error';
+
+    /**
+     * The container cannot run.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_REASON
+     */
+    public const K8S_CONTAINER_STATUS_REASON_CONTAINER_CANNOT_RUN = 'ContainerCannotRun';
+
+    /**
+     * The container has terminated.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_STATE
+     */
+    public const K8S_CONTAINER_STATUS_STATE_TERMINATED = 'terminated';
+
+    /**
+     * The container is running.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_STATE
+     */
+    public const K8S_CONTAINER_STATUS_STATE_RUNNING = 'running';
+
+    /**
+     * The container is waiting.
+     *
+     * @see TraceAttributes::K8S_CONTAINER_STATUS_STATE
+     */
+    public const K8S_CONTAINER_STATUS_STATE_WAITING = 'waiting';
 
     /**
      * Active namespace phase as described by [K8s API](https://pkg.go.dev/k8s.io/api@v0.31.3/core/v1#NamespacePhase)
@@ -3299,11 +3582,18 @@ interface TraceAttributeValues
     public const OS_TYPE_SOLARIS = 'solaris';
 
     /**
-     * IBM z/OS
+     * Deprecated. Use `zos` instead.
      *
      * @see TraceAttributes::OS_TYPE
      */
     public const OS_TYPE_Z_OS = 'z_os';
+
+    /**
+     * IBM z/OS
+     *
+     * @see TraceAttributes::OS_TYPE
+     */
+    public const OS_TYPE_ZOS = 'zos';
 
     /**
      * The builtin SDK batching span processor

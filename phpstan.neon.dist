@@ -51,3 +51,19 @@ parameters:
             message: "#.*return with type T is not subtype.*#"
             paths:
                 - src/SDK/Common/InstrumentationScope
+        -
+            message: "#.*expects Google\\\\Protobuf\\\\RepeatedField.*#"
+            paths:
+                - src/Contrib/Otlp
+        -
+            message: "#^Call to (static )?method .* on an unknown class .*#"
+            paths:
+                - src/Config/SDK/Configuration/Environment/Adapter/
+        -
+            message: "#^Instantiated class .* not found\\.#"
+            paths:
+                - src/Config/SDK/Configuration/Environment/Adapter/
+        -
+            message: "#^Caught class .* not found\\.#"
+            paths:
+                - src/Config/SDK/Configuration/Environment/Adapter/

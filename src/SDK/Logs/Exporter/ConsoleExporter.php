@@ -7,6 +7,7 @@ namespace OpenTelemetry\SDK\Logs\Exporter;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Future\ErrorFuture;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
@@ -26,6 +27,7 @@ class ConsoleExporter implements LogRecordExporterInterface
     /**
      * @param iterable<mixed, ReadableLogRecord> $batch
      */
+    #[\Override]
     public function export(iterable $batch, ?CancellationInterface $cancellation = null): FutureInterface
     {
         $resource = null;
@@ -44,16 +46,24 @@ class ConsoleExporter implements LogRecordExporterInterface
             'resource' => $resource,
             'scopes' => array_values($scopes),
         ];
-        $this->transport->send(json_encode($output, JSON_PRETTY_PRINT));
+        $payload = json_encode($output, JSON_PRETTY_PRINT);
+        if ($payload === false) {
+            return new ErrorFuture(
+                new \RuntimeException('Failed to encode log records to JSON: ' . json_last_error_msg())
+            );
+        }
+        $this->transport->send($payload);
 
         return new CompletedFuture(true);
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         return true;

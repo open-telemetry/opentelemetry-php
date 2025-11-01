@@ -286,6 +286,7 @@ return [
         'PhanAccessPropertyInternal',
         'PhanTypeMismatchPropertyReal',
         'PhanTemplateTypeNotUsedInFunctionReturn',
+        'PhanUndeclaredClassAttribute',
     ],
 
     // A regular expression to match files to be excluded
@@ -381,6 +382,7 @@ return [
         'vendor/google/protobuf/src',
         'vendor/ramsey/uuid/src',
         'vendor/nyholm/psr7-server/src',
+        'vendor/symfony/config',
     ],
 
     // A list of individual files to include in analysis

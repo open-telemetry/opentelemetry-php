@@ -31,6 +31,7 @@ class TraceContextPropagatorTest extends TestCase
     private TraceContextPropagator $traceContextPropagator;
     private TraceStateInterface $traceState;
 
+    #[\Override]
     protected function setUp(): void
     {
         Logging::disable();
@@ -285,6 +286,18 @@ class TraceContextPropagatorTest extends TestCase
             SpanContext::createFromRemoteParent(self::TRACE_ID_BASE16, self::SPAN_ID_BASE16, TraceFlags::DEFAULT, $this->traceState),
             $this->getSpanContext($this->traceContextPropagator->extract($carrierFutureMoreParts)),
         );
+    }
+
+    public function test_trace_context_level2_random_flag(): void
+    {
+        $traceparent = '00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-03';
+
+        $context = $this->traceContextPropagator->extract([TraceContextPropagator::TRACEPARENT => $traceparent]);
+        $this->assertSame(TraceFlags::SAMPLED | TraceFlags::RANDOM, Span::fromContext($context)->getContext()->getTraceFlags());
+
+        $carrier = [];
+        $this->traceContextPropagator->inject($carrier, context: $context);
+        $this->assertSame($traceparent, $carrier[TraceContextPropagator::TRACEPARENT]);
     }
 
     public function test_invalid_traceparent_version_0xff(): void

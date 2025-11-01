@@ -16,6 +16,7 @@ class JaegerBaggagePropagatorTest extends TestCase
 {
     private TextMapPropagatorInterface $propagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propagator = JaegerBaggagePropagator::getInstance();

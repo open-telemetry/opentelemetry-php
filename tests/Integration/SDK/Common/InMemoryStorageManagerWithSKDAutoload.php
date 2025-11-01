@@ -24,6 +24,7 @@ class InMemoryStorageManagerWithSKDAutoload extends TestCase
 
     protected LoggerInterface&MockObject $logger;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

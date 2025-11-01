@@ -18,6 +18,7 @@ class EnvironmentTest extends TestCase
 
     private Environment $detector;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->detector = new Environment();

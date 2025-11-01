@@ -23,6 +23,7 @@ final class ConfigurationRegistry implements ConfigProperties
      * @param class-string<C> $id
      * @return C|null
      */
+    #[\Override]
     public function get(string $id): ?InstrumentationConfiguration
     {
         return $this->configurations[$id] ?? null;

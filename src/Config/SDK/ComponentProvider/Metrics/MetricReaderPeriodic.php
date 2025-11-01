@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
@@ -37,6 +37,7 @@ final class MetricReaderPeriodic implements ComponentProvider
      *     },
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
         return new ExportingReader(
@@ -44,6 +45,7 @@ final class MetricReaderPeriodic implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('periodic');

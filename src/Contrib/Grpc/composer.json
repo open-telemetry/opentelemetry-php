@@ -6,7 +6,7 @@
   "support": {
     "issues": "https://github.com/open-telemetry/opentelemetry-php/issues",
     "source": "https://github.com/open-telemetry/opentelemetry-php",
-    "docs": "https://opentelemetry.io/docs/php",
+    "docs": "https://opentelemetry.io/docs/languages/php",
     "chat": "https://app.slack.com/client/T08PSQ7BQ/C01NFPCV44V"
   },
   "license": "Apache-2.0",

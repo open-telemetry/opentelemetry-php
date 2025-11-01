@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
 
 class TracerProviderBuilder
 {
@@ -14,6 +16,7 @@ class TracerProviderBuilder
     private ?ResourceInfo $resource = null;
     private ?SamplerInterface $sampler = null;
     private ?Configurator $configurator = null;
+    private ?SpanSuppressionStrategy $spanSuppressionStrategy = null;
 
     public function addSpanProcessor(SpanProcessorInterface $spanProcessor): self
     {
@@ -43,6 +46,13 @@ class TracerProviderBuilder
         return $this;
     }
 
+    public function setSpanSuppressionStrategy(SpanSuppressionStrategy $spanSuppressionStrategy): self
+    {
+        $this->spanSuppressionStrategy = $spanSuppressionStrategy;
+
+        return $this;
+    }
+
     public function build(): TracerProviderInterface
     {
         return new TracerProvider(
@@ -50,6 +60,7 @@ class TracerProviderBuilder
             $this->sampler,
             $this->resource,
             configurator: $this->configurator ?? Configurator::tracer(),
+            spanSuppressionStrategy: $this->spanSuppressionStrategy ?? new NoopSuppressionStrategy(),
         );
     }
 }

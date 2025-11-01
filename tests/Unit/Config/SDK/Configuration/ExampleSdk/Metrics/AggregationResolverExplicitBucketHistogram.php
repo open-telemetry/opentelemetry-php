@@ -7,9 +7,9 @@ namespace ExampleSDK\ComponentProvider\Metrics;
 use BadMethodCallException;
 use ExampleSDK\Metrics\AggregationResolver;
 use InvalidArgumentException;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -21,11 +21,13 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
      *     record_min_max: bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): AggregationResolver
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('explicit_bucket_histogram');

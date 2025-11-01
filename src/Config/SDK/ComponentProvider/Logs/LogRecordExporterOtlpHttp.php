@@ -6,9 +6,9 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Common\Time\ClockInterface;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
@@ -37,6 +37,7 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
      *     encoding: 'protobuf'|'json',
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
@@ -56,6 +57,7 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_http');

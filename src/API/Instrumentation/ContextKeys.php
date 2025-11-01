@@ -10,6 +10,7 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextKeyInterface;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 
 /**
@@ -45,6 +46,16 @@ final class ContextKeys
         static $instance;
 
         return $instance ??= Context::createKey(TextMapPropagatorInterface::class);
+    }
+
+    /**
+     * @return ContextKeyInterface<ResponsePropagatorInterface>
+     */
+    public static function responsePropagator(): ContextKeyInterface
+    {
+        static $instance;
+
+        return $instance ??= Context::createKey(ResponsePropagatorInterface::class);
     }
 
     /**

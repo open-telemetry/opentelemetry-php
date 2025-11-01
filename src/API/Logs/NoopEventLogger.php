@@ -19,6 +19,7 @@ class NoopEventLogger implements EventLoggerInterface
         return $instance;
     }
 
+    #[\Override]
     public function emit(string $name, mixed $body = null, ?int $timestamp = null, ?ContextInterface $context = null, Severity|int|null $severityNumber = null, iterable $attributes = []): void
     {
     }

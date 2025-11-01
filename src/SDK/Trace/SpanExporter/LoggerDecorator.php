@@ -30,11 +30,13 @@ class LoggerDecorator implements SpanExporterInterface, LoggerAwareInterface
         $this->setSpanConverter($converter ?? new FriendlySpanConverter());
     }
 
+    #[\Override]
     protected function beforeExport(iterable $spans): iterable
     {
         return $spans;
     }
 
+    #[\Override]
     protected function afterExport(iterable $spans, bool $exportSuccess): void
     {
         if ($exportSuccess) {

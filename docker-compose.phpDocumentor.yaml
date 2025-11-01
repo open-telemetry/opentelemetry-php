@@ -1,10 +1,10 @@
 services:
   phpdoc:
-    image: phpdoc/phpdoc:3
+    image: phpdoc/phpdoc:3@sha256:acc0755cc8d4bc39863fcf57cdda713f4d79e1d5db0f8e6cdfa87756a4f29bdd
     volumes:
       - ./:/data
   preview:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:b3c656d55d7ad751196f21b7fd2e8d4da9cb430e32f646adcf92441b72f82b14
     ports:
       - 8080:80
     volumes:

@@ -33,11 +33,13 @@ final class ArrayNode extends \Symfony\Component\Config\Definition\ArrayNode
         $this->defaultValueSet = true;
     }
 
+    #[\Override]
     public function hasDefaultValue(): bool
     {
         return $this->defaultValueSet || parent::hasDefaultValue();
     }
 
+    #[\Override]
     public function getDefaultValue(): mixed
     {
         return $this->defaultValueSet

@@ -17,21 +17,25 @@ class NoopLoggerProvider implements LoggerProviderInterface
         return $instance ??= new self();
     }
 
+    #[\Override]
     public function getLogger(string $name, ?string $version = null, ?string $schemaUrl = null, iterable $attributes = []): LoggerInterface
     {
         return NoopLogger::getInstance();
     }
 
+    #[\Override]
     public function shutdown(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function forceFlush(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function updateConfigurator(Configurator $configurator): void
     {
         //no-op

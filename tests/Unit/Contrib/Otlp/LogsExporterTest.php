@@ -19,6 +19,7 @@ class LogsExporterTest extends TestCase
     private MockObject $transport;
     private LogsExporter $exporter;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);

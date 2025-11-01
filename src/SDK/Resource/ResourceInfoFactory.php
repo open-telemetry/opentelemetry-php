@@ -29,50 +29,51 @@ class ResourceInfoFactory
             return (new Detectors\Composite([
                 new Detectors\Host(),
                 new Detectors\Process(),
-                ...Registry::resourceDetectors(),
                 new Detectors\Environment(),
                 new Detectors\Sdk(),
                 new Detectors\Service(),
+                ...Registry::resourceDetectors(),
             ]))->getResource();
         }
 
+        /**
+         * Process env-provided detectors:
+         * - host, process, environment, composer first if requested
+         * - sdk, service always
+         * - any other detectors registered in the registry if requested
+         */
         $resourceDetectors = [];
-
-        foreach ($detectors as $detector) {
-            switch ($detector) {
-                case Values::VALUE_DETECTORS_ENVIRONMENT:
-                    $resourceDetectors[] = new Detectors\Environment();
-
-                    break;
-                case Values::VALUE_DETECTORS_HOST:
-                    $resourceDetectors[] = new Detectors\Host();
-
-                    break;
-                case Values::VALUE_DETECTORS_PROCESS:
-                    $resourceDetectors[] = new Detectors\Process();
-
-                    break;
-
-                case Values::VALUE_DETECTORS_COMPOSER:
-                    $resourceDetectors[] = new Detectors\Composer();
-
-                    break;
-                case Values::VALUE_DETECTORS_SDK_PROVIDED: //deprecated
-                case Values::VALUE_DETECTORS_OS: //deprecated
-                case Values::VALUE_DETECTORS_PROCESS_RUNTIME: //deprecated
-                case Values::VALUE_NONE:
-
-                    break;
-                default:
-                    try {
-                        $resourceDetectors[] = Registry::resourceDetector($detector);
-                    } catch (RuntimeException $e) {
-                        self::logWarning($e->getMessage());
-                    }
+        foreach ([
+            Values::VALUE_DETECTORS_HOST => Detectors\Host::class,
+            Values::VALUE_DETECTORS_PROCESS => Detectors\Process::class,
+            Values::VALUE_DETECTORS_ENVIRONMENT => Detectors\Environment::class,
+            Values::VALUE_DETECTORS_COMPOSER => Detectors\Composer::class,
+            Values::VALUE_DETECTORS_SERVICE_INSTANCE => Detectors\ServiceInstance::class,
+        ] as $detector => $class) {
+            if (in_array($detector, $detectors)) {
+                $resourceDetectors[] = new $class();
+                $detectors = array_diff($detectors, [$detector]);
             }
         }
         $resourceDetectors [] = new Detectors\Sdk();
         $resourceDetectors [] = new Detectors\Service();
+        // Don't try to load mandatory + deprecated detectors
+        $detectors = array_diff($detectors, [
+            Values::VALUE_DETECTORS_SDK,
+            Values::VALUE_DETECTORS_SERVICE,
+            Values::VALUE_DETECTORS_SDK_PROVIDED, //deprecated
+            Values::VALUE_DETECTORS_OS, //deprecated
+            Values::VALUE_DETECTORS_PROCESS_RUNTIME, //deprecated
+            Values::VALUE_NONE,
+        ]);
+
+        foreach ($detectors as $detector) {
+            try {
+                $resourceDetectors[] = Registry::resourceDetector($detector);
+            } catch (RuntimeException $e) {
+                self::logWarning($e->getMessage());
+            }
+        }
 
         return (new Detectors\Composite($resourceDetectors))->getResource();
     }

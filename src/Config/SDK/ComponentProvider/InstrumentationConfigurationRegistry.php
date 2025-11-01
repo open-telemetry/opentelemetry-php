@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -23,34 +23,36 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
 {
     /**
      * @param array{
-     *     instrumentation: array{
+     *     "instrumentation/development": array{
      *         php: list<ComponentPlugin<InstrumentationConfiguration>>,
      *         general: list<ComponentPlugin<GeneralInstrumentationConfiguration>>
      *     }
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): ConfigurationRegistry
     {
         $configurationRegistry = new ConfigurationRegistry();
         /** @phpstan-ignore-next-line */
-        foreach ($properties['instrumentation']['php'] ?? [] as $configuration) {
+        foreach ($properties['instrumentation/development']['php'] ?? [] as $configuration) {
             $configurationRegistry->add($configuration->create($context));
         }
         /** @phpstan-ignore-next-line */
-        foreach ($properties['instrumentation']['general'] ?? [] as $configuration) {
+        foreach ($properties['instrumentation/development']['general'] ?? [] as $configuration) {
             $configurationRegistry->add($configuration->create($context));
         }
 
         return $configurationRegistry;
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $root = $builder->arrayNode('open_telemetry');
         $root
             ->ignoreExtraKeys()
             ->children()
-                ->arrayNode('instrumentation')
+                ->arrayNode('instrumentation/development')
                     ->ignoreExtraKeys()
                     ->append($registry->componentMap('php', InstrumentationConfiguration::class))
                     ->append($registry->componentMap('general', GeneralInstrumentationConfiguration::class))

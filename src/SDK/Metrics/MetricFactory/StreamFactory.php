@@ -36,6 +36,7 @@ use Throwable;
  */
 final class StreamFactory implements MetricFactoryInterface
 {
+    #[\Override]
     public function createAsynchronousObserver(
         MetricRegistryInterface $registry,
         ResourceInfo $resource,
@@ -78,6 +79,7 @@ final class StreamFactory implements MetricFactoryInterface
         return array_keys($streams);
     }
 
+    #[\Override]
     public function createSynchronousWriter(
         MetricRegistryInterface $registry,
         ResourceInfo $resource,

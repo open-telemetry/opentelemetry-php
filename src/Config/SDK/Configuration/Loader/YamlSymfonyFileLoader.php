@@ -24,6 +24,7 @@ final class YamlSymfonyFileLoader extends FileLoader
         parent::__construct($locator, $env);
     }
 
+    #[\Override]
     public function load(mixed $resource, ?string $type = null): mixed
     {
         assert(class_exists(Yaml::class));
@@ -42,6 +43,7 @@ final class YamlSymfonyFileLoader extends FileLoader
         return null;
     }
 
+    #[\Override]
     public function supports(mixed $resource, ?string $type = null): bool
     {
         return class_exists(Yaml::class)

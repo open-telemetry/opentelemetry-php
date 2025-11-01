@@ -19,6 +19,7 @@ final class PsrClientResolver implements ResolverInterface
         return new self($client);
     }
 
+    #[\Override]
     public function resolvePsrClient(): ClientInterface
     {
         return $this->client ??= Psr18ClientDiscovery::find();

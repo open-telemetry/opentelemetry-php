@@ -8,6 +8,7 @@ use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Psr\Log\LoggerInterface;
 
@@ -40,4 +41,8 @@ interface InstrumentationInterface
     public function setLogger(LoggerInterface $logger): void;
 
     public function getLogger(): LoggerInterface;
+
+    public function setResponsePropagator(ResponsePropagatorInterface $responsePropagator): void;
+
+    public function getResponsePropagator(): ResponsePropagatorInterface;
 }

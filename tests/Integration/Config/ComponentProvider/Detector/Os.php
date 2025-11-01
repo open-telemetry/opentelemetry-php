@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
@@ -18,9 +18,11 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class Os implements ComponentProvider
 {
+    #[\Override]
     public function createPlugin(array $properties, Context $context): ResourceDetectorInterface
     {
         return new class() implements ResourceDetectorInterface {
+            #[\Override]
             public function getResource(): ResourceInfo
             {
                 return ResourceInfoFactory::emptyResource();
@@ -28,6 +30,7 @@ final class Os implements ComponentProvider
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('os');

@@ -11,11 +11,12 @@ use ExampleSDK\Metrics\AggregationResolver;
 use ExampleSDK\Metrics\MetricReader;
 use ExampleSDK\Trace\Sampler;
 use ExampleSDK\Trace\SpanProcessor;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -35,6 +36,7 @@ final class OpenTelemetryConfiguration implements ComponentProvider
      *         attribute_count_limit: int<0, max>,
      *     },
      *     propagator: ?ComponentPlugin<TextMapPropagatorInterface>,
+     *     response_propagator/development: ?ComponentPlugin<ResponsePropagatorInterface>,
      *     tracer_provider: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
@@ -75,11 +77,13 @@ final class OpenTelemetryConfiguration implements ComponentProvider
      *     },
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): Configuration
     {
         throw new BadMethodCallException('not implemented');
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('open_telemetry');
@@ -100,6 +104,7 @@ final class OpenTelemetryConfiguration implements ComponentProvider
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
+                ->append($registry->component('response_propagator/development', ResponsePropagatorInterface::class))
             ->end();
 
         return $node;

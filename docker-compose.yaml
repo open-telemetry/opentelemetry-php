@@ -7,18 +7,18 @@ services:
     env_file:
       - .env
   zipkin:
-    image: openzipkin/zipkin-slim
+    image: openzipkin/zipkin-slim@sha256:d951994017185bce1c859b62e13adf640e26c37e08b90ca2e4de2669dc1aad87
     ports:
     - 9411:9411
   jaeger:
-    image: jaegertracing/all-in-one
+    image: jaegertracing/all-in-one@sha256:c87fc1d9b22766284168abb2ac57ac2160dfc26484e4f965ff2dcc6b849b263a
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9412
     ports:
     - 9412:9412
     - 16686:16686
   collector:
-    image: otel/opentelemetry-collector-contrib
+    image: otel/opentelemetry-collector-contrib@sha256:4a951ff0a9772f4fa8e9c7a326434370301b98b2b813933468dcb54aa6a6b5e5
     command: [ "--config=/etc/otel-collector-config.yml" ]
     volumes:
       - ./files/collector/otel-collector-config.yml:/etc/otel-collector-config.yml

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -20,11 +20,13 @@ final class LogRecordExporterMemory implements ComponentProvider
     /**
      * @param array{} $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         return new InMemoryExporter();
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('memory/development');

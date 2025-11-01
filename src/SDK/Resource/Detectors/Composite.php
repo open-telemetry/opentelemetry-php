@@ -17,6 +17,7 @@ final class Composite implements ResourceDetectorInterface
     {
     }
 
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $resource = ResourceInfoFactory::mandatoryResource();

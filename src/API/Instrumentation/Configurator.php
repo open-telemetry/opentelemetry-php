@@ -15,7 +15,9 @@ use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ImplicitContextKeyedInterface;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
+use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 
@@ -31,6 +33,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     private ?TextMapPropagatorInterface $propagator = null;
     private ?LoggerProviderInterface $loggerProvider = null;
     private ?EventLoggerProviderInterface $eventLoggerProvider = null;
+    private ?ResponsePropagatorInterface $responsePropagator = null;
 
     private function __construct()
     {
@@ -56,9 +59,11 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withPropagator(new NoopTextMapPropagator())
             ->withLoggerProvider(NoopLoggerProvider::getInstance())
             ->withEventLoggerProvider(new NoopEventLoggerProvider())
+            ->withResponsePropagator(new NoopResponsePropagator())
         ;
     }
 
+    #[\Override]
     public function activate(): ScopeInterface
     {
         return $this->storeInContext()->activate();
@@ -67,6 +72,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     /**
      * @phan-suppress PhanDeprecatedFunction
      */
+    #[\Override]
     public function storeInContext(?ContextInterface $context = null): ContextInterface
     {
         $context ??= Context::getCurrent();
@@ -85,6 +91,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         }
         if ($this->eventLoggerProvider !== null) {
             $context = $context->with(ContextKeys::eventLoggerProvider(), $this->eventLoggerProvider);
+        }
+        if ($this->responsePropagator !== null) {
+            $context = $context->with(ContextKeys::responsePropagator(), $this->responsePropagator);
         }
 
         return $context;
@@ -129,6 +138,14 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $self = clone $this;
         $self->eventLoggerProvider = $eventLoggerProvider;
+
+        return $self;
+    }
+
+    public function withResponsePropagator(?ResponsePropagatorInterface $responsePropagator): Configurator
+    {
+        $self = clone $this;
+        $self->responsePropagator = $responsePropagator;
 
         return $self;
     }

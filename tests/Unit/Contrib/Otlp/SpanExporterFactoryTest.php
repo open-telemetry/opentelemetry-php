@@ -25,6 +25,7 @@ class SpanExporterFactoryTest extends TestCase
     private TransportFactoryInterface $transportFactory;
     private TransportInterface $transport;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->transportFactory = $this->createMock(TransportFactoryInterface::class);

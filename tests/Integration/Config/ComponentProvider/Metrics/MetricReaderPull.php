@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -25,19 +25,23 @@ final class MetricReaderPull implements ComponentProvider
      *     cardinality_limits: array,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
         return new class() implements MetricReaderInterface {
+            #[\Override]
             public function collect(): bool
             {
                 return true;
             }
 
+            #[\Override]
             public function shutdown(): bool
             {
                 return true;
             }
 
+            #[\Override]
             public function forceFlush(): bool
             {
                 return true;
@@ -45,6 +49,7 @@ final class MetricReaderPull implements ComponentProvider
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('pull');

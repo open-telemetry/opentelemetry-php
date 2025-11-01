@@ -41,6 +41,7 @@ final class StatusData implements StatusDataInterface
         return new self($code, $description); /** @phan-suppress-current-line PhanTypeMismatchArgumentNullable */
     }
 
+    #[\Override]
     public static function ok(): self
     {
         if (null === self::$ok) {
@@ -50,6 +51,7 @@ final class StatusData implements StatusDataInterface
         return self::$ok;
     }
 
+    #[\Override]
     public static function error(): self
     {
         if (null === self::$error) {
@@ -59,6 +61,7 @@ final class StatusData implements StatusDataInterface
         return self::$error;
     }
 
+    #[\Override]
     public static function unset(): self
     {
         if (null === self::$unset) {
@@ -68,11 +71,13 @@ final class StatusData implements StatusDataInterface
         return self::$unset;
     }
 
+    #[\Override]
     public function getCode(): string
     {
         return $this->code;
     }
 
+    #[\Override]
     public function getDescription(): string
     {
         return $this->description;

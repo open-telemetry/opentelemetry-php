@@ -20,11 +20,13 @@ final class CompletedFuture implements FutureInterface
     {
     }
 
+    #[\Override]
     public function await()
     {
         return $this->value;
     }
 
+    #[\Override]
     public function map(Closure $closure): FutureInterface
     {
         $c = $closure;
@@ -37,6 +39,7 @@ final class CompletedFuture implements FutureInterface
         }
     }
 
+    #[\Override]
     public function catch(Closure $closure): FutureInterface
     {
         return $this;

@@ -14,6 +14,7 @@ final class InstrumentationScopeSchemaUrlCriteria implements SelectionCriteriaIn
     {
     }
 
+    #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
         return $this->schemaUrl === $instrumentationScope->getSchemaUrl();

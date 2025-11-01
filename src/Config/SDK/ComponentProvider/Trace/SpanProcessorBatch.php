@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
@@ -29,6 +29,7 @@ final class SpanProcessorBatch implements ComponentProvider
      *     exporter: ComponentPlugin<SpanExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanProcessorInterface
     {
         return new BatchSpanProcessor(
@@ -42,6 +43,7 @@ final class SpanProcessorBatch implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('batch');

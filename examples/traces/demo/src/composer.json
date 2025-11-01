@@ -1,7 +1,7 @@
 {
   "name": "open-telemetry/distributed-tracing-example",
   "type": "application",
-  "homepage": "https://opentelemetry.io/docs/php",
+  "homepage": "https://opentelemetry.io/docs/languages/php",
   "license": "Apache-2.0",
   "repositories": [
     {

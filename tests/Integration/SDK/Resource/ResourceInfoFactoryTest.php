@@ -171,4 +171,16 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         $this->assertEquals(InstalledVersions::getRootPackage()['pretty_version'], $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
+
+    public function test_env_doesnt_clobber_service(): void
+    {
+        //service.name should be provided by mandatory Service detector, and should not be clobbered by environment detector
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'test-service');
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'service.name=ignore-me');
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'env');
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertEquals('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
 }

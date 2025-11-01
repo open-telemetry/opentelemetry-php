@@ -11,7 +11,7 @@ use Google\Protobuf\Internal\GPBUtil;
 /**
  * Summary metric data are used to convey quantile summaries,
  * a Prometheus (see: https://prometheus.io/docs/concepts/metric_types/#summary)
- * and OpenMetrics (see: https://github.com/OpenObservability/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)
+ * and OpenMetrics (see: https://github.com/prometheus/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)
  * data type. These data points cannot always be merged in a meaningful way.
  * While they can be useful in some applications, histogram data points are
  * recommended for new applications.

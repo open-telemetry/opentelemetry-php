@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(CurlClient::class)]
 class CurlClientTest extends AbstractDiscoveryTestCase
 {
+    #[\Override]
     public function getInstance(): DiscoveryInterface
     {
         return new CurlClient();

@@ -6,10 +6,10 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
@@ -43,6 +43,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
      *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         $protocol = Protocols::GRPC;
@@ -67,6 +68,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
         ), $temporality);
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_grpc');

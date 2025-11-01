@@ -1,17 +1,17 @@
 version: '3.7'
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038
     ports:
       - 9090:9090
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
   redis:
-    image: redis
+    image: redis@sha256:4521b581dbddea6e7d81f8fe95ede93f5648aaa66a9dacd581611bf6fe7527bd
     ports:
         - 6379:6379
   web:
-    image: nginx:alpine
+    image: nginx:alpine@sha256:b3c656d55d7ad751196f21b7fd2e8d4da9cb430e32f646adcf92441b72f82b14
     ports:
       - 8080:80
     depends_on:

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
@@ -24,6 +24,7 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
      *      record_min_max: bool,
      *  } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): DefaultAggregationProviderInterface
     {
         return new class() implements DefaultAggregationProviderInterface {
@@ -31,6 +32,7 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('explicit_bucket_histogram');

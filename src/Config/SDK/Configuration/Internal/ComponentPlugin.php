@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Context;
 
 /**
  * @template T
- * @implements \OpenTelemetry\Config\SDK\Configuration\ComponentPlugin<T>
+ * @implements \OpenTelemetry\API\Configuration\Config\ComponentPlugin<T>
  *
  * @internal
  */
-final class ComponentPlugin implements \OpenTelemetry\Config\SDK\Configuration\ComponentPlugin
+final class ComponentPlugin implements \OpenTelemetry\API\Configuration\Config\ComponentPlugin
 {
     /**
      * @param array $properties resolved properties according to component provider config
@@ -25,6 +25,7 @@ final class ComponentPlugin implements \OpenTelemetry\Config\SDK\Configuration\C
     ) {
     }
 
+    #[\Override]
     public function create(Context $context): mixed
     {
         return $this->provider->createPlugin($this->properties, $context);

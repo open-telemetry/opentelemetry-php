@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Util::class)]
 class UtilTest extends TestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         set_error_handler(static function (int $errno, string $errstr): never {
@@ -21,6 +22,7 @@ class UtilTest extends TestCase
         }, E_USER_WARNING|E_USER_NOTICE|E_USER_ERROR|E_USER_DEPRECATED);
     }
 
+    #[\Override]
     public function tearDown(): void
     {
         Util::setErrorLevel();

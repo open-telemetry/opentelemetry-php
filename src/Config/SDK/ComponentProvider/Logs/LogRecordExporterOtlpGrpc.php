@@ -6,10 +6,10 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
@@ -40,6 +40,7 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
      *     insecure: ?bool,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
         $protocol = Protocols::GRPC;
@@ -57,6 +58,7 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
         ));
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('otlp_grpc');

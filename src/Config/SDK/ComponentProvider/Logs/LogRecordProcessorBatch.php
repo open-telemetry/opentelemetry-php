@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -29,6 +29,7 @@ final class LogRecordProcessorBatch implements ComponentProvider
      *     exporter: ComponentPlugin<LogRecordExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface
     {
         return new BatchLogRecordProcessor(
@@ -42,6 +43,7 @@ final class LogRecordProcessorBatch implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('batch');

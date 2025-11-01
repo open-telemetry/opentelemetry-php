@@ -11,7 +11,10 @@ tracer_provider:
 propagator:
   composite: []
 
-instrumentation:
+response_propagator/development:
+  composite: []
+
+instrumentation/development:
   php:
     example_instrumentation:
       span_name: my-span

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Logs;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentPlugin;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
@@ -24,6 +24,7 @@ final class LogRecordProcessorSimple implements ComponentProvider
      *     exporter: ComponentPlugin<LogRecordExporterInterface>,
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordProcessorInterface
     {
         return new SimpleLogRecordProcessor(
@@ -31,6 +32,7 @@ final class LogRecordProcessorSimple implements ComponentProvider
         );
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('simple');

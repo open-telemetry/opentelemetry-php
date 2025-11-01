@@ -139,10 +139,12 @@ class BatchSpanProcessor implements SpanProcessorInterface
             });
     }
 
+    #[\Override]
     public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void
     {
     }
 
+    #[\Override]
     public function onEnd(ReadableSpanInterface $span): void
     {
         if ($this->closed) {
@@ -170,6 +172,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
     }
 
+    #[\Override]
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {
@@ -179,6 +182,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         return $this->flush(__FUNCTION__, $cancellation);
     }
 
+    #[\Override]
     public function shutdown(?CancellationInterface $cancellation = null): bool
     {
         if ($this->closed) {

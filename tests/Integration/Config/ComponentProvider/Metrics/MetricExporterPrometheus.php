@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Metrics;
 
-use OpenTelemetry\Config\SDK\Configuration\ComponentProvider;
-use OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Context;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -30,14 +30,17 @@ final class MetricExporterPrometheus implements ComponentProvider
      *     },
      * } $properties
      */
+    #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         return new class() implements MetricExporterInterface {
+            #[\Override]
             public function export(iterable $batch): bool
             {
                 return true;
             }
 
+            #[\Override]
             public function shutdown(): bool
             {
                 return true;
@@ -45,6 +48,7 @@ final class MetricExporterPrometheus implements ComponentProvider
         };
     }
 
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('prometheus/development');

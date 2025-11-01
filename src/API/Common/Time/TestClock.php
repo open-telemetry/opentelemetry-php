@@ -33,6 +33,7 @@ final class TestClock implements ClockInterface
         $this->currentEpochNanos = $nanoSeconds;
     }
 
+    #[\Override]
     public function now(): int
     {
         return $this->currentEpochNanos;

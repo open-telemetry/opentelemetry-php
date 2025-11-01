@@ -23,6 +23,7 @@ final class Process implements ResourceDetectorInterface
     /**
      * @psalm-suppress PossiblyUndefinedArrayOffset
      */
+    #[\Override]
     public function getResource(): ResourceInfo
     {
         $attributes = [

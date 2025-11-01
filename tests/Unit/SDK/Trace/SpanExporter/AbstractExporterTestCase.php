@@ -23,6 +23,7 @@ abstract class AbstractExporterTestCase extends MockeryTestCase
     protected TransportInterface $transport;
     protected FutureInterface $future;
 
+    #[\Override]
     public function setUp(): void
     {
         Logging::disable();
