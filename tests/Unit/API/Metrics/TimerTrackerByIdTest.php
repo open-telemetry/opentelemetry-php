@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Metrics\Util;
+namespace OpenTelemetry\Tests\Unit\API\Metrics;
 
-use OpenTelemetry\SDK\Metrics\Util\TimerTrackerById;
+use OpenTelemetry\API\Metrics\TimerTrackerById;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(TimerTrackerById::class)]
 class TimerTrackerByIdTest extends TestCase
 {
     private TimerTrackerById $timerTracker;

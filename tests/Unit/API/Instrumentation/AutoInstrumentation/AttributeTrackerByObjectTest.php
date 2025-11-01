@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK\Util;
+namespace Unit\API\Instrumentation\AutoInstrumentation;
 
-use OpenTelemetry\SDK\Util\AttributeTrackerByObject;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\AttributeTrackerByObject;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(AttributeTrackerByObject::class)]
 class AttributeTrackerByObjectTest extends TestCase
 {
     private AttributeTrackerByObject $tracker;
