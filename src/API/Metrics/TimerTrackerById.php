@@ -38,4 +38,9 @@ class TimerTrackerById
     {
         return $this->durationNanos($id) / ClockInterface::NANOS_PER_MILLISECOND;
     }
+
+    public function durationS(string|int $id): float
+    {
+        return $this->durationNanos($id) / ClockInterface::NANOS_PER_SECOND;
+    }
 }

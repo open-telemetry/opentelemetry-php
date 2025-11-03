@@ -40,4 +40,9 @@ class TimerTrackerByObject
     {
         return $this->durationNanos($id) / ClockInterface::NANOS_PER_MILLISECOND;
     }
+
+    public function durationS(object $id): float
+    {
+        return $this->durationNanos($id) / ClockInterface::NANOS_PER_SECOND;
+    }
 }
