@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SemConv;
 
 /**
- * @deprecated Use {@see OpenTelemetry\SemConv\Attributes}\* or {@see OpenTelemetry\SemConv\Unstable\Attributes}\* instead.
+ * @deprecated Use {@see OpenTelemetry\SemConv\Attributes}\* or {@see OpenTelemetry\SemConv\Incubating\Attributes}\* instead.
  */
 interface ResourceAttributeValues
 {
