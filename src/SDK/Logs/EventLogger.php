@@ -40,7 +40,6 @@ class EventLogger implements EventLoggerInterface
         iterable $attributes = [],
     ): void {
         $logRecord = new LogRecord();
-        $logRecord->setAttribute('event.name', $name);
         $logRecord->setAttributes($attributes);
         $logRecord->setAttribute('event.name', $name);
         $logRecord->setBody($body);
