@@ -504,7 +504,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->arrayNode('default_config')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->booleanNode('disabled')->isRequired()->end()
+                                ->booleanNode('disabled')->end()
                             ->end()
                         ->end()
                         ->arrayNode('tracers')
