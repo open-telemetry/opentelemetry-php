@@ -1,5 +1,5 @@
 FROM composer:2.8@sha256:5248900ab8b5f7f880c2d62180e40960cd87f60149ec9a1abfd62ac72a02577c AS composer
-FROM debian:bullseye@sha256:5e2b4654ea0dc0bc22434199dace15adf9799f292857679fa79f9395e6d4dafd
+FROM debian:bullseye@sha256:05bc4300f29708b0e6f4fa006ed3d16930baae91613416937c39e79dd9a095ac
 WORKDIR /usr/src/myapp
 
 RUN apt-get update  \
