@@ -37,7 +37,7 @@ jobs:
 
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
 
-    - uses: gacts/run-and-post-run@d803f6920adc9a47eeac4cb6c93dbc2e2890c684 # v1
+    - uses: gacts/run-and-post-run@81b6ce503cde93862cec047c54652e45c5dca991 # v1.4.3
       id: post-run-command
       with:
         post: |
