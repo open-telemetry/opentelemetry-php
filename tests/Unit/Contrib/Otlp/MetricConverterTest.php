@@ -43,7 +43,7 @@ final class MetricConverterTest extends TestCase
                         {"attributes":[{"key":"foo","value":{"stringValue":"bar"}}],"startTimeUnixNano":"17","timeUnixNano":"42","asInt":"5"}
                     ],"aggregationTemporality":"AGGREGATION_TEMPORALITY_CUMULATIVE"}},
                     {"name":"test-2","histogram":{"dataPoints":[
-                        {"startTimeUnixNano":"17","timeUnixNano":"42","count":"2","sum":7,"bucketCounts":["2", "0"],"explicitBounds":[5]}
+                        {"startTimeUnixNano":"17","timeUnixNano":"42","count":"2","sum":7,"bucketCounts":["2", "0"],"explicitBounds":[5],"min":3,"max":4}
                     ],"aggregationTemporality":"AGGREGATION_TEMPORALITY_DELTA"}},
                     {"name":"test-3","gauge":{"dataPoints":[
                         {"startTimeUnixNano":"17","timeUnixNano":"42","asDouble":9.5}
@@ -122,7 +122,7 @@ final class MetricConverterTest extends TestCase
             <<<JSON
                 {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[
                     {"name":"test-1","histogram":{"dataPoints":[
-                        {"attributes":[{"key":"foo","value":{"stringValue":"bar"}}],"startTimeUnixNano":"17","timeUnixNano":"42","count":"5","sum":9,"bucketCounts":["5"],"exemplars":[
+                        {"attributes":[{"key":"foo","value":{"stringValue":"bar"}}],"startTimeUnixNano":"17","timeUnixNano":"42","count":"5","sum":9,"bucketCounts":["5"],"min":-2,"max":8,"exemplars":[
                             {"filteredAttributes":[{"key":"key","value":{"stringValue":"value"}}],"timeUnixNano":"19","asDouble":0.5},
                             {"filteredAttributes":[{"key":"key","value":{"stringValue":"other"}}],"timeUnixNano":"37","asInt":"-3","spanId":"APBnqgupArc=","traceId":"S/kvNXezTaajzpKdDg5HNg=="}
                         ]}
