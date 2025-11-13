@@ -59,6 +59,7 @@ final class ConfigurationTest extends TestCase
     {
         yield 'kitchen-sink' => [__DIR__ . '/configurations/kitchen-sink.yaml'];
         yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
+        yield 'php-specific' => [__DIR__ . '/configurations/php-specific.yaml'];
     }
 
     public function test_configurators(): void
