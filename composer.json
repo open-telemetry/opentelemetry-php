@@ -63,6 +63,7 @@
         },
         "files": [
             "src/Context/fiber/initialize_fiber_handler.php",
+            "src/API/_compat.php",
             "src/API/Trace/functions.php",
             "src/Contrib/Otlp/_register.php",
             "src/Contrib/Grpc/_register.php",
@@ -207,5 +208,10 @@
                 "OpenTelemetry\\Tests\\Integration\\SDK\\Common\\Configuration\\TestEnvSourceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test-psr3": [
+            "OpenTelemetry\\Tests\\Integration\\Composer\\Psr3Compatibility::run"
+        ]
     }
 }
