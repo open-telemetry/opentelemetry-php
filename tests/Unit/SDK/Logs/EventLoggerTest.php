@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Logs\LoggerInterface;
@@ -12,7 +13,12 @@ use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Logs\EventLogger;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
+use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
+use OpenTelemetry\SDK\Logs\LoggerProviderBuilder;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\ReadableLogRecord;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -95,5 +101,33 @@ class EventLoggerTest extends TestCase
 
         $eventLogger = $this->eventLoggerProvider->getEventLogger('event.logger');
         $eventLogger->emit('my.event', attributes: ['event.name' => 'not.my.event']);
+    }
+
+    /**
+     * "The event.name attribute MUST be the first attribute added to the LogRecord"
+     * @see https://github.com/open-telemetry/opentelemetry-php/pull/1768#issuecomment-3527425474
+     */
+    #[BackupGlobals(true)]
+    public function test_event_name_is_not_dropped_first(): void
+    {
+        $_SERVER['OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT'] = 1;
+        $eventLoggerProvider = new EventLoggerProvider((new LoggerProviderBuilder())
+            ->addLogRecordProcessor(new SimpleLogRecordProcessor($exporter = new InMemoryExporter()))
+            ->build());
+        $eventLogger = $eventLoggerProvider->getEventLogger('test');
+
+        Logging::disable();
+
+        try {
+            $eventLogger->emit('my.event', attributes: ['other.attribute' => 'not.my.event']);
+        } finally {
+            Logging::reset();
+        }
+        $eventLoggerProvider->forceFlush();
+
+        /** @var list<ReadableLogRecord> $logs */
+        $logs = $exporter->getStorage()->getArrayCopy();
+        $this->assertCount(1, $logs);
+        $this->assertArrayHasKey('event.name', $logs[0]->getAttributes()->toArray());
     }
 }
