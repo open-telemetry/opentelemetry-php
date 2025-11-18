@@ -40,6 +40,12 @@ class EventLogger implements EventLoggerInterface
         iterable $attributes = [],
     ): void {
         $logRecord = new LogRecord();
+        /**
+         *  Set event.name twice: first to position it as the initial attribute entry,
+         *  then again after setAttributes() to prevent its value from being overwritten.
+         *  This ensures event.name won't be dropped by attribute limits.
+         * @see https://github.com/open-telemetry/opentelemetry-php/pull/1768#issuecomment-3527425474
+         */
         $logRecord->setAttribute('event.name', $name);
         $logRecord->setAttributes($attributes);
         $logRecord->setAttribute('event.name', $name);
