@@ -111,7 +111,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *              tracers: list<array{
      *                  name: string,
      *                  config: array{
-     *                      disabled: bool,
+     *                      disabled: ?bool,
      *                  }
      *              }>
      *           }
