@@ -7,7 +7,7 @@ services:
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
   redis:
-    image: redis@sha256:4521b581dbddea6e7d81f8fe95ede93f5648aaa66a9dacd581611bf6fe7527bd
+    image: redis@sha256:980d6260ff4105b8fe786898582e9524e13a127a89d3919d492a4306260bec5d
     ports:
         - 6379:6379
   web:
