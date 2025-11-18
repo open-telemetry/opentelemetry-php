@@ -332,4 +332,11 @@ final class ConfigurationTest extends TestCase
 
         return $resource;
     }
+
+    public function test_empty_tracer_configurator_config(): void
+    {
+        $file = __DIR__ . '/configurations/empty-tracer-config.yaml';
+        $this->expectNotToPerformAssertions();
+        Configuration::parseFile($file)->create();
+    }
 }

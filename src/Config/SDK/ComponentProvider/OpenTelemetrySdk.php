@@ -239,7 +239,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
         foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
-            $disabled = $tracer['config']['disabled'];
+            $disabled = $tracer['config']['disabled'] ?? false;
             $configurator = $configurator->with(
                 static fn (TracerConfig $config) => $config->setDisabled($disabled),
                 name: $tracer['name'],
