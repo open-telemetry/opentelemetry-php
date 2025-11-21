@@ -155,7 +155,7 @@ class MultiSpanProcessorTest extends TestCase
     {
         return new MultiSpanProcessor(
             $this->getSpanProcessors()[0],
-            $this->getSpanProcessors()[1],
+            $this->getSpanProcessors()[1]
         );
     }
 
