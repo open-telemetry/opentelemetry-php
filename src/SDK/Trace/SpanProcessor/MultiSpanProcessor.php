@@ -49,11 +49,11 @@ final class MultiSpanProcessor implements ExtendedSpanProcessorInterface
 
     /** @inheritDoc */
     #[\Override]
-    public function OnEnding(ReadWriteSpanInterface $span): void
+    public function onEnding(ReadWriteSpanInterface $span): void
     {
         foreach ($this->processors as $processor) {
             if ($processor instanceof ExtendedSpanProcessorInterface) {
-                $processor->OnEnding($span);
+                $processor->onEnding($span);
             }
         }
     }
