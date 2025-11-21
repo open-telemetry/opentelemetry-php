@@ -304,6 +304,7 @@ return [
     // This is useful for excluding hopelessly unanalyzable
     // files that can't be removed for whatever reason.
     'exclude_file_list' => [
+        'src/API/Common/Compatibility/Psr3.php',
         'vendor/composer/composer/src/Composer/InstalledVersions.php',
     ],
 
