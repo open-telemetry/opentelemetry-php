@@ -273,6 +273,9 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         }
 
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
+        if ($this->spanProcessor instanceof ExtendedSpanProcessorInterface) {
+            $this->spanProcessor->onEnding($this);
+        }
         $this->hasEnded = true;
 
         $this->checkForDroppedElements();

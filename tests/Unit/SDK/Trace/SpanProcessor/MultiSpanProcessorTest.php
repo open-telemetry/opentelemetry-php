@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Trace\ExtendedSpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
@@ -31,9 +32,12 @@ class MultiSpanProcessorTest extends TestCase
         $multiProcessor = $this->createMultiSpanProcessor();
         $processor = $this->createMock(SpanProcessorInterface::class);
         $multiProcessor->addSpanProcessor($processor);
+        $extendedProcessor = $this->createMock(ExtendedSpanProcessorInterface::class);
+        $multiProcessor->addSpanProcessor($extendedProcessor);
         $processors = array_merge(
+            $this->getSpanProcessors(),
             [$this->createMock(SpanProcessorInterface::class)],
-            $this->getSpanProcessors()
+            [$this->createMock(ExtendedSpanProcessorInterface::class)],
         );
 
         $this->assertEquals(
@@ -54,6 +58,22 @@ class MultiSpanProcessorTest extends TestCase
             ->onStart(
                 $this->createMock(ReadWriteSpanInterface::class),
                 Context::getCurrent(),
+            );
+    }
+
+    public function test_on_ending(): void
+    {
+        /** @var MockObject $processor */
+        foreach ($this->getSpanProcessors() as $processor) {
+            if ($processor instanceof ExtendedSpanProcessorInterface) {
+                $processor->expects($this->once())
+                    ->method('onEnding');
+            }
+        }
+
+        $this->createMultiSpanProcessor()
+            ->onEnding(
+                $this->createMock(ReadWriteSpanInterface::class)
             );
     }
 
@@ -144,7 +164,7 @@ class MultiSpanProcessorTest extends TestCase
         return $this->spanProcessors === []
             ? $this->spanProcessors = [
                 $this->createMock(SpanProcessorInterface::class),
-                $this->createMock(SpanProcessorInterface::class),
+                $this->createMock(ExtendedSpanProcessorInterface::class),
             ]
             : $this->spanProcessors;
     }
