@@ -20,7 +20,7 @@ jobs:
       - name: "Checkout"
         uses: "actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3" # v5
       - name: "Build"
-        uses: "phpDocumentor/phpDocumentor@d49f1917eafdf48df9660a088e9221c2b1d3fb99" # v3.8.1
+        uses: "phpDocumentor/phpDocumentor@185f45c1ff1b34f85bdaa01e1777ee26c1c6ebfa" # v3.9.0
         with:
           target: "docs/build"
       - name: Setup Pages
