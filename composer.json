@@ -87,6 +87,7 @@
         }
     },
     "require-dev": {
+        "amphp/amp": "^3",
         "ext-grpc": "*",
         "bamarni/composer-bin-plugin": "^1.8",
         "dg/bypass-finals": "^1.4",

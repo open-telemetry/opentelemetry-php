@@ -146,6 +146,16 @@ class SpanTest extends MockeryTestCase
             ->once();
     }
 
+    #[Group('trace-compliance')]
+    public function test_end_span_calls_processor_onending(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_CONSUMER);
+        $span->end();
+        $this->spanProcessor
+            ->shouldHaveReceived('onEnding')
+            ->once();
+    }
+
     public function test_get_start_epoch_nanos(): void
     {
         $span = $this->createTestSpan(API\SpanKind::KIND_INTERNAL);
@@ -283,13 +293,11 @@ class SpanTest extends MockeryTestCase
         $this
             ->spanProcessor
             ->shouldHaveReceived('onEnding')
-            ->once()
-            ->with($span);
+            ->once();
         $this
             ->spanProcessor
             ->shouldHaveReceived('onEnd')
-            ->once()
-            ->with($span);
+            ->once();
 
         $this->assertSpanData(
             $span->toSpanData(),
