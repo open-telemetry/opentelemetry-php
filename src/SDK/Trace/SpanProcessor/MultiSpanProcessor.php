@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Trace\ExtendedSpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
@@ -14,7 +15,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
  * Class SpanMultiProcessor is a SpanProcessor that forwards all events to an
  * array of SpanProcessors.
  */
-final class MultiSpanProcessor implements SpanProcessorInterface
+final class MultiSpanProcessor implements ExtendedSpanProcessorInterface
 {
     /** @var list<SpanProcessorInterface> */
     private array $processors = [];
@@ -43,6 +44,17 @@ final class MultiSpanProcessor implements SpanProcessorInterface
     {
         foreach ($this->processors as $processor) {
             $processor->onStart($span, $parentContext);
+        }
+    }
+
+    /** @inheritDoc */
+    #[\Override]
+    public function onEnding(ReadWriteSpanInterface $span): void
+    {
+        foreach ($this->processors as $processor) {
+            if ($processor instanceof ExtendedSpanProcessorInterface) {
+                $processor->onEnding($span);
+            }
         }
     }
 

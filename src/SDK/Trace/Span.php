@@ -26,7 +26,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     private array $events = [];
     private int $totalRecordedEvents = 0;
     private StatusDataInterface $status;
-    private int $endEpochNanos = 0;
+    private ?int $endEpochNanos = null;
     private bool $hasEnded = false;
 
     /**
@@ -268,16 +268,20 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     #[\Override]
     public function end(?int $endEpochNanos = null): void
     {
-        if ($this->hasEnded) {
+        if ($this->endEpochNanos !== null) {
             return;
         }
 
         $this->endEpochNanos = $endEpochNanos ?? Clock::getDefault()->now();
-        $this->hasEnded = true;
+        $span = clone $this;
+        $this->hasEnded = true; // prevent further modifications to the span by async code
+        if ($this->spanProcessor instanceof ExtendedSpanProcessorInterface) {
+            $this->spanProcessor->onEnding($span);
+        }
+        $span->hasEnded = true;
 
-        $this->checkForDroppedElements();
-
-        $this->spanProcessor->onEnd($this);
+        $this->spanProcessor->onEnd($span);
+        $span->checkForDroppedElements();
     }
 
     /** @inheritDoc */
@@ -317,7 +321,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $this->totalRecordedLinks,
             $this->totalRecordedEvents,
             $this->status,
-            $this->endEpochNanos,
+            $this->endEpochNanos ?? 0,
             $this->hasEnded
         );
     }

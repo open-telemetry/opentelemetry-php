@@ -28,6 +28,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\Event;
 use OpenTelemetry\SDK\Trace\EventInterface;
+use OpenTelemetry\SDK\Trace\ExtendedSpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\Link;
 use OpenTelemetry\SDK\Trace\LinkInterface;
@@ -36,7 +37,6 @@ use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
-use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\StatusData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -59,7 +59,7 @@ class SpanTest extends MockeryTestCase
         'bool_attribute' => false,
     ];
 
-    /** @var MockInterface&SpanProcessorInterface */
+    /** @var MockInterface&ExtendedSpanProcessorInterface */
     private $spanProcessor;
     /** @var LogWriterInterface&MockObject $logWriter */
     private LogWriterInterface $logWriter;
@@ -84,7 +84,7 @@ class SpanTest extends MockeryTestCase
         $this->resource = ResourceInfoFactory::emptyResource();
         $this->instrumentationScope = new InstrumentationScope('test_scope', '0.1.2', null, Attributes::create([]));
 
-        $this->spanProcessor = Mockery::spy(SpanProcessorInterface::class);
+        $this->spanProcessor = Mockery::spy(ExtendedSpanProcessorInterface::class);
 
         $this->traceId = $this->idGenerator->generateTraceId();
         $this->spanId = $this->idGenerator->generateSpanId();
@@ -139,7 +139,20 @@ class SpanTest extends MockeryTestCase
         $span->end();
         $this->assertTrue($span->hasEnded());
         $this->spanProcessor
+            ->shouldHaveReceived('onEnding')
+            ->once();
+        $this->spanProcessor
             ->shouldHaveReceived('onEnd')
+            ->once();
+    }
+
+    #[Group('trace-compliance')]
+    public function test_end_span_calls_processor_onending(): void
+    {
+        $span = $this->createTestSpan(API\SpanKind::KIND_CONSUMER);
+        $span->end();
+        $this->spanProcessor
+            ->shouldHaveReceived('onEnding')
             ->once();
     }
 
@@ -279,9 +292,12 @@ class SpanTest extends MockeryTestCase
 
         $this
             ->spanProcessor
+            ->shouldHaveReceived('onEnding')
+            ->once();
+        $this
+            ->spanProcessor
             ->shouldHaveReceived('onEnd')
-            ->once()
-            ->with($span);
+            ->once();
 
         $this->assertSpanData(
             $span->toSpanData(),
