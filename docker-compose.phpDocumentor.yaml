@@ -1,6 +1,6 @@
 services:
   phpdoc:
-    image: phpdoc/phpdoc:3@sha256:34883e361bd0ff8c6ead79d508575b37f62e5ba11f8445c8db979416fa5bf664
+    image: phpdoc/phpdoc:3@sha256:2b36e4f74937e40246d54ed12dfa4f988f21ed8d19e46f426ac3dc32eac2ff1d
     volumes:
       - ./:/data
   preview:
