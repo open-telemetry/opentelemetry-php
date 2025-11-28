@@ -1,4 +1,4 @@
-FROM composer:2.9@sha256:ea704a565cd41c2c6f6910def509cb8944096a81e4a46cb02f827063c216363f AS composer
+FROM composer:2.9@sha256:8f3b7d97cd7436dae41d6af0dd6a53853779040ecac26e65544fc31746035705 AS composer
 FROM debian:bullseye@sha256:ee239c601913c0d3962208299eef70dcffcb7aac1787f7a02f6d3e2b518755e6
 WORKDIR /usr/src/myapp
 
