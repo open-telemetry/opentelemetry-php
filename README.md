@@ -6,6 +6,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php?ref=badge_shield&issueType=license)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php.svg?type=shield&issueType=security)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php?ref=badge_shield&issueType=security)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/open-telemetry/opentelemetry-php/badge)](https://scorecard.dev/viewer/?uri=github.com/open-telemetry/opentelemetry-php)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11534/badge)](https://www.bestpractices.dev/projects/11534)
 
 This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of [OpenTelemetry](https://opentelemetry.io/) for PHP.
 
