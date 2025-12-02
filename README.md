@@ -3,6 +3,9 @@
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
 [![Slack](https://img.shields.io/badge/slack-@cncf/otel--php-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/D03FAB6GN0K)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php.svg?type=shield&issueType=license)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php?ref=badge_shield&issueType=license)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php.svg?type=shield&issueType=security)](https://app.fossa.com/projects/custom%2B162%2Fgithub.com%2Fopen-telemetry%2Fopentelemetry-php?ref=badge_shield&issueType=security)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/open-telemetry/opentelemetry-php/badge)](https://scorecard.dev/viewer/?uri=github.com/open-telemetry/opentelemetry-php)
 
 This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of [OpenTelemetry](https://opentelemetry.io/) for PHP.
 
