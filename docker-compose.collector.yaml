@@ -18,7 +18,7 @@ services:
     - 9412:9412
     - 16686:16686
   collector:
-    image: otel/opentelemetry-collector-contrib@sha256:ffc818ee108d0b934fd14207fd87ff247c9b64f344ed349d0b66c166c18a2312
+    image: otel/opentelemetry-collector-contrib@sha256:004ecfe36ed8d3a5785adb8740024cdba1c546b3ae357a9db7a3e7b05c3bd160
     command: ["--config=/etc/otel-collector-config.yml"]
     volumes:
       - ./files/collector/otel-collector-config.yml:/etc/otel-collector-config.yml
