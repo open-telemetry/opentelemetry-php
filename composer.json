@@ -208,5 +208,10 @@
                 "OpenTelemetry\\Tests\\Integration\\SDK\\Common\\Configuration\\TestEnvSourceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test-psr3": [
+            "OpenTelemetry\\Tests\\Integration\\Composer\\Psr3Compatability::run"
+        ]
     }
 }
