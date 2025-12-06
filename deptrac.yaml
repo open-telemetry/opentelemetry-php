@@ -18,6 +18,8 @@ deptrac:
         - ./vendor/symfony/polyfill-php83/Resources/stubs
     exclude_files:
         - '#.*test.*#'
+        - '#src/API/_compat\.php#'
+        - '#src/API/Common/Compatibility/.*#'
     layers:
       -   name: API
           collectors:
