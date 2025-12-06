@@ -56,8 +56,6 @@ final class MetricExporterPrometheus implements ComponentProvider
             ->children()
                 ->scalarNode('host')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                 ->scalarNode('port')->isRequired()->validate()->always(Validation::ensureNumber())->end()->end()
-                ->booleanNode('without_units')->defaultFalse()->end()
-                ->booleanNode('without_type_suffix')->defaultFalse()->end()
                 ->booleanNode('without_scope_info')->defaultFalse()->end()
                 ->booleanNode('without_scope_trace')->defaultFalse()->end()
                 ->arrayNode('with_resource_constant_labels')
@@ -69,6 +67,15 @@ final class MetricExporterPrometheus implements ComponentProvider
                             ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                         ->end()
                     ->end()
+                ->end()
+                ->enumNode('translation_strategy')
+                    ->defaultValue('UnderscoreEscapingWithSuffixes')
+                    ->values([
+                        'UnderscoreEscapingWithSuffixes',
+                        'UnderscoreEscapingWithoutSuffixes',
+                        'NoUTF8EscapingWithSuffixes',
+                        'NoTranslation',
+                    ])
                 ->end()
             ->end()
         ;
