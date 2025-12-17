@@ -10,27 +10,28 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 
 /**
- * This implementation of the SamplerInterface converts `DROP` decisions 
- * from the root sampler into `RECORD_ONLY` decisions, allowing processors 
- * to see all spans without sending them to exporters. This is typically used
- * to enable accurate span-to-metrics processing.
+ * This implementation of the SamplerInterface converts {@link \OpenTelemetry\SDK\Trace\SamplingResult::DROP} 
+ * decisions from the root sampler into {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY} 
+ * decisions, allowing processors to see all spans without sending them to exporters. 
+ * This is typically used to enable accurate span-to-metrics processing.
+ * 
  * Example:
  * ```
  * use OpenTelemetry\SDK\Trace\Sampler\AlwaysRecordSampler;
  * use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
- * 
+ *
  * $rootSampler = new AlwaysOffSampler();
  * $sampler = new AlwaysRecordSampler($rootSampler);
  * ```
  */
 class AlwaysRecordSampler implements SamplerInterface
 {
-
     /**
-     * AlwaysRecord sampler ensures every span is passed to the `SpanProcessor`, 
+     * AlwaysRecord sampler ensures every span is passed to the `SpanProcessor`,
      * even those that would normally be dropped by the root sampler. It does this
-     * by converting `DROP` decisions into `RECORD_ONLY`.
-     * 
+     * by converting {@link \OpenTelemetry\SDK\Trace\SamplingResult::DROP} decisions
+     * into {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY}.
+     *
      * @param SamplerInterface $root The root sampler called for the span.
      */
     public function __construct(
@@ -38,8 +39,9 @@ class AlwaysRecordSampler implements SamplerInterface
     ) {}
 
     /**
-     * Overrides the sampling decision from the root sampler to RECORD_ONLY when
-     * the root sampler returns DROP.
+     * Overrides the sampling decision from the root sampler to 
+     * {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY} when the 
+     * root sampler returns {@link \OpenTelemetry\SDK\Trace\SamplingResult::DROP}.
      * {@inheritdoc}
      */
     #[\Override]
@@ -66,6 +68,7 @@ class AlwaysRecordSampler implements SamplerInterface
                 $rootSamplerSamplingResult->getTraceState()
             );
         }
+
         return $rootSamplerSamplingResult;
     }
 
