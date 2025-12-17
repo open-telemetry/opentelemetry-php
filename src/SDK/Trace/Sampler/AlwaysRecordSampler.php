@@ -10,11 +10,10 @@ use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 
 /**
- * This implementation of the SamplerInterface converts {@link \OpenTelemetry\SDK\Trace\SamplingResult::DROP} 
- * decisions from the root sampler into {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY} 
- * decisions, allowing processors to see all spans without sending them to exporters. 
+ * This implementation of the SamplerInterface converts {@link \OpenTelemetry\SDK\Trace\SamplingResult::DROP}
+ * decisions from the root sampler into {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY}
+ * decisions, allowing processors to see all spans without sending them to exporters.
  * This is typically used to enable accurate span-to-metrics processing.
- * 
  * Example:
  * ```
  * use OpenTelemetry\SDK\Trace\Sampler\AlwaysRecordSampler;
@@ -36,11 +35,12 @@ class AlwaysRecordSampler implements SamplerInterface
      */
     public function __construct(
         private readonly SamplerInterface $root,
-    ) {}
+    ) {
+    }
 
     /**
-     * Overrides the sampling decision from the root sampler to 
-     * {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY} when the 
+     * Overrides the sampling decision from the root sampler to
+     * {@link \OpenTelemetry\SDK\Trace\SamplingResult::RECORD_ONLY} when the
      * root sampler returns {@link \OpenTelemetry\SDK\Trace\SamplingResult::DROP}.
      * {@inheritdoc}
      */
