@@ -59,6 +59,7 @@ final class ConfigurationTest extends TestCase
     {
         yield 'kitchen-sink' => [__DIR__ . '/configurations/kitchen-sink.yaml'];
         yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
+        yield 'php-specific' => [__DIR__ . '/configurations/php-specific.yaml'];
     }
 
     public function test_configurators(): void
@@ -221,7 +222,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "0.4"
+            file_format: "1.0-rc.2"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -240,7 +241,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "0.4"
+            file_format: "1.0-rc.2"
             resource:
               detection/development:
                 detectors:
@@ -262,7 +263,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "0.4"
+            file_format: "1.0-rc.2"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -302,7 +303,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "0.4"
+            file_format: "1.0-rc.2"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -330,5 +331,12 @@ final class ConfigurationTest extends TestCase
         $resource = $resourceProperty->getValue($sharedState);
 
         return $resource;
+    }
+
+    public function test_empty_tracer_configurator_config(): void
+    {
+        $file = __DIR__ . '/configurations/empty-tracer-config.yaml';
+        $this->expectNotToPerformAssertions();
+        Configuration::parseFile($file)->create();
     }
 }

@@ -1,0 +1,7 @@
+file_format: "1.0-rc.2"
+
+tracer_provider:
+  tracer_configurator/development:
+    tracers:
+      - name: test
+        config:
