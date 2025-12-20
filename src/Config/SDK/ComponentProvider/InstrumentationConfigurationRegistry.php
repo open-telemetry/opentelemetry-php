@@ -49,14 +49,16 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $root = $builder->arrayNode('open_telemetry');
-        $root->ignoreExtraKeys();
-
-        $children = $root->children();
-        $instrumentation = $children->arrayNode('instrumentation/development');
-        $instrumentation
+        $root
             ->ignoreExtraKeys()
-            ->append($registry->componentMap('php', InstrumentationConfiguration::class))
-            ->append($registry->componentMap('general', GeneralInstrumentationConfiguration::class));
+            ->children()
+                ->arrayNode('instrumentation/development')
+                    ->ignoreExtraKeys()
+                    ->append($registry->componentMap('php', InstrumentationConfiguration::class))
+                    ->append($registry->componentMap('general', GeneralInstrumentationConfiguration::class))
+                ->end()
+            ->end()
+        ;
 
         return $root;
     }
