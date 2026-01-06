@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
-use function basename;
+use function class_exists;
 use function getenv;
-use function in_array;
 
 final class ComposerHandler
 {
@@ -23,13 +22,6 @@ final class ComposerHandler
             return true;
         }
 
-        if (
-            ($entrypoint = $_SERVER['argv'][0] ?? '') === getenv('COMPOSER_BINARY')
-            || in_array(basename($entrypoint), ['composer', 'composer.phar'], true)
-        ) {
-            return true;
-        }
-
-        return false;
+        return class_exists(\Composer\Console\Application::class, false);
     }
 }
