@@ -140,7 +140,7 @@ final class ProtobufSerializer
                 continue;
             }
 
-            if ($field->getLabel() === GPBLabel::REPEATED) {
+            if ($field->isRepeated()) {
                 foreach ($data->$name as $key => $value) {
                     $data->$name[$key] = self::traverseFieldDescriptor($value, $field);
                 }
