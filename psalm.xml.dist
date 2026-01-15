@@ -45,12 +45,6 @@
                 <directory name="src/Config/SDK/Configuration/Internal"/>
             </errorLevel>
         </InvalidArgument>
-        <UndefinedInterfaceMethod>
-            <errorLevel type="suppress">
-                <directory name="src/Config/SDK/ComponentProvider"/>
-                <directory name="tests/Integration/Config/ComponentProvider"/>
-            </errorLevel>
-        </UndefinedInterfaceMethod>
         <PossiblyInvalidArgument>
             <errorLevel type="suppress">
                 <directory name="src/Config/SDK/Configuration"/>
@@ -69,6 +63,23 @@
                 <directory name="tests"/>
             </errorLevel>
         </MoreSpecificImplementedParamType>
+        <UndefinedInterfaceMethod>
+            <errorLevel type="suppress">
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::end"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::scalarNode"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::integerNode"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::booleanNode"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::arrayNode"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::variableNode"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::enumNode"/>
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::floatNode"/>
+            </errorLevel>
+        </UndefinedInterfaceMethod>
+        <TooManyTemplateParams>
+            <errorLevel type="suppress">
+                <directory name="src/Config/SDK/Configuration/Internal/NodeDefinition"/>
+            </errorLevel>
+        </TooManyTemplateParams>
         <UndefinedMagicMethod>
             <errorLevel type="suppress">
                 <referencedMethod name="Prophecy\Prophecy\ObjectProphecy::accepts"/>
