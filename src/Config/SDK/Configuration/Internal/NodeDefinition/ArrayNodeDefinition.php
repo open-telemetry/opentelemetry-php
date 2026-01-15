@@ -9,6 +9,9 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 use Symfony\Component\Config\Definition\NodeInterface;
 
+/**
+ * @extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition<NodeParentInterface|null>
+ */
 class ArrayNodeDefinition extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
 {
     use NodeDefinitionTrait;
