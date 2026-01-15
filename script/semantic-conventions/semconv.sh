@@ -17,10 +17,10 @@ SPEC_DIR="${ROOT_DIR}/var/semantic-conventions"
 CODE_DIR="${ROOT_DIR}/src/SemConv"
 
 # freeze the spec & generator tools versions to make SemanticAttributes generation reproducible
-SEMCONV_VERSION=1.37.0
+SEMCONV_VERSION=1.38.0
 SPEC_VERSION=v$SEMCONV_VERSION
 SCHEMA_URL=https://opentelemetry.io/schemas/$SEMCONV_VERSION
-OTEL_WEAVER_IMG_VERSION=v0.17.1
+OTEL_WEAVER_IMG_VERSION=v0.20.0
 
 rm -rf "${SPEC_DIR}"
 mkdir "${SPEC_DIR}"

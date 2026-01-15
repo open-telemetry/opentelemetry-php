@@ -4,8 +4,8 @@ params:
   excluded_namespaces: [
     android, app, artifact, aws, azure, browser, cassandra, device, disk,
     elasticsearch, enduser, event, faas, feature_flag, file, gen_ai, gcp,
-    geo, go, graphql, heroku, ios, k8s, linux, mainframe, message,
-    oci, openai, opentracing, other, pool, rpc, security_rule, source, system, test,
+    geo, go, graphql, heroku, ios, json_rpc, k8s, linux, mainframe, mcp, message, nfs,
+    oci, onc_rpc, openai, openshift, opentracing, other, pool, pprof, rpc, security_rule, source, system, test,
     useragent, v8js, vcs, webengine, zos, az, session, thread, destination,
     cicd, cloud, cloudevents, cpu, cpython, aspnetcore,
     cloudfoundry, dotnet, hw, jvm, nodejs, profile, signalr

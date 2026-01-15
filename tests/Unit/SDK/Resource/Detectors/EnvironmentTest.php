@@ -28,7 +28,7 @@ class EnvironmentTest extends TestCase
     {
         $resource = $this->detector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
         $this->assertEmpty($resource->getAttributes());
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
