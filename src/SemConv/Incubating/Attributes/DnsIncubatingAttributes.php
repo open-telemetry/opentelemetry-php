@@ -22,7 +22,7 @@ interface DnsIncubatingAttributes
 
     /**
      * The name being queried.
-     * If the name field contains non-printable characters (below 32 or above 126), those characters should be represented as escaped base 10 integers (\DDD). Back slashes and quotes should be escaped. Tabs, carriage returns, and line feeds should be converted to \t, \r, and \n respectively.
+     * The name represents the queried domain name as it appears in the DNS query without any additional normalization.
      *
      * @experimental
      */

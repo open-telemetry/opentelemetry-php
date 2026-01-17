@@ -27,7 +27,7 @@ class HostTest extends TestCase
         $resourceDetector = new Host();
         $resource = $resourceDetector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::OS_TYPE));

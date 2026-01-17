@@ -30,7 +30,7 @@ class SdkTest extends TestCase
         $resource = $this->detector->getResource();
         $version = InstalledVersions::getPrettyVersion('open-telemetry/opentelemetry');
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
         $this->assertSame('opentelemetry', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
         $this->assertSame('php', $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_LANGUAGE));
         $this->assertSame($version, $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION));

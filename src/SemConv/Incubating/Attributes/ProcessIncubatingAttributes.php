@@ -48,7 +48,7 @@ interface ProcessIncubatingAttributes
      *
      * @experimental
      */
-    public const PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch_type';
+    public const PROCESS_CONTEXT_SWITCH_TYPE = 'process.context_switch.type';
 
     /**
      * @experimental
@@ -161,23 +161,6 @@ interface ProcessIncubatingAttributes
     public const PROCESS_OWNER = 'process.owner';
 
     /**
-     * The type of page fault for this data point. Type `major` is for major/hard page faults, and `minor` is for minor/soft page faults.
-     *
-     * @experimental
-     */
-    public const PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
-
-    /**
-     * @experimental
-     */
-    public const PROCESS_PAGING_FAULT_TYPE_VALUE_MAJOR = 'major';
-
-    /**
-     * @experimental
-     */
-    public const PROCESS_PAGING_FAULT_TYPE_VALUE_MINOR = 'minor';
-
-    /**
      * Parent Process identifier (PPID).
      *
      * @experimental
@@ -246,6 +229,33 @@ interface ProcessIncubatingAttributes
      * @experimental
      */
     public const PROCESS_SESSION_LEADER_PID = 'process.session_leader.pid';
+
+    /**
+     * The process state, e.g., [Linux Process State Codes](https://man7.org/linux/man-pages/man1/ps.1.html#PROCESS_STATE_CODES)
+     *
+     * @experimental
+     */
+    public const PROCESS_STATE = 'process.state';
+
+    /**
+     * @experimental
+     */
+    public const PROCESS_STATE_VALUE_RUNNING = 'running';
+
+    /**
+     * @experimental
+     */
+    public const PROCESS_STATE_VALUE_SLEEPING = 'sleeping';
+
+    /**
+     * @experimental
+     */
+    public const PROCESS_STATE_VALUE_STOPPED = 'stopped';
+
+    /**
+     * @experimental
+     */
+    public const PROCESS_STATE_VALUE_DEFUNCT = 'defunct';
 
     /**
      * Process title (proctitle)

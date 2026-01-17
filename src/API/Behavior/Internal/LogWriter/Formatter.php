@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Behavior\Internal\LogWriter;
 
+/**
+ * @todo print $context
+ */
 class Formatter
 {
     public static function format($level, string $message, array $context): string

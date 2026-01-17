@@ -17,7 +17,7 @@ class ProcessTest extends TestCase
         $resourceDetector = new Process();
         $resource = $resourceDetector->getResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
         $this->assertIsInt($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertIsString($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));

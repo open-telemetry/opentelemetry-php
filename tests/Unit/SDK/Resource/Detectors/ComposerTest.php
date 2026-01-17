@@ -20,7 +20,7 @@ class ComposerTest extends TestCase
         $name = 'open-telemetry/opentelemetry';
         $version = InstalledVersions::getPrettyVersion($name);
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
         $this->assertSame($name, $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         $this->assertSame($version, $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }

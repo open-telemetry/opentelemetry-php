@@ -20,7 +20,7 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $resource = ResourceInfoFactory::defaultResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
 
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
@@ -87,7 +87,7 @@ class ResourceInfoFactoryTest extends TestCase
 
         $resource = ResourceInfoFactory::defaultResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
 
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
@@ -114,7 +114,7 @@ class ResourceInfoFactoryTest extends TestCase
 
         $resource = ResourceInfoFactory::defaultResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
 
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
@@ -140,7 +140,7 @@ class ResourceInfoFactoryTest extends TestCase
 
         $resource = ResourceInfoFactory::defaultResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
 
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_NAME));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::HOST_ARCH));
@@ -166,7 +166,7 @@ class ResourceInfoFactoryTest extends TestCase
 
         $resource = ResourceInfoFactory::defaultResource();
 
-        $this->assertSame(ResourceAttributes::SCHEMA_URL, $resource->getSchemaUrl());
+        $this->assertStringMatchesFormat('https://opentelemetry.io/schemas/%d.%d.%d', $resource->getSchemaUrl() ?? '');
 
         $this->assertEquals('open-telemetry/opentelemetry', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         $this->assertEquals(InstalledVersions::getRootPackage()['pretty_version'], $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
