@@ -62,7 +62,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 {
     /**
      * @param array{
-     *     file_format: '0.4',
+     *     file_format: '1.0-rc.2',
      *     disabled: bool,
      *     resource: array{
      *         attributes: array{
@@ -111,7 +111,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *              tracers: list<array{
      *                  name: string,
      *                  config: array{
-     *                      disabled: bool,
+     *                      disabled: ?bool,
      *                  }
      *              }>
      *           }
@@ -239,7 +239,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
         foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
-            $disabled = $tracer['config']['disabled'];
+            $disabled = $tracer['config']['disabled'] ?? false;
             $configurator = $configurator->with(
                 static fn (TracerConfig $config) => $config->setDisabled($disabled),
                 name: $tracer['name'],
@@ -409,7 +409,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->isRequired()
                     ->example('0.1')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['0.4'])->thenInvalid('unsupported version')->end()
+                    ->validate()->ifNotInArray(['1.0-rc.2'])->thenInvalid('unsupported version')->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
                 ->append($this->getResourceConfig($registry, $builder))
@@ -504,17 +504,17 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->arrayNode('default_config')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->booleanNode('disabled')->isRequired()->end()
+                                ->booleanNode('disabled')->end()
                             ->end()
                         ->end()
                         ->arrayNode('tracers')
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('name')->end()
                                     ->arrayNode('config')
                                         ->addDefaultsIfNotSet()
                                         ->children()
-                                            ->booleanNode('disabled')->isRequired()->end()
+                                            ->booleanNode('disabled')->end()
                                         ->end()
                                     ->end()
                                 ->end()

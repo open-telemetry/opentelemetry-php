@@ -21,7 +21,7 @@
         "open-telemetry/api": "^1.8",
         "open-telemetry/context": "^1.4",
         "open-telemetry/sdk": "^1.8",
-        "symfony/config": "^5.4 || ^6.4 || ^7.0",
+        "symfony/config": "^5.4 || ^6.4 || ^7.0 || ^8.0",
         "tbachert/spi": "^1.0.5"
     },
     "autoload": {
@@ -80,6 +80,7 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider"

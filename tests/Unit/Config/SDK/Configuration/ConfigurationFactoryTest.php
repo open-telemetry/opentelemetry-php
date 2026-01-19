@@ -64,7 +64,6 @@ final class ConfigurationFactoryTest extends TestCase
                 public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
                 {
                     $node = new ArrayNodeDefinition('env_substitution');
-                    /** @phpstan-ignore-next-line */
                     $node
                         ->children()
                             ->scalarNode('string_key')->end()

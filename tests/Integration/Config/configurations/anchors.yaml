@@ -1,6 +1,6 @@
 # anchors.yaml demonstrates anchor substitution to reuse OTLP exporter configuration across signals.
 
-file_format: "0.4"
+file_format: "1.0-rc.2"
 exporters:
     otlp: &otlp-exporter
         encoding: protobuf

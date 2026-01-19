@@ -17,7 +17,7 @@
         "psr/http-message": "^1.0.1|^2.0",
         "psr/log": "^1.1|^2.0|^3.0",
         "ramsey/uuid": "^3.0 || ^4.0",
-        "symfony/config": "^5.4 || ^6.4 || ^7.0",
+        "symfony/config": "^5.4 || ^6.4 || ^7.0 || ^8.0",
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php82": "^1.26",
         "symfony/polyfill-php83": "^1.32",
@@ -108,9 +108,9 @@
         "phpstan/phpstan-phpunit": "^1.3",
         "phpunit/phpunit": "^10 || ^11",
         "sebastian/exporter": "<= 6.0.1 || >= 6.1.3",
-        "symfony/http-client": "^5.2",
-        "symfony/var-exporter": "^5.4 || ^6.4 || ^7.0",
-        "symfony/yaml": "^5.4 || ^6.4 || ^7.0"
+        "symfony/http-client": "^5.2 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/var-exporter": "^5.4 || ^6.4 || ^7.0 || ^8.0",
+        "symfony/yaml": "^5.4 || ^6.4 || ^7.0 || ^8.0"
     },
     "conflict": {
         "mockery/mockery": "1.6.12"
@@ -170,6 +170,7 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
@@ -208,5 +209,10 @@
                 "OpenTelemetry\\Tests\\Integration\\SDK\\Common\\Configuration\\TestEnvSourceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test-psr3": [
+            "OpenTelemetry\\Tests\\Integration\\Composer\\Psr3Compatability::run"
+        ]
     }
 }
