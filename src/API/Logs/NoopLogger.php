@@ -18,6 +18,14 @@ class NoopLogger implements LoggerInterface
         return $instance ??= new self();
     }
 
+    #[\Override]
+    public function logRecordBuilder(): LogRecordBuilderInterface
+    {
+        static $logRecordBuilder = new NoopLogRecordBuilder();
+
+        return $logRecordBuilder;
+    }
+
     /**
      * @codeCoverageIgnore
      */
