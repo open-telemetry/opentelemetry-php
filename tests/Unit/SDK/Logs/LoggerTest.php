@@ -7,6 +7,9 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -219,6 +222,25 @@ class LoggerTest extends TestCase
 
         $logger
             ->logRecordBuilder()
+            ->emit();
+    }
+
+    public function test_builder_sets_span_context_from_context(): void
+    {
+        $logger = new Logger($this->sharedState, $this->scope);
+
+        $spanContext = SpanContext::create('0af7651916cd43dd8448eb211c80319c', 'b9c7c989f97918e1');
+        $context = Span::wrap($spanContext)->storeInContext(Context::getRoot());
+
+        $this->processor->expects($this->once())->method('onEmit')
+            ->willReturnCallback(function (ReadWriteLogRecord $record, ContextInterface $processorContext) use ($spanContext, $context): void {
+                $this->assertSame($spanContext, $record->getSpanContext());
+                $this->assertSame($context, $processorContext);
+            });
+
+        $logger
+            ->logRecordBuilder()
+            ->setContext($context)
             ->emit();
     }
 }
