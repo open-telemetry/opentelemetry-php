@@ -15,28 +15,35 @@ RUN apt-get update && apt-get install -y lsb-release apt-transport-https ca-cert
 
 ARG PHP_VERSION=8.3
 
-RUN apt-get install -y \
-    php${PHP_VERSION}-ast \
-    php${PHP_VERSION}-cli \
-    php${PHP_VERSION}-curl \
-    php${PHP_VERSION}-dev \
-    php${PHP_VERSION}-grpc \
-    php${PHP_VERSION}-intl \
-    php${PHP_VERSION}-mbstring \
-    php${PHP_VERSION}-opcache \
-    php${PHP_VERSION}-opentelemetry \
-    php${PHP_VERSION}-protobuf \
-    php${PHP_VERSION}-simplexml \
-    php${PHP_VERSION}-sockets \
-    php${PHP_VERSION}-xdebug \
-    php${PHP_VERSION}-zip \
-    php${PHP_VERSION}-mongodb \
-    php${PHP_VERSION}-amqp \
-    php${PHP_VERSION}-rdkafka \
-    php${PHP_VERSION}-mysqli \
-    php${PHP_VERSION}-pgsql \
-    php${PHP_VERSION}-sqlite3 \
-    unzip
+RUN set -eux; \
+    major=${PHP_VERSION%%.*}; minor=${PHP_VERSION#*.}; \
+    if [ "$major" -gt 8 ] || { [ "$major" -eq 8 ] && [ "$minor" -ge 5 ]; }; then \
+      OPCACHE_PKG=""; \
+    else \
+      OPCACHE_PKG="php${PHP_VERSION}-opcache"; \
+    fi; \
+    apt-get install -y \
+        php${PHP_VERSION}-ast \
+        php${PHP_VERSION}-cli \
+        php${PHP_VERSION}-curl \
+        php${PHP_VERSION}-dev \
+        php${PHP_VERSION}-grpc \
+        php${PHP_VERSION}-intl \
+        php${PHP_VERSION}-mbstring \
+        ${OPCACHE_PKG} \
+        php${PHP_VERSION}-opentelemetry \
+        php${PHP_VERSION}-protobuf \
+        php${PHP_VERSION}-simplexml \
+        php${PHP_VERSION}-sockets \
+        php${PHP_VERSION}-xdebug \
+        php${PHP_VERSION}-zip \
+        php${PHP_VERSION}-mongodb \
+        php${PHP_VERSION}-amqp \
+        php${PHP_VERSION}-rdkafka \
+        php${PHP_VERSION}-mysqli \
+        php${PHP_VERSION}-pgsql \
+        php${PHP_VERSION}-sqlite3 \
+        unzip
 
 COPY --from=composer /usr/bin/composer /usr/local/bin/composer
 
