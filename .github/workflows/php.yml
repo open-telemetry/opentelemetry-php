@@ -171,5 +171,5 @@ jobs:
     needs: php
     with:
       matrix_extension: '["ast, json, grpc"]'
-      matrix_php_version: '["8.2", "8.3", "8.4", "8.5"]'
+      matrix_php_version: '["8.2", "8.3", "8.4"]'
       install_directory: '~/.test/.packages'
