@@ -17,6 +17,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
+use OpenTelemetry\SDK\Logs\LogRecordBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
@@ -28,6 +29,7 @@ use PHPUnit\Framework\TestCase;
  * @psalm-suppress UndefinedInterfaceMethod
  */
 #[CoversClass(Logger::class)]
+#[CoversClass(LogRecordBuilder::class)]
 class LoggerTest extends TestCase
 {
     /** @var LogWriterInterface&MockObject $logWriter */
