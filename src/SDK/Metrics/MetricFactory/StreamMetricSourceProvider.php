@@ -17,16 +17,16 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 /**
  * @internal
  */
-final class StreamMetricSourceProvider implements MetricSourceProviderInterface, MetricMetadataInterface
+final readonly class StreamMetricSourceProvider implements MetricSourceProviderInterface, MetricMetadataInterface
 {
     public function __construct(
-        public readonly ViewProjection $view,
-        public readonly Instrument $instrument,
-        public readonly InstrumentationScopeInterface $instrumentationLibrary,
-        public readonly ResourceInfo $resource,
-        public readonly MetricStreamInterface $stream,
-        public readonly MetricCollectorInterface $metricCollector,
-        public readonly int $streamId,
+        public ViewProjection $view,
+        public Instrument $instrument,
+        public InstrumentationScopeInterface $instrumentationLibrary,
+        public ResourceInfo $resource,
+        public MetricStreamInterface $stream,
+        public MetricCollectorInterface $metricCollector,
+        public int $streamId,
     ) {
     }
 

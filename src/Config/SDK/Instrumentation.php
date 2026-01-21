@@ -17,13 +17,13 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use WeakMap;
 
-final class Instrumentation
+final readonly class Instrumentation
 {
     /**
      * @param ComponentPlugin<ConfigurationRegistry> $plugin
      */
     private function __construct(
-        private readonly ComponentPlugin $plugin,
+        private ComponentPlugin $plugin,
     ) {
     }
 

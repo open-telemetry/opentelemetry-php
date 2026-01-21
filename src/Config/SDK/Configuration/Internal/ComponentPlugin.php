@@ -13,15 +13,15 @@ use OpenTelemetry\API\Configuration\Context;
  *
  * @internal
  */
-final class ComponentPlugin implements \OpenTelemetry\API\Configuration\Config\ComponentPlugin
+final readonly class ComponentPlugin implements \OpenTelemetry\API\Configuration\Config\ComponentPlugin
 {
     /**
      * @param array $properties resolved properties according to component provider config
      * @param ComponentProvider<T> $provider component provider used to create the component
      */
     public function __construct(
-        private readonly array $properties,
-        private readonly ComponentProvider $provider,
+        private array $properties,
+        private ComponentProvider $provider,
     ) {
     }
 

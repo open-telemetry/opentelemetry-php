@@ -7,12 +7,12 @@ namespace OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionS
 /**
  * @internal
  */
-final class CompiledSemanticConventionAttribute
+final readonly class CompiledSemanticConventionAttribute
 {
     public function __construct(
-        public readonly string $name,
-        public readonly int $notSamplingRelevantIn,
-        public readonly int $includedIn,
+        public string $name,
+        public int $notSamplingRelevantIn,
+        public int $includedIn,
     ) {
     }
 }

@@ -25,9 +25,9 @@ use Opentelemetry\Proto\Resource\V1\Resource as Resource_;
 use OpenTelemetry\SDK;
 use function serialize;
 
-final class MetricConverter
+final readonly class MetricConverter
 {
-    private readonly ProtobufSerializer $serializer;
+    private ProtobufSerializer $serializer;
 
     public function __construct(?ProtobufSerializer $serializer = null)
     {

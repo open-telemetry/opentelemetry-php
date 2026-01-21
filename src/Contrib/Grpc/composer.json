@@ -17,7 +17,7 @@
     }
   ],
   "require": {
-    "php": "^8.1",
+    "php": "^8.2",
     "ext-grpc": "*",
     "grpc/grpc": "*",
     "open-telemetry/sdk": "^1.0"

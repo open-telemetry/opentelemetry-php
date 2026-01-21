@@ -8,12 +8,12 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 
-final class AllCriteria implements SelectionCriteriaInterface
+final readonly class AllCriteria implements SelectionCriteriaInterface
 {
     /**
      * @param iterable<SelectionCriteriaInterface> $criteria
      */
-    public function __construct(private readonly iterable $criteria)
+    public function __construct(private iterable $criteria)
     {
     }
 

@@ -7,14 +7,14 @@ namespace OpenTelemetry\SDK\Trace;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Sdk;
 
-final class TracerProviderFactory
+final readonly class TracerProviderFactory
 {
     use LogsMessagesTrait;
 
     public function __construct(
-        private readonly ExporterFactory $exporterFactory = new ExporterFactory(),
-        private readonly SamplerFactory $samplerFactory = new SamplerFactory(),
-        private readonly SpanProcessorFactory $spanProcessorFactory = new SpanProcessorFactory(),
+        private ExporterFactory $exporterFactory = new ExporterFactory(),
+        private SamplerFactory $samplerFactory = new SamplerFactory(),
+        private SpanProcessorFactory $spanProcessorFactory = new SpanProcessorFactory(),
     ) {
     }
 

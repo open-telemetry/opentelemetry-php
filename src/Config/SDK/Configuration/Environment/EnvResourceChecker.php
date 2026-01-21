@@ -8,10 +8,10 @@ use function assert;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\ResourceCheckerInterface;
 
-final class EnvResourceChecker implements ResourceCheckerInterface
+final readonly class EnvResourceChecker implements ResourceCheckerInterface
 {
     public function __construct(
-        private readonly EnvReader $envReader,
+        private EnvReader $envReader,
     ) {
     }
 

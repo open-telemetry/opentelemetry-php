@@ -26,10 +26,10 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 /**
  * @internal
  */
-final class EnvSubstitutionNormalization implements Normalization
+final readonly class EnvSubstitutionNormalization implements Normalization
 {
     public function __construct(
-        private readonly EnvReader $envReader,
+        private EnvReader $envReader,
     ) {
     }
 

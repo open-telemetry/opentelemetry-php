@@ -12,9 +12,9 @@ use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 /**
  * @internal
  */
-final class FilteredAttributeProcessor implements AttributeProcessorInterface
+final readonly class FilteredAttributeProcessor implements AttributeProcessorInterface
 {
-    public function __construct(private readonly array $attributeKeys)
+    public function __construct(private array $attributeKeys)
     {
     }
 

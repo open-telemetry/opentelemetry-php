@@ -16,9 +16,9 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
  * "b3" used for trace context propagation across service boundaries.
  * (https://github.com/openzipkin/b3-propagation)
  */
-final class B3Propagator implements TextMapPropagatorInterface
+final readonly class B3Propagator implements TextMapPropagatorInterface
 {
-    private function __construct(private readonly TextMapPropagatorInterface $propagator)
+    private function __construct(private TextMapPropagatorInterface $propagator)
     {
     }
 

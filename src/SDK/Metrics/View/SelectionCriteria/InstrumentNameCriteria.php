@@ -12,9 +12,9 @@ use function preg_quote;
 use function sprintf;
 use function strtr;
 
-final class InstrumentNameCriteria implements SelectionCriteriaInterface
+final readonly class InstrumentNameCriteria implements SelectionCriteriaInterface
 {
-    private readonly string $pattern;
+    private string $pattern;
 
     /**
      * @param non-empty-string $name

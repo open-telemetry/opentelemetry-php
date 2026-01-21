@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "open-telemetry/api": "^1.8",
         "open-telemetry/context": "^1.4",
         "open-telemetry/sdk": "^1.8",
