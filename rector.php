@@ -23,20 +23,13 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->sets([
-        SetList::PHP_81,
+        SetList::PHP_82,
         SetList::CODE_QUALITY,
         PHPUnitSetList::PHPUNIT_100,
     ]);
     $rectorConfig->rule(AddOverrideAttributeToOverriddenMethodsRector::class);
     $rectorConfig->skip([
         FlipTypeControlToUseExclusiveTypeRector::class,
-        NewInInitializerRector::class => [
-            __DIR__ . '/src/SDK/Trace/Sampler/ParentBased.php',
-        ],
-        ReadOnlyPropertyRector::class => [
-            __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
-            __DIR__ . '/tests/Unit/Extension/Propagator',
-        ],
         DisallowedEmptyRuleFixerRector::class,
         ExplicitBoolCompareRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
