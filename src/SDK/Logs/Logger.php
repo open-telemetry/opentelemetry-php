@@ -7,6 +7,8 @@ namespace OpenTelemetry\SDK\Logs;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Logs\LogRecordBuilderInterface;
+use OpenTelemetry\API\Logs\NoopLogRecordBuilder;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
@@ -28,6 +30,16 @@ class Logger implements LoggerInterface
         $this->config = $configurator ? $configurator->resolve($scope) : LoggerConfig::default();
     }
 
+    #[\Override]
+    public function logRecordBuilder(): LogRecordBuilderInterface
+    {
+        if (!$this->config->isEnabled() || $this->loggerSharedState->hasShutdown()) {
+            return new NoopLogRecordBuilder();
+        }
+
+        return new LogRecordBuilder($this);
+    }
+
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/logs/api.md#emit-a-logrecord
      */
@@ -35,7 +47,7 @@ class Logger implements LoggerInterface
     public function emit(LogRecord $logRecord): void
     {
         //If a Logger is disabled, it MUST behave equivalently to No-op Logger.
-        if ($this->isEnabled() === false) {
+        if (!$this->config->isEnabled()) {
             return;
         }
         $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);

@@ -18,6 +18,12 @@ class LateBindingLogger implements LoggerInterface
     }
 
     #[\Override]
+    public function logRecordBuilder(): LogRecordBuilderInterface
+    {
+        return ($this->logger ??= ($this->factory)())->logRecordBuilder();
+    }
+
+    #[\Override]
     public function emit(LogRecord $logRecord): void
     {
         ($this->logger ??= ($this->factory)())->emit($logRecord);

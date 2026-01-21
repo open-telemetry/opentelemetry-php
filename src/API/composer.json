@@ -23,7 +23,7 @@
         "symfony/polyfill-php82": "^1.26"
     },
     "conflict": {
-        "open-telemetry/sdk": "<=1.0.8"
+        "open-telemetry/sdk": "<=1.11"
     },
     "autoload": {
         "psr-4": {
