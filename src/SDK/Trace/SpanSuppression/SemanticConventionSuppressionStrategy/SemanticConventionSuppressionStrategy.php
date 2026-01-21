@@ -16,13 +16,13 @@ use function strlen;
 /**
  * @experimental
  */
-final class SemanticConventionSuppressionStrategy implements SpanSuppressionStrategy
+final readonly class SemanticConventionSuppressionStrategy implements SpanSuppressionStrategy
 {
     /**
      * @param iterable<SemanticConventionResolver> $resolvers
      */
     public function __construct(
-        private readonly iterable $resolvers,
+        private iterable $resolvers,
     ) {
     }
 

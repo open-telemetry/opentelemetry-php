@@ -12,13 +12,13 @@ use function preg_replace;
  * handle edge cases where the header has a trailing ';' or an empty trace state.
  * We also need to trim trailing separators from the header, found when a header is empty.
  */
-final class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagationGetterInterface
+final readonly class SanitizeCombinedHeadersPropagationGetter implements ExtendedPropagationGetterInterface
 {
     private const LIST_MEMBERS_SEPARATOR = ',';
     private const SERVER_CONCAT_HEADERS_REGEX = '/;(?=[^,=;]*=|$)/';
     private const TRAILING_LEADING_SEPARATOR_REGEX = '/^' . self::LIST_MEMBERS_SEPARATOR . '+|' . self::LIST_MEMBERS_SEPARATOR . '+$/';
 
-    public function __construct(private readonly PropagationGetterInterface $getter)
+    public function __construct(private PropagationGetterInterface $getter)
     {
     }
 

@@ -11,11 +11,11 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
  * The exemplar spec is not yet stable, and can change at any time.
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#exemplar
  */
-final class FilteredReservoir implements ExemplarReservoirInterface
+final readonly class FilteredReservoir implements ExemplarReservoirInterface
 {
     public function __construct(
-        private readonly ExemplarReservoirInterface $reservoir,
-        private readonly ExemplarFilterInterface $filter,
+        private ExemplarReservoirInterface $reservoir,
+        private ExemplarFilterInterface $filter,
     ) {
     }
 

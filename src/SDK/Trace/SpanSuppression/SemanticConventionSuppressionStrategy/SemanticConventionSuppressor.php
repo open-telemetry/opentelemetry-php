@@ -13,15 +13,15 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
 /**
  * @internal
  */
-final class SemanticConventionSuppressor implements SpanSuppressor
+final readonly class SemanticConventionSuppressor implements SpanSuppressor
 {
     /**
      * @param array<int, list<string>> $semanticConventions
      * @param array<int, list<CompiledSemanticConventionAttribute>> $attributeMap
      */
     public function __construct(
-        private readonly array $semanticConventions,
-        private readonly array $attributeMap,
+        private array $semanticConventions,
+        private array $attributeMap,
     ) {
     }
 

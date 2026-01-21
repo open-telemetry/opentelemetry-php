@@ -10,9 +10,9 @@ use Throwable;
 /**
  * @psalm-suppress MissingTemplateParam
  */
-final class ErrorFuture implements FutureInterface
+final readonly class ErrorFuture implements FutureInterface
 {
-    public function __construct(private readonly Throwable $throwable)
+    public function __construct(private Throwable $throwable)
     {
     }
 

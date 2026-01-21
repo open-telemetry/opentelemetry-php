@@ -10,11 +10,11 @@ use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 /**
  * @internal
  */
-final class StreamMetricSource implements MetricSourceInterface
+final readonly class StreamMetricSource implements MetricSourceInterface
 {
     public function __construct(
-        private readonly StreamMetricSourceProvider $provider,
-        private readonly int $reader,
+        private StreamMetricSourceProvider $provider,
+        private int $reader,
     ) {
     }
 

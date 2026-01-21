@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Trace as API;
 
-final class SamplingResult
+final readonly class SamplingResult
 {
     /**
      * Span will not be recorded and all events and attributes will be dropped.
@@ -27,9 +27,9 @@ final class SamplingResult
      * @param ?API\TraceStateInterface $traceState A Tracestate that will be associated with the Span through the new SpanContext.
      */
     public function __construct(
-        private readonly int $decision,
-        private readonly iterable $attributes = [],
-        private readonly ?API\TraceStateInterface $traceState = null,
+        private int $decision,
+        private iterable $attributes = [],
+        private ?API\TraceStateInterface $traceState = null,
     ) {
     }
 

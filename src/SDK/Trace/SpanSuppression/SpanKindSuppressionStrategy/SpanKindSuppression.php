@@ -11,10 +11,10 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
 /**
  * @internal
  */
-final class SpanKindSuppression implements SpanSuppression
+final readonly class SpanKindSuppression implements SpanSuppression
 {
     public function __construct(
-        private readonly ContextKeyInterface $contextKey,
+        private ContextKeyInterface $contextKey,
     ) {
     }
 
