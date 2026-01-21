@@ -13,11 +13,4 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
  */
 interface PeerIncubatingAttributes
 {
-    /**
-     * The [`service.name`](/docs/resource/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
-     *
-     * @experimental
-     */
-    public const PEER_SERVICE = 'peer.service';
-
 }

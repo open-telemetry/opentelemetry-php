@@ -462,7 +462,7 @@ meter_provider:
         meter_version: 1.0.0
         # Configure meter schema url selection criteria.
         # If omitted or null, all meter schema URLs match.
-        meter_schema_url: https://opentelemetry.io/schemas/1.32.0
+        meter_schema_url: https://opentelemetry.io/schemas/1.38.0
       # Configure view stream.
       stream:
         # Configure metric name of the resulting stream(s).
@@ -852,7 +852,7 @@ resource:
         service:
   # Configure resource schema URL.
   # If omitted or null, no schema URL is used.
-  schema_url: https://opentelemetry.io/schemas/1.32.0
+  schema_url: https://opentelemetry.io/schemas/1.38.0
 # Configure instrumentation.
 # This type is in development and subject to breaking changes in minor versions.
 instrumentation/development:

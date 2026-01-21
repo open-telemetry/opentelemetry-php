@@ -1,7 +1,7 @@
 file_format: '1.0-rc.2'
 
 resource:
-  schema_url: https://opentelemetry.io/schemas/1.32.0
+  schema_url: https://opentelemetry.io/schemas/1.38.0
   detection/development:
     # include attributes from sdk + process detectors, then exclude
     # some of the results. sdk+service detectors are included by default.

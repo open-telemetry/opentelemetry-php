@@ -22,7 +22,7 @@ interface ServiceAttributes
     public const SERVICE_NAME = 'service.name';
 
     /**
-     * The version string of the service API or implementation. The format is not defined by these conventions.
+     * The version string of the service component. The format is not defined by these conventions.
      *
      * @stable
      */

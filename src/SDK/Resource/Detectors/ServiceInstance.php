@@ -7,7 +7,8 @@ namespace OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\ServiceIncubatingAttributes;
+use OpenTelemetry\SemConv\Version;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -25,9 +26,9 @@ final class ServiceInstance implements ResourceDetectorInterface
         $serviceInstanceId ??= Uuid::uuid4()->toString();
 
         $attributes = [
-            ResourceAttributes::SERVICE_INSTANCE_ID => $serviceInstanceId,
+            ServiceIncubatingAttributes::SERVICE_INSTANCE_ID => $serviceInstanceId,
         ];
 
-        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), Version::VERSION_1_38_0->url());
     }
 }
