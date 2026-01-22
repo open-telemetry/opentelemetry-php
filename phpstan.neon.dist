@@ -67,7 +67,11 @@ parameters:
             message: "#Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface::.+\\(\\)#"
             paths:
                 - src/Config/SDK
+                - tests/Integration/Config
+                - tests/Unit/Config
         -
             message: "#PHPDoc tag @extends contains generic type Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\.*NodeDefinition<.*> but class .* is not generic#"
             paths:
                 - src/Config/SDK
+                - tests/Integration/Config
+                - tests/Unit/Config
