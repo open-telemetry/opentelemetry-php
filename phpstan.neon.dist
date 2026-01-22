@@ -5,6 +5,7 @@ includes:
 parameters:
     tmpDir: var/cache/phpstan
     level: 5
+    reportUnmatchedIgnoredErrors: false
     paths:
         - ./src
         - ./tests
