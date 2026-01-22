@@ -62,3 +62,11 @@ parameters:
             message: "#^Caught class .* not found\\.#"
             paths:
                 - src/Config/SDK/Configuration/Environment/Adapter/
+        -
+            message: "#Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface::.+\\(\\)#"
+            paths:
+                - src/Config/SDK
+        -
+            message: "#PHPDoc tag @extends contains generic type Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\.*NodeDefinition<.*> but class .* is not generic#"
+            paths:
+                - src/Config/SDK

@@ -10,10 +10,13 @@ use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSamplerFactory;
+use OpenTelemetry\SDK\Trace\Sampler\SamplerFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use TypeError;
 
 #[CoversClass(Registry::class)]
@@ -121,6 +124,42 @@ class FactoryRegistryTest extends TestCase
         ];
     }
 
+    #[DataProvider('samplerFactoryProvider')]
+    public function test_default_sampler_factories(string $name): void
+    {
+        $factory = Registry::samplerFactory($name);
+        $this->assertInstanceOf(SamplerFactoryInterface::class, $factory);
+    }
+
+    public static function samplerFactoryProvider(): array
+    {
+        return [
+            ['always_on'],
+            ['always_off'],
+            ['traceidratio'],
+            ['parentbased_always_on'],
+            ['parentbased_always_off'],
+            ['parentbased_traceidratio'],
+        ];
+    }
+
+    public function test_sampler_factory_throws_for_unknown_sampler(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Sampler factory not registered for: unknown_sampler');
+        Registry::samplerFactory('unknown_sampler');
+    }
+
+    public function test_register_and_retrieve_sampler_factory(): void
+    {
+        Registry::registerSamplerFactory('test_sampler', AlwaysOnSamplerFactory::class);
+
+        $factory = Registry::samplerFactory('test_sampler');
+
+        $this->assertInstanceOf(SamplerFactoryInterface::class, $factory);
+        $this->assertInstanceOf(AlwaysOnSamplerFactory::class, $factory);
+    }
+
     #[DataProvider('invalidFactoryProvider')]
     public function test_register_invalid_transport_factory($factory): void
     {
@@ -147,6 +186,13 @@ class FactoryRegistryTest extends TestCase
     {
         $this->expectException(TypeError::class);
         Registry::registerLogRecordExporterFactory('foo', $factory, true);
+    }
+
+    #[DataProvider('invalidFactoryProvider')]
+    public function test_register_invalid_sampler_factory($factory): void
+    {
+        $this->expectException(TypeError::class);
+        Registry::registerSamplerFactory('foo', $factory, true);
     }
 
     public static function invalidFactoryProvider(): array

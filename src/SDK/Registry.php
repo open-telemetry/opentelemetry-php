@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
+use OpenTelemetry\SDK\Trace\Sampler\SamplerFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use RuntimeException;
 use TypeError;
@@ -28,6 +29,7 @@ class Registry
     private static array $logRecordExporterFactories = [];
     private static array $resourceDetectors = [];
     private static array $responsePropagators = [];
+    private static array $samplerFactories = [];
 
     /**
      * @param TransportFactoryInterface|class-string<TransportFactoryInterface> $factory
@@ -134,6 +136,27 @@ class Registry
         self::$responsePropagators[$name] = $responsePropagator;
     }
 
+    /**
+     * @param SamplerFactoryInterface|class-string<SamplerFactoryInterface> $factory
+     * @throws TypeError
+     */
+    public static function registerSamplerFactory(string $sampler, SamplerFactoryInterface|string $factory, bool $clobber = false): void
+    {
+        if (!$clobber && array_key_exists($sampler, self::$samplerFactories)) {
+            return;
+        }
+        if (!is_subclass_of($factory, SamplerFactoryInterface::class)) {
+            throw new TypeError(
+                sprintf(
+                    'Cannot register sampler factory: %s must exist and implement %s',
+                    is_string($factory) ? $factory : $factory::class,
+                    SamplerFactoryInterface::class
+                )
+            );
+        }
+        self::$samplerFactories[$sampler] = $factory;
+    }
+
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
         if (!array_key_exists($exporter, self::$spanExporterFactories)) {
@@ -220,5 +243,17 @@ class Registry
     public static function resourceDetectors(): array
     {
         return array_values(self::$resourceDetectors);
+    }
+
+    public static function samplerFactory(string $sampler): SamplerFactoryInterface
+    {
+        if (!array_key_exists($sampler, self::$samplerFactories)) {
+            throw new RuntimeException('Sampler factory not registered for: ' . $sampler);
+        }
+        $class = self::$samplerFactories[$sampler];
+        $factory = (is_callable($class)) ? $class : new $class();
+        assert($factory instanceof SamplerFactoryInterface);
+
+        return $factory;
     }
 }
