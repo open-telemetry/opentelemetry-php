@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Registry;
 
 /**
  * @experimental
+ * TODO deprecated
  */
 class ResponsePropagatorFactory
 {

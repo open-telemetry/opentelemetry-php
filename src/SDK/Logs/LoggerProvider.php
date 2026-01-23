@@ -26,10 +26,11 @@ class LoggerProvider implements LoggerProviderInterface
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
         private ?Configurator $configurator = null,
+        ?LogRecordLimits $logRecordLimits = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
-            (new LogRecordLimitsBuilder())->build(),
+            $logRecordLimits ?? (new LogRecordLimitsBuilder())->build(),
             $processor
         );
         $this->loggers = new WeakMap();

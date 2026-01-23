@@ -15,6 +15,7 @@ class TracerProviderBuilder
     private ?array $spanProcessors = [];
     private ?ResourceInfo $resource = null;
     private ?SamplerInterface $sampler = null;
+    private ?SpanLimits $spanLimits = null;
     private ?Configurator $configurator = null;
     private ?SpanSuppressionStrategy $spanSuppressionStrategy = null;
 
@@ -39,6 +40,13 @@ class TracerProviderBuilder
         return $this;
     }
 
+    public function setSpanLimits(SpanLimits $spanLimits): self
+    {
+        $this->spanLimits = $spanLimits;
+
+        return $this;
+    }
+
     public function setConfigurator(Configurator $configurator): self
     {
         $this->configurator = $configurator;
@@ -59,6 +67,7 @@ class TracerProviderBuilder
             $this->spanProcessors,
             $this->sampler,
             $this->resource,
+            $this->spanLimits,
             configurator: $this->configurator ?? Configurator::tracer(),
             spanSuppressionStrategy: $this->spanSuppressionStrategy ?? new NoopSuppressionStrategy(),
         );
