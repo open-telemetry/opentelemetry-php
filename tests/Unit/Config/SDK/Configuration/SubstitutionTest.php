@@ -9,6 +9,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ArrayNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\Substitution;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,7 @@ use Symfony\Component\Config\Definition\Processor;
  * @see https://opentelemetry.io/docs/specs/otel/configuration/data-model/#environment-variable-substitution
  */
 #[CoversClass(EnvSubstitutionNormalization::class)]
+#[CoversClass(Substitution::class)]
 final class SubstitutionTest extends TestCase
 {
     #[DataProvider('substitutionDataProvider')]
