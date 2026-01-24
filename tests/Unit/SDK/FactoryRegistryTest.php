@@ -102,8 +102,6 @@ class FactoryRegistryTest extends TestCase
             ['b3multi'],
             ['cloudtrace'],
             ['cloudtrace-oneway'],
-            ['jaeger'],
-            ['jaeger-baggage'],
         ];
     }
 

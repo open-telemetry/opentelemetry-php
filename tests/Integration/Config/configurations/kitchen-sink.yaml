@@ -540,7 +540,7 @@ meter_provider:
 # If omitted, a noop propagator is used.
 propagator:
   # Configure the propagators in the composite text map propagator. Entries from .composite_list are appended to the list here with duplicates filtered out.
-  # Built-in propagator keys include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party keys include: xray.
+  # Built-in propagator keys include: tracecontext, baggage, b3, b3multi, ottrace. Known third party keys include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
   composite:
     - # Include the w3c trace context propagator.
@@ -551,15 +551,13 @@ propagator:
       b3:
     - # Include the zipkin b3 multi propagator.
       b3multi:
-    - # Include the jaeger propagator.
-      jaeger:
     - # Include the opentracing propagator.
       ottrace:
   # Configure the propagators in the composite text map propagator. Entries are appended to .composite with duplicates filtered out.
   # The value is a comma separated list of propagator identifiers matching the format of OTEL_PROPAGATORS. See https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration for details.
-  # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, jaeger, ottrace. Known third party identifiers include: xray.
+  # Built-in propagator identifiers include: tracecontext, baggage, b3, b3multi, ottrace. Known third party identifiers include: xray.
   # If the resolved list of propagators (from .composite and .composite_list) is empty, a noop propagator is used.
-  composite_list: "tracecontext,baggage,b3,b3multi,jaeger,ottrace,xray"
+  composite_list: "tracecontext,baggage,b3,b3multi,ottrace,xray"
 # Configure tracer provider.
 # If omitted, a noop tracer provider is used.
 tracer_provider:
