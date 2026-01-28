@@ -4,40 +4,34 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use InvalidArgumentException;
-use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\KnownValues as Values;
-use OpenTelemetry\SDK\Common\Configuration\Variables as Env;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSampler;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
-use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Configuration\ConfigEnv\EnvComponentLoader;
+use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\SDK\Common\Configuration\Defaults;
+use OpenTelemetry\SDK\Common\Configuration\EnvComponentLoaderRegistry;
+use OpenTelemetry\SDK\Common\Configuration\EnvResolver;
+use OpenTelemetry\SDK\Common\Configuration\Variables;
 
+/**
+ * TODO deprecated
+ */
 class SamplerFactory
 {
-    private const TRACEIDRATIO_PREFIX = 'traceidratio';
-
+    /**
+     * @phan-suppress PhanTypeMismatchReturn
+     */
     public function create(): SamplerInterface
     {
-        $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
-
-        if (str_contains($name, self::TRACEIDRATIO_PREFIX)) {
-            $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);
-
-            switch ($name) {
-                case Values::VALUE_TRACE_ID_RATIO:
-                    return new TraceIdRatioBasedSampler($arg);
-                case Values::VALUE_PARENT_BASED_TRACE_ID_RATIO:
-                    return new ParentBased(new TraceIdRatioBasedSampler($arg));
-            }
+        $registry = new EnvComponentLoaderRegistry();
+        foreach (ServiceLoader::load(EnvComponentLoader::class) as $loader) {
+            $registry->register($loader);
         }
 
-        return match ($name) {
-            Values::VALUE_ALWAYS_ON => new AlwaysOnSampler(),
-            Values::VALUE_ALWAYS_OFF => new AlwaysOffSampler(),
-            Values::VALUE_PARENT_BASED_ALWAYS_ON => new ParentBased(new AlwaysOnSampler()),
-            Values::VALUE_PARENT_BASED_ALWAYS_OFF => new ParentBased(new AlwaysOffSampler()),
-            default => throw new InvalidArgumentException(sprintf('Unknown sampler: %s', $name)),
-        };
+        $env = new EnvResolver();
+        $context = new Context();
+
+        $samplerName = $env->string(Variables::OTEL_TRACES_SAMPLER) ?? Defaults::OTEL_TRACES_SAMPLER;
+
+        return $registry->load(SamplerInterface::class, $samplerName, $env, $context);
     }
 }

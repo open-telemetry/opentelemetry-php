@@ -33,9 +33,11 @@ class SamplerFactoryTest extends TestCase
             'always on' => ['always_on', 'AlwaysOn'],
             'always off' => ['always_off', 'AlwaysOff'],
             'trace id ratio' => ['traceidratio', 'TraceIdRatio', '0.95'],
+            'trace id ratio without arg' => ['traceidratio', 'TraceIdRatio'],
             'parent based always on' => ['parentbased_always_on', 'ParentBased+AlwaysOn'],
             'parent based always off' => ['parentbased_always_off', 'ParentBased+AlwaysOff'],
             'parent based trade id ratio' => ['parentbased_traceidratio', 'ParentBased+TraceIdRatio', '0.95'],
+            'parent based trade id ratio without arg' => ['parentbased_traceidratio', 'ParentBased+TraceIdRatio'],
         ];
     }
     #[DataProvider('invalidSamplerProvider')]
@@ -51,8 +53,6 @@ class SamplerFactoryTest extends TestCase
     public static function invalidSamplerProvider(): array
     {
         return [
-            'ratio without arg' => ['traceidratio'],
-            'parent ratio without arg' => ['parentbased_traceidratio'],
             'ratio with invalid arg' => ['traceidratio', 'foo'],
             'parent ratio with invalid arg' => ['parentbased_traceidratio', 'foo'],
             'unknown sampler' => ['foo'],

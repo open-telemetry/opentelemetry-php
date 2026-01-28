@@ -45,6 +45,7 @@
             "Propagation/_register.php",
             "Trace/SpanExporter/_register.php",
             "Common/Dev/Compatibility/_load.php",
+            "_register.php",
             "_autoload.php"
         ]
     },
@@ -56,6 +57,11 @@
     "extra": {
         "branch-alias": {
             "dev-main": "1.12.x-dev"
+        },
+        "spi-config": {
+            "autoload-files": [
+                "_register.php"
+            ]
         },
         "spi": {
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [

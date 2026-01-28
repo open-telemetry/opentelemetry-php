@@ -20,6 +20,9 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Sdk;
 
+/**
+ * TODO deprecated
+ */
 class MeterProviderFactory
 {
     use LogsMessagesTrait;

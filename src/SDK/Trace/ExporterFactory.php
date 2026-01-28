@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Registry;
 use RuntimeException;
 
+/**
+ * TODO deprecated
+ */
 class ExporterFactory
 {
     /**

@@ -22,9 +22,10 @@ interface EnvResolver
     /**
      * Resolves an enum-valued environment variable.
      *
+     * @template T of string
      * @param string $name environment variable name
-     * @param list<string> $values list of permissible enum values
-     * @return string|null value of the environment variable, of null if not set or invalid
+     * @param list<T> $values list of permissible enum values
+     * @return T|null value of the environment variable, of null if not set or invalid
      *
      * @see https://opentelemetry.io/docs/specs/otel/configuration/sdk-environment-variables/#enum
      */

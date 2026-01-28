@@ -34,20 +34,13 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\EnvComponentLoaderRegistry;
 use OpenTelemetry\SDK\Common\Configuration\EnvResolver;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
-use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
-use OpenTelemetry\SDK\Logs\EventLoggerProviderFactory;
-use OpenTelemetry\SDK\Logs\LoggerProviderFactory;
-use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
+use OpenTelemetry\SDK\ConfigEnv\EnvConfiguration;
+use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Propagation\LateBindingResponsePropagator;
 use OpenTelemetry\SDK\Propagation\LateBindingTextMapPropagator;
-use OpenTelemetry\SDK\Propagation\PropagatorFactory;
-use OpenTelemetry\SDK\Propagation\ResponsePropagatorFactory;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
-use OpenTelemetry\SDK\Trace\ExporterFactory;
-use OpenTelemetry\SDK\Trace\SamplerFactory;
-use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
-use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use RuntimeException;
 use Throwable;
 
@@ -85,42 +78,37 @@ class SdkAutoloader
     }
 
     /**
-     * @phan-suppress PhanDeprecatedClass,PhanDeprecatedFunction
+     * @phan-suppress PhanPossiblyUndeclaredVariable,PhanDeprecatedClass,PhanDeprecatedFunction
      */
     private static function environmentBasedInitializer(Configurator $configurator): Configurator
     {
-        $propagator = (new PropagatorFactory())->create();
-        $responsePropagator = (new ResponsePropagatorFactory())->create();
-        if (Sdk::isDisabled()) {
-            //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
-            return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
+        $scope = HookManager::disable(Context::getCurrent())->activate();
+
+        try {
+            $sdk = EnvConfiguration::loadFromEnv()
+                ->setAutoShutdown(true)
+                ->build();
+        } finally {
+            $scope->detach();
         }
-        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
 
-        $resource = ResourceInfoFactory::defaultResource();
-        $exporter = (new ExporterFactory())->create();
-        $meterProvider = (new MeterProviderFactory())->create($resource);
-        $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
-        $tracerProvider = (new TracerProviderBuilder())
-            ->addSpanProcessor($spanProcessor)
-            ->setResource($resource)
-            ->setSampler((new SamplerFactory())->create())
-            ->build();
+        $tracerProvider = $sdk->getTracerProvider();
+        $meterProvider = $sdk->getMeterProvider();
+        $loggerProvider = $sdk->getLoggerProvider();
 
-        $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
-        $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);
-
-        ShutdownHandler::register($tracerProvider->shutdown(...));
-        ShutdownHandler::register($meterProvider->shutdown(...));
-        ShutdownHandler::register($loggerProvider->shutdown(...));
+        if ($tracerProvider instanceof TracerProvider) {
+            $configurator = $configurator->withTracerProvider($tracerProvider);
+        }
+        if ($meterProvider instanceof MeterProvider) {
+            $configurator = $configurator->withMeterProvider($meterProvider);
+        }
+        if ($loggerProvider instanceof LoggerProvider) {
+            $configurator = $configurator->withLoggerProvider($loggerProvider);
+        }
 
         return $configurator
-            ->withTracerProvider($tracerProvider)
-            ->withMeterProvider($meterProvider)
-            ->withLoggerProvider($loggerProvider)
-            ->withEventLoggerProvider($eventLoggerProvider)
-            ->withPropagator($propagator)
-            ->withResponsePropagator($responsePropagator)
+            ->withPropagator($sdk->getPropagator())
+            ->withResponsePropagator($sdk->getResponsePropagator())
         ;
     }
 
