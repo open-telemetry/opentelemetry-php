@@ -66,7 +66,7 @@ jobs:
         key: ${{ env.key }}
 
     - name: Cache extensions
-      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: ${{ steps.extcache.outputs.dir }}
         key: ${{ steps.extcache.outputs.key }}
@@ -85,7 +85,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: vendor
         key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-${{ hashFiles('composer.json') }}
@@ -93,7 +93,7 @@ jobs:
           ${{ runner.os }}-${{ matrix.php-version }}-vendor-
     - name: Cache test tools
       id: test-tools-cache
-      uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+      uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
       with:
         path: vendor-bin
         key: ${{ runner.os }}-${{ matrix.php-version }}-vendor-bin-${{ hashFiles('vendor-bin/*/composer.json') }}
