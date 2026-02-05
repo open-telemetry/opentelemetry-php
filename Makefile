@@ -12,7 +12,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  \033[32m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 all: update all-checks ## Update to latest and run all checks
 all-lowest: update-lowest all-checks ## Update to lowest dependencies and run all checks
-all-checks: rector style deptrac packages-composer phan psalm phpstan test ## Run all checks
+all-checks: rector style deptrac packages-composer phan psalm phpstan test spi ## Run all checks
 pull: ## Pull latest developer image
 	$(DOCKER_COMPOSE) pull php
 build: ## Build developer image locally
@@ -56,6 +56,8 @@ benchmark: ## Run phpbench
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/phpbench/vendor/bin/phpbench run --report=default
 phpmetrics: ## Run php metrics
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/phpmetrics/vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
+spi: ## Validate SPI package dependencies
+	$(DC_RUN_PHP) composer spi:show-outdated-package-dependencies
 smoke-test-examples: smoke-test-isolated-examples smoke-test-exporter-examples smoke-test-collector-integration smoke-test-prometheus-example ## Run smoke test examples
 smoke-test-isolated-examples: ## Run smoke test isolated examples
 	$(DC_RUN_PHP) php ./examples/traces/getting_started.php

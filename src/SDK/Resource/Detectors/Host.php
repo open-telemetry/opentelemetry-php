@@ -7,7 +7,9 @@ namespace OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\HostIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\OsIncubatingAttributes;
+use OpenTelemetry\SemConv\Version;
 use const PHP_OS;
 use const PHP_OS_FAMILY;
 use function php_uname;
@@ -33,16 +35,16 @@ final class Host implements ResourceDetectorInterface
     public function getResource(): ResourceInfo
     {
         $attributes = [
-            ResourceAttributes::HOST_NAME => php_uname('n'),
-            ResourceAttributes::HOST_ARCH => php_uname('m'),
-            ResourceAttributes::HOST_ID => $this->getMachineId(),
-            ResourceAttributes::OS_TYPE => strtolower(PHP_OS_FAMILY),
-            ResourceAttributes::OS_DESCRIPTION => php_uname('r'),
-            ResourceAttributes::OS_NAME => PHP_OS,
-            ResourceAttributes::OS_VERSION => php_uname('v'),
+            HostIncubatingAttributes::HOST_NAME => php_uname('n'),
+            HostIncubatingAttributes::HOST_ARCH => php_uname('m'),
+            HostIncubatingAttributes::HOST_ID => $this->getMachineId(),
+            OsIncubatingAttributes::OS_TYPE => strtolower(PHP_OS_FAMILY),
+            OsIncubatingAttributes::OS_DESCRIPTION => php_uname('r'),
+            OsIncubatingAttributes::OS_NAME => PHP_OS,
+            OsIncubatingAttributes::OS_VERSION => php_uname('v'),
         ];
 
-        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), Version::VERSION_1_38_0->url());
     }
 
     private function getMachineId(): ?string

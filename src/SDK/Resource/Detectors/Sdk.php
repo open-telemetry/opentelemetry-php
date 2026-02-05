@@ -9,7 +9,9 @@ use Composer\InstalledVersions;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\SemConv\Attributes\TelemetryAttributes;
+use OpenTelemetry\SemConv\Incubating\Attributes\TelemetryIncubatingAttributes;
+use OpenTelemetry\SemConv\Version;
 
 /**
  * The SDK MUST provide access to a Resource with at least the attributes listed
@@ -26,8 +28,8 @@ final class Sdk implements ResourceDetectorInterface
     public function getResource(): ResourceInfo
     {
         $attributes = [
-            ResourceAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
-            ResourceAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
+            TelemetryAttributes::TELEMETRY_SDK_NAME => 'opentelemetry',
+            TelemetryAttributes::TELEMETRY_SDK_LANGUAGE => 'php',
         ];
 
         if (class_exists(InstalledVersions::class)) {
@@ -39,17 +41,17 @@ final class Sdk implements ResourceDetectorInterface
                     continue;
                 }
 
-                $attributes[ResourceAttributes::TELEMETRY_SDK_VERSION] = $version;
+                $attributes[TelemetryAttributes::TELEMETRY_SDK_VERSION] = $version;
 
                 break;
             }
         }
 
         if (extension_loaded('opentelemetry')) {
-            $attributes[ResourceAttributes::TELEMETRY_DISTRO_NAME] = 'opentelemetry-php-instrumentation';
-            $attributes[ResourceAttributes::TELEMETRY_DISTRO_VERSION] = phpversion('opentelemetry');
+            $attributes[TelemetryIncubatingAttributes::TELEMETRY_DISTRO_NAME] = 'opentelemetry-php-instrumentation';
+            $attributes[TelemetryIncubatingAttributes::TELEMETRY_DISTRO_VERSION] = phpversion('opentelemetry');
         }
 
-        return ResourceInfo::create(Attributes::create($attributes), ResourceAttributes::SCHEMA_URL);
+        return ResourceInfo::create(Attributes::create($attributes), Version::VERSION_1_38_0->url());
     }
 }

@@ -7,6 +7,9 @@ namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\API\Trace\Span;
+use OpenTelemetry\API\Trace\SpanContext;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -14,6 +17,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
+use OpenTelemetry\SDK\Logs\LogRecordBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
@@ -25,6 +29,7 @@ use PHPUnit\Framework\TestCase;
  * @psalm-suppress UndefinedInterfaceMethod
  */
 #[CoversClass(Logger::class)]
+#[CoversClass(LogRecordBuilder::class)]
 class LoggerTest extends TestCase
 {
     /** @var LogWriterInterface&MockObject $logWriter */
@@ -67,6 +72,22 @@ class LoggerTest extends TestCase
         $logger->emit($record);
     }
 
+    public function test_builder_log_record(): void
+    {
+        $logger = new Logger($this->sharedState, $this->scope);
+
+        $this->processor->expects($this->once())->method('onEmit')
+            ->with(
+                $this->isInstanceOf(ReadWriteLogRecord::class),
+                $this->isInstanceOf(ContextInterface::class)
+            );
+
+        $logger
+            ->logRecordBuilder()
+            ->setContext($this->createMock(ContextInterface::class))
+            ->emit();
+    }
+
     public function test_sets_observed_timestamp_on_emit(): void
     {
         $logger = new Logger($this->sharedState, $this->scope);
@@ -85,6 +106,27 @@ class LoggerTest extends TestCase
             );
 
         $logger->emit($record);
+    }
+
+    public function test_builder_sets_observed_timestamp_on_emit(): void
+    {
+        $logger = new Logger($this->sharedState, $this->scope);
+        $time = microtime(true) * (float) LogRecord::NANOS_PER_SECOND;
+
+        $this->processor->expects($this->once())->method('onEmit')
+            ->with(
+                $this->callback(function (ReadWriteLogRecord $record) use ($time) {
+                    $this->assertNotNull($record->getObservedTimestamp());
+                    $this->assertGreaterThan($time, $record->getObservedTimestamp());
+
+                    return true;
+                }),
+                $this->anything(),
+            );
+
+        $logger
+            ->logRecordBuilder()
+            ->emit();
     }
 
     public function test_logs_dropped_attributes(): void
@@ -114,6 +156,31 @@ class LoggerTest extends TestCase
         $logger->emit($record);
     }
 
+    public function test_builder_logs_dropped_attributes(): void
+    {
+        $this->logWriter
+            ->expects($this->once())
+            ->method('write')
+            ->with(
+                $this->equalTo('warning'),
+                $this->stringContains('Dropped'),
+                $this->callback(function (array $context): bool {
+                    $this->assertArrayHasKey('attributes', $context);
+                    $this->assertSame(2, $context['attributes']);
+
+                    return true;
+                }),
+            );
+        $logger = new Logger($this->sharedState, $this->scope);
+
+        $logger
+            ->logRecordBuilder()
+            ->setAttribute('one', 'attr_one')
+            ->setAttribute('two', 'attr_two')
+            ->setAttribute('three', 'attr_three')
+            ->emit();
+    }
+
     public function test_enabled(): void
     {
         $logger = new Logger($this->sharedState, $this->scope);
@@ -122,6 +189,18 @@ class LoggerTest extends TestCase
         $this->processor->expects($this->once())->method('onEmit');
 
         $logger->emit(new LogRecord());
+    }
+
+    public function test_builder_enabled(): void
+    {
+        $logger = new Logger($this->sharedState, $this->scope);
+        $this->assertTrue($logger->isEnabled());
+
+        $this->processor->expects($this->once())->method('onEmit');
+
+        $logger
+            ->logRecordBuilder()
+            ->emit();
     }
 
     public function test_does_not_log_if_disabled(): void
@@ -133,5 +212,37 @@ class LoggerTest extends TestCase
         $this->processor->expects($this->never())->method('onEmit');
 
         $logger->emit(new LogRecord());
+    }
+
+    public function test_builder_does_not_log_if_disabled(): void
+    {
+        $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled(true), name: 'foo');
+        $logger = new Logger($this->sharedState, $this->scope, $configurator);
+        $this->assertFalse($logger->isEnabled());
+
+        $this->processor->expects($this->never())->method('onEmit');
+
+        $logger
+            ->logRecordBuilder()
+            ->emit();
+    }
+
+    public function test_builder_sets_span_context_from_context(): void
+    {
+        $logger = new Logger($this->sharedState, $this->scope);
+
+        $spanContext = SpanContext::create('0af7651916cd43dd8448eb211c80319c', 'b9c7c989f97918e1');
+        $context = Span::wrap($spanContext)->storeInContext(Context::getRoot());
+
+        $this->processor->expects($this->once())->method('onEmit')
+            ->willReturnCallback(function (ReadWriteLogRecord $record, ContextInterface $processorContext) use ($spanContext, $context): void {
+                $this->assertSame($spanContext, $record->getSpanContext());
+                $this->assertSame($context, $processorContext);
+            });
+
+        $logger
+            ->logRecordBuilder()
+            ->setContext($context)
+            ->emit();
     }
 }

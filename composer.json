@@ -21,8 +21,7 @@
         "symfony/polyfill-mbstring": "^1.23",
         "symfony/polyfill-php83": "^1.32",
         "symfony/polyfill-php84": "^1.32",
-        "symfony/polyfill-php85": "^1.32",
-        "tbachert/spi": "^1.0.1"
+        "tbachert/spi": "^1.0.x-dev"
     },
     "config": {
         "sort-packages": true,
@@ -47,7 +46,6 @@
         "open-telemetry/exporter-zipkin": "1.0.x-dev",
         "open-telemetry/extension-propagator-b3": "1.0.x-dev",
         "open-telemetry/extension-propagator-cloudtrace": "1.0.x-dev",
-        "open-telemetry/extension-propagator-jaeger": "0.0.2",
         "open-telemetry/gen-otlp-protobuf": "1.0.x-dev",
         "open-telemetry/sdk": "1.0.x-dev",
         "open-telemetry/sdk-configuration": "0.1.x-dev",
@@ -69,7 +67,6 @@
             "src/Contrib/Zipkin/_register.php",
             "src/Extension/Propagator/B3/_register.php",
             "src/Extension/Propagator/CloudTrace/_register.php",
-            "src/Extension/Propagator/Jaeger/_register.php",
             "src/SDK/Logs/Exporter/_register.php",
             "src/SDK/Metrics/MetricExporter/_register.php",
             "src/SDK/Propagation/_register.php",
@@ -135,7 +132,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorJaeger",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",

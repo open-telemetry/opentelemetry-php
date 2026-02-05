@@ -35,7 +35,7 @@ jobs:
       run: |
         echo "key=$(date +'%Y-%U')" >> $GITHUB_ENV
 
-    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
     - uses: gacts/run-and-post-run@81b6ce503cde93862cec047c54652e45c5dca991 # v1.4.3
       id: post-run-command
@@ -50,15 +50,16 @@ jobs:
           echo "phpstan=${{steps.phpstan.outcome}}"
           echo "unit=${{steps.unit.outcome}}"
           echo "integration=${{steps.integration.outcome}}"
+          echo "spi=${{steps.spi.outcome}}"
           echo "::endgroup::"
 
-          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' }} == true ]; then \
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.spi.outcome == 'failure' }} == true ]; then \
             echo "::error::One or more steps failed"; \
           fi
 
     - name: Setup cache environment
       id: extcache
-      uses: shivammathur/cache-extensions@4595bea7d6630821b0a3a4894f816402faaf324c # v1
+      uses: shivammathur/cache-extensions@4595bea7d6630821b0a3a4894f816402faaf324c # 1.13.0
       with:
         php-version: ${{ matrix.php-version }}
         extensions: ${{ env.extensions }}
@@ -72,7 +73,7 @@ jobs:
         restore-keys: ${{ steps.extcache.outputs.key }}
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # v2
+      uses: shivammathur/setup-php@44454db4f0199b8b9685a5d763dc37cbf79108e1 # 2.36.0
       with:
         php-version: ${{ matrix.php-version }}
         coverage: xdebug
@@ -157,6 +158,11 @@ jobs:
       id: integration
       continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/phpunit --testsuite integration
+
+    - name: Check for outdated SPI package dependencies
+      id: spi
+      continue-on-error: ${{ matrix.experimental }}
+      run: composer spi:show-outdated-package-dependencies
 
     - name: Code Coverage
       uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2

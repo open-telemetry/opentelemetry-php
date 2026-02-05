@@ -6,6 +6,9 @@ namespace OpenTelemetry\API\Logs;
 
 use OpenTelemetry\Context\ContextInterface;
 
+/**
+ * Deprecated, use {@link LoggerInterface::logRecordBuilder()} instead.
+ */
 class LogRecord
 {
     public const NANOS_PER_SECOND = 1_000_000_000;
