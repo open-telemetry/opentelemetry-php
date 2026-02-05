@@ -10,6 +10,7 @@ use Exception;
 use Google\Protobuf\Descriptor;
 use Google\Protobuf\DescriptorPool;
 use Google\Protobuf\FieldDescriptor;
+use Google\Protobuf\Internal\GPBLabel;
 use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\Message;
 use InvalidArgumentException;
@@ -139,7 +140,7 @@ final class ProtobufSerializer
                 continue;
             }
 
-            if ($field->isRepeated()) {
+            if ($field->getLabel() === GPBLabel::REPEATED) {
                 foreach ($data->$name as $key => $value) {
                     $data->$name[$key] = self::traverseFieldDescriptor($value, $field);
                 }
