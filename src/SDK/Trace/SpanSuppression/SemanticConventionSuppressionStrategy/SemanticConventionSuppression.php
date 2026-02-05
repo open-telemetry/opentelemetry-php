@@ -11,11 +11,11 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
 /**
  * @internal
  */
-final readonly class SemanticConventionSuppression implements SpanSuppression
+final class SemanticConventionSuppression implements SpanSuppression
 {
     public function __construct(
-        private ContextKeyInterface $contextKey,
-        private array $semanticConventions,
+        private readonly ContextKeyInterface $contextKey,
+        private readonly array $semanticConventions,
     ) {
     }
 

@@ -11,10 +11,10 @@ use function array_values;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 
-final readonly class MultiTextMapPropagator implements TextMapPropagatorInterface
+final class MultiTextMapPropagator implements TextMapPropagatorInterface
 {
     /** @var list<string> */
-    private array $fields;
+    private readonly array $fields;
 
     /**
      * @no-named-arguments
@@ -22,7 +22,7 @@ final readonly class MultiTextMapPropagator implements TextMapPropagatorInterfac
      * @param list<TextMapPropagatorInterface> $propagators
      */
     public function __construct(
-        private array $propagators,
+        private readonly array $propagators,
     ) {
         $this->fields = $this->extractFields($this->propagators);
     }

@@ -14,7 +14,7 @@ use Symfony\Component\Config\Definition\Processor;
  *
  * @internal
  */
-final readonly class CompiledConfigurationFactory
+final class CompiledConfigurationFactory
 {
     /**
      * @param ComponentProvider<T> $rootComponent
@@ -22,9 +22,9 @@ final readonly class CompiledConfigurationFactory
      * @param iterable<ResourceTrackable> $resourceTrackable
      */
     public function __construct(
-        private ComponentProvider $rootComponent,
-        private NodeInterface $node,
-        private iterable $resourceTrackable,
+        private readonly ComponentProvider $rootComponent,
+        private readonly NodeInterface $node,
+        private readonly iterable $resourceTrackable,
     ) {
     }
 

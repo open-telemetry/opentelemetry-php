@@ -43,9 +43,9 @@ use function var_export;
 /**
  * @template T
  */
-final readonly class ConfigurationFactory
+final class ConfigurationFactory
 {
-    private CompiledConfigurationFactory $compiledFactory;
+    private readonly CompiledConfigurationFactory $compiledFactory;
 
     /**
      * @param iterable<ComponentProvider> $componentProviders
@@ -53,9 +53,9 @@ final readonly class ConfigurationFactory
      * @param EnvReader $envReader
      */
     public function __construct(
-        private iterable $componentProviders,
-        private ComponentProvider $rootComponent,
-        private EnvReader $envReader,
+        private readonly iterable $componentProviders,
+        private readonly ComponentProvider $rootComponent,
+        private readonly EnvReader $envReader,
     ) {
         $this->compiledFactory = $this->compileFactory();
     }

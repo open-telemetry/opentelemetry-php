@@ -12,11 +12,11 @@ use OpenTelemetry\SDK\Metrics\AggregationInterface;
  * @internal
  * @phan-file-suppress PhanUndeclaredTypeParameter, PhanUndeclaredTypeProperty
  */
-final readonly class DeltaStorage
+final class DeltaStorage
 {
-    private Delta $head;
+    private readonly Delta $head;
 
-    public function __construct(private AggregationInterface $aggregation)
+    public function __construct(private readonly AggregationInterface $aggregation)
     {
         $this->head = new Delta(new Metric([], [], 0), 0);
 

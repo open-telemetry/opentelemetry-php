@@ -9,7 +9,7 @@ use OpenTelemetry\Context\ContextInterface;
 /**
  * @experimental
  */
-final readonly class MultiResponsePropagator implements ResponsePropagatorInterface
+final class MultiResponsePropagator implements ResponsePropagatorInterface
 {
     /**
      * @no-named-arguments
@@ -17,7 +17,7 @@ final readonly class MultiResponsePropagator implements ResponsePropagatorInterf
      * @param list<ResponsePropagatorInterface> $responsePropagators
      */
     public function __construct(
-        private array $responsePropagators,
+        private readonly array $responsePropagators,
     ) {
     }
 

@@ -17,13 +17,13 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\SDK\SdkBuilder;
 use WeakMap;
 
-final readonly class Configuration
+final class Configuration
 {
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
      */
     private function __construct(
-        private ComponentPlugin $sdkPlugin,
+        private readonly ComponentPlugin $sdkPlugin,
     ) {
     }
 

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 
-final readonly class ArrayEnvSource implements EnvSource
+final class ArrayEnvSource implements EnvSource
 {
     public function __construct(
-        private array $env,
+        private readonly array $env,
     ) {
     }
 

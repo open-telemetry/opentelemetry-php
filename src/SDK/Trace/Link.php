@@ -7,11 +7,11 @@ namespace OpenTelemetry\SDK\Trace;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
-final readonly class Link implements LinkInterface
+final class Link implements LinkInterface
 {
     public function __construct(
-        private API\SpanContextInterface $context,
-        private AttributesInterface $attributes,
+        private readonly API\SpanContextInterface $context,
+        private readonly AttributesInterface $attributes,
     ) {
     }
 

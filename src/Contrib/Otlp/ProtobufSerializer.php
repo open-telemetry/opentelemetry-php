@@ -28,11 +28,11 @@ use function ucwords;
  * @internal
  * @psalm-type SUPPORTED_CONTENT_TYPES = ContentTypes::PROTOBUF|ContentTypes::JSON|ContentTypes::NDJSON
  */
-final readonly class ProtobufSerializer
+final class ProtobufSerializer
 {
     use LogsMessagesTrait;
 
-    private function __construct(private string $contentType)
+    private function __construct(private readonly string $contentType)
     {
     }
 

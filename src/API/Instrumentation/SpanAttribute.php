@@ -12,13 +12,13 @@ use Attribute;
  * add the argument as a span attribute.
  */
 #[Attribute(Attribute::TARGET_PARAMETER | Attribute::TARGET_PROPERTY)]
-final readonly class SpanAttribute
+final class SpanAttribute
 {
     /**
      * @param string|null $name Optional name to use for the attribute. Default: argument name.
      */
     public function __construct(
-        public ?string $name = null,
+        public readonly ?string $name = null,
     ) {
     }
 }

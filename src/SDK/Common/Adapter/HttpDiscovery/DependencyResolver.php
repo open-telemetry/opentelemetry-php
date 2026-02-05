@@ -17,11 +17,11 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
-final readonly class DependencyResolver implements DependencyResolverInterface
+final class DependencyResolver implements DependencyResolverInterface
 {
-    private MessageFactoryResolverInterface $messageFactoryResolver;
-    private PsrClientResolverInterface $psrClientResolver;
-    private HttpPlugClientResolverInterface $httpPlugClientResolver;
+    private readonly MessageFactoryResolverInterface $messageFactoryResolver;
+    private readonly PsrClientResolverInterface $psrClientResolver;
+    private readonly HttpPlugClientResolverInterface $httpPlugClientResolver;
 
     public function __construct(
         ?MessageFactoryResolverInterface $messageFactoryResolver = null,

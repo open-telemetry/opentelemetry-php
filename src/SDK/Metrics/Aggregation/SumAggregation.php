@@ -12,9 +12,9 @@ use OpenTelemetry\SDK\Metrics\Data;
 /**
  * @implements AggregationInterface<SumSummary>
  */
-final readonly class SumAggregation implements AggregationInterface
+final class SumAggregation implements AggregationInterface
 {
-    public function __construct(private bool $monotonic = false)
+    public function __construct(private readonly bool $monotonic = false)
     {
     }
 

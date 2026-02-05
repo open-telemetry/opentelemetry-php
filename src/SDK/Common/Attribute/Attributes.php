@@ -12,14 +12,14 @@ use Traversable;
 /**
  * @psalm-suppress MissingTemplateParam
  */
-final readonly class Attributes implements AttributesInterface, IteratorAggregate, JsonSerializable
+final class Attributes implements AttributesInterface, IteratorAggregate, JsonSerializable
 {
     /**
      * @internal
      */
     public function __construct(
-        private array $attributes,
-        private int $droppedAttributesCount,
+        private readonly array $attributes,
+        private readonly int $droppedAttributesCount,
     ) {
     }
 

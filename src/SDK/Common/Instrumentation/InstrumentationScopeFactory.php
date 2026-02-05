@@ -6,9 +6,9 @@ namespace OpenTelemetry\SDK\Common\Instrumentation;
 
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
 
-final readonly class InstrumentationScopeFactory implements InstrumentationScopeFactoryInterface
+final class InstrumentationScopeFactory implements InstrumentationScopeFactoryInterface
 {
-    public function __construct(private AttributesFactoryInterface $attributesFactory)
+    public function __construct(private readonly AttributesFactoryInterface $attributesFactory)
     {
     }
 

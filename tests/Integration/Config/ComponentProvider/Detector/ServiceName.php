@@ -18,10 +18,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 /**
  * @implements ComponentProvider<ResourceDetectorInterface>
  */
-final readonly class ServiceName implements ComponentProvider
+final class ServiceName implements ComponentProvider
 {
     public function __construct(
-        private string $serviceName,
+        private readonly string $serviceName,
     ) {
     }
 

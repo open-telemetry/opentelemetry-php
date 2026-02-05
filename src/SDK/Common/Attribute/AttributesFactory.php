@@ -7,11 +7,11 @@ namespace OpenTelemetry\SDK\Common\Attribute;
 /**
  * @internal
  */
-final readonly class AttributesFactory implements AttributesFactoryInterface
+final class AttributesFactory implements AttributesFactoryInterface
 {
     public function __construct(
-        private ?int $attributeCountLimit = null,
-        private ?int $attributeValueLengthLimit = null,
+        private readonly ?int $attributeCountLimit = null,
+        private readonly ?int $attributeValueLengthLimit = null,
     ) {
     }
 
