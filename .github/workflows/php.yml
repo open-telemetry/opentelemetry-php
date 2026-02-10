@@ -16,16 +16,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.2', '8.3']
+        php-version: ['8.2', '8.3', '8.4']
         experimental: [false]
         composer_args: [""]
         include:
-          - php-version: 8.4
-            experimental: false
-            composer_args: "--ignore-platform-reqs"
           - php-version: 8.5
             experimental: true
-            composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
 
