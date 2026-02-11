@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "nyholm/psr7-server": "^1.1",
         "open-telemetry/api": "^1.8",

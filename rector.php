@@ -6,8 +6,7 @@ use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRe
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
-use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
-use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
@@ -23,22 +22,16 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->sets([
-        SetList::PHP_81,
+        SetList::PHP_82,
         SetList::CODE_QUALITY,
         PHPUnitSetList::PHPUNIT_100,
     ]);
     $rectorConfig->rule(AddOverrideAttributeToOverriddenMethodsRector::class);
     $rectorConfig->skip([
         FlipTypeControlToUseExclusiveTypeRector::class,
-        NewInInitializerRector::class => [
-            __DIR__ . '/src/SDK/Trace/Sampler/ParentBased.php',
-        ],
-        ReadOnlyPropertyRector::class => [
-            __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
-            __DIR__ . '/tests/Unit/Extension/Propagator',
-        ],
         DisallowedEmptyRuleFixerRector::class,
         ExplicitBoolCompareRector::class,
         LocallyCalledStaticMethodToNonStaticRector::class,
+        ReadOnlyClassRector::class,
     ]);
 };
