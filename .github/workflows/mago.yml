@@ -1,0 +1,27 @@
+name: Mago
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  mago:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Mago
+        uses: nhedger/setup-mago@v1
+        with:
+          version: ""
+          token: ${{ github.token }}
+          working-directory: ""
+      - name: Lint
+        run: mago lint --reporting-format=github
+      - name: Format Check
+        run: mago fmt --check
