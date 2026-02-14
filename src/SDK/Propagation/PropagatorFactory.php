@@ -12,6 +12,9 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Registry;
 
+/**
+ * TODO deprecated
+ */
 class PropagatorFactory
 {
     use LogsMessagesTrait;
