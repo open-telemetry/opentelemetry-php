@@ -22,6 +22,6 @@ jobs:
           token: ${{ github.token }}
           working-directory: ""
       - name: Lint
-        run: mago lint --reporting-format=github
+        run: mago lint ./src --reporting-format=github
       - name: Format Check
-        run: mago fmt --check
+        run: mago fmt ./src --dry-run
