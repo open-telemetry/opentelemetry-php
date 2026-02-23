@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
+/**
+ * @deprecated environment variables should be accessed using {@link \OpenTelemetry\API\Configuration\ConfigEnv\EnvComponentLoader}s.
+ *
+ * @phan-suppress PhanDeprecatedInterface
+ */
 class ConfigurationResolver implements ConfigurationResolverInterface
 {
     #[\Override]

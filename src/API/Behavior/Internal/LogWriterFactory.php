@@ -18,6 +18,7 @@ class LogWriterFactory
 
     public function create(): LogWriterInterface
     {
+        /** @phan-suppress-next-line PhanDeprecatedClass */
         $dest = (new ConfigurationResolver())->getString(self::OTEL_PHP_LOG_DESTINATION);
         $logger = LoggerHolder::get();
 

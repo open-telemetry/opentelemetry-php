@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
+/**
+ * @deprecated
+ */
 interface ConfigurationResolverInterface
 {
     public function has(string $name): bool;
