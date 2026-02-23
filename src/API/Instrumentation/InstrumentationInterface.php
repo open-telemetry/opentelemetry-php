@@ -12,6 +12,9 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @deprecated
+ */
 interface InstrumentationInterface
 {
     public function getName(): string;

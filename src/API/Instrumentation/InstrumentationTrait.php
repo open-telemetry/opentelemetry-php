@@ -61,6 +61,8 @@ $instrumentation = new Instrumentation;
 $instrumentation->activate()
 
 to activate and use the instrumentation with the API/SDK.
+ *
+ * @deprecated
  **/
 
 trait InstrumentationTrait
