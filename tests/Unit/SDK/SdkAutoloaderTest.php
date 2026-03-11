@@ -163,7 +163,7 @@ class SdkAutoloaderTest extends TestCase
     {
         $this->logger->expects($this->never())->method('log')->with($this->equalTo(LogLevel::ERROR));
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
-        $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
 
         $this->assertTrue(SdkAutoloader::autoload());
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
@@ -176,7 +176,7 @@ class SdkAutoloaderTest extends TestCase
     public function test_autoload_with_late_globals_initializer(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
-        $this->setEnvironmentVariable(Variables::OTEL_EXPERIMENTAL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
         $this->assertTrue(SdkAutoloader::autoload());
         //SDK is configured, but globals have not been initialized yet, so we can add more initializers
         $propagator = $this->createMock(TextMapPropagatorInterface::class);

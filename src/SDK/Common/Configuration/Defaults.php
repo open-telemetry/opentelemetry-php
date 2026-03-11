@@ -120,6 +120,6 @@ interface Defaults
     public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
     public const OTEL_PHP_LOG_DESTINATION = 'default';
     public const OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN = 'false';
-    public const OTEL_EXPERIMENTAL_CONFIG_FILE = 'sdk-config.yaml';
+    public const OTEL_CONFIG_FILE = 'sdk-config.yaml';
     public const OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS = 'none';
 }
