@@ -20,4 +20,9 @@ final class ContextKeysTest extends TestCase
     {
         $this->assertSame(ContextKeys::baggage(), ContextKeys::baggage());
     }
+
+    public function test_suppress_context_key(): void
+    {
+        $this->assertSame(ContextKeys::suppress(), ContextKeys::suppress());
+    }
 }
