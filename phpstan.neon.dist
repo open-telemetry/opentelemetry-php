@@ -12,6 +12,7 @@ parameters:
     excludePaths:
         - tests/TraceContext/W3CTestService
         - tests/Unit/Config/SDK/Configuration/ExampleSdk
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         -
             message: "#Call to an undefined method .*#"
