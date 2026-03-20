@@ -96,6 +96,9 @@ class SpanBuilderTest extends MockeryTestCase
         $span->end();
     }
 
+    /**
+     * @psalm-suppress InvalidArrayOffset
+     */
     public function test_add_link_dropping_links(): void
     {
         Logging::disable();

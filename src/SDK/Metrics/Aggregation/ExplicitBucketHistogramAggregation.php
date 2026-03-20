@@ -40,6 +40,7 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
 
     /**
      * @param ExplicitBucketHistogramSummary $summary
+     * @psalm-suppress InvalidArrayOffset
      */
     #[\Override]
     public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void

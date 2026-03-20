@@ -25,6 +25,9 @@ final class HistogramBucketReservoir implements ExemplarReservoirInterface
         $this->boundaries = $boundaries;
     }
 
+    /**
+     * @psalm-suppress InvalidArrayOffset
+     */
     #[\Override]
     public function offer($index, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void
     {

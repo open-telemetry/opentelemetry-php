@@ -63,6 +63,7 @@ final class PsrUtils
     /**
      * @param list<string> $encodings
      * @param array<int, string>|null $appliedEncodings
+     * @psalm-suppress PossiblyInvalidArrayOffset
      */
     public static function encode(string $value, array $encodings, ?array &$appliedEncodings = null): string
     {
