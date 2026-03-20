@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition;
 
 use OpenTelemetry\Config\SDK\Configuration\Internal\Node\StringNode;
-use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
