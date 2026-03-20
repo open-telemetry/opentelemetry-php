@@ -69,3 +69,7 @@ parameters:
             message: "#^Caught class .* not found\\.#"
             paths:
                 - src/Config/SDK/Configuration/Environment/Adapter/
+        -
+            message: "#^PHPDoc tag @extends contains generic type .* but class .* is not generic\\.#"
+            paths:
+                - src/Config/SDK/Configuration/Internal/NodeDefinition/
