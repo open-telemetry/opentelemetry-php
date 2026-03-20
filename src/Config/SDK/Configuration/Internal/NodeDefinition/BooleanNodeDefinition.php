@@ -9,7 +9,6 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition<NodeParentInterface|null>
  */
 final class BooleanNodeDefinition extends \Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition
 {

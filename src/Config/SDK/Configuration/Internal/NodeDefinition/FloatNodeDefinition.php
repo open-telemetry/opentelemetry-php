@@ -9,7 +9,6 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\FloatNodeDefinition<NodeParentInterface|null>
  */
 final class FloatNodeDefinition extends \Symfony\Component\Config\Definition\Builder\FloatNodeDefinition
 {

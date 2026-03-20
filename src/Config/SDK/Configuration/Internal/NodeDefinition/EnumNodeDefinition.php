@@ -9,7 +9,6 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\EnumNodeDefinition<NodeParentInterface|null>
  */
 final class EnumNodeDefinition extends \Symfony\Component\Config\Definition\Builder\EnumNodeDefinition
 {

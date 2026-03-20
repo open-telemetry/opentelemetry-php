@@ -35,6 +35,12 @@ parameters:
             paths:
                 - tests
         -
+            message: "#Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface::.*#"
+            paths:
+                - src/Config/SDK
+                - tests/Unit/Config
+                - tests/Integration/Config
+        -
             message: "#Cannot call method .* on null#"
             paths:
                 - tests/Integration/SDK/Trace

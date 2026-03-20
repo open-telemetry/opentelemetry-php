@@ -9,7 +9,6 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition<NodeParentInterface|null>
  */
 final class IntegerNodeDefinition extends \Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition
 {

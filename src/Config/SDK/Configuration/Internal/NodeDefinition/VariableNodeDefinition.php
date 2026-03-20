@@ -9,7 +9,6 @@ use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\VariableNodeDefinition<NodeParentInterface|null>
  */
 final class VariableNodeDefinition extends \Symfony\Component\Config\Definition\Builder\VariableNodeDefinition
 {
