@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use Exception;
+use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOffSamplerFactory;
+use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSamplerFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -57,5 +60,52 @@ class SamplerFactoryTest extends TestCase
             'parent ratio with invalid arg' => ['parentbased_traceidratio', 'foo'],
             'unknown sampler' => ['foo'],
         ];
+    }
+
+    public function test_custom_sampler_can_be_registered_and_used(): void
+    {
+        // Register a custom sampler factory
+        Registry::registerSamplerFactory('custom_test', AlwaysOffSamplerFactory::class);
+
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', 'custom_test');
+
+        $factory = new SamplerFactory();
+        $sampler = $factory->create();
+
+        $this->assertStringContainsString('AlwaysOff', $sampler->getDescription());
+    }
+
+    public function test_custom_sampler_with_clobber_overrides_existing(): void
+    {
+        // First register a custom sampler
+        Registry::registerSamplerFactory('clobber_test', AlwaysOnSamplerFactory::class);
+
+        // Now override it with clobber=true
+        Registry::registerSamplerFactory('clobber_test', AlwaysOffSamplerFactory::class, true);
+
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', 'clobber_test');
+
+        $factory = new SamplerFactory();
+        $sampler = $factory->create();
+
+        // Should now be AlwaysOff due to override
+        $this->assertStringContainsString('AlwaysOff', $sampler->getDescription());
+    }
+
+    public function test_custom_sampler_without_clobber_does_not_override(): void
+    {
+        // First register a custom sampler
+        Registry::registerSamplerFactory('no_clobber_test', AlwaysOnSamplerFactory::class);
+
+        // Try to override without clobber - should be ignored
+        Registry::registerSamplerFactory('no_clobber_test', AlwaysOffSamplerFactory::class, false);
+
+        $this->setEnvironmentVariable('OTEL_TRACES_SAMPLER', 'no_clobber_test');
+
+        $factory = new SamplerFactory();
+        $sampler = $factory->create();
+
+        // Should still be AlwaysOn because clobber was false
+        $this->assertStringContainsString('AlwaysOn', $sampler->getDescription());
     }
 }
