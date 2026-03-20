@@ -8,6 +8,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\EnumNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\EnumNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class EnumNodeDefinition extends \Symfony\Component\Config\Definition\Builder\EnumNodeDefinition
 {

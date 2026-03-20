@@ -9,6 +9,7 @@ use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class StringNodeDefinition extends \Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition
 {

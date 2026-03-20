@@ -8,6 +8,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\BooleanNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class BooleanNodeDefinition extends \Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition
 {

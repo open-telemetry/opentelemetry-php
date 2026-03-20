@@ -8,6 +8,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\IntegerNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class IntegerNodeDefinition extends \Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition
 {

@@ -8,6 +8,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\ScalarNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class ScalarNodeDefinition extends \Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition
 {

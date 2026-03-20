@@ -8,6 +8,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\FloatNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\FloatNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class FloatNodeDefinition extends \Symfony\Component\Config\Definition\Builder\FloatNodeDefinition
 {

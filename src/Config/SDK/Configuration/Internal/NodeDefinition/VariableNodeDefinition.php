@@ -8,6 +8,7 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\Node\VariableNode;
 
 /**
  * @internal
+ * @extends \Symfony\Component\Config\Definition\Builder\VariableNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
  */
 final class VariableNodeDefinition extends \Symfony\Component\Config\Definition\Builder\VariableNodeDefinition
 {
