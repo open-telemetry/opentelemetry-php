@@ -133,11 +133,14 @@ final class StackTraceFormatter
         $trace = $e->getTrace();
         $traceCount = count($trace);
         for ($i = 0; $i < $traceCount + 1; $i++) {
+            $traceFrame = $trace[$i] ?? null;
+            $previousTraceFrame = $i > 0 ? $trace[$i - 1] : null;
+
             $frames[] = [
-                'function' => $trace[$i]['function'] ?? '{main}',
-                'class' => $trace[$i]['class'] ?? null,
-                'file' => $trace[$i - 1]['file'] ?? null,
-                'line' => $trace[$i - 1]['line'] ?? null,
+                'function' => $traceFrame['function'] ?? '{main}',
+                'class' => $traceFrame['class'] ?? null,
+                'file' => $previousTraceFrame['file'] ?? null,
+                'line' => $previousTraceFrame['line'] ?? null,
             ];
         }
         $frames[0]['file'] = $e->getFile();
