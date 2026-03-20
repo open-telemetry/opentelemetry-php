@@ -11,7 +11,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition<\Symfony\Component\Config\Definition\Builder\NodeParentInterface|null>
+ * @extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition<NodeParentInterface|null>
  */
 class ArrayNodeDefinition extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
 {
