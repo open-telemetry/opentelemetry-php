@@ -55,7 +55,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.12.x-dev"
+            "dev-main": "1.14.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
@@ -63,7 +63,12 @@
             ],
             "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
-                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig"
+                "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig",
+
+                "OpenTelemetry\\SDK\\ConfigEnv\\Trace\\SpanSuppressionStrategySemConv",
+                "OpenTelemetry\\SDK\\ConfigEnv\\Trace\\SpanSuppressionStrategySpanKind",
+
+                "OpenTelemetry\\SDK\\ConfigEnv\\Distribution\\DistributionConfigurationSdk"
             ],
             "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
                 "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\SdkConfigurationResolver"

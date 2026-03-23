@@ -147,6 +147,8 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySemConv",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySpanKind",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
@@ -172,6 +174,8 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk",
+
                 "OpenTelemetry\\Example\\ExampleConfigProvider",
 
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Container",
@@ -187,6 +191,11 @@
             "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderPeerConfig",
+
+                "OpenTelemetry\\SDK\\ConfigEnv\\Trace\\SpanSuppressionStrategySemConv",
+                "OpenTelemetry\\SDK\\ConfigEnv\\Trace\\SpanSuppressionStrategySpanKind",
+
+                "OpenTelemetry\\SDK\\ConfigEnv\\Distribution\\DistributionConfigurationSdk",
 
                 "OpenTelemetry\\Example\\ExampleConfigLoader"
             ],

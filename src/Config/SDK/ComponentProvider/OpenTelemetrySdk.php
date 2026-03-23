@@ -18,6 +18,9 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Distribution\DistributionConfiguration;
+use OpenTelemetry\SDK\Common\Distribution\DistributionRegistry;
+use OpenTelemetry\SDK\Common\Distribution\SdkDistribution;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
@@ -169,6 +172,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *            }>
      *         },
      *     },
+     *     distribution: list<ComponentPlugin<DistributionConfiguration>>,
      * } $properties
      */
     #[\Override]
@@ -193,6 +197,13 @@ final class OpenTelemetrySdk implements ComponentProvider
         if ($properties['disabled']) {
             return $sdkBuilder;
         }
+
+        $distributionProperties = new DistributionRegistry();
+        foreach ($properties['distribution'] as $distributionConfiguration) {
+            $distributionProperties->add($distributionConfiguration->create($context));
+        }
+
+        $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
 
         //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
         $schemaUrl = $properties['resource']['schema_url'];
@@ -277,6 +288,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
             ),
             configurator: $configurator,
+            spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
         );
 
         // </editor-fold>
@@ -419,6 +431,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
                 ->append($this->getExperimentalResponsePropagatorConfig($registry, $builder))
+                ->append($registry->componentMap('distribution', DistributionConfiguration::class)->defaultValue([]))
             ->end();
 
         return $node;
