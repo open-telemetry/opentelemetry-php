@@ -41,7 +41,7 @@ class TracerTest extends TestCase
         $processor->expects($this->never())->method('onStart');
         $span = $tracer->spanBuilder('test.span')->startSpan();
 
-        $this->assertInstanceOf(NonRecordingSpan::class, $span);
+        $this->assertFalse($span->isRecording());
         $this->assertNotEquals(API\TraceFlags::SAMPLED, $span->getContext()->getTraceFlags());
     }
 

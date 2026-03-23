@@ -168,8 +168,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
         );
 
         if (!in_array($samplingDecision, [SamplingResult::RECORD_AND_SAMPLE, SamplingResult::RECORD_ONLY], true)) {
-            // TODO must suppress no-op spans too
-            return Span::wrap($spanContext);
+            return new NonRecordingSpan($spanContext, $spanSuppression);
         }
 
         $attributesBuilder = clone $this->attributesBuilder;
