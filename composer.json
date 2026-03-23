@@ -98,7 +98,7 @@
         "nyholm/psr7": "^1.4",
         "open-telemetry/dev-tools": "dev-main",
         "php-http/mock-client": "^1.5",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^6.0",
         "phpspec/prophecy": "1.22.*",
         "phpspec/prophecy-phpunit": "^2",
         "phpstan/phpstan": "^1.10.13",
