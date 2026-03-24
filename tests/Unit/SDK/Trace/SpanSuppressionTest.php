@@ -8,6 +8,8 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\SpanSuppression\SemanticConvention;
 use OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Trace\SpanSuppression\ManualSuppressionStrategy\ManualSuppressionContextKey;
+use OpenTelemetry\SDK\Trace\SpanSuppression\ManualSuppressionStrategy\ManualSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
@@ -177,5 +179,38 @@ class SpanSuppressionTest extends TestCase
 
         $strategy = new SemanticConventionSuppressionStrategy([]);
         $strategy->getSuppressor('test', null, null)->resolveSuppression(SpanKind::KIND_CLIENT, []);
+    }
+
+    public function test_manual_suppression_strategy_enabled(): void
+    {
+        $strategy = new ManualSuppressionStrategy();
+        $suppressor = $strategy->getSuppressor('test', null, null);
+
+        $suppression = $suppressor->resolveSuppression(SpanKind::KIND_INTERNAL, []);
+
+        $context = Context::getCurrent()->with(ManualSuppressionContextKey::Suppress, true);
+        $this->assertTrue($suppression->isSuppressed($context));
+    }
+
+    public function test_manual_suppression_strategy_disabled(): void
+    {
+        $strategy = new ManualSuppressionStrategy();
+        $suppressor = $strategy->getSuppressor('test', null, null);
+
+        $suppression = $suppressor->resolveSuppression(SpanKind::KIND_INTERNAL, []);
+
+        $context = Context::getCurrent();
+        $this->assertFalse($suppression->isSuppressed($context));
+    }
+
+    public function test_manual_suppression_strategy_noop_for_suppress_call(): void
+    {
+        $strategy = new ManualSuppressionStrategy();
+        $suppressor = $strategy->getSuppressor('test', null, null);
+
+        $suppression = $suppressor->resolveSuppression(SpanKind::KIND_INTERNAL, []);
+
+        $context = $suppression->suppress(Context::getCurrent());
+        $this->assertFalse($suppression->isSuppressed($context));
     }
 }
