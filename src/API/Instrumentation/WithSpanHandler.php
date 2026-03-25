@@ -8,6 +8,7 @@ use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\SemConv\Attributes\CodeAttributes;
 use Throwable;
 
 /**
@@ -36,10 +37,10 @@ class WithSpanHandler
             ->tracer()
             ->spanBuilder($name)
             ->setSpanKind($kind)
-            ->setAttribute('code.function', $function)
+            ->setAttribute(CodeAttributes::CODE_FUNCTION_NAME, $function)
             ->setAttribute('code.namespace', $class)
-            ->setAttribute('code.filepath', $filename)
-            ->setAttribute('code.lineno', $lineno)
+            ->setAttribute(CodeAttributes::CODE_FILE_PATH, $filename)
+            ->setAttribute(CodeAttributes::CODE_LINE_NUMBER, $lineno)
             ->setAttributes($attributes ?? [])
             ->startSpan();
         $context = $span->storeInContext(Context::getCurrent());
