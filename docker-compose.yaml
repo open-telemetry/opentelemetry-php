@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
   zipkin:
-    image: openzipkin/zipkin-slim@sha256:d951994017185bce1c859b62e13adf640e26c37e08b90ca2e4de2669dc1aad87
+    image: openzipkin/zipkin-slim@sha256:fc29b9862c14f4fc241cf0259c585e1cfd4e9b18f01ad36d86adaabb7d01815c
     ports:
     - 9411:9411
   jaeger:
