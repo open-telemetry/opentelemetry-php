@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SemConv\Attributes\CodeAttributes;
 use Throwable;
 
 /**
@@ -22,7 +21,7 @@ class WithSpanHandler
     public static function pre(mixed $target, array $params, ?string $class, string $function, ?string $filename, ?int $lineno, ?array $span_args = [], ?array $attributes = []): void
     {
         static $instrumentation;
-        $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.25.0');
+        $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.40.0');
 
         $name = $span_args['name'] ?? null;
         if ($name === null) {
@@ -37,10 +36,11 @@ class WithSpanHandler
             ->tracer()
             ->spanBuilder($name)
             ->setSpanKind($kind)
-            ->setAttribute(CodeAttributes::CODE_FUNCTION_NAME, $function)
+            ->setAttribute('code.function.name', $function)
             ->setAttribute('code.namespace', $class)
-            ->setAttribute(CodeAttributes::CODE_FILE_PATH, $filename)
-            ->setAttribute(CodeAttributes::CODE_LINE_NUMBER, $lineno)
+            ->setAttribute('code.file.path', $filename)
+            ->setAttribute('code.line.number', $lineno)
+            ->setAttribute('code.column.number', $lineno)
             ->setAttributes($attributes ?? [])
             ->startSpan();
         $context = $span->storeInContext(Context::getCurrent());
