@@ -39,7 +39,6 @@ class WithSpanHandler
             ->setAttribute('code.function.name', $class !== null ? $class . '::' . $function : $function)
             ->setAttribute('code.file.path', $filename)
             ->setAttribute('code.line.number', $lineno)
-            ->setAttribute('code.column.number', $lineno)
             ->setAttributes($attributes ?? [])
             ->startSpan();
         $context = $span->storeInContext(Context::getCurrent());
