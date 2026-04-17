@@ -11,7 +11,7 @@ services:
     ports:
         - 6379:6379
   web:
-    image: nginx:alpine@sha256:f46cb72c7df02710e693e863a983ac42f6a9579058a59a35f1ae36c9958e4ce0
+    image: nginx:alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
     ports:
       - 8080:80
     depends_on:
