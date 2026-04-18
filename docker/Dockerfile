@@ -11,11 +11,13 @@ RUN apt-get update \
     && groupadd --gid 1000 php \
     && useradd --system --uid 1000 --gid php --shell /bin/bash --create-home php
 
+# https://packages.sury.org/php/README.txt
 RUN apt-get update \
-  && apt-get install -y lsb-release apt-transport-https ca-certificates \
-  && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list \
-  && wget -qO - https://packages.sury.org/php/apt.gpg | apt-key add - \
-  && apt-get update
+    && apt-get -y install lsb-release ca-certificates curl \
+    && curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
+    && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
+    && sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' \
+    && apt-get update
 
 RUN apt-get install -y \
     php${PHP_VERSION}-amqp \
