@@ -16,9 +16,15 @@ permissions:
 jobs:
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
+    continue-on-error: true
     strategy:
       matrix:
-        php-version: ['8.1', '8.2', '8.3', '8.4']
+        php-version:
+          - "8.1"
+          - "8.2"
+          - "8.3"
+          - "8.4"
+          - "8.5"
     runs-on: ubuntu-latest
     permissions:
       packages: write
