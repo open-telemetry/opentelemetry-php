@@ -30,7 +30,7 @@ RUN apt-get install -y \
     php${PHP_VERSION}-mbstring \
     php${PHP_VERSION}-mongodb \
     php${PHP_VERSION}-mysqli \
-    php${PHP_VERSION}-opcache \
+    `if echo "${PHP_VERSION}" | grep -qE '^8\.(1|2|3|4)'; then echo "php${PHP_VERSION}-opcache"; fi` \
     php${PHP_VERSION}-opentelemetry \
     php${PHP_VERSION}-pgsql \
     php${PHP_VERSION}-protobuf \
