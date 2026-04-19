@@ -1,7 +1,7 @@
 FROM composer:2.9@sha256:743aebe48ca67097c36819040633ea77e44a561eca135e4fc84c002e63a1ba07 AS composer
 FROM debian:trixie@sha256:55a15a112b42be10bfc8092fcc40b6748dc236f7ef46a358d9392b339e9d60e8
 
-ARG PHP_VERSION=8.3
+ARG PHP_VERSION=8.5
 
 WORKDIR /usr/src/myapp
 
@@ -16,6 +16,7 @@ RUN apt-get update \
     && apt-get -y install lsb-release ca-certificates curl \
     && curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
     && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
+    && rm /tmp/debsuryorg-archive-keyring.deb \
     && sh -c 'echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' \
     && apt-get update
 
