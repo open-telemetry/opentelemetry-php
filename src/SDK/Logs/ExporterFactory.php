@@ -10,6 +10,9 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Logs\Exporter\NoopExporter;
 use OpenTelemetry\SDK\Registry;
 
+/**
+ * TODO deprecated
+ */
 class ExporterFactory
 {
     public function create(): LogRecordExporterInterface

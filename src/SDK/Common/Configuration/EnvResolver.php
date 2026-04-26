@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Configuration;
 
-use function in_array;
-
 /**
  * @internal
  */
@@ -29,11 +27,11 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
         }
 
         $value = Configuration::getEnum($name);
-        if (!in_array($value, $values, true)) {
+        if (($key = array_search($value, $values, true)) === false) {
             return null;
         }
 
-        return $value;
+        return $values[$key];
     }
 
     #[\Override]

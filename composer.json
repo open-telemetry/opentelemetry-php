@@ -74,6 +74,7 @@
             "src/SDK/Trace/SpanExporter/_register.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
             "src/SDK/Common/Util/functions.php",
+            "src/SDK/_register.php",
             "src/SDK/_autoload.php"
         ]
     },
@@ -125,6 +126,11 @@
             "bin-links": false,
             "target-directory": "vendor-bin",
             "forward-command": true
+        },
+        "spi-config": {
+            "autoload-files": [
+                "src/SDK/_register.php"
+            ]
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [

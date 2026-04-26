@@ -9,6 +9,9 @@ use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 
+/**
+ * TODO deprecated
+ */
 class LoggerProviderFactory
 {
     public function create(?MeterProviderInterface $meterProvider = null, ?ResourceInfo $resource = null): LoggerProviderInterface

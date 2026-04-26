@@ -15,12 +15,20 @@ class LoggerProviderBuilder
 {
     /** @var array<LogRecordProcessorInterface> */
     private array $processors = [];
+    private ?LogRecordLimits $logRecordLimits = null;
     private ?ResourceInfo $resource = null;
     private ?Configurator $configurator = null;
 
     public function addLogRecordProcessor(LogRecordProcessorInterface $processor): self
     {
         $this->processors[] = $processor;
+
+        return $this;
+    }
+
+    public function setLogRecordLimits(LogRecordLimits $logRecordLimits): self
+    {
+        $this->logRecordLimits = $logRecordLimits;
 
         return $this;
     }
@@ -39,6 +47,7 @@ class LoggerProviderBuilder
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->resource,
             configurator: $this->configurator ?? Configurator::logger(),
+            logRecordLimits: $this->logRecordLimits,
         );
     }
 

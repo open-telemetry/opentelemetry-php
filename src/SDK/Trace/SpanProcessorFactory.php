@@ -15,6 +15,9 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
 
+/**
+ * TODO deprecated
+ */
 class SpanProcessorFactory
 {
     public function create(?SpanExporterInterface $exporter = null, ?MeterProviderInterface $meterProvider = null): SpanProcessorInterface

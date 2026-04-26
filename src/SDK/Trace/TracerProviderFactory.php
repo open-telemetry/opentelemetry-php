@@ -7,6 +7,9 @@ namespace OpenTelemetry\SDK\Trace;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Sdk;
 
+/**
+ * TODO deprecated
+ */
 final class TracerProviderFactory
 {
     use LogsMessagesTrait;

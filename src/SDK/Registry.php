@@ -53,6 +53,8 @@ class Registry
     /**
      * @param SpanExporterFactoryInterface|class-string<SpanExporterFactoryInterface> $factory
      * @throws TypeError
+     *
+     * TODO deprecated
      */
     public static function registerSpanExporterFactory(string $exporter, SpanExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
@@ -74,6 +76,8 @@ class Registry
     /**
      * @param MetricExporterFactoryInterface|class-string<MetricExporterFactoryInterface> $factory
      * @throws TypeError
+     *
+     * TODO deprecated
      */
     public static function registerMetricExporterFactory(string $exporter, MetricExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
@@ -95,6 +99,8 @@ class Registry
     /**
      * @param LogRecordExporterFactoryInterface|class-string<LogRecordExporterFactoryInterface> $factory
      * @throws TypeError
+     *
+     * TODO deprecated
      */
     public static function registerLogRecordExporterFactory(string $exporter, LogRecordExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
@@ -113,6 +119,9 @@ class Registry
         self::$logRecordExporterFactories[$exporter] = $factory;
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
     {
         if (!$clobber && array_key_exists($name, self::$textMapPropagators)) {
@@ -126,6 +135,9 @@ class Registry
         self::$resourceDetectors[$name] = $detector;
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function registerResponsePropagator(string $name, ResponsePropagatorInterface $responsePropagator, bool $clobber = false): void
     {
         if (!$clobber && array_key_exists($name, self::$responsePropagators)) {
@@ -134,6 +146,9 @@ class Registry
         self::$responsePropagators[$name] = $responsePropagator;
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
         if (!array_key_exists($exporter, self::$spanExporterFactories)) {
@@ -146,6 +161,9 @@ class Registry
         return $factory;
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
         if (!array_key_exists($exporter, self::$logRecordExporterFactories)) {
@@ -175,6 +193,9 @@ class Registry
         return $factory;
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
         if (!array_key_exists($exporter, self::$metricExporterFactories)) {
@@ -187,6 +208,9 @@ class Registry
         return $factory;
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
         if (!array_key_exists($name, self::$textMapPropagators)) {
@@ -205,6 +229,9 @@ class Registry
         return self::$resourceDetectors[$name];
     }
 
+    /**
+     * TODO deprecated
+     */
     public static function responsePropagator(string $name): ResponsePropagatorInterface
     {
         if (!array_key_exists($name, self::$responsePropagators)) {
@@ -216,6 +243,8 @@ class Registry
 
     /**
      * @return array<int, ResourceDetectorInterface>
+     *
+     * TODO deprecated
      */
     public static function resourceDetectors(): array
     {
