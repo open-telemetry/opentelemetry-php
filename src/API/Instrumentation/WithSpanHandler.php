@@ -36,7 +36,7 @@ class WithSpanHandler
             ->tracer()
             ->spanBuilder($name)
             ->setSpanKind($kind)
-            ->setAttribute('code.function.name', $class !== null ? $class . '::' . $function : $function)
+            ->setAttribute('code.function.name', $name)
             ->setAttribute('code.file.path', $filename)
             ->setAttribute('code.line.number', $lineno)
             ->setAttributes($attributes ?? [])
