@@ -39,7 +39,7 @@ final class DistributionConfigurationSdk implements ComponentProvider
     #[Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('opentelemetry_php');
+        $node = $builder->arrayNode('opentelemetry_php/development');
         $node
             ->children()
                 ->append($registry->component('span_suppression_strategy/development', SpanSuppressionStrategy::class))
