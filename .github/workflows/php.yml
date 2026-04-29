@@ -173,7 +173,7 @@ jobs:
         verbose: false
 
   packages:
-    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@main
+    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@21e75f4123f69dd6c0b3acda14b90044112a2538 # main
     needs: php
     with:
       matrix_extension: '["ast, json, grpc"]'

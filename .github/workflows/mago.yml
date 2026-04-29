@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Cache Mago
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: .mago
           key: ${{ runner.os }}-mago-${{ hashFiles('mago.toml') }}
@@ -29,7 +29,7 @@ jobs:
             ${{ runner.os }}-mago-
 
       - name: Setup Mago
-        uses: nhedger/setup-mago@v1
+        uses: nhedger/setup-mago@b1b8f89862e133daf595f9ec95c7193c36ccfc14 # v1
         with:
           version: "latest"
           token: ${{ github.token }}
