@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   prometheus:
-    image: prom/prometheus@sha256:4a61322ac1103a0e3aea2a61ef1718422a48fa046441f299d71e660a3bc71ae9
+    image: prom/prometheus@sha256:e4254400b85610324913f0dc4acf92603d9984e7519414c5a12811aa6146acc3
     ports:
       - 9090:9090
     volumes:
