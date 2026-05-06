@@ -22,10 +22,12 @@ RUN apt-get update \
 
 RUN apt-get install -y \
     php${PHP_VERSION}-amqp \
+    php${PHP_VERSION}-bcmath \
     php${PHP_VERSION}-ast \
     php${PHP_VERSION}-cli \
     php${PHP_VERSION}-curl \
     php${PHP_VERSION}-dev \
+    php${PHP_VERSION}-gd \
     php${PHP_VERSION}-grpc \
     php${PHP_VERSION}-intl \
     php${PHP_VERSION}-mbstring \
@@ -37,6 +39,7 @@ RUN apt-get install -y \
     php${PHP_VERSION}-protobuf \
     php${PHP_VERSION}-rdkafka \
     php${PHP_VERSION}-simplexml \
+    php${PHP_VERSION}-soap \
     php${PHP_VERSION}-sockets \
     php${PHP_VERSION}-sqlite3 \
     php${PHP_VERSION}-xdebug \
