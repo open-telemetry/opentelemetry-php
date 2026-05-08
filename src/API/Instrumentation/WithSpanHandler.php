@@ -23,7 +23,8 @@ class WithSpanHandler
         static $instrumentation;
         $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.40.0');
 
-        $name = $span_args['name'] ?? null;
+        $functionName = $class !== null ? $class . '::' . $function : $function;
+        $name = $span_args['name'] ?? $functionName;
         if ($name === null) {
             $name = empty($class)
                 ? $function
@@ -36,7 +37,7 @@ class WithSpanHandler
             ->tracer()
             ->spanBuilder($name)
             ->setSpanKind($kind)
-            ->setAttribute('code.function.name', $name)
+            ->setAttribute('code.function.name', $functionName)
             ->setAttribute('code.file.path', $filename)
             ->setAttribute('code.line.number', $lineno)
             ->setAttributes($attributes ?? [])
