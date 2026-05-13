@@ -35,6 +35,11 @@
                 <referencedMethod name="Google\Protobuf\Internal\RepeatedField::offsetSet"/>
             </errorLevel>
         </UndefinedMethod>
+        <UndefinedDocblockClass>
+            <errorLevel type="suppress">
+                <referencedClass name="Google\Protobuf\Internal\RepeatedField"/>
+            </errorLevel>
+        </UndefinedDocblockClass>
         <ArgumentTypeCoercion>
             <errorLevel type="suppress">
                 <directory name="./examples"/>
