@@ -58,6 +58,10 @@ parameters:
             paths:
                 - src/Contrib/Otlp
         -
+            message: "#Call to an undefined method Google\\\\Protobuf\\\\FieldDescriptor::getLabel\\(\\).#"
+            paths:
+                - src/Contrib/Otlp/ProtobufSerializer.php
+        -
             message: "#^Call to (static )?method .* on an unknown class .*#"
             paths:
                 - src/Config/SDK/Configuration/Environment/Adapter/
