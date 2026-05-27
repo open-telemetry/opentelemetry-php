@@ -100,4 +100,42 @@ class ParserTest extends TestCase
             'missing value' => ['key1='],
         ];
     }
+
+    public function test_parse_into_rejects_header_exceeding_w3c_byte_limit(): void
+    {
+        // https://www.w3.org/TR/baggage/#limits, max total bytes 8192
+        $pairs = [];
+        for ($i = 0; $i < 1024; $i++) {
+            $pairs[] = "k{$i}=v{$i}";
+        }
+        $header = implode(',', $pairs);
+        $this->assertGreaterThan(8192, strlen($header));
+
+        $parser = new Parser($header);
+
+        $this->builder
+            ->expects($this->never())
+            ->method('set');
+
+        $parser->parseInto($this->builder);
+    }
+
+    public function test_parse_into_caps_entries_at_w3c_list_member_limit(): void
+    {
+        // https://www.w3.org/TR/baggage/#limits, max list-members 180
+        $pairs = [];
+        for ($i = 0; $i < 500; $i++) {
+            $pairs[] = "k{$i}=v{$i}";
+        }
+        $header = implode(',', $pairs);
+        $this->assertLessThanOrEqual(8192, strlen($header));
+
+        $parser = new Parser($header);
+
+        $this->builder
+            ->expects($this->exactly(180))
+            ->method('set');
+
+        $parser->parseInto($this->builder);
+    }
 }
