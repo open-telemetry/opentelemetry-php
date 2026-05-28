@@ -138,4 +138,75 @@ class ParserTest extends TestCase
 
         $parser->parseInto($this->builder);
     }
+
+    public function test_parse_into_accepts_header_at_exactly_w3c_byte_limit(): void
+    {
+        // The byte cap is inclusive: strlen() > 8192 is rejected, so exactly 8192 is accepted.
+        // Single valid pair padded to exactly 8192 bytes with a non-excluded value char.
+        $prefix = 'key=';
+        $header = $prefix . str_repeat('a', 8192 - strlen($prefix));
+        $this->assertSame(8192, strlen($header));
+
+        $parser = new Parser($header);
+
+        $this->builder
+            ->expects($this->once())
+            ->method('set');
+
+        $parser->parseInto($this->builder);
+    }
+
+    public function test_parse_into_rejects_header_one_byte_over_w3c_byte_limit(): void
+    {
+        // One byte past the inclusive cap (8193 > 8192) discards the entire header.
+        $prefix = 'key=';
+        $header = $prefix . str_repeat('a', 8193 - strlen($prefix));
+        $this->assertSame(8193, strlen($header));
+
+        $parser = new Parser($header);
+
+        $this->builder
+            ->expects($this->never())
+            ->method('set');
+
+        $parser->parseInto($this->builder);
+    }
+
+    public function test_parse_into_accepts_exactly_w3c_list_member_limit(): void
+    {
+        // 180 valid list-members are all accepted; the >= cap only trips on the 181st.
+        $pairs = [];
+        for ($i = 0; $i < 180; $i++) {
+            $pairs[] = "k{$i}=v{$i}";
+        }
+        $header = implode(',', $pairs);
+        $this->assertLessThanOrEqual(8192, strlen($header));
+
+        $parser = new Parser($header);
+
+        $this->builder
+            ->expects($this->exactly(180))
+            ->method('set');
+
+        $parser->parseInto($this->builder);
+    }
+
+    public function test_parse_into_caps_at_w3c_list_member_limit_plus_one(): void
+    {
+        // 181 valid list-members: the 181st is dropped once $entries reaches 180.
+        $pairs = [];
+        for ($i = 0; $i < 181; $i++) {
+            $pairs[] = "k{$i}=v{$i}";
+        }
+        $header = implode(',', $pairs);
+        $this->assertLessThanOrEqual(8192, strlen($header));
+
+        $parser = new Parser($header);
+
+        $this->builder
+            ->expects($this->exactly(180))
+            ->method('set');
+
+        $parser->parseInto($this->builder);
+    }
 }

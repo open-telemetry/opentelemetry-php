@@ -33,6 +33,8 @@ final class Parser
             return;
         }
 
+        // Counts only ACCEPTED entries (incremented at the bottom of the loop), not raw
+        // comma-separated list-members, so empty/invalid pairs do not consume the W3C cap.
         $entries = 0;
         foreach (explode(',', $this->baggageHeader) as $baggageString) {
             if ($entries >= self::MAX_BAGGAGE_ENTRIES) {
