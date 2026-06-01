@@ -62,6 +62,7 @@ Versioning rationale can be found in the [Versioning Documentation](/docs/versio
 - [Ago Allikmaa](https://github.com/agoallikmaa), Approver
 - [Amber Sistla](https://github.com/zsistla), Triager
 - [Beniamin](https://github.com/beniamin), Triager
+- [Cedric Ziel](https://github.com/cedricziel), Approver
 - [Fahmy Mohammed](https://github.com/Fahmy-Mohammed), Triager
 - [Jodee Varney](https://github.com/jodeev), Triager
 - [Kishan Sangani](https://github.com/kishannsangani), Triager
