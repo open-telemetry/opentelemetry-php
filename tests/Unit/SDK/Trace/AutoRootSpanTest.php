@@ -137,7 +137,7 @@ class AutoRootSpanTest extends TestCase
     public function test_create_converts_request_time_float_to_nanoseconds(): void
     {
         $requestTimeFloat = 1700000000.5;
-        $expectedNanos = (int) ($requestTimeFloat * ClockInterface::NANOS_PER_SECOND);
+        $expectedNanos = (int) ($requestTimeFloat * (float) ClockInterface::NANOS_PER_SECOND);
 
         $request = new ServerRequest(
             'GET',
@@ -190,9 +190,9 @@ class AutoRootSpanTest extends TestCase
 
         $this->tracer->method('spanBuilder')->willReturn($spanBuilder);
 
-        $before = (int) (microtime(true) * ClockInterface::NANOS_PER_SECOND);
+        $before = (int) (microtime(true) * (float) ClockInterface::NANOS_PER_SECOND);
         AutoRootSpan::create($request);
-        $after = (int) (microtime(true) * ClockInterface::NANOS_PER_SECOND);
+        $after = (int) (microtime(true) * (float) ClockInterface::NANOS_PER_SECOND);
 
         $this->assertNotNull($capturedTimestamp);
         $this->assertGreaterThanOrEqual($before, $capturedTimestamp);
