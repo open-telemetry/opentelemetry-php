@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\SDK\Trace;
 
 use Nyholm\Psr7\ServerRequest;
+use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\Span;
@@ -131,6 +132,73 @@ class AutoRootSpanTest extends TestCase
         $scope = Context::storage()->scope();
         $this->assertNotNull($scope);
         $scope->detach();
+    }
+
+    public function test_create_converts_request_time_float_to_nanoseconds(): void
+    {
+        $requestTimeFloat = 1700000000.5;
+        $expectedNanos = (int) ($requestTimeFloat * ClockInterface::NANOS_PER_SECOND);
+
+        $request = new ServerRequest(
+            'GET',
+            'https://example.com/',
+            [],
+            null,
+            '1.1',
+            ['REQUEST_TIME_FLOAT' => $requestTimeFloat],
+        );
+
+        $span = $this->createMock(SpanInterface::class);
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $spanBuilder->method('setSpanKind')->willReturnSelf();
+        $spanBuilder->method('setParent')->willReturnSelf();
+        $spanBuilder->method('setAttribute')->willReturnSelf();
+        $spanBuilder->method('startSpan')->willReturn($span);
+        $spanBuilder
+            ->expects($this->once())
+            ->method('setStartTimestamp')
+            ->with($this->identicalTo($expectedNanos))
+            ->willReturnSelf();
+
+        $this->tracer->method('spanBuilder')->willReturn($spanBuilder);
+
+        AutoRootSpan::create($request);
+
+        Context::storage()->scope()?->detach();
+    }
+
+    public function test_create_start_timestamp_preserves_sub_second_precision_without_request_time_float(): void
+    {
+        $request = new ServerRequest('GET', 'https://example.com/');
+
+        $capturedTimestamp = null;
+        $span = $this->createMock(SpanInterface::class);
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $spanBuilder->method('setSpanKind')->willReturnSelf();
+        $spanBuilder->method('setParent')->willReturnSelf();
+        $spanBuilder->method('setAttribute')->willReturnSelf();
+        $spanBuilder->method('startSpan')->willReturn($span);
+        $spanBuilder
+            ->expects($this->once())
+            ->method('setStartTimestamp')
+            ->with($this->callback(function (int $timestamp) use (&$capturedTimestamp): bool {
+                $capturedTimestamp = $timestamp;
+
+                return true;
+            }))
+            ->willReturnSelf();
+
+        $this->tracer->method('spanBuilder')->willReturn($spanBuilder);
+
+        $before = (int) (microtime(true) * ClockInterface::NANOS_PER_SECOND);
+        AutoRootSpan::create($request);
+        $after = (int) (microtime(true) * ClockInterface::NANOS_PER_SECOND);
+
+        $this->assertNotNull($capturedTimestamp);
+        $this->assertGreaterThanOrEqual($before, $capturedTimestamp);
+        $this->assertLessThanOrEqual($after, $capturedTimestamp);
+
+        Context::storage()->scope()?->detach();
     }
 
     public function test_shutdown_handler(): void
