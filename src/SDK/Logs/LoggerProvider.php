@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\NoopLogger;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
@@ -26,11 +27,13 @@ class LoggerProvider implements LoggerProviderInterface
         private readonly InstrumentationScopeFactoryInterface $instrumentationScopeFactory,
         ?ResourceInfo $resource = null,
         private ?Configurator $configurator = null,
+        ?MeterProviderInterface $meterProvider = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
             (new LogRecordLimitsBuilder())->build(),
-            $processor
+            $processor,
+            $meterProvider,
         );
         $this->loggers = new WeakMap();
     }

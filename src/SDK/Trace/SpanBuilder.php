@@ -167,6 +167,21 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $samplingResultTraceState,
         );
 
+        $samplingResultAttr = match ($samplingDecision) {
+            SamplingResult::RECORD_AND_SAMPLE => 'RECORD_AND_SAMPLE',
+            SamplingResult::RECORD_ONLY => 'RECORD_ONLY',
+            default => 'DROP',
+        };
+        $parentOriginAttr = match (true) {
+            !$parentSpanContext->isValid() => 'none',
+            $parentSpanContext->isRemote() => 'remote',
+            default => 'local',
+        };
+        $this->tracerSharedState->getSpanStartedCounter()->add(1, [
+            'otel.span.sampling_result' => $samplingResultAttr,
+            'otel.span.parent.origin' => $parentOriginAttr,
+        ]);
+
         if (!in_array($samplingDecision, [SamplingResult::RECORD_AND_SAMPLE, SamplingResult::RECORD_ONLY], true)) {
             return new NonRecordingSpan($spanContext, $spanSuppression);
         }
@@ -191,6 +206,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $this->totalNumberOfLinksAdded,
             $this->startEpochNanos,
             $spanSuppression,
+            $this->tracerSharedState->getSpanLiveCounter(),
         );
     }
 }

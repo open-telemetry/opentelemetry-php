@@ -6,6 +6,8 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
+use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\Context\ContextInterface;
@@ -28,6 +30,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     private StatusDataInterface $status;
     private ?int $endEpochNanos = null;
     private bool $hasEnded = false;
+    private readonly UpDownCounterInterface $spanLiveCounter;
 
     /**
      * @param non-empty-string $name
@@ -47,8 +50,10 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         private int $totalRecordedLinks,
         private readonly int $startEpochNanos,
         private readonly SpanSuppression $spanSuppression,
+        UpDownCounterInterface $spanLiveCounter = new NoopUpDownCounter(),
     ) {
         $this->status = StatusData::unset();
+        $this->spanLiveCounter = $spanLiveCounter;
     }
 
     /**
@@ -77,6 +82,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         int $totalRecordedLinks,
         int $startEpochNanos,
         SpanSuppression $spanSuppression = new NoopSuppression(),
+        UpDownCounterInterface $spanLiveCounter = new NoopUpDownCounter(),
     ): self {
         $span = new self(
             $name,
@@ -92,7 +98,11 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $totalRecordedLinks,
             $startEpochNanos !== 0 ? $startEpochNanos : Clock::getDefault()->now(),
             $spanSuppression,
+            $spanLiveCounter,
         );
+
+        $samplingResultAttr = $context->isSampled() ? 'RECORD_AND_SAMPLE' : 'RECORD_ONLY';
+        $spanLiveCounter->add(1, ['otel.span.sampling_result' => $samplingResultAttr]);
 
         // Call onStart here to ensure the span is fully initialized.
         $spanProcessor->onStart($span, $parentContext);
@@ -279,6 +289,9 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $this->spanProcessor->onEnding($span);
         }
         $span->hasEnded = true;
+
+        $samplingResultAttr = $this->context->isSampled() ? 'RECORD_AND_SAMPLE' : 'RECORD_ONLY';
+        $this->spanLiveCounter->add(-1, ['otel.span.sampling_result' => $samplingResultAttr]);
 
         $this->spanProcessor->onEnd($span);
         $span->checkForDroppedElements();

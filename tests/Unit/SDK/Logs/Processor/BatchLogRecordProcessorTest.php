@@ -432,9 +432,11 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $reader->collect();
         $this->assertEquals(
             [
-                'otel.logs.log_processor.logs',
-                'otel.logs.log_processor.queue.limit',
-                'otel.logs.log_processor.queue.usage',
+                'otel.sdk.processor.log.queue.capacity',
+                'otel.sdk.processor.log.queue.size',
+                'otel.sdk.processor.log.processed',
+                'otel.sdk.exporter.log.inflight',
+                'otel.sdk.exporter.log.exported',
             ],
             array_column($metrics->collect(), 'name'),
         );

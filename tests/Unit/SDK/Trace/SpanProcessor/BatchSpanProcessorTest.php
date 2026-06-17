@@ -487,9 +487,11 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $reader->collect();
         $this->assertEquals(
             [
-                'otel.trace.span_processor.spans',
-                'otel.trace.span_processor.queue.limit',
-                'otel.trace.span_processor.queue.usage',
+                'otel.sdk.processor.span.queue.capacity',
+                'otel.sdk.processor.span.queue.size',
+                'otel.sdk.processor.span.processed',
+                'otel.sdk.exporter.span.inflight',
+                'otel.sdk.exporter.span.exported',
             ],
             array_column($metrics->collect(), 'name'),
         );

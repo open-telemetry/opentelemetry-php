@@ -4,18 +4,39 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
+use OpenTelemetry\API\Metrics\CounterInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\Noop\NoopCounter;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 class LoggerSharedState
 {
     private ?bool $shutdownResult = null;
+    private readonly CounterInterface $logCreatedCounter;
 
     public function __construct(
         private readonly ResourceInfo $resource,
         private readonly LogRecordLimits $limits,
         private readonly LogRecordProcessorInterface $processor,
+        ?MeterProviderInterface $meterProvider = null,
     ) {
+        if ($meterProvider !== null) {
+            $this->logCreatedCounter = $meterProvider
+                ->getMeter('io.opentelemetry.sdk')
+                ->createCounter(
+                    'otel.sdk.log.created',
+                    '{log_record}',
+                    'The number of logs submitted to enabled SDK Loggers',
+                );
+        } else {
+            $this->logCreatedCounter = new NoopCounter();
+        }
+    }
+
+    public function getLogCreatedCounter(): CounterInterface
+    {
+        return $this->logCreatedCounter;
     }
 
     public function hasShutdown(): bool
