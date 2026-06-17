@@ -5,8 +5,20 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
+use OpenTelemetry\API\Metrics\CounterInterface;
+use OpenTelemetry\API\Metrics\HistogramInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\Noop\NoopCounter;
+use OpenTelemetry\API\Metrics\Noop\NoopHistogram;
+use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
+use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
+use OpenTelemetry\SDK\Metrics\Data\DataInterface;
+use OpenTelemetry\SDK\Metrics\Data\Gauge;
+use OpenTelemetry\SDK\Metrics\Data\Histogram;
+use OpenTelemetry\SDK\Metrics\Data\Metric;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -35,8 +47,64 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    public function __construct(private readonly MetricExporterInterface $exporter)
+    private static int $instanceCount = 0;
+
+    private readonly HistogramInterface $collectionDuration;
+    private readonly UpDownCounterInterface $dataPointInflightCounter;
+    private readonly CounterInterface $dataPointExportedCounter;
+
+    /** @var array<string, string> */
+    private readonly array $readerAttributes;
+    /** @var array<string, string> */
+    private readonly array $exporterAttributes;
+
+    public function __construct(
+        private readonly MetricExporterInterface $exporter,
+        ?MeterProviderInterface $meterProvider = null,
+    ) {
+        $instanceId = self::$instanceCount++;
+        $this->readerAttributes = [
+            'otel.component.type' => 'periodic_metric_reader',
+            'otel.component.name' => 'periodic_metric_reader/' . $instanceId,
+        ];
+        $exporterClass = (new \ReflectionClass($this->exporter))->getShortName();
+        $this->exporterAttributes = [
+            'otel.component.name' => $exporterClass,
+        ];
+
+        if ($meterProvider === null) {
+            $this->collectionDuration = new NoopHistogram();
+            $this->dataPointInflightCounter = new NoopUpDownCounter();
+            $this->dataPointExportedCounter = new NoopCounter();
+
+            return;
+        }
+
+        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+        $this->collectionDuration = $meter->createHistogram(
+            'otel.sdk.metric_reader.collection.duration',
+            's',
+            'The duration of the collect operation of the metric reader',
+        );
+        $this->dataPointInflightCounter = $meter->createUpDownCounter(
+            'otel.sdk.exporter.metric_data_point.inflight',
+            '{data_point}',
+            'The number of metric data points which were passed to the exporter, but that have not been exported yet',
+        );
+        $this->dataPointExportedCounter = $meter->createCounter(
+            'otel.sdk.exporter.metric_data_point.exported',
+            '{data_point}',
+            'The number of metric data points for which the export has finished, either successful or failed',
+        );
+    }
+
+    private function countDataPoints(DataInterface $data): int
     {
+        if (($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) && isset($data->dataPoints)) {
+            return iterator_count($data->dataPoints);
+        }
+
+        return 0;
     }
 
     #[\Override]
@@ -101,21 +169,49 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private function doCollect(): bool
     {
+        $startNs = hrtime(true);
+
         foreach ($this->registries as $registryId => $registry) {
             $streamIds = $this->streamIds[$registryId] ?? [];
             $registry->collectAndPush(array_keys($streamIds));
         }
 
+        /** @var list<Metric> $metrics */
         $metrics = [];
         foreach ($this->sources as $source) {
             $metrics[] = $source->collect();
         }
 
+        $durationSeconds = (hrtime(true) - $startNs) / 1_000_000_000;
+
         if ($metrics === []) {
+            $this->collectionDuration->record($durationSeconds, $this->readerAttributes);
+
             return true;
         }
 
-        return $this->exporter->export($metrics);
+        $dataPointCount = 0;
+        foreach ($metrics as $metric) {
+            if (isset($metric->data)) {
+                $dataPointCount += $this->countDataPoints($metric->data);
+            }
+        }
+
+        $this->dataPointInflightCounter->add($dataPointCount, $this->exporterAttributes);
+
+        $result = $this->exporter->export($metrics);
+
+        $elapsedSeconds = (hrtime(true) - $startNs) / 1_000_000_000;
+        $this->collectionDuration->record($elapsedSeconds, $this->readerAttributes);
+
+        if ($result) {
+            $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes);
+        } else {
+            $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes + ['error.type' => 'export_failure']);
+        }
+        $this->dataPointInflightCounter->add(-$dataPointCount, $this->exporterAttributes);
+
+        return $result;
     }
 
     #[\Override]
