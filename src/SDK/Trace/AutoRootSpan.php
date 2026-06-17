@@ -43,12 +43,12 @@ class AutoRootSpan
             Version::VERSION_1_25_0->url(),
         );
         $parent = Globals::propagator()->extract($request->getHeaders());
-        $startTime = array_key_exists('REQUEST_TIME_FLOAT', $request->getServerParams())
-            ? $request->getServerParams()['REQUEST_TIME_FLOAT']
-            : (int) microtime(true);
+        $startTimeInNanos = array_key_exists('REQUEST_TIME_FLOAT', $request->getServerParams())
+            ? (int) ((float) $request->getServerParams()['REQUEST_TIME_FLOAT'] * (float) ClockInterface::NANOS_PER_SECOND)
+            : (int) (microtime(true) * (float) ClockInterface::NANOS_PER_SECOND);
         $span = $tracer->spanBuilder($request->getMethod())
             ->setSpanKind(SpanKind::KIND_SERVER)
-            ->setStartTimestamp((int) ($startTime*ClockInterface::NANOS_PER_SECOND))
+            ->setStartTimestamp($startTimeInNanos)
             ->setParent($parent)
             ->setAttribute(TraceAttributes::URL_FULL, (string) $request->getUri())
             ->setAttribute(TraceAttributes::HTTP_REQUEST_METHOD, $request->getMethod())
