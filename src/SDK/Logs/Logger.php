@@ -47,7 +47,7 @@ class Logger implements LoggerInterface
     public function emit(LogRecord $logRecord): void
     {
         //If a Logger is disabled, it MUST behave equivalently to No-op Logger.
-        if (!$this->config->isEnabled()) {
+        if (!$this->config->isEnabled() || $this->loggerSharedState->hasShutdown()) {
             return;
         }
         $this->loggerSharedState->getLogCreatedCounter()->add(1);

@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressor;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressor;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 
 final class SpanBuilder implements API\SpanBuilderInterface
 {
@@ -168,18 +169,18 @@ final class SpanBuilder implements API\SpanBuilderInterface
         );
 
         $samplingResultAttr = match ($samplingDecision) {
-            SamplingResult::RECORD_AND_SAMPLE => 'RECORD_AND_SAMPLE',
-            SamplingResult::RECORD_ONLY => 'RECORD_ONLY',
-            default => 'DROP',
+            SamplingResult::RECORD_AND_SAMPLE => OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE,
+            SamplingResult::RECORD_ONLY => OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY,
+            default => OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_DROP,
         };
         $parentOriginAttr = match (true) {
-            !$parentSpanContext->isValid() => 'none',
-            $parentSpanContext->isRemote() => 'remote',
-            default => 'local',
+            !$parentSpanContext->isValid() => OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN_VALUE_NONE,
+            $parentSpanContext->isRemote() => OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN_VALUE_REMOTE,
+            default => OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN_VALUE_LOCAL,
         };
         $this->tracerSharedState->getSpanStartedCounter()->add(1, [
-            'otel.span.sampling_result' => $samplingResultAttr,
-            'otel.span.parent.origin' => $parentOriginAttr,
+            OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr,
+            OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN => $parentOriginAttr,
         ]);
 
         if (!in_array($samplingDecision, [SamplingResult::RECORD_AND_SAMPLE, SamplingResult::RECORD_ONLY], true)) {

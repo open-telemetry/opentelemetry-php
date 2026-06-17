@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 
 /**
  * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.
@@ -43,12 +44,12 @@ final class TracerSharedState
         if ($meterProvider !== null) {
             $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
             $this->spanStartedCounter = $meter->createCounter(
-                'otel.sdk.span.started',
+                OtelIncubatingMetrics::OTEL_SDK_SPAN_STARTED,
                 '{span}',
                 'The number of created spans',
             );
             $this->spanLiveCounter = $meter->createUpDownCounter(
-                'otel.sdk.span.live',
+                OtelIncubatingMetrics::OTEL_SDK_SPAN_LIVE,
                 '{span}',
                 'The number of created spans with recording=true for which the end operation has not been called yet',
             );

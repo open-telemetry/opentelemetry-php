@@ -23,6 +23,8 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use SplQueue;
 use function sprintf;
 use Throwable;
@@ -102,12 +104,12 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
         $instanceId = self::$instanceCount++;
         $this->processorAttributes = [
-            'otel.component.type' => 'batching_span_processor',
-            'otel.component.name' => 'batching_span_processor/' . $instanceId,
+            OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR . '/' . $instanceId,
         ];
         $exporterClass = (new \ReflectionClass($this->exporter))->getShortName();
         $this->exporterAttributes = [
-            'otel.component.name' => $exporterClass,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => $exporterClass,
         ];
 
         if ($meterProvider === null) {
@@ -121,7 +123,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
         $meter
             ->createObservableUpDownCounter(
-                'otel.sdk.processor.span.queue.capacity',
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,
                 '{span}',
                 'The maximum number of spans the queue of a given span processor can hold',
             )
@@ -130,7 +132,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             });
         $meter
             ->createObservableUpDownCounter(
-                'otel.sdk.processor.span.queue.size',
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE,
                 '{span}',
                 'The number of spans in the queue of a given span processor',
             )
@@ -138,17 +140,17 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 $observer->observe($this->queueSize, $this->processorAttributes);
             });
         $this->spanProcessedCounter = $meter->createCounter(
-            'otel.sdk.processor.span.processed',
+            OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_PROCESSED,
             '{span}',
             'The number of spans for which the processing has finished, either successful or failed',
         );
         $this->spanInflightCounter = $meter->createUpDownCounter(
-            'otel.sdk.exporter.span.inflight',
+            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_INFLIGHT,
             '{span}',
             'The number of spans which were passed to the exporter, but that have not been exported yet',
         );
         $this->spanExportedCounter = $meter->createCounter(
-            'otel.sdk.exporter.span.exported',
+            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_EXPORTED,
             '{span}',
             'The number of spans for which the export has finished, either successful or failed',
         );

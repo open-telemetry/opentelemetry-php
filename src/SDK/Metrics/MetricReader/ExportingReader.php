@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
+use function count;
+use function is_array;
+use function iterator_count;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -32,6 +35,8 @@ use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryUnregisterInterface;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use function spl_object_id;
 
 final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface, MetricSourceRegistryUnregisterInterface, DefaultAggregationProviderInterface
@@ -64,12 +69,12 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     ) {
         $instanceId = self::$instanceCount++;
         $this->readerAttributes = [
-            'otel.component.type' => 'periodic_metric_reader',
-            'otel.component.name' => 'periodic_metric_reader/' . $instanceId,
+            OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER . '/' . $instanceId,
         ];
         $exporterClass = (new \ReflectionClass($this->exporter))->getShortName();
         $this->exporterAttributes = [
-            'otel.component.name' => $exporterClass,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => $exporterClass,
         ];
 
         if ($meterProvider === null) {
@@ -82,17 +87,17 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
         $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
         $this->collectionDuration = $meter->createHistogram(
-            'otel.sdk.metric_reader.collection.duration',
+            OtelIncubatingMetrics::OTEL_SDK_METRIC_READER_COLLECTION_DURATION,
             's',
             'The duration of the collect operation of the metric reader',
         );
         $this->dataPointInflightCounter = $meter->createUpDownCounter(
-            'otel.sdk.exporter.metric_data_point.inflight',
+            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT,
             '{data_point}',
             'The number of metric data points which were passed to the exporter, but that have not been exported yet',
         );
         $this->dataPointExportedCounter = $meter->createCounter(
-            'otel.sdk.exporter.metric_data_point.exported',
+            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED,
             '{data_point}',
             'The number of metric data points for which the export has finished, either successful or failed',
         );
@@ -101,7 +106,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     private function countDataPoints(DataInterface $data): int
     {
         if (($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) && isset($data->dataPoints)) {
-            return iterator_count($data->dataPoints);
+            return is_array($data->dataPoints) ? count($data->dataPoints) : iterator_count($data->dataPoints);
         }
 
         return 0;
@@ -183,10 +188,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         }
 
         $durationSeconds = (hrtime(true) - $startNs) / 1_000_000_000;
+        $this->collectionDuration->record($durationSeconds, $this->readerAttributes);
 
         if ($metrics === []) {
-            $this->collectionDuration->record($durationSeconds, $this->readerAttributes);
-
             return true;
         }
 
@@ -200,9 +204,6 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         $this->dataPointInflightCounter->add($dataPointCount, $this->exporterAttributes);
 
         $result = $this->exporter->export($metrics);
-
-        $elapsedSeconds = (hrtime(true) - $startNs) / 1_000_000_000;
-        $this->collectionDuration->record($elapsedSeconds, $this->readerAttributes);
 
         if ($result) {
             $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes);

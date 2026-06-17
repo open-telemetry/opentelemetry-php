@@ -19,6 +19,8 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use SplQueue;
 use Throwable;
 
@@ -97,12 +99,12 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
 
         $instanceId = self::$instanceCount++;
         $this->processorAttributes = [
-            'otel.component.type' => 'batching_log_processor',
-            'otel.component.name' => 'batching_log_processor/' . $instanceId,
+            OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR . '/' . $instanceId,
         ];
         $exporterClass = (new \ReflectionClass($this->exporter))->getShortName();
         $this->exporterAttributes = [
-            'otel.component.name' => $exporterClass,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => $exporterClass,
         ];
 
         if ($meterProvider === null) {
@@ -116,7 +118,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
         $meter
             ->createObservableUpDownCounter(
-                'otel.sdk.processor.log.queue.capacity',
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY,
                 '{log_record}',
                 'The maximum number of log records the queue of a given log record processor can hold',
             )
@@ -125,7 +127,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
             });
         $meter
             ->createObservableUpDownCounter(
-                'otel.sdk.processor.log.queue.size',
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE,
                 '{log_record}',
                 'The number of log records in the queue of a given log record processor',
             )
@@ -133,17 +135,17 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                 $observer->observe($this->queueSize, $this->processorAttributes);
             });
         $this->logProcessedCounter = $meter->createCounter(
-            'otel.sdk.processor.log.processed',
+            OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_PROCESSED,
             '{log_record}',
             'The number of log records for which the processing has finished, either successful or failed',
         );
         $this->logInflightCounter = $meter->createUpDownCounter(
-            'otel.sdk.exporter.log.inflight',
+            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_INFLIGHT,
             '{log_record}',
             'The number of log records which were passed to the exporter, but that have not been exported yet',
         );
         $this->logExportedCounter = $meter->createCounter(
-            'otel.sdk.exporter.log.exported',
+            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_EXPORTED,
             '{log_record}',
             'The number of log records for which the export has finished, either successful or failed',
         );

@@ -18,6 +18,7 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 use Throwable;
 
 final class Span extends API\Span implements ReadWriteSpanInterface
@@ -101,8 +102,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $spanLiveCounter,
         );
 
-        $samplingResultAttr = $context->isSampled() ? 'RECORD_AND_SAMPLE' : 'RECORD_ONLY';
-        $spanLiveCounter->add(1, ['otel.span.sampling_result' => $samplingResultAttr]);
+        $samplingResultAttr = $context->isSampled() ? OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE : OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY;
+        $spanLiveCounter->add(1, [OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr]);
 
         // Call onStart here to ensure the span is fully initialized.
         $spanProcessor->onStart($span, $parentContext);
@@ -290,8 +291,8 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         }
         $span->hasEnded = true;
 
-        $samplingResultAttr = $this->context->isSampled() ? 'RECORD_AND_SAMPLE' : 'RECORD_ONLY';
-        $this->spanLiveCounter->add(-1, ['otel.span.sampling_result' => $samplingResultAttr]);
+        $samplingResultAttr = $this->context->isSampled() ? OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE : OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY;
+        $this->spanLiveCounter->add(-1, [OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr]);
 
         $this->spanProcessor->onEnd($span);
         $span->checkForDroppedElements();
