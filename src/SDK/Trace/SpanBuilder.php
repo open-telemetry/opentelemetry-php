@@ -178,7 +178,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $parentSpanContext->isRemote() => OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN_VALUE_REMOTE,
             default => OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN_VALUE_LOCAL,
         };
-        $this->tracerSharedState->getSpanStartedCounter()->add(1, [
+        $this->tracerSharedState->getSpanStartedCounter()?->add(1, [
             OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr,
             OtelIncubatingAttributes::OTEL_SPAN_PARENT_ORIGIN => $parentOriginAttr,
         ]);

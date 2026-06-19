@@ -9,8 +9,6 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\Context\Context;
@@ -51,9 +49,9 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
 
     private bool $closed = false;
 
-    private readonly CounterInterface $logProcessedCounter;
-    private readonly UpDownCounterInterface $logInflightCounter;
-    private readonly CounterInterface $logExportedCounter;
+    private readonly ?CounterInterface $logProcessedCounter;
+    private readonly ?UpDownCounterInterface $logInflightCounter;
+    private readonly ?CounterInterface $logExportedCounter;
 
     /** @var array<string, string> */
     private readonly array $processorAttributes;
@@ -100,9 +98,9 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
 
         if ($meterProvider === null) {
             $this->exporterAttributes = [];
-            $this->logProcessedCounter = new NoopCounter();
-            $this->logInflightCounter = new NoopUpDownCounter();
-            $this->logExportedCounter = new NoopCounter();
+            $this->logProcessedCounter = null;
+            $this->logInflightCounter = null;
+            $this->logExportedCounter = null;
 
             return;
         }
@@ -155,7 +153,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         }
 
         if ($this->queueSize === $this->maxQueueSize) {
-            $this->logProcessedCounter->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
+            $this->logProcessedCounter?->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
         }
@@ -241,20 +239,20 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                 $batchSize = count($this->queue->bottom());
                 $this->batchId++;
                 $scope = $this->exportContext->activate();
-                $this->logInflightCounter->add($batchSize, $this->exporterAttributes);
+                $this->logInflightCounter?->add($batchSize, $this->exporterAttributes);
 
                 try {
                     $this->exporter->export($this->queue->dequeue())->await();
-                    $this->logExportedCounter->add($batchSize, $this->exporterAttributes);
-                    $this->logProcessedCounter->add($batchSize, $this->processorAttributes);
+                    $this->logExportedCounter?->add($batchSize, $this->exporterAttributes);
+                    $this->logProcessedCounter?->add($batchSize, $this->processorAttributes);
                 } catch (Throwable $e) {
                     $errorAttrs = ['error.type' => $e::class];
-                    $this->logExportedCounter->add($batchSize, $this->exporterAttributes + $errorAttrs);
-                    $this->logProcessedCounter->add($batchSize, $this->processorAttributes + $errorAttrs);
+                    $this->logExportedCounter?->add($batchSize, $this->exporterAttributes + $errorAttrs);
+                    $this->logProcessedCounter?->add($batchSize, $this->processorAttributes + $errorAttrs);
                     self::logError('Unhandled export error', ['exception' => $e]);
                 } finally {
                     $this->queueSize -= $batchSize;
-                    $this->logInflightCounter->add(-$batchSize, $this->exporterAttributes);
+                    $this->logInflightCounter?->add(-$batchSize, $this->exporterAttributes);
                     $scope->detach();
                 }
             }

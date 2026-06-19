@@ -50,7 +50,7 @@ class Logger implements LoggerInterface
         if (!$this->config->isEnabled() || $this->loggerSharedState->hasShutdown()) {
             return;
         }
-        $this->loggerSharedState->getLogCreatedCounter()->add(1);
+        $this->loggerSharedState->getLogCreatedCounter()?->add(1);
         $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
         $this->loggerSharedState->getProcessor()->onEmit(

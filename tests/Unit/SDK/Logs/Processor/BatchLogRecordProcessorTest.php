@@ -22,6 +22,7 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
@@ -516,8 +517,12 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $reader->collect();
 
         $byName = array_column($metrics->collect(), null, 'name');
-        $processedDps = [...$byName['otel.sdk.processor.log.processed']->data->dataPoints];
-        $exportedDps = [...$byName['otel.sdk.exporter.log.exported']->data->dataPoints];
+        $processedData = $byName['otel.sdk.processor.log.processed']->data;
+        $exportedData = $byName['otel.sdk.exporter.log.exported']->data;
+        assert($processedData instanceof Sum);
+        assert($exportedData instanceof Sum);
+        $processedDps = [...$processedData->dataPoints];
+        $exportedDps = [...$exportedData->dataPoints];
 
         $successProcessed = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
         $successExported = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
@@ -568,7 +573,9 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $reader->collect();
 
         $byName = array_column($metrics->collect(), null, 'name');
-        $processedDps = [...$byName['otel.sdk.processor.log.processed']->data->dataPoints];
+        $processedData = $byName['otel.sdk.processor.log.processed']->data;
+        assert($processedData instanceof Sum);
+        $processedDps = [...$processedData->dataPoints];
 
         $droppedDps = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
         $this->assertCount(1, $droppedDps);

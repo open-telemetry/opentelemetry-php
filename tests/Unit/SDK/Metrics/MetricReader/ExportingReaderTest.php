@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
@@ -280,7 +281,9 @@ final class ExportingReaderTest extends TestCase
         $selfObsReader->collect(); // flushes selfObs to $selfObsMetrics
 
         $byName = array_column($selfObsMetrics->collect(), null, 'name');
-        $exportedDps = [...$byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data->dataPoints];
+        $exportedData = $byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data;
+        assert($exportedData instanceof Sum);
+        $exportedDps = [...$exportedData->dataPoints];
         $successDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
 
         $this->assertCount(1, $successDps);
@@ -329,7 +332,9 @@ final class ExportingReaderTest extends TestCase
         $selfObsReader->collect();
 
         $byName = array_column($selfObsMetrics->collect(), null, 'name');
-        $exportedDps = [...$byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data->dataPoints];
+        $exportedData = $byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data;
+        assert($exportedData instanceof Sum);
+        $exportedDps = [...$exportedData->dataPoints];
         $failedDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
 
         $this->assertCount(1, $failedDps);

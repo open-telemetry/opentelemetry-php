@@ -10,9 +10,6 @@ use function is_countable;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopHistogram;
-use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
@@ -51,9 +48,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    private readonly HistogramInterface $collectionDuration;
-    private readonly UpDownCounterInterface $dataPointInflightCounter;
-    private readonly CounterInterface $dataPointExportedCounter;
+    private readonly ?HistogramInterface $collectionDuration;
+    private readonly ?UpDownCounterInterface $dataPointInflightCounter;
+    private readonly ?CounterInterface $dataPointExportedCounter;
 
     /** @var array<string, string> */
     private readonly array $readerAttributes;
@@ -71,9 +68,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
         if ($meterProvider === null) {
             $this->exporterAttributes = [];
-            $this->collectionDuration = new NoopHistogram();
-            $this->dataPointInflightCounter = new NoopUpDownCounter();
-            $this->dataPointExportedCounter = new NoopCounter();
+            $this->collectionDuration = null;
+            $this->dataPointInflightCounter = null;
+            $this->dataPointExportedCounter = null;
 
             return;
         }
@@ -185,7 +182,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         }
 
         $durationSeconds = (hrtime(true) - $startNs) / 1_000_000_000;
-        $this->collectionDuration->record($durationSeconds, $this->readerAttributes);
+        $this->collectionDuration?->record($durationSeconds, $this->readerAttributes);
 
         if ($metrics === []) {
             return true;
@@ -198,19 +195,19 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
             }
         }
 
-        $this->dataPointInflightCounter->add($dataPointCount, $this->exporterAttributes);
+        $this->dataPointInflightCounter?->add($dataPointCount, $this->exporterAttributes);
         $result = false;
 
         try {
             $result = $this->exporter->export($metrics);
             if ($result) {
-                $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes);
+                $this->dataPointExportedCounter?->add($dataPointCount, $this->exporterAttributes);
             } else {
                 // '_OTHER' is the semconv catch-all for errors with no specific exception class or protocol code
-                $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes + ['error.type' => '_OTHER']);
+                $this->dataPointExportedCounter?->add($dataPointCount, $this->exporterAttributes + ['error.type' => '_OTHER']);
             }
         } finally {
-            $this->dataPointInflightCounter->add(-$dataPointCount, $this->exporterAttributes);
+            $this->dataPointInflightCounter?->add(-$dataPointCount, $this->exporterAttributes);
         }
 
         return $result;

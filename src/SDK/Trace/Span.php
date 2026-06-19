@@ -6,7 +6,6 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
-use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\SpanContextInterface;
@@ -31,7 +30,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     private StatusDataInterface $status;
     private ?int $endEpochNanos = null;
     private bool $hasEnded = false;
-    private readonly UpDownCounterInterface $spanLiveCounter;
+    private readonly ?UpDownCounterInterface $spanLiveCounter;
 
     /**
      * @param non-empty-string $name
@@ -51,7 +50,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         private int $totalRecordedLinks,
         private readonly int $startEpochNanos,
         private readonly SpanSuppression $spanSuppression,
-        UpDownCounterInterface $spanLiveCounter = new NoopUpDownCounter(),
+        ?UpDownCounterInterface $spanLiveCounter = null,
     ) {
         $this->status = StatusData::unset();
         $this->spanLiveCounter = $spanLiveCounter;
@@ -83,7 +82,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         int $totalRecordedLinks,
         int $startEpochNanos,
         SpanSuppression $spanSuppression = new NoopSuppression(),
-        UpDownCounterInterface $spanLiveCounter = new NoopUpDownCounter(),
+        ?UpDownCounterInterface $spanLiveCounter = null,
     ): self {
         $span = new self(
             $name,
@@ -103,7 +102,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         );
 
         $samplingResultAttr = $context->isSampled() ? OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE : OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY;
-        $spanLiveCounter->add(1, [OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr]);
+        $spanLiveCounter?->add(1, [OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr]);
 
         // Call onStart here to ensure the span is fully initialized.
         $spanProcessor->onStart($span, $parentContext);
@@ -292,7 +291,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         $span->hasEnded = true;
 
         $samplingResultAttr = $this->context->isSampled() ? OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE : OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY;
-        $this->spanLiveCounter->add(-1, [OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr]);
+        $this->spanLiveCounter?->add(-1, [OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT => $samplingResultAttr]);
 
         $this->spanProcessor->onEnd($span);
         $span->checkForDroppedElements();

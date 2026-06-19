@@ -6,8 +6,6 @@ namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\API\Trace as API; /** @phan-suppress-current-line PhanUnreferencedUseNormal */
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -22,8 +20,8 @@ use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 final class TracerSharedState
 {
     private readonly SpanProcessorInterface $spanProcessor;
-    private readonly CounterInterface $spanStartedCounter;
-    private readonly UpDownCounterInterface $spanLiveCounter;
+    private readonly ?CounterInterface $spanStartedCounter;
+    private readonly ?UpDownCounterInterface $spanLiveCounter;
 
     private ?bool $shutdownResult = null;
 
@@ -54,8 +52,8 @@ final class TracerSharedState
                 'The number of created spans with recording=true for which the end operation has not been called yet',
             );
         } else {
-            $this->spanStartedCounter = new NoopCounter();
-            $this->spanLiveCounter = new NoopUpDownCounter();
+            $this->spanStartedCounter = null;
+            $this->spanLiveCounter = null;
         }
     }
 
@@ -89,12 +87,12 @@ final class TracerSharedState
         return $this->spanProcessor;
     }
 
-    public function getSpanStartedCounter(): CounterInterface
+    public function getSpanStartedCounter(): ?CounterInterface
     {
         return $this->spanStartedCounter;
     }
 
-    public function getSpanLiveCounter(): UpDownCounterInterface
+    public function getSpanLiveCounter(): ?UpDownCounterInterface
     {
         return $this->spanLiveCounter;
     }

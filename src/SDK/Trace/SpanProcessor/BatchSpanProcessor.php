@@ -11,8 +11,6 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
-use OpenTelemetry\API\Metrics\Noop\NoopCounter;
-use OpenTelemetry\API\Metrics\Noop\NoopUpDownCounter;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\Context\Context;
@@ -56,9 +54,9 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
     private bool $closed = false;
 
-    private readonly CounterInterface $spanProcessedCounter;
-    private readonly UpDownCounterInterface $spanInflightCounter;
-    private readonly CounterInterface $spanExportedCounter;
+    private readonly ?CounterInterface $spanProcessedCounter;
+    private readonly ?UpDownCounterInterface $spanInflightCounter;
+    private readonly ?CounterInterface $spanExportedCounter;
 
     /** @var array<string, string> */
     private readonly array $processorAttributes;
@@ -105,9 +103,9 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
         if ($meterProvider === null) {
             $this->exporterAttributes = [];
-            $this->spanProcessedCounter = new NoopCounter();
-            $this->spanInflightCounter = new NoopUpDownCounter();
-            $this->spanExportedCounter = new NoopCounter();
+            $this->spanProcessedCounter = null;
+            $this->spanInflightCounter = null;
+            $this->spanExportedCounter = null;
 
             return;
         }
@@ -168,7 +166,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
 
         if ($this->queueSize === $this->maxQueueSize) {
-            $this->spanProcessedCounter->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
+            $this->spanProcessedCounter?->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
         }
@@ -259,20 +257,20 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 $batchSize = count($this->queue->bottom());
                 $this->batchId++;
                 $scope = $this->exportContext->activate();
-                $this->spanInflightCounter->add($batchSize, $this->exporterAttributes);
+                $this->spanInflightCounter?->add($batchSize, $this->exporterAttributes);
 
                 try {
                     $this->exporter->export($this->queue->dequeue())->await();
-                    $this->spanExportedCounter->add($batchSize, $this->exporterAttributes);
-                    $this->spanProcessedCounter->add($batchSize, $this->processorAttributes);
+                    $this->spanExportedCounter?->add($batchSize, $this->exporterAttributes);
+                    $this->spanProcessedCounter?->add($batchSize, $this->processorAttributes);
                 } catch (Throwable $e) {
                     $errorAttrs = ['error.type' => $e::class];
-                    $this->spanExportedCounter->add($batchSize, $this->exporterAttributes + $errorAttrs);
-                    $this->spanProcessedCounter->add($batchSize, $this->processorAttributes + $errorAttrs);
+                    $this->spanExportedCounter?->add($batchSize, $this->exporterAttributes + $errorAttrs);
+                    $this->spanProcessedCounter?->add($batchSize, $this->processorAttributes + $errorAttrs);
                     self::logError('Unhandled export error', ['exception' => $e]);
                 } finally {
                     $this->queueSize -= $batchSize;
-                    $this->spanInflightCounter->add(-$batchSize, $this->exporterAttributes);
+                    $this->spanInflightCounter?->add(-$batchSize, $this->exporterAttributes);
                     $scope->detach();
                 }
             }
