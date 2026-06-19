@@ -97,7 +97,10 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     private function countDataPoints(DataInterface $data): int
     {
         if ($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) {
-            return is_array($data->dataPoints) ? count($data->dataPoints) : 0;
+            $points = $data->dataPoints;
+            if (is_array($points)) {
+                return count($points);
+            }
         }
 
         return 0;
