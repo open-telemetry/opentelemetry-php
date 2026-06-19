@@ -70,7 +70,7 @@ class Logger implements LoggerInterface
     #[\Override]
     public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
-        return $this->config->isEnabled();
+        return $this->config->isEnabled() && !$this->loggerSharedState->hasShutdown();
     }
 
     /**

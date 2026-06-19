@@ -33,8 +33,6 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
     public const DEFAULT_MAX_QUEUE_SIZE = 2048;
     public const DEFAULT_MAX_EXPORT_BATCH_SIZE = 512;
 
-    private static int $instanceCount = 0;
-
     private int $maxQueueSize;
     private int $scheduledDelayNanos;
     private int $maxExportBatchSize;
@@ -42,8 +40,6 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
 
     private ?int $nextScheduledRun = null;
     private bool $running = false;
-    private int $dropped = 0;
-    private int $processed = 0;
     private int $batchId = 0;
     private int $queueSize = 0;
     /** @var list<ReadWriteLogRecord> */
@@ -97,23 +93,23 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         $this->queue = new SplQueue();
         $this->flush = new SplQueue();
 
-        $instanceId = self::$instanceCount++;
         $this->processorAttributes = [
             OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR,
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR . '/' . $instanceId,
-        ];
-        $exporterClass = (new \ReflectionClass($this->exporter))->getShortName();
-        $this->exporterAttributes = [
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => $exporterClass,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR . '/' . spl_object_id($this),
         ];
 
         if ($meterProvider === null) {
+            $this->exporterAttributes = [];
             $this->logProcessedCounter = new NoopCounter();
             $this->logInflightCounter = new NoopUpDownCounter();
             $this->logExportedCounter = new NoopCounter();
 
             return;
         }
+
+        $this->exporterAttributes = [
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+        ];
 
         $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
         $meter
@@ -159,7 +155,6 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         }
 
         if ($this->queueSize === $this->maxQueueSize) {
-            $this->dropped++;
             $this->logProcessedCounter->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
@@ -258,7 +253,6 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                     $this->logProcessedCounter->add($batchSize, $this->processorAttributes + $errorAttrs);
                     self::logError('Unhandled export error', ['exception' => $e]);
                 } finally {
-                    $this->processed += $batchSize;
                     $this->queueSize -= $batchSize;
                     $this->logInflightCounter->add(-$batchSize, $this->exporterAttributes);
                     $scope->detach();

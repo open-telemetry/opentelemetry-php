@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
 use function count;
-use function is_array;
+use function is_countable;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -51,8 +51,6 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    private static int $instanceCount = 0;
-
     private readonly HistogramInterface $collectionDuration;
     private readonly UpDownCounterInterface $dataPointInflightCounter;
     private readonly CounterInterface $dataPointExportedCounter;
@@ -66,23 +64,23 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         private readonly MetricExporterInterface $exporter,
         ?MeterProviderInterface $meterProvider = null,
     ) {
-        $instanceId = self::$instanceCount++;
         $this->readerAttributes = [
             OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER . '/' . $instanceId,
-        ];
-        $exporterClass = (new \ReflectionClass($this->exporter))->getShortName();
-        $this->exporterAttributes = [
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => $exporterClass,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER . '/' . spl_object_id($this),
         ];
 
         if ($meterProvider === null) {
+            $this->exporterAttributes = [];
             $this->collectionDuration = new NoopHistogram();
             $this->dataPointInflightCounter = new NoopUpDownCounter();
             $this->dataPointExportedCounter = new NoopCounter();
 
             return;
         }
+
+        $this->exporterAttributes = [
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+        ];
 
         $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
         $this->collectionDuration = $meter->createHistogram(
@@ -104,8 +102,8 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private function countDataPoints(DataInterface $data): int
     {
-        if (($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) && isset($data->dataPoints)) {
-            return is_array($data->dataPoints) ? count($data->dataPoints) : 0;
+        if ($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) {
+            return is_countable($data->dataPoints) ? count($data->dataPoints) : 0;
         }
 
         return 0;
@@ -201,16 +199,18 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         }
 
         $this->dataPointInflightCounter->add($dataPointCount, $this->exporterAttributes);
-
-        $result = $this->exporter->export($metrics);
-
-        if ($result) {
-            $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes);
-        } else {
-            // '_OTHER' is the semconv catch-all for errors with no specific exception class or protocol code
-            $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes + ['error.type' => '_OTHER']);
+        $result = false;
+        try {
+            $result = $this->exporter->export($metrics);
+            if ($result) {
+                $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes);
+            } else {
+                // '_OTHER' is the semconv catch-all for errors with no specific exception class or protocol code
+                $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes + ['error.type' => '_OTHER']);
+            }
+        } finally {
+            $this->dataPointInflightCounter->add(-$dataPointCount, $this->exporterAttributes);
         }
-        $this->dataPointInflightCounter->add(-$dataPointCount, $this->exporterAttributes);
 
         return $result;
     }

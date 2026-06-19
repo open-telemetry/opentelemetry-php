@@ -321,6 +321,8 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         // </editor-fold>
 
+        $context = $context->withMeterProvider($meterProvider);
+
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
             $spanProcessors[] = $processor->create($context);
