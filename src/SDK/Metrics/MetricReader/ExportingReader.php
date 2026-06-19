@@ -7,7 +7,6 @@ namespace OpenTelemetry\SDK\Metrics\MetricReader;
 use function array_keys;
 use function count;
 use function is_array;
-use function iterator_count;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -106,7 +105,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     private function countDataPoints(DataInterface $data): int
     {
         if (($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) && isset($data->dataPoints)) {
-            return is_array($data->dataPoints) ? count($data->dataPoints) : iterator_count($data->dataPoints);
+            return is_array($data->dataPoints) ? count($data->dataPoints) : 0;
         }
 
         return 0;
@@ -208,7 +207,8 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         if ($result) {
             $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes);
         } else {
-            $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes + ['error.type' => 'export_failure']);
+            // '_OTHER' is the semconv catch-all for errors with no specific exception class or protocol code
+            $this->dataPointExportedCounter->add($dataPointCount, $this->exporterAttributes + ['error.type' => '_OTHER']);
         }
         $this->dataPointInflightCounter->add(-$dataPointCount, $this->exporterAttributes);
 

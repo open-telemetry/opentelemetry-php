@@ -173,6 +173,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
         if ($this->queueSize === $this->maxQueueSize) {
             $this->dropped++;
+            $this->spanProcessedCounter->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
         }

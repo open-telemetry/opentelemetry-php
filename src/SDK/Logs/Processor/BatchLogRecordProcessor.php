@@ -160,6 +160,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
 
         if ($this->queueSize === $this->maxQueueSize) {
             $this->dropped++;
+            $this->logProcessedCounter->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
         }
