@@ -106,48 +106,46 @@ class BatchSpanProcessor implements SpanProcessorInterface
             $this->spanProcessedCounter = null;
             $this->spanInflightCounter = null;
             $this->spanExportedCounter = null;
+        } else {
+            $this->exporterAttributes = [
+                OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+            ];
 
-            return;
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,
+                    '{span}',
+                    'The maximum number of spans the queue of a given span processor can hold',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->maxQueueSize, $this->processorAttributes);
+                });
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE,
+                    '{span}',
+                    'The number of spans in the queue of a given span processor',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->queueSize, $this->processorAttributes);
+                });
+            $this->spanProcessedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_PROCESSED,
+                '{span}',
+                'The number of spans for which the processing has finished, either successful or failed',
+            );
+            $this->spanInflightCounter = $meter->createUpDownCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_INFLIGHT,
+                '{span}',
+                'The number of spans which were passed to the exporter, but that have not been exported yet',
+            );
+            $this->spanExportedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_EXPORTED,
+                '{span}',
+                'The number of spans for which the export has finished, either successful or failed',
+            );
         }
-
-        $this->exporterAttributes = [
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
-        ];
-
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
-        $meter
-            ->createObservableUpDownCounter(
-                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,
-                '{span}',
-                'The maximum number of spans the queue of a given span processor can hold',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $observer->observe($this->maxQueueSize, $this->processorAttributes);
-            });
-        $meter
-            ->createObservableUpDownCounter(
-                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE,
-                '{span}',
-                'The number of spans in the queue of a given span processor',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $observer->observe($this->queueSize, $this->processorAttributes);
-            });
-        $this->spanProcessedCounter = $meter->createCounter(
-            OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_PROCESSED,
-            '{span}',
-            'The number of spans for which the processing has finished, either successful or failed',
-        );
-        $this->spanInflightCounter = $meter->createUpDownCounter(
-            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_INFLIGHT,
-            '{span}',
-            'The number of spans which were passed to the exporter, but that have not been exported yet',
-        );
-        $this->spanExportedCounter = $meter->createCounter(
-            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_EXPORTED,
-            '{span}',
-            'The number of spans for which the export has finished, either successful or failed',
-        );
     }
 
     #[\Override]

@@ -101,48 +101,46 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
             $this->logProcessedCounter = null;
             $this->logInflightCounter = null;
             $this->logExportedCounter = null;
+        } else {
+            $this->exporterAttributes = [
+                OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+            ];
 
-            return;
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY,
+                    '{log_record}',
+                    'The maximum number of log records the queue of a given log record processor can hold',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->maxQueueSize, $this->processorAttributes);
+                });
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE,
+                    '{log_record}',
+                    'The number of log records in the queue of a given log record processor',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->queueSize, $this->processorAttributes);
+                });
+            $this->logProcessedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_PROCESSED,
+                '{log_record}',
+                'The number of log records for which the processing has finished, either successful or failed',
+            );
+            $this->logInflightCounter = $meter->createUpDownCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_INFLIGHT,
+                '{log_record}',
+                'The number of log records which were passed to the exporter, but that have not been exported yet',
+            );
+            $this->logExportedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_EXPORTED,
+                '{log_record}',
+                'The number of log records for which the export has finished, either successful or failed',
+            );
         }
-
-        $this->exporterAttributes = [
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
-        ];
-
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
-        $meter
-            ->createObservableUpDownCounter(
-                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY,
-                '{log_record}',
-                'The maximum number of log records the queue of a given log record processor can hold',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $observer->observe($this->maxQueueSize, $this->processorAttributes);
-            });
-        $meter
-            ->createObservableUpDownCounter(
-                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE,
-                '{log_record}',
-                'The number of log records in the queue of a given log record processor',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $observer->observe($this->queueSize, $this->processorAttributes);
-            });
-        $this->logProcessedCounter = $meter->createCounter(
-            OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_PROCESSED,
-            '{log_record}',
-            'The number of log records for which the processing has finished, either successful or failed',
-        );
-        $this->logInflightCounter = $meter->createUpDownCounter(
-            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_INFLIGHT,
-            '{log_record}',
-            'The number of log records which were passed to the exporter, but that have not been exported yet',
-        );
-        $this->logExportedCounter = $meter->createCounter(
-            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_EXPORTED,
-            '{log_record}',
-            'The number of log records for which the export has finished, either successful or failed',
-        );
     }
 
     #[\Override]

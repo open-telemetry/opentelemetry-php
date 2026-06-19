@@ -6,7 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
 use function count;
-use function is_countable;
+use function is_array;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -16,7 +16,6 @@ use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Gauge;
 use OpenTelemetry\SDK\Metrics\Data\Histogram;
-use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
@@ -71,36 +70,34 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
             $this->collectionDuration = null;
             $this->dataPointInflightCounter = null;
             $this->dataPointExportedCounter = null;
+        } else {
+            $this->exporterAttributes = [
+                OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+            ];
 
-            return;
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $this->collectionDuration = $meter->createHistogram(
+                OtelIncubatingMetrics::OTEL_SDK_METRIC_READER_COLLECTION_DURATION,
+                's',
+                'The duration of the collect operation of the metric reader',
+            );
+            $this->dataPointInflightCounter = $meter->createUpDownCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT,
+                '{data_point}',
+                'The number of metric data points which were passed to the exporter, but that have not been exported yet',
+            );
+            $this->dataPointExportedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED,
+                '{data_point}',
+                'The number of metric data points for which the export has finished, either successful or failed',
+            );
         }
-
-        $this->exporterAttributes = [
-            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
-        ];
-
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
-        $this->collectionDuration = $meter->createHistogram(
-            OtelIncubatingMetrics::OTEL_SDK_METRIC_READER_COLLECTION_DURATION,
-            's',
-            'The duration of the collect operation of the metric reader',
-        );
-        $this->dataPointInflightCounter = $meter->createUpDownCounter(
-            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT,
-            '{data_point}',
-            'The number of metric data points which were passed to the exporter, but that have not been exported yet',
-        );
-        $this->dataPointExportedCounter = $meter->createCounter(
-            OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED,
-            '{data_point}',
-            'The number of metric data points for which the export has finished, either successful or failed',
-        );
     }
 
     private function countDataPoints(DataInterface $data): int
     {
         if ($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) {
-            return is_countable($data->dataPoints) ? count($data->dataPoints) : 0;
+            return is_array($data->dataPoints) ? count($data->dataPoints) : 0;
         }
 
         return 0;
@@ -175,7 +172,6 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
             $registry->collectAndPush(array_keys($streamIds));
         }
 
-        /** @var list<Metric> $metrics */
         $metrics = [];
         foreach ($this->sources as $source) {
             $metrics[] = $source->collect();
