@@ -200,6 +200,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
         $this->dataPointInflightCounter->add($dataPointCount, $this->exporterAttributes);
         $result = false;
+
         try {
             $result = $this->exporter->export($metrics);
             if ($result) {

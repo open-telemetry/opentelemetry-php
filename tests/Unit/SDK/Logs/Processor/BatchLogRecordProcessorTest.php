@@ -519,8 +519,8 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $processedDps = [...$byName['otel.sdk.processor.log.processed']->data->dataPoints];
         $exportedDps = [...$byName['otel.sdk.exporter.log.exported']->data->dataPoints];
 
-        $successProcessed = array_filter($processedDps, fn($dp) => $dp->attributes->get('error.type') === null);
-        $successExported = array_filter($exportedDps, fn($dp) => $dp->attributes->get('error.type') === null);
+        $successProcessed = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
+        $successExported = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
 
         $this->assertCount(1, $successProcessed);
         $this->assertSame(2, reset($successProcessed)->value);
@@ -570,7 +570,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $byName = array_column($metrics->collect(), null, 'name');
         $processedDps = [...$byName['otel.sdk.processor.log.processed']->data->dataPoints];
 
-        $droppedDps = array_filter($processedDps, fn($dp) => $dp->attributes->get('error.type') === '_OTHER');
+        $droppedDps = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
         $this->assertCount(1, $droppedDps);
         $this->assertSame(1, reset($droppedDps)->value);
     }

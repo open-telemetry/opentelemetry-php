@@ -281,7 +281,7 @@ final class ExportingReaderTest extends TestCase
 
         $byName = array_column($selfObsMetrics->collect(), null, 'name');
         $exportedDps = [...$byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data->dataPoints];
-        $successDps = array_filter($exportedDps, fn($dp) => $dp->attributes->get('error.type') === null);
+        $successDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
 
         $this->assertCount(1, $successDps);
         $this->assertSame(1, reset($successDps)->value);
@@ -330,7 +330,7 @@ final class ExportingReaderTest extends TestCase
 
         $byName = array_column($selfObsMetrics->collect(), null, 'name');
         $exportedDps = [...$byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data->dataPoints];
-        $failedDps = array_filter($exportedDps, fn($dp) => $dp->attributes->get('error.type') === '_OTHER');
+        $failedDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
 
         $this->assertCount(1, $failedDps);
         $this->assertSame(1, reset($failedDps)->value);
