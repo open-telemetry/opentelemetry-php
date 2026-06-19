@@ -283,11 +283,14 @@ final class ExportingReaderTest extends TestCase
         $byName = array_column($selfObsMetrics->collect(), null, 'name');
         $exportedData = $byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data;
         assert($exportedData instanceof Sum);
-        $exportedDps = [...$exportedData->dataPoints];
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($exportedDps));
         $successDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
 
         $this->assertCount(1, $successDps);
-        $this->assertSame(1, reset($successDps)->value);
+        $successDp = reset($successDps);
+        assert($successDp !== false);
+        $this->assertSame(1, $successDp->value);
     }
 
     public function test_self_diagnostics_export_failure_uses_other_error_type(): void
@@ -334,11 +337,14 @@ final class ExportingReaderTest extends TestCase
         $byName = array_column($selfObsMetrics->collect(), null, 'name');
         $exportedData = $byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data;
         assert($exportedData instanceof Sum);
-        $exportedDps = [...$exportedData->dataPoints];
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($exportedDps));
         $failedDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
 
         $this->assertCount(1, $failedDps);
-        $this->assertSame(1, reset($failedDps)->value);
+        $failedDp = reset($failedDps);
+        assert($failedDp !== false);
+        $this->assertSame(1, $failedDp->value);
     }
 }
 

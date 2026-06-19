@@ -521,16 +521,22 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $exportedData = $byName['otel.sdk.exporter.log.exported']->data;
         assert($processedData instanceof Sum);
         assert($exportedData instanceof Sum);
-        $processedDps = [...$processedData->dataPoints];
-        $exportedDps = [...$exportedData->dataPoints];
+        $processedDps = $processedData->dataPoints;
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($processedDps));
+        assert(is_array($exportedDps));
 
         $successProcessed = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
         $successExported = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
 
         $this->assertCount(1, $successProcessed);
-        $this->assertSame(2, reset($successProcessed)->value);
+        $successProcessedDp = reset($successProcessed);
+        assert($successProcessedDp !== false);
+        $this->assertSame(2, $successProcessedDp->value);
         $this->assertCount(1, $successExported);
-        $this->assertSame(2, reset($successExported)->value);
+        $successExportedDp = reset($successExported);
+        assert($successExportedDp !== false);
+        $this->assertSame(2, $successExportedDp->value);
     }
 
     public function test_self_diagnostics_dropped_log_increments_processed_with_error(): void
@@ -575,10 +581,13 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $byName = array_column($metrics->collect(), null, 'name');
         $processedData = $byName['otel.sdk.processor.log.processed']->data;
         assert($processedData instanceof Sum);
-        $processedDps = [...$processedData->dataPoints];
+        $processedDps = $processedData->dataPoints;
+        assert(is_array($processedDps));
 
         $droppedDps = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
         $this->assertCount(1, $droppedDps);
-        $this->assertSame(1, reset($droppedDps)->value);
+        $droppedDp = reset($droppedDps);
+        assert($droppedDp !== false);
+        $this->assertSame(1, $droppedDp->value);
     }
 }

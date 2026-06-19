@@ -58,9 +58,9 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private readonly ?UpDownCounterInterface $spanInflightCounter;
     private readonly ?CounterInterface $spanExportedCounter;
 
-    /** @var array<string, string> */
+    /** @var array<non-empty-string, string> */
     private readonly array $processorAttributes;
-    /** @var array<string, string> */
+    /** @var array<non-empty-string, string> */
     private readonly array $exporterAttributes;
 
     public function __construct(

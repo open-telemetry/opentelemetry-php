@@ -51,9 +51,9 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
     private readonly ?UpDownCounterInterface $dataPointInflightCounter;
     private readonly ?CounterInterface $dataPointExportedCounter;
 
-    /** @var array<string, string> */
+    /** @var array<non-empty-string, string> */
     private readonly array $readerAttributes;
-    /** @var array<string, string> */
+    /** @var array<non-empty-string, string> */
     private readonly array $exporterAttributes;
 
     public function __construct(
@@ -189,6 +189,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
         $dataPointCount = 0;
         foreach ($metrics as $metric) {
+            /** @psalm-suppress RedundantCondition */
             if (isset($metric->data)) {
                 $dataPointCount += $this->countDataPoints($metric->data);
             }
