@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
-use function count;
-use function is_array;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\HistogramInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -14,9 +12,6 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
-use OpenTelemetry\SDK\Metrics\Data\Gauge;
-use OpenTelemetry\SDK\Metrics\Data\Histogram;
-use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -96,14 +91,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private function countDataPoints(DataInterface $data): int
     {
-        if ($data instanceof Sum || $data instanceof Gauge || $data instanceof Histogram) {
-            $points = $data->dataPoints;
-            if (is_array($points)) {
-                return count($points);
-            }
-        }
-
-        return 0;
+        return $data->dataPointCount();
     }
 
     #[\Override]

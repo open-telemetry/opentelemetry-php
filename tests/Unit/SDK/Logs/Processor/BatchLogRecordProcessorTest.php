@@ -14,20 +14,15 @@ use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
-use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
-use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -405,17 +400,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $clock = new TestClock();
         $metrics = new InMemoryExporter();
         $reader = new ExportingReader($metrics);
-        $meterProvider = new MeterProvider(
-            null,
-            ResourceInfoFactory::emptyResource(),
-            $clock,
-            Attributes::factory(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            [$reader],
-            new CriteriaViewRegistry(),
-            null,
-            new ImmediateStalenessHandlerFactory(),
-        );
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
 
         $exporter = $this->createMock(LogRecordExporterInterface::class);
 
@@ -483,17 +468,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $clock = new TestClock();
         $metrics = new InMemoryExporter();
         $reader = new ExportingReader($metrics);
-        $meterProvider = new MeterProvider(
-            null,
-            ResourceInfoFactory::emptyResource(),
-            $clock,
-            Attributes::factory(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            [$reader],
-            new CriteriaViewRegistry(),
-            null,
-            new ImmediateStalenessHandlerFactory(),
-        );
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
 
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->method('export')->willReturn(new CompletedFuture(null));
@@ -544,17 +519,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $clock = new TestClock();
         $metrics = new InMemoryExporter();
         $reader = new ExportingReader($metrics);
-        $meterProvider = new MeterProvider(
-            null,
-            ResourceInfoFactory::emptyResource(),
-            $clock,
-            Attributes::factory(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            [$reader],
-            new CriteriaViewRegistry(),
-            null,
-            new ImmediateStalenessHandlerFactory(),
-        );
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
 
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         $exporter->expects($this->never())->method('export');
