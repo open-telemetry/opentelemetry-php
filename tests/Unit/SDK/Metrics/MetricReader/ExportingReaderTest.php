@@ -26,8 +26,8 @@ use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
-use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
