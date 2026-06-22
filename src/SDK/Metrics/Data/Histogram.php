@@ -18,6 +18,7 @@ final class Histogram implements DataInterface
     ) {
     }
 
+    #[\Override]
     public function dataPointCount(): int
     {
         return is_array($this->dataPoints) ? count($this->dataPoints) : 0;
