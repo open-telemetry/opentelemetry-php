@@ -55,4 +55,24 @@ class LogWriterFactoryTest extends TestCase
         LoggerHolder::set($this->createMock(LoggerInterface::class));
         $this->assertInstanceOf(Psr3LogWriter::class, (new LogWriterFactory())->create());
     }
+
+    public function test_psr3_from_env_with_logger(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_LOG_DESTINATION', 'psr3');
+        LoggerHolder::set($this->createMock(LoggerInterface::class));
+        $this->assertInstanceOf(Psr3LogWriter::class, (new LogWriterFactory())->create());
+    }
+
+    public function test_psr3_from_env_without_logger_falls_back_to_error_log(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_LOG_DESTINATION', 'psr3');
+        $this->assertInstanceOf(ErrorLogWriter::class, (new LogWriterFactory())->create());
+    }
+
+    public function test_default_with_logger_uses_psr3(): void
+    {
+        LoggerHolder::set($this->createMock(LoggerInterface::class));
+        $this->setEnvironmentVariable('OTEL_PHP_LOG_DESTINATION', '');
+        $this->assertInstanceOf(Psr3LogWriter::class, (new LogWriterFactory())->create());
+    }
 }

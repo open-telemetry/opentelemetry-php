@@ -33,6 +33,40 @@ final class MetricExporterTest extends TestCase
         $this->exporter = new MetricExporter($transport);
     }
 
+    public function test_temporality_returns_configured_temporality(): void
+    {
+        $stream = fopen('php://memory', 'a+b');
+        $transport = new StreamTransport($stream, 'application/x-ndjson');
+        $exporter = new MetricExporter($transport, Temporality::DELTA);
+        $metric = $this->createMock(\OpenTelemetry\SDK\Metrics\MetricMetadataInterface::class);
+        $this->assertSame(Temporality::DELTA, $exporter->temporality($metric));
+    }
+
+    public function test_temporality_delegates_to_metric_when_null(): void
+    {
+        $metric = $this->createMock(\OpenTelemetry\SDK\Metrics\MetricMetadataInterface::class);
+        $metric->expects($this->once())->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $this->assertSame(Temporality::CUMULATIVE, $this->exporter->temporality($metric));
+    }
+
+    public function test_shutdown_delegates_to_transport(): void
+    {
+        $transport = $this->createMock(\OpenTelemetry\SDK\Common\Export\TransportInterface::class);
+        $transport->method('contentType')->willReturn('application/x-protobuf');
+        $transport->expects($this->once())->method('shutdown')->willReturn(true);
+        $exporter = new MetricExporter($transport);
+        $this->assertTrue($exporter->shutdown());
+    }
+
+    public function test_force_flush_delegates_to_transport(): void
+    {
+        $transport = $this->createMock(\OpenTelemetry\SDK\Common\Export\TransportInterface::class);
+        $transport->method('contentType')->willReturn('application/x-protobuf');
+        $transport->expects($this->once())->method('forceFlush')->willReturn(true);
+        $exporter = new MetricExporter($transport);
+        $this->assertTrue($exporter->forceFlush());
+    }
+
     public function test_exporter_writes_metrics_in_otlp_json_format_with_trailing_newline(): void
     {
         $this->exporter->export([

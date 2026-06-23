@@ -4,66 +4,82 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Context\Propagation;
 
-use Mockery;
-use Mockery\Adapter\Phpunit\MockeryTestCase;
 use OpenTelemetry\Context\Propagation\ExtendedPropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\PropagationGetterInterface;
 use OpenTelemetry\Context\Propagation\SanitizeCombinedHeadersPropagationGetter;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SanitizeCombinedHeadersPropagationGetter::class)]
-class SanitizeCombinedHeadersPropagationGetterTest extends MockeryTestCase
+class SanitizeCombinedHeadersPropagationGetterTest extends TestCase
 {
-    /** @var Mockery\MockInterface&PropagationGetterInterface */
-    private $propagationGetter;
-
-    /** @var Mockery\MockInterface&ExtendedPropagationGetterInterface */
-    private $extendedPropagationGetter;
-
-    #[\Override]
-    protected function setUp(): void
+    public function test_get_returns_null_when_inner_returns_null(): void
     {
-        $this->propagationGetter = Mockery::mock(PropagationGetterInterface::class);
-        $this->extendedPropagationGetter = Mockery::mock(ExtendedPropagationGetterInterface::class);
+        $inner = $this->createMock(PropagationGetterInterface::class);
+        $inner->method('get')->willReturn(null);
+
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
+
+        $this->assertNull($getter->get([], 'traceparent'));
     }
 
-    public function test_get_all_from_carrier_with_semicolons(): void
+    public function test_get_replaces_semicolons_between_key_value_pairs_with_commas(): void
     {
-        $carrier = ['a' => ['key1=value1;key2=value2', 'key3=value3']];
+        $inner = $this->createMock(PropagationGetterInterface::class);
+        $inner->method('get')->willReturn('key1=value1;key2=value2');
 
-        $this->extendedPropagationGetter->shouldReceive('getAll')->with($carrier, 'a')->andReturn(['key1=value1;key2=value2', 'key3=value3']);
-        $getter = new SanitizeCombinedHeadersPropagationGetter($this->extendedPropagationGetter);
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
 
-        $this->assertSame(['key1=value1,key2=value2', 'key3=value3'], $getter->getAll($carrier, 'a'));
+        $this->assertSame('key1=value1,key2=value2', $getter->get([], 'tracestate'));
     }
 
-    public function test_get_all_from_carrier_with_leading_commas(): void
+    public function test_get_trims_trailing_and_leading_commas(): void
     {
-        $carrier = ['a' => [',,alpha,beta']];
+        $inner = $this->createMock(PropagationGetterInterface::class);
+        $inner->method('get')->willReturn(',,key1=value1,key2=value2,,');
 
-        $this->extendedPropagationGetter->shouldReceive('getAll')->with($carrier, 'a')->andReturn([',,alpha,beta']);
-        $getter = new SanitizeCombinedHeadersPropagationGetter($this->extendedPropagationGetter);
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
 
-        $this->assertSame(['alpha,beta'], $getter->getAll($carrier, 'a'));
+        $this->assertSame('key1=value1,key2=value2', $getter->get([], 'tracestate'));
     }
 
-    public function test_get_all_from_not_existing_key(): void
+    public function test_keys_delegates_to_inner_getter(): void
     {
-        $carrier = ['a' => 'alpha'];
+        $inner = $this->createMock(PropagationGetterInterface::class);
+        $inner->method('keys')->willReturn(['traceparent', 'tracestate']);
 
-        $this->extendedPropagationGetter->shouldReceive('getAll')->with($carrier, 'b')->andReturn([]);
-        $getter = new SanitizeCombinedHeadersPropagationGetter($this->extendedPropagationGetter);
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
 
-        $this->assertSame([], $getter->getAll($carrier, 'b'));
+        $this->assertSame(['traceparent', 'tracestate'], $getter->keys([]));
     }
 
-    public function test_get_all_from_carrier_without_implement_extended_getter(): void
+    public function test_get_all_uses_get_all_when_inner_implements_extended_getter(): void
     {
-        $carrier = ['a' => 'alpha'];
+        $inner = $this->createMock(ExtendedPropagationGetterInterface::class);
+        $inner->method('getAll')->willReturn(['key1=value1;key2=value2', 'key3=value3']);
 
-        $this->propagationGetter->shouldReceive('get')->with($carrier, 'a')->andReturn('alpha');
-        $getter = new SanitizeCombinedHeadersPropagationGetter($this->propagationGetter);
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
 
-        $this->assertSame(['alpha'], $getter->getAll($carrier, 'a'));
+        $this->assertSame(['key1=value1,key2=value2', 'key3=value3'], $getter->getAll([], 'tracestate'));
+    }
+
+    public function test_get_all_falls_back_to_get_when_inner_does_not_implement_extended_getter(): void
+    {
+        $inner = $this->createMock(PropagationGetterInterface::class);
+        $inner->method('get')->willReturn('key1=value1;key2=value2');
+
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
+
+        $this->assertSame(['key1=value1,key2=value2'], $getter->getAll([], 'tracestate'));
+    }
+
+    public function test_get_all_returns_empty_array_when_value_is_empty(): void
+    {
+        $inner = $this->createMock(ExtendedPropagationGetterInterface::class);
+        $inner->method('getAll')->willReturn([]);
+
+        $getter = new SanitizeCombinedHeadersPropagationGetter($inner);
+
+        $this->assertSame([], $getter->getAll([], 'tracestate'));
     }
 }

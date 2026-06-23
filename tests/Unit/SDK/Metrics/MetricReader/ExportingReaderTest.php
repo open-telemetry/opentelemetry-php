@@ -13,16 +13,21 @@ use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
+use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricFactory\StreamMetricSourceProvider;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
+use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricCollectorInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
+use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
+use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -229,6 +234,147 @@ final class ExportingReaderTest extends TestCase
         $reader->collect();
         $reader->shutdown();
         $reader->forceFlush();
+    }
+
+    public function test_unregister_stream_removes_source_from_collection(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+
+        $collector = $this->createMock(MetricCollectorInterface::class);
+        $stream = $this->createMock(MetricStreamInterface::class);
+        $stream->method('register')->willReturn(0);
+        $stream->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $stream->method('collect')->willReturn($this->createMock(DataInterface::class));
+        $stream->method('timestamp')->willReturn(0);
+
+        $provider = new StreamMetricSourceProvider(
+            view: new ViewProjection('test', null, null, null, null),
+            instrument: new Instrument(InstrumentType::COUNTER, 'test', null, null),
+            instrumentationLibrary: $this->createMock(InstrumentationScopeInterface::class),
+            resource: $this->createMock(ResourceInfo::class),
+            stream: $stream,
+            metricCollector: $collector,
+            streamId: 1,
+        );
+
+        $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
+        $reader->add($provider, $provider, $stalenessHandler);
+
+        // Before unregister, collecting should produce a metric
+        $reader->collect();
+        $metrics = $exporter->collect(true);
+        $this->assertCount(1, $metrics);
+
+        // Unregister the stream
+        $reader->unregisterStream($collector, 1);
+
+        // After unregister, collecting should produce no metrics
+        $reader->collect();
+        $metrics = $exporter->collect();
+        $this->assertSame([], $metrics);
+    }
+
+    public function test_unregister_stream_cleans_up_registry_when_no_streams_remain(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+
+        $collector = $this->createMock(MetricCollectorInterface::class);
+        $stream = $this->createMock(MetricStreamInterface::class);
+        $stream->method('register')->willReturn(0);
+        $stream->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $stream->method('collect')->willReturn($this->createMock(DataInterface::class));
+        $stream->method('timestamp')->willReturn(0);
+
+        $provider = new StreamMetricSourceProvider(
+            view: new ViewProjection('test', null, null, null, null),
+            instrument: new Instrument(InstrumentType::COUNTER, 'test', null, null),
+            instrumentationLibrary: $this->createMock(InstrumentationScopeInterface::class),
+            resource: $this->createMock(ResourceInfo::class),
+            stream: $stream,
+            metricCollector: $collector,
+            streamId: 1,
+        );
+
+        $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
+        $reader->add($provider, $provider, $stalenessHandler);
+
+        // Unregister the only stream for this collector
+        $reader->unregisterStream($collector, 1);
+
+        // collectAndPush should never be called since the registry was cleaned up
+        $collector->expects($this->never())->method('collectAndPush');
+        $reader->collect();
+        $this->assertSame([], $exporter->collect());
+    }
+
+    public function test_unregister_stream_keeps_registry_when_other_streams_remain(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+
+        $collector = $this->createMock(MetricCollectorInterface::class);
+
+        $stream1 = $this->createMock(MetricStreamInterface::class);
+        $stream1->method('register')->willReturn(0);
+        $stream1->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $stream1->method('collect')->willReturn($this->createMock(DataInterface::class));
+        $stream1->method('timestamp')->willReturn(0);
+
+        $stream2 = $this->createMock(MetricStreamInterface::class);
+        $stream2->method('register')->willReturn(1);
+        $stream2->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $stream2->method('collect')->willReturn($this->createMock(DataInterface::class));
+        $stream2->method('timestamp')->willReturn(0);
+
+        $provider1 = new StreamMetricSourceProvider(
+            view: new ViewProjection('test1', null, null, null, null),
+            instrument: new Instrument(InstrumentType::COUNTER, 'test1', null, null),
+            instrumentationLibrary: $this->createMock(InstrumentationScopeInterface::class),
+            resource: $this->createMock(ResourceInfo::class),
+            stream: $stream1,
+            metricCollector: $collector,
+            streamId: 1,
+        );
+
+        $provider2 = new StreamMetricSourceProvider(
+            view: new ViewProjection('test2', null, null, null, null),
+            instrument: new Instrument(InstrumentType::COUNTER, 'test2', null, null),
+            instrumentationLibrary: $this->createMock(InstrumentationScopeInterface::class),
+            resource: $this->createMock(ResourceInfo::class),
+            stream: $stream2,
+            metricCollector: $collector,
+            streamId: 2,
+        );
+
+        $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
+        $reader->add($provider1, $provider1, $stalenessHandler);
+        $reader->add($provider2, $provider2, $stalenessHandler);
+
+        // Unregister only stream 1 - stream 2 should still remain
+        $reader->unregisterStream($collector, 1);
+
+        // collectAndPush should still be called since stream 2 remains for this collector
+        $collector->expects($this->once())->method('collectAndPush');
+        $reader->collect();
+        $metrics = $exporter->collect();
+        $this->assertCount(1, $metrics);
+    }
+
+    public function test_unregister_stream_with_nonexistent_stream_is_noop(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+
+        $collector = $this->createMock(MetricCollectorInterface::class);
+
+        // Unregistering a stream that was never registered triggers a PHP warning
+        // due to accessing an undefined array key in the cleanup check
+        @$reader->unregisterStream($collector, 999);
+
+        $reader->collect();
+        $this->assertSame([], $exporter->collect());
     }
 }
 

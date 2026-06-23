@@ -74,4 +74,40 @@ class StatusDataTest extends TestCase
             [StatusCode::STATUS_UNSET],
         ];
     }
+
+    public function test_create_with_description_ignores_description_for_ok(): void
+    {
+        $status = StatusData::create(StatusCode::STATUS_OK, 'some description');
+        $this->assertSame(StatusCode::STATUS_OK, $status->getCode());
+        $this->assertSame('', $status->getDescription());
+    }
+
+    public function test_create_with_description_ignores_description_for_unset(): void
+    {
+        $status = StatusData::create(StatusCode::STATUS_UNSET, 'some description');
+        $this->assertSame(StatusCode::STATUS_UNSET, $status->getCode());
+        $this->assertSame('', $status->getDescription());
+    }
+
+    public function test_create_with_null_description(): void
+    {
+        $status = StatusData::create(StatusCode::STATUS_ERROR);
+        $this->assertSame(StatusCode::STATUS_ERROR, $status->getCode());
+        $this->assertSame('', $status->getDescription());
+    }
+
+    public function test_ok_returns_same_instance(): void
+    {
+        $this->assertSame(StatusData::ok(), StatusData::ok());
+    }
+
+    public function test_error_returns_same_instance(): void
+    {
+        $this->assertSame(StatusData::error(), StatusData::error());
+    }
+
+    public function test_unset_returns_same_instance(): void
+    {
+        $this->assertSame(StatusData::unset(), StatusData::unset());
+    }
 }

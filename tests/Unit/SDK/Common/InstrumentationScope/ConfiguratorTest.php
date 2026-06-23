@@ -49,4 +49,55 @@ class ConfiguratorTest extends TestCase
 
         $this->assertTrue($config->isEnabled());
     }
+
+    public function test_match_wildcard_name(): void
+    {
+        $configurator = $this->configurator->with(static fn (Config $config) => $config->setDisabled(true), name: 'te*');
+        $this->assertFalse($configurator->resolve($this->scope)->isEnabled());
+    }
+
+    public function test_no_match_wildcard_name(): void
+    {
+        $configurator = $this->configurator->with(static fn (Config $config) => $config->setDisabled(true), name: 'other*');
+        $this->assertTrue($configurator->resolve($this->scope)->isEnabled());
+    }
+
+    public function test_match_null_name(): void
+    {
+        $configurator = $this->configurator->with(static fn (Config $config) => $config->setDisabled(true), name: null);
+        $this->assertFalse($configurator->resolve($this->scope)->isEnabled());
+    }
+
+    public function test_resolve_caches_config(): void
+    {
+        $config1 = $this->configurator->resolve($this->scope);
+        $config2 = $this->configurator->resolve($this->scope);
+        $this->assertSame($config1, $config2);
+    }
+
+    public function test_with_applies_to_already_resolved_config(): void
+    {
+        $config = $this->configurator->resolve($this->scope);
+        $this->assertTrue($config->isEnabled());
+        $this->configurator->with(static fn (Config $config) => $config->setDisabled(true), name: 'test');
+        $this->assertFalse($config->isEnabled());
+    }
+
+    public function test_logger_factory(): void
+    {
+        $configurator = Configurator::logger();
+        $this->assertInstanceOf(Configurator::class, $configurator);
+    }
+
+    public function test_meter_factory(): void
+    {
+        $configurator = Configurator::meter();
+        $this->assertInstanceOf(Configurator::class, $configurator);
+    }
+
+    public function test_tracer_factory(): void
+    {
+        $configurator = Configurator::tracer();
+        $this->assertInstanceOf(Configurator::class, $configurator);
+    }
 }

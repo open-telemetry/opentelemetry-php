@@ -57,6 +57,14 @@ class SpanExporterTest extends TestCase
         $this->assertTrue($result->await());
     }
 
+    public function test_export_success_with_null_payload(): void
+    {
+        $future = new CompletedFuture(null);
+        $this->transport->method('send')->willReturn($future);
+        $result = $this->exporter->export([]);
+        $this->assertTrue($result->await());
+    }
+
     public function test_shutdown(): void
     {
         $this->transport->expects($this->once())->method('shutdown');

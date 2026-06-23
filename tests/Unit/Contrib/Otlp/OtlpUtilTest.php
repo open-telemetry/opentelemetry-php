@@ -136,4 +136,26 @@ class OtlpUtilTest extends TestCase
             ],
         ];
     }
+
+    #[DataProvider('pathProvider')]
+    public function test_path(string $signal, string $protocol, string $expected): void
+    {
+        $path = OtlpUtil::path($signal, $protocol);
+        $this->assertSame($expected, $path);
+    }
+
+    public static function pathProvider(): array
+    {
+        return [
+            'grpc trace' => [Signals::TRACE, 'grpc', '/opentelemetry.proto.collector.trace.v1.TraceService/Export'],
+            'grpc metrics' => [Signals::METRICS, 'grpc', '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'],
+            'grpc logs' => [Signals::LOGS, 'grpc', '/opentelemetry.proto.collector.logs.v1.LogsService/Export'],
+            'http/protobuf trace' => [Signals::TRACE, 'http/protobuf', '/v1/traces'],
+            'http/protobuf metrics' => [Signals::METRICS, 'http/protobuf', '/v1/metrics'],
+            'http/protobuf logs' => [Signals::LOGS, 'http/protobuf', '/v1/logs'],
+            'http/json trace' => [Signals::TRACE, 'http/json', '/v1/traces'],
+            'http/json metrics' => [Signals::METRICS, 'http/json', '/v1/metrics'],
+            'http/json logs' => [Signals::LOGS, 'http/json', '/v1/logs'],
+        ];
+    }
 }

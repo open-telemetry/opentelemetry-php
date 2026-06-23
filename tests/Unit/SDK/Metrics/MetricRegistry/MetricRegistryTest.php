@@ -152,4 +152,40 @@ final class MetricRegistryTest extends TestCase
             new NumberDataPoint(0, Attributes::create([]), 5, 7),
         ], Temporality::DELTA, true), $stream1->collect($reader1));
     }
+
+    public function test_unregister_streams_removes_instrument_streams(): void
+    {
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
+        $stream = new SynchronousMetricStream(new SumAggregation(true), 0);
+        $instrument = new Instrument(InstrumentType::COUNTER, 'test', null, null);
+
+        $streamId = $registry->registerSynchronousStream($instrument, $stream, new MetricAggregator(null, new SumAggregation(true)));
+        $this->assertTrue($registry->enabled($instrument));
+
+        $streamIds = $registry->unregisterStreams($instrument);
+        $this->assertSame([$streamId => $streamId], $streamIds);
+        $this->assertFalse($registry->enabled($instrument));
+    }
+
+    public function test_enabled_returns_false_for_unregistered_instrument(): void
+    {
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
+        $instrument = new Instrument(InstrumentType::COUNTER, 'test', null, null);
+        $this->assertFalse($registry->enabled($instrument));
+    }
+
+    public function test_unregister_callback_removes_callback(): void
+    {
+        $this->expectOutputString('');
+
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
+        $stream = new AsynchronousMetricStream(new SumAggregation(true), 0);
+        $instrument = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null);
+
+        $streamId = $registry->registerAsynchronousStream($instrument, $stream, new MetricAggregatorFactory(null, new SumAggregation(true)));
+        $callbackId = $registry->registerCallback(fn (ObserverInterface $o) => printf('called'), $instrument);
+        $registry->unregisterCallback($callbackId);
+
+        $registry->collectAndPush([$streamId]);
+    }
 }
