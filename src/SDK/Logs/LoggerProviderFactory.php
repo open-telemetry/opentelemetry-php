@@ -20,6 +20,6 @@ class LoggerProviderFactory
         $processor = (new LogRecordProcessorFactory())->create($exporter, $meterProvider);
         $instrumentationScopeFactory = new InstrumentationScopeFactory((new LogRecordLimitsBuilder())->build()->getAttributeFactory());
 
-        return new LoggerProvider($processor, $instrumentationScopeFactory, $resource);
+        return new LoggerProvider($processor, $instrumentationScopeFactory, $resource, meterProvider: $meterProvider);
     }
 }

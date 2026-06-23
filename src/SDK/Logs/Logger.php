@@ -47,9 +47,10 @@ class Logger implements LoggerInterface
     public function emit(LogRecord $logRecord): void
     {
         //If a Logger is disabled, it MUST behave equivalently to No-op Logger.
-        if (!$this->config->isEnabled()) {
+        if (!$this->config->isEnabled() || $this->loggerSharedState->hasShutdown()) {
             return;
         }
+        $this->loggerSharedState->getLogCreatedCounter()?->add(1);
         $readWriteLogRecord = new ReadWriteLogRecord($this->scope, $this->loggerSharedState, $logRecord);
         // @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/sdk.md#onemit
         $this->loggerSharedState->getProcessor()->onEmit(
@@ -69,7 +70,7 @@ class Logger implements LoggerInterface
     #[\Override]
     public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
-        return $this->config->isEnabled();
+        return $this->config->isEnabled() && !$this->loggerSharedState->hasShutdown();
     }
 
     /**

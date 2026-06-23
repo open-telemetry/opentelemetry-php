@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricReader;
 
+use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation;
@@ -11,6 +12,7 @@ use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
@@ -24,6 +26,8 @@ use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -229,6 +233,73 @@ final class ExportingReaderTest extends TestCase
         $reader->collect();
         $reader->shutdown();
         $reader->forceFlush();
+    }
+
+    public function test_self_diagnostics_data_point_exported_counter_value(): void
+    {
+        $clock = new TestClock();
+
+        // Self-observability layer: stores the reader's own metrics
+        $selfObsMetrics = new InMemoryExporter();
+        $selfObsReader = new ExportingReader($selfObsMetrics);
+        $selfObsMeterProvider = MeterProviderFactory::create($clock, $selfObsReader);
+
+        // Main layer: user metrics go here; reader reports to selfObsMeterProvider
+        $mainExporter = new InMemoryExporter();
+        $mainReader = new ExportingReader($mainExporter, $selfObsMeterProvider);
+        $mainMeterProvider = MeterProviderFactory::create($clock, $mainReader);
+
+        $counter = $mainMeterProvider->getMeter('test')->createCounter('test.counter');
+        $counter->add(3);
+
+        $mainReader->collect();    // collects 1 data point; records inflight/exported to selfObs
+        $selfObsReader->collect(); // flushes selfObs to $selfObsMetrics
+
+        $byName = array_column($selfObsMetrics->collect(), null, 'name');
+        $exportedData = $byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data;
+        assert($exportedData instanceof Sum);
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($exportedDps));
+        $successDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
+
+        $this->assertCount(1, $successDps);
+        $successDp = reset($successDps);
+        assert($successDp !== false);
+        $this->assertSame(1, $successDp->value);
+    }
+
+    public function test_self_diagnostics_export_failure_uses_other_error_type(): void
+    {
+        $clock = new TestClock();
+
+        $selfObsMetrics = new InMemoryExporter();
+        $selfObsReader = new ExportingReader($selfObsMetrics);
+        $selfObsMeterProvider = MeterProviderFactory::create($clock, $selfObsReader);
+
+        $failingExporter = $this->createMock(MetricExporterWithTemporalityInterface::class);
+        $failingExporter->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $failingExporter->method('export')->willReturn(false);
+
+        $mainReader = new ExportingReader($failingExporter, $selfObsMeterProvider);
+        $mainMeterProvider = MeterProviderFactory::create($clock, $mainReader);
+
+        $counter = $mainMeterProvider->getMeter('test')->createCounter('test.counter');
+        $counter->add(1);
+
+        $mainReader->collect();
+        $selfObsReader->collect();
+
+        $byName = array_column($selfObsMetrics->collect(), null, 'name');
+        $exportedData = $byName[OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED]->data;
+        assert($exportedData instanceof Sum);
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($exportedDps));
+        $failedDps = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
+
+        $this->assertCount(1, $failedDps);
+        $failedDp = reset($failedDps);
+        assert($failedDp !== false);
+        $this->assertSame(1, $failedDp->value);
     }
 }
 

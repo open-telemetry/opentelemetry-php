@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricReader;
 
 use function array_keys;
+use OpenTelemetry\API\Metrics\CounterInterface;
+use OpenTelemetry\API\Metrics\HistogramInterface;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
+use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
+use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -20,6 +25,8 @@ use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricSourceRegistryUnregisterInterface;
 use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use function spl_object_id;
 
 final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface, MetricSourceRegistryUnregisterInterface, DefaultAggregationProviderInterface
@@ -35,8 +42,56 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private bool $closed = false;
 
-    public function __construct(private readonly MetricExporterInterface $exporter)
+    private readonly ?HistogramInterface $collectionDuration;
+    private readonly ?UpDownCounterInterface $dataPointInflightCounter;
+    private readonly ?CounterInterface $dataPointExportedCounter;
+
+    /** @var array<non-empty-string, string> */
+    private readonly array $readerAttributes;
+    /** @var array<non-empty-string, string> */
+    private readonly array $exporterAttributes;
+
+    public function __construct(
+        private readonly MetricExporterInterface $exporter,
+        ?MeterProviderInterface $meterProvider = null,
+    ) {
+        $this->readerAttributes = [
+            OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_PERIODIC_METRIC_READER . '/' . spl_object_id($this),
+        ];
+
+        if ($meterProvider === null) {
+            $this->exporterAttributes = [];
+            $this->collectionDuration = null;
+            $this->dataPointInflightCounter = null;
+            $this->dataPointExportedCounter = null;
+        } else {
+            $this->exporterAttributes = [
+                OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+            ];
+
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $this->collectionDuration = $meter->createHistogram(
+                OtelIncubatingMetrics::OTEL_SDK_METRIC_READER_COLLECTION_DURATION,
+                's',
+                'The duration of the collect operation of the metric reader',
+            );
+            $this->dataPointInflightCounter = $meter->createUpDownCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_INFLIGHT,
+                '{data_point}',
+                'The number of metric data points which were passed to the exporter, but that have not been exported yet',
+            );
+            $this->dataPointExportedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_METRIC_DATA_POINT_EXPORTED,
+                '{data_point}',
+                'The number of metric data points for which the export has finished, either successful or failed',
+            );
+        }
+    }
+
+    private function countDataPoints(DataInterface $data): int
     {
+        return $data->dataPointCount();
     }
 
     #[\Override]
@@ -101,6 +156,8 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
 
     private function doCollect(): bool
     {
+        $startNs = hrtime(true);
+
         foreach ($this->registries as $registryId => $registry) {
             $streamIds = $this->streamIds[$registryId] ?? [];
             $registry->collectAndPush(array_keys($streamIds));
@@ -111,11 +168,37 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
             $metrics[] = $source->collect();
         }
 
+        $durationSeconds = (hrtime(true) - $startNs) / 1_000_000_000;
+        $this->collectionDuration?->record($durationSeconds, $this->readerAttributes);
+
         if ($metrics === []) {
             return true;
         }
 
-        return $this->exporter->export($metrics);
+        $dataPointCount = 0;
+        foreach ($metrics as $metric) {
+            /** @psalm-suppress RedundantCondition */
+            if (isset($metric->data)) {
+                $dataPointCount += $this->countDataPoints($metric->data);
+            }
+        }
+
+        $this->dataPointInflightCounter?->add($dataPointCount, $this->exporterAttributes);
+        $result = false;
+
+        try {
+            $result = $this->exporter->export($metrics);
+            if ($result) {
+                $this->dataPointExportedCounter?->add($dataPointCount, $this->exporterAttributes);
+            } else {
+                // '_OTHER' is the semconv catch-all for errors with no specific exception class or protocol code
+                $this->dataPointExportedCounter?->add($dataPointCount, $this->exporterAttributes + ['error.type' => '_OTHER']);
+            }
+        } finally {
+            $this->dataPointInflightCounter?->add(-$dataPointCount, $this->exporterAttributes);
+        }
+
+        return $result;
     }
 
     #[\Override]

@@ -16,21 +16,17 @@ use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
-use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
-use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessorBuilder;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -459,17 +455,7 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $clock = new TestClock();
         $metrics = new InMemoryExporter();
         $reader = new ExportingReader($metrics);
-        $meterProvider = new MeterProvider(
-            null,
-            ResourceInfoFactory::emptyResource(),
-            $clock,
-            Attributes::factory(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            [$reader],
-            new CriteriaViewRegistry(),
-            null,
-            new ImmediateStalenessHandlerFactory(),
-        );
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
 
         $exporter = $this->createMock(SpanExporterInterface::class);
 
@@ -487,9 +473,11 @@ class BatchSpanProcessorTest extends MockeryTestCase
         $reader->collect();
         $this->assertEquals(
             [
-                'otel.trace.span_processor.spans',
-                'otel.trace.span_processor.queue.limit',
-                'otel.trace.span_processor.queue.usage',
+                'otel.sdk.processor.span.queue.capacity',
+                'otel.sdk.processor.span.queue.size',
+                'otel.sdk.processor.span.processed',
+                'otel.sdk.exporter.span.inflight',
+                'otel.sdk.exporter.span.exported',
             ],
             array_column($metrics->collect(), 'name'),
         );
@@ -534,6 +522,99 @@ class BatchSpanProcessorTest extends MockeryTestCase
     {
         $exporter = $this->createMock(SpanExporterInterface::class);
         $this->assertInstanceOf(BatchSpanProcessorBuilder::class, BatchSpanProcessor::builder($exporter));
+    }
+
+    public function test_self_diagnostics_processed_and_exported_counter_values(): void
+    {
+        $clock = new TestClock();
+        $metrics = new InMemoryExporter();
+        $reader = new ExportingReader($metrics);
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->method('export')->willReturn(new CompletedFuture(null));
+
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            4,
+            5000,
+            30000,
+            2,
+            false,
+            $meterProvider,
+        );
+
+        $span = $this->createSampledSpanMock();
+        $processor->onEnd($span);
+        $processor->onEnd($span);
+        $processor->forceFlush();
+
+        $reader->collect();
+
+        $byName = array_column($metrics->collect(), null, 'name');
+        $processedData = $byName['otel.sdk.processor.span.processed']->data;
+        $exportedData = $byName['otel.sdk.exporter.span.exported']->data;
+        assert($processedData instanceof Sum);
+        assert($exportedData instanceof Sum);
+        $processedDps = $processedData->dataPoints;
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($processedDps));
+        assert(is_array($exportedDps));
+
+        $successProcessed = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
+        $successExported = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
+
+        $this->assertCount(1, $successProcessed);
+        $successProcessedDp = reset($successProcessed);
+        assert($successProcessedDp !== false);
+        $this->assertSame(2, $successProcessedDp->value);
+        $this->assertCount(1, $successExported);
+        $successExportedDp = reset($successExported);
+        assert($successExportedDp !== false);
+        $this->assertSame(2, $successExportedDp->value);
+    }
+
+    public function test_self_diagnostics_dropped_span_increments_processed_with_error(): void
+    {
+        $clock = new TestClock();
+        $metrics = new InMemoryExporter();
+        $reader = new ExportingReader($metrics);
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
+
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->never())->method('export');
+
+        $processor = new BatchSpanProcessor(
+            $exporter,
+            $this->testClock,
+            2,
+            5000,
+            30000,
+            2,
+            false,
+            $meterProvider,
+        );
+
+        $span = $this->createSampledSpanMock();
+        $processor->onEnd($span);
+        $processor->onEnd($span);
+        // queue full — this span must be dropped
+        $processor->onEnd($span);
+
+        $reader->collect();
+
+        $byName = array_column($metrics->collect(), null, 'name');
+        $processedData = $byName['otel.sdk.processor.span.processed']->data;
+        assert($processedData instanceof Sum);
+        $processedDps = $processedData->dataPoints;
+        assert(is_array($processedDps));
+
+        $droppedDps = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
+        $this->assertCount(1, $droppedDps);
+        $droppedDp = reset($droppedDps);
+        assert($droppedDp !== false);
+        $this->assertSame(1, $droppedDp->value);
     }
 
     private function createSampledSpanMock()

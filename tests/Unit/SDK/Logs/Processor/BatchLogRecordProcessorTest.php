@@ -14,19 +14,15 @@ use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\Context\Context;
-use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
-use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
-use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandlerFactory;
-use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
-use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -404,17 +400,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $clock = new TestClock();
         $metrics = new InMemoryExporter();
         $reader = new ExportingReader($metrics);
-        $meterProvider = new MeterProvider(
-            null,
-            ResourceInfoFactory::emptyResource(),
-            $clock,
-            Attributes::factory(),
-            new InstrumentationScopeFactory(Attributes::factory()),
-            [$reader],
-            new CriteriaViewRegistry(),
-            null,
-            new ImmediateStalenessHandlerFactory(),
-        );
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
 
         $exporter = $this->createMock(LogRecordExporterInterface::class);
 
@@ -432,9 +418,11 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $reader->collect();
         $this->assertEquals(
             [
-                'otel.logs.log_processor.logs',
-                'otel.logs.log_processor.queue.limit',
-                'otel.logs.log_processor.queue.usage',
+                'otel.sdk.processor.log.queue.capacity',
+                'otel.sdk.processor.log.queue.size',
+                'otel.sdk.processor.log.processed',
+                'otel.sdk.exporter.log.inflight',
+                'otel.sdk.exporter.log.exported',
             ],
             array_column($metrics->collect(), 'name'),
         );
@@ -473,5 +461,98 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createMock(LogRecordExporterInterface::class);
         new BatchLogRecordProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+    }
+
+    public function test_self_diagnostics_processed_and_exported_counter_values(): void
+    {
+        $clock = new TestClock();
+        $metrics = new InMemoryExporter();
+        $reader = new ExportingReader($metrics);
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
+
+        $exporter = $this->createMock(LogRecordExporterInterface::class);
+        $exporter->method('export')->willReturn(new CompletedFuture(null));
+
+        $processor = new BatchLogRecordProcessor(
+            $exporter,
+            $this->testClock,
+            4,
+            5000,
+            30000,
+            2,
+            false,
+            $meterProvider,
+        );
+
+        $record = $this->createMock(ReadWriteLogRecord::class);
+        $processor->onEmit($record);
+        $processor->onEmit($record);
+        $processor->forceFlush();
+
+        $reader->collect();
+
+        $byName = array_column($metrics->collect(), null, 'name');
+        $processedData = $byName['otel.sdk.processor.log.processed']->data;
+        $exportedData = $byName['otel.sdk.exporter.log.exported']->data;
+        assert($processedData instanceof Sum);
+        assert($exportedData instanceof Sum);
+        $processedDps = $processedData->dataPoints;
+        $exportedDps = $exportedData->dataPoints;
+        assert(is_array($processedDps));
+        assert(is_array($exportedDps));
+
+        $successProcessed = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
+        $successExported = array_filter($exportedDps, fn ($dp) => $dp->attributes->get('error.type') === null);
+
+        $this->assertCount(1, $successProcessed);
+        $successProcessedDp = reset($successProcessed);
+        assert($successProcessedDp !== false);
+        $this->assertSame(2, $successProcessedDp->value);
+        $this->assertCount(1, $successExported);
+        $successExportedDp = reset($successExported);
+        assert($successExportedDp !== false);
+        $this->assertSame(2, $successExportedDp->value);
+    }
+
+    public function test_self_diagnostics_dropped_log_increments_processed_with_error(): void
+    {
+        $clock = new TestClock();
+        $metrics = new InMemoryExporter();
+        $reader = new ExportingReader($metrics);
+        $meterProvider = MeterProviderFactory::create($clock, $reader);
+
+        $exporter = $this->createMock(LogRecordExporterInterface::class);
+        $exporter->expects($this->never())->method('export');
+
+        $processor = new BatchLogRecordProcessor(
+            $exporter,
+            $this->testClock,
+            2,
+            5000,
+            30000,
+            2,
+            false,
+            $meterProvider,
+        );
+
+        $record = $this->createMock(ReadWriteLogRecord::class);
+        $processor->onEmit($record);
+        $processor->onEmit($record);
+        // queue full — this record must be dropped
+        $processor->onEmit($record);
+
+        $reader->collect();
+
+        $byName = array_column($metrics->collect(), null, 'name');
+        $processedData = $byName['otel.sdk.processor.log.processed']->data;
+        assert($processedData instanceof Sum);
+        $processedDps = $processedData->dataPoints;
+        assert(is_array($processedDps));
+
+        $droppedDps = array_filter($processedDps, fn ($dp) => $dp->attributes->get('error.type') === '_OTHER');
+        $this->assertCount(1, $droppedDps);
+        $droppedDp = reset($droppedDps);
+        assert($droppedDp !== false);
+        $this->assertSame(1, $droppedDp->value);
     }
 }

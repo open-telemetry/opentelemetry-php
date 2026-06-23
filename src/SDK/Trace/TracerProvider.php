@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use function is_array;
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NoopTracer;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -36,6 +37,7 @@ final class TracerProvider implements TracerProviderInterface
         ?InstrumentationScopeFactoryInterface $instrumentationScopeFactory = null,
         private ?Configurator $configurator = null,
         private readonly SpanSuppressionStrategy $spanSuppressionStrategy = new NoopSuppressionStrategy(),
+        ?MeterProviderInterface $meterProvider = null,
     ) {
         $spanProcessors ??= [];
         $spanProcessors = is_array($spanProcessors) ? $spanProcessors : [$spanProcessors];
@@ -49,7 +51,8 @@ final class TracerProvider implements TracerProviderInterface
             $resource,
             $spanLimits,
             $sampler,
-            $spanProcessors
+            $spanProcessors,
+            $meterProvider,
         );
         $this->instrumentationScopeFactory = $instrumentationScopeFactory ?? new InstrumentationScopeFactory(Attributes::factory());
         $this->tracers = new WeakMap();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Logs;
 
+use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactory;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
@@ -17,6 +18,7 @@ class LoggerProviderBuilder
     private array $processors = [];
     private ?ResourceInfo $resource = null;
     private ?Configurator $configurator = null;
+    private ?MeterProviderInterface $meterProvider = null;
 
     public function addLogRecordProcessor(LogRecordProcessorInterface $processor): self
     {
@@ -39,12 +41,20 @@ class LoggerProviderBuilder
             new InstrumentationScopeFactory(Attributes::factory()),
             $this->resource,
             configurator: $this->configurator ?? Configurator::logger(),
+            meterProvider: $this->meterProvider,
         );
     }
 
     public function setConfigurator(Configurator $configurator): self
     {
         $this->configurator = $configurator;
+
+        return $this;
+    }
+
+    public function setMeterProvider(MeterProviderInterface $meterProvider): self
+    {
+        $this->meterProvider = $meterProvider;
 
         return $this;
     }

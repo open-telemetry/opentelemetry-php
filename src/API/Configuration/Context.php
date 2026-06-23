@@ -27,6 +27,14 @@ final class Context
     ) {
     }
 
+    public function withMeterProvider(MeterProviderInterface $meterProvider): self
+    {
+        $ctx = new self($this->tracerProvider, $meterProvider, $this->loggerProvider, $this->logger);
+        $ctx->extensions = $this->extensions;
+
+        return $ctx;
+    }
+
     /**
      * @psalm-template T of object
      * @psalm-param T $extension

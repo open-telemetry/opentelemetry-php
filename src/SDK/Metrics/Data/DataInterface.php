@@ -6,4 +6,5 @@ namespace OpenTelemetry\SDK\Metrics\Data;
 
 interface DataInterface
 {
+    public function dataPointCount(): int;
 }

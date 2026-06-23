@@ -9,8 +9,10 @@ use function count;
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -19,6 +21,8 @@ use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use SplQueue;
 use function sprintf;
 use Throwable;
@@ -32,12 +36,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
     public const DEFAULT_MAX_QUEUE_SIZE = 2048;
     public const DEFAULT_MAX_EXPORT_BATCH_SIZE = 512;
 
-    private const ATTRIBUTES_PROCESSOR = ['processor' => 'batching'];
-    private const ATTRIBUTES_QUEUED    = self::ATTRIBUTES_PROCESSOR + ['state' => 'queued'];
-    private const ATTRIBUTES_PENDING   = self::ATTRIBUTES_PROCESSOR + ['state' => 'pending'];
-    private const ATTRIBUTES_PROCESSED = self::ATTRIBUTES_PROCESSOR + ['state' => 'processed'];
-    private const ATTRIBUTES_DROPPED   = self::ATTRIBUTES_PROCESSOR + ['state' => 'dropped'];
-    private const ATTRIBUTES_FREE      = self::ATTRIBUTES_PROCESSOR + ['state' => 'free'];
     private int $maxQueueSize;
     private int $scheduledDelayNanos;
     private int $maxExportBatchSize;
@@ -45,8 +43,6 @@ class BatchSpanProcessor implements SpanProcessorInterface
 
     private ?int $nextScheduledRun = null;
     private bool $running = false;
-    private int $dropped = 0;
-    private int $processed = 0;
     private int $batchId = 0;
     private int $queueSize = 0;
     /** @var list<SpanDataInterface> */
@@ -57,6 +53,15 @@ class BatchSpanProcessor implements SpanProcessorInterface
     private SplQueue $flush;
 
     private bool $closed = false;
+
+    private readonly ?CounterInterface $spanProcessedCounter;
+    private readonly ?UpDownCounterInterface $spanInflightCounter;
+    private readonly ?CounterInterface $spanExportedCounter;
+
+    /** @var array<non-empty-string, string> */
+    private readonly array $processorAttributes;
+    /** @var array<non-empty-string, string> */
+    private readonly array $exporterAttributes;
 
     public function __construct(
         private readonly SpanExporterInterface $exporter,
@@ -91,52 +96,56 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->queue = new SplQueue();
         $this->flush = new SplQueue();
 
+        $this->processorAttributes = [
+            OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR . '/' . spl_object_id($this),
+        ];
+
         if ($meterProvider === null) {
-            return;
+            $this->exporterAttributes = [];
+            $this->spanProcessedCounter = null;
+            $this->spanInflightCounter = null;
+            $this->spanExportedCounter = null;
+        } else {
+            $this->exporterAttributes = [
+                OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+            ];
+
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,
+                    '{span}',
+                    'The maximum number of spans the queue of a given span processor can hold',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->maxQueueSize, $this->processorAttributes);
+                });
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_SIZE,
+                    '{span}',
+                    'The number of spans in the queue of a given span processor',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->queueSize, $this->processorAttributes);
+                });
+            $this->spanProcessedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_PROCESSED,
+                '{span}',
+                'The number of spans for which the processing has finished, either successful or failed',
+            );
+            $this->spanInflightCounter = $meter->createUpDownCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_INFLIGHT,
+                '{span}',
+                'The number of spans which were passed to the exporter, but that have not been exported yet',
+            );
+            $this->spanExportedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_SPAN_EXPORTED,
+                '{span}',
+                'The number of spans for which the export has finished, either successful or failed',
+            );
         }
-
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
-        $meter
-            ->createObservableUpDownCounter(
-                'otel.trace.span_processor.spans',
-                '{spans}',
-                'The number of sampled spans received by the span processor',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $queued = $this->queue->count() * $this->maxExportBatchSize + count($this->batch);
-                $pending = $this->queueSize - $queued;
-                $processed = $this->processed;
-                $dropped = $this->dropped;
-
-                $observer->observe($queued, self::ATTRIBUTES_QUEUED);
-                $observer->observe($pending, self::ATTRIBUTES_PENDING);
-                $observer->observe($processed, self::ATTRIBUTES_PROCESSED);
-                $observer->observe($dropped, self::ATTRIBUTES_DROPPED);
-            });
-        $meter
-            ->createObservableUpDownCounter(
-                'otel.trace.span_processor.queue.limit',
-                '{spans}',
-                'The queue size limit',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $observer->observe($this->maxQueueSize, self::ATTRIBUTES_PROCESSOR);
-            });
-        $meter
-            ->createObservableUpDownCounter(
-                'otel.trace.span_processor.queue.usage',
-                '{spans}',
-                'The current queue usage',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $queued = $this->queue->count() * $this->maxExportBatchSize + count($this->batch);
-                $pending = $this->queueSize - $queued;
-                $free = $this->maxQueueSize - $this->queueSize;
-
-                $observer->observe($queued, self::ATTRIBUTES_QUEUED);
-                $observer->observe($pending, self::ATTRIBUTES_PENDING);
-                $observer->observe($free, self::ATTRIBUTES_FREE);
-            });
     }
 
     #[\Override]
@@ -155,7 +164,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         }
 
         if ($this->queueSize === $this->maxQueueSize) {
-            $this->dropped++;
+            $this->spanProcessedCounter?->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
         }
@@ -246,14 +255,20 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 $batchSize = count($this->queue->bottom());
                 $this->batchId++;
                 $scope = $this->exportContext->activate();
+                $this->spanInflightCounter?->add($batchSize, $this->exporterAttributes);
 
                 try {
                     $this->exporter->export($this->queue->dequeue())->await();
+                    $this->spanExportedCounter?->add($batchSize, $this->exporterAttributes);
+                    $this->spanProcessedCounter?->add($batchSize, $this->processorAttributes);
                 } catch (Throwable $e) {
+                    $errorAttrs = ['error.type' => $e::class];
+                    $this->spanExportedCounter?->add($batchSize, $this->exporterAttributes + $errorAttrs);
+                    $this->spanProcessedCounter?->add($batchSize, $this->processorAttributes + $errorAttrs);
                     self::logError('Unhandled export error', ['exception' => $e]);
                 } finally {
-                    $this->processed += $batchSize;
                     $this->queueSize -= $batchSize;
+                    $this->spanInflightCounter?->add(-$batchSize, $this->exporterAttributes);
                     $scope->detach();
                 }
             }

@@ -7,14 +7,18 @@ namespace OpenTelemetry\SDK\Logs\Processor;
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\ObserverInterface;
+use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
+use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use SplQueue;
 use Throwable;
 
@@ -27,12 +31,6 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
     public const DEFAULT_MAX_QUEUE_SIZE = 2048;
     public const DEFAULT_MAX_EXPORT_BATCH_SIZE = 512;
 
-    private const ATTRIBUTES_PROCESSOR = ['processor' => 'batching'];
-    private const ATTRIBUTES_QUEUED    = self::ATTRIBUTES_PROCESSOR + ['state' => 'queued'];
-    private const ATTRIBUTES_PENDING   = self::ATTRIBUTES_PROCESSOR + ['state' => 'pending'];
-    private const ATTRIBUTES_PROCESSED = self::ATTRIBUTES_PROCESSOR + ['state' => 'processed'];
-    private const ATTRIBUTES_DROPPED   = self::ATTRIBUTES_PROCESSOR + ['state' => 'dropped'];
-    private const ATTRIBUTES_FREE      = self::ATTRIBUTES_PROCESSOR + ['state' => 'free'];
     private int $maxQueueSize;
     private int $scheduledDelayNanos;
     private int $maxExportBatchSize;
@@ -40,8 +38,6 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
 
     private ?int $nextScheduledRun = null;
     private bool $running = false;
-    private int $dropped = 0;
-    private int $processed = 0;
     private int $batchId = 0;
     private int $queueSize = 0;
     /** @var list<ReadWriteLogRecord> */
@@ -52,6 +48,15 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
     private SplQueue $flush;
 
     private bool $closed = false;
+
+    private readonly ?CounterInterface $logProcessedCounter;
+    private readonly ?UpDownCounterInterface $logInflightCounter;
+    private readonly ?CounterInterface $logExportedCounter;
+
+    /** @var array<non-empty-string, string> */
+    private readonly array $processorAttributes;
+    /** @var array<non-empty-string, string> */
+    private readonly array $exporterAttributes;
 
     public function __construct(
         private readonly LogRecordExporterInterface $exporter,
@@ -86,52 +91,56 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         $this->queue = new SplQueue();
         $this->flush = new SplQueue();
 
+        $this->processorAttributes = [
+            OtelIncubatingAttributes::OTEL_COMPONENT_TYPE => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR,
+            OtelIncubatingAttributes::OTEL_COMPONENT_NAME => OtelIncubatingAttributes::OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR . '/' . spl_object_id($this),
+        ];
+
         if ($meterProvider === null) {
-            return;
+            $this->exporterAttributes = [];
+            $this->logProcessedCounter = null;
+            $this->logInflightCounter = null;
+            $this->logExportedCounter = null;
+        } else {
+            $this->exporterAttributes = [
+                OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
+            ];
+
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY,
+                    '{log_record}',
+                    'The maximum number of log records the queue of a given log record processor can hold',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->maxQueueSize, $this->processorAttributes);
+                });
+            $meter
+                ->createObservableUpDownCounter(
+                    OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_SIZE,
+                    '{log_record}',
+                    'The number of log records in the queue of a given log record processor',
+                )
+                ->observe(function (ObserverInterface $observer): void {
+                    $observer->observe($this->queueSize, $this->processorAttributes);
+                });
+            $this->logProcessedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_PROCESSED,
+                '{log_record}',
+                'The number of log records for which the processing has finished, either successful or failed',
+            );
+            $this->logInflightCounter = $meter->createUpDownCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_INFLIGHT,
+                '{log_record}',
+                'The number of log records which were passed to the exporter, but that have not been exported yet',
+            );
+            $this->logExportedCounter = $meter->createCounter(
+                OtelIncubatingMetrics::OTEL_SDK_EXPORTER_LOG_EXPORTED,
+                '{log_record}',
+                'The number of log records for which the export has finished, either successful or failed',
+            );
         }
-
-        $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
-        $meter
-            ->createObservableUpDownCounter(
-                'otel.logs.log_processor.logs',
-                '{logs}',
-                'The number of log records received by the processor',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $queued = $this->queue->count() * $this->maxExportBatchSize + count($this->batch);
-                $pending = $this->queueSize - $queued;
-                $processed = $this->processed;
-                $dropped = $this->dropped;
-
-                $observer->observe($queued, self::ATTRIBUTES_QUEUED);
-                $observer->observe($pending, self::ATTRIBUTES_PENDING);
-                $observer->observe($processed, self::ATTRIBUTES_PROCESSED);
-                $observer->observe($dropped, self::ATTRIBUTES_DROPPED);
-            });
-        $meter
-            ->createObservableUpDownCounter(
-                'otel.logs.log_processor.queue.limit',
-                '{logs}',
-                'The queue size limit',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $observer->observe($this->maxQueueSize, self::ATTRIBUTES_PROCESSOR);
-            });
-        $meter
-            ->createObservableUpDownCounter(
-                'otel.logs.log_processor.queue.usage',
-                '{logs}',
-                'The current queue usage',
-            )
-            ->observe(function (ObserverInterface $observer): void {
-                $queued = $this->queue->count() * $this->maxExportBatchSize + count($this->batch);
-                $pending = $this->queueSize - $queued;
-                $free = $this->maxQueueSize - $this->queueSize;
-
-                $observer->observe($queued, self::ATTRIBUTES_QUEUED);
-                $observer->observe($pending, self::ATTRIBUTES_PENDING);
-                $observer->observe($free, self::ATTRIBUTES_FREE);
-            });
     }
 
     #[\Override]
@@ -142,7 +151,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         }
 
         if ($this->queueSize === $this->maxQueueSize) {
-            $this->dropped++;
+            $this->logProcessedCounter?->add(1, $this->processorAttributes + ['error.type' => '_OTHER']);
 
             return;
         }
@@ -228,14 +237,20 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                 $batchSize = count($this->queue->bottom());
                 $this->batchId++;
                 $scope = $this->exportContext->activate();
+                $this->logInflightCounter?->add($batchSize, $this->exporterAttributes);
 
                 try {
                     $this->exporter->export($this->queue->dequeue())->await();
+                    $this->logExportedCounter?->add($batchSize, $this->exporterAttributes);
+                    $this->logProcessedCounter?->add($batchSize, $this->processorAttributes);
                 } catch (Throwable $e) {
+                    $errorAttrs = ['error.type' => $e::class];
+                    $this->logExportedCounter?->add($batchSize, $this->exporterAttributes + $errorAttrs);
+                    $this->logProcessedCounter?->add($batchSize, $this->processorAttributes + $errorAttrs);
                     self::logError('Unhandled export error', ['exception' => $e]);
                 } finally {
-                    $this->processed += $batchSize;
                     $this->queueSize -= $batchSize;
+                    $this->logInflightCounter?->add(-$batchSize, $this->exporterAttributes);
                     $scope->detach();
                 }
             }
