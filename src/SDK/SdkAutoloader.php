@@ -113,6 +113,7 @@ class SdkAutoloader
             ->setResource($resource)
             ->setSampler((new SamplerFactory())->create())
             ->setSpanSuppressionStrategy($distributionConfiguration->spanSuppressionStrategy)
+            ->setMeterProvider($emitMetrics ? $meterProvider : null)
             ->build();
 
         $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
