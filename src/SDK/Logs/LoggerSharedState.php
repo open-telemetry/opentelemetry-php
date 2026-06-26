@@ -9,6 +9,7 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\SemConv\Version;
 
 class LoggerSharedState
 {
@@ -23,7 +24,7 @@ class LoggerSharedState
     ) {
         if ($meterProvider !== null) {
             $this->logCreatedCounter = $meterProvider
-                ->getMeter('io.opentelemetry.sdk', schemaUrl: 'https://opentelemetry.io/schemas/1.32.0')
+                ->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_32_0->url())
                 ->createCounter(
                     OtelIncubatingMetrics::OTEL_SDK_LOG_CREATED,
                     '{log_record}',

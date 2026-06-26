@@ -13,6 +13,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\SemConv\Version;
 
 /**
  * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.
@@ -40,7 +41,7 @@ final class TracerSharedState
         };
 
         if ($meterProvider !== null) {
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: 'https://opentelemetry.io/schemas/1.32.0');
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_32_0->url());
             $this->spanStartedCounter = $meter->createCounter(
                 OtelIncubatingMetrics::OTEL_SDK_SPAN_STARTED,
                 '{span}',
