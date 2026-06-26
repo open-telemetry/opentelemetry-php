@@ -112,7 +112,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
             ];
 
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_32_0->url());
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_36_0->url());
             $meter
                 ->createObservableUpDownCounter(
                     OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,

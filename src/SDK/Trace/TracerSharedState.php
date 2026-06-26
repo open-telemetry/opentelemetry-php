@@ -41,7 +41,7 @@ final class TracerSharedState
         };
 
         if ($meterProvider !== null) {
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_32_0->url());
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_36_0->url());
             $this->spanStartedCounter = $meter->createCounter(
                 OtelIncubatingMetrics::OTEL_SDK_SPAN_STARTED,
                 '{span}',
