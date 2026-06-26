@@ -55,7 +55,7 @@ class Logging
     {
         $value = array_search($level, self::LEVELS);
 
-        return $value ?: 1; //'info'
+        return $value !== false ? $value : 1; //'info'
     }
 
     /**
