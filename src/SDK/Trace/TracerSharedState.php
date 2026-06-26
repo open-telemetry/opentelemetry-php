@@ -21,7 +21,6 @@ final class TracerSharedState
 {
     private readonly SpanProcessorInterface $spanProcessor;
     private readonly ?CounterInterface $spanStartedCounter;
-    private readonly ?CounterInterface $spanEndedCounter;
     private readonly ?UpDownCounterInterface $spanLiveCounter;
 
     private ?bool $shutdownResult = null;
@@ -41,16 +40,11 @@ final class TracerSharedState
         };
 
         if ($meterProvider !== null) {
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: 'https://opentelemetry.io/schemas/1.32.0');
             $this->spanStartedCounter = $meter->createCounter(
                 OtelIncubatingMetrics::OTEL_SDK_SPAN_STARTED,
                 '{span}',
                 'The number of created spans',
-            );
-            $this->spanEndedCounter = $meter->createCounter(
-                OtelIncubatingMetrics::OTEL_SDK_SPAN_ENDED,
-                '{span}',
-                'The number of spans which have been finished by a Span.end() call',
             );
             $this->spanLiveCounter = $meter->createUpDownCounter(
                 OtelIncubatingMetrics::OTEL_SDK_SPAN_LIVE,
@@ -59,7 +53,6 @@ final class TracerSharedState
             );
         } else {
             $this->spanStartedCounter = null;
-            $this->spanEndedCounter = null;
             $this->spanLiveCounter = null;
         }
     }
@@ -97,11 +90,6 @@ final class TracerSharedState
     public function getSpanStartedCounter(): ?CounterInterface
     {
         return $this->spanStartedCounter;
-    }
-
-    public function getSpanEndedCounter(): ?CounterInterface
-    {
-        return $this->spanEndedCounter;
     }
 
     public function getSpanLiveCounter(): ?UpDownCounterInterface

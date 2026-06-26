@@ -70,7 +70,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
                 OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
             ];
 
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: 'https://opentelemetry.io/schemas/1.32.0');
             $this->collectionDuration = $meter->createHistogram(
                 OtelIncubatingMetrics::OTEL_SDK_METRIC_READER_COLLECTION_DURATION,
                 's',

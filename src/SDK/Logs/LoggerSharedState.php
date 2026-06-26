@@ -23,7 +23,7 @@ class LoggerSharedState
     ) {
         if ($meterProvider !== null) {
             $this->logCreatedCounter = $meterProvider
-                ->getMeter('io.opentelemetry.sdk')
+                ->getMeter('io.opentelemetry.sdk', schemaUrl: 'https://opentelemetry.io/schemas/1.32.0')
                 ->createCounter(
                     OtelIncubatingMetrics::OTEL_SDK_LOG_CREATED,
                     '{log_record}',
