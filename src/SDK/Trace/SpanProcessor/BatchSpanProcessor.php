@@ -23,6 +23,7 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\SemConv\Version;
 use SplQueue;
 use function sprintf;
 use Throwable;
@@ -111,7 +112,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                 OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
             ];
 
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_36_0->url());
             $meter
                 ->createObservableUpDownCounter(
                     OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_SPAN_QUEUE_CAPACITY,

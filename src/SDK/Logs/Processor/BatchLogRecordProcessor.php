@@ -19,6 +19,7 @@ use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\SemConv\Version;
 use SplQueue;
 use Throwable;
 
@@ -106,7 +107,7 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
                 OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
             ];
 
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_36_0->url());
             $meter
                 ->createObservableUpDownCounter(
                     OtelIncubatingMetrics::OTEL_SDK_PROCESSOR_LOG_QUEUE_CAPACITY,

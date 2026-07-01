@@ -108,12 +108,15 @@ class SdkAutoloader
         $exporter = (new ExporterFactory())->create();
         $meterProvider = (new MeterProviderFactory())->create($resource);
         $spanProcessor = (new SpanProcessorFactory())->create($exporter, $emitMetrics ? $meterProvider : null);
-        $tracerProvider = (new TracerProviderBuilder())
+        $builder = (new TracerProviderBuilder())
             ->addSpanProcessor($spanProcessor)
             ->setResource($resource)
             ->setSampler((new SamplerFactory())->create())
-            ->setSpanSuppressionStrategy($distributionConfiguration->spanSuppressionStrategy)
-            ->build();
+            ->setSpanSuppressionStrategy($distributionConfiguration->spanSuppressionStrategy);
+        if ($emitMetrics) {
+            $builder->setMeterProvider($meterProvider);
+        }
+        $tracerProvider = $builder->build();
 
         $loggerProvider = (new LoggerProviderFactory())->create($emitMetrics ? $meterProvider : null, $resource);
         $eventLoggerProvider = (new EventLoggerProviderFactory())->create($loggerProvider);

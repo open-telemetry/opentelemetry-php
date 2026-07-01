@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Sdk;
 
 final class TracerProviderFactory
@@ -18,7 +19,7 @@ final class TracerProviderFactory
     ) {
     }
 
-    public function create(): TracerProviderInterface
+    public function create(?MeterProviderInterface $meterProvider = null): TracerProviderInterface
     {
         if (Sdk::isDisabled()) {
             return new NoopTracerProvider();
@@ -39,7 +40,7 @@ final class TracerProviderFactory
         }
 
         try {
-            $spanProcessor = $this->spanProcessorFactory->create($exporter);
+            $spanProcessor = $this->spanProcessorFactory->create($exporter, $meterProvider);
         } catch (\Throwable $t) {
             self::logWarning('Unable to create span processor', ['exception' => $t]);
             $spanProcessor = null;
@@ -48,6 +49,7 @@ final class TracerProviderFactory
         return new TracerProvider(
             $spanProcessor,
             $sampler,
+            meterProvider: $meterProvider,
         );
     }
 }

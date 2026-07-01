@@ -27,6 +27,7 @@ use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
+use OpenTelemetry\SemConv\Version;
 use function spl_object_id;
 
 final class ExportingReader implements MetricReaderInterface, MetricSourceRegistryInterface, MetricSourceRegistryUnregisterInterface, DefaultAggregationProviderInterface
@@ -70,7 +71,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
                 OtelIncubatingAttributes::OTEL_COMPONENT_NAME => (new \ReflectionClass($this->exporter))->getShortName(),
             ];
 
-            $meter = $meterProvider->getMeter('io.opentelemetry.sdk');
+            $meter = $meterProvider->getMeter('io.opentelemetry.sdk', schemaUrl: Version::VERSION_1_36_0->url());
             $this->collectionDuration = $meter->createHistogram(
                 OtelIncubatingMetrics::OTEL_SDK_METRIC_READER_COLLECTION_DURATION,
                 's',
