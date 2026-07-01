@@ -22,4 +22,14 @@ final class FilteredAttributeProcessorTest extends TestCase
                 ->toArray(),
         );
     }
+
+    public function test_attribute_processor_skips_missing_keys(): void
+    {
+        $this->assertEquals(
+            ['foo' => 3],
+            (new FilteredAttributeProcessor(['foo', 'baz']))
+                ->process(Attributes::create(['foo' => 3, 'bar' => 5]), Context::getRoot())
+                ->toArray(),
+        );
+    }
 }
