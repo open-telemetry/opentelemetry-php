@@ -275,11 +275,11 @@ class SpanConverter implements SpanConverterInterface
         ];
 
         if (filter_var($ipString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            $remoteEndpointArr['ipv4'] = ip2long($ipString);
+            $remoteEndpointArr['ipv4'] = $ipString;
         }
 
         if (filter_var($ipString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $remoteEndpointArr['ipv6'] = inet_pton($ipString);
+            $remoteEndpointArr['ipv6'] = inet_ntop(inet_pton($ipString));
         }
 
         $remoteEndpointArr['port'] = $portNumber ?? 0;

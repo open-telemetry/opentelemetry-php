@@ -171,31 +171,39 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('"event.name"', $annotation['value']);
     }
 
-    public function test_should_use_otel_ipv_4_and_port_correctly_for_zipkin_remote_endpoint(): void
-    {
+    #[DataProvider('remoteEndpointIpProvider')]
+    public function test_should_use_otel_net_peer_ip_correctly_for_zipkin_remote_endpoint(
+        string $ip,
+        ?string $port,
+        string $expectedKey,
+        string $expectedValue,
+        int $expectedPort,
+    ): void {
         $span = (new SpanData())
-            ->addAttribute('net.peer.ip', '255.255.255.255')
-            ->addAttribute('net.peer.port', '80')
-            ->setKind(SpanKind::KIND_PRODUCER);
+            ->addAttribute('net.peer.ip', $ip)
+            ->setKind(SpanKind::KIND_CLIENT);
+        if ($port !== null) {
+            $span->addAttribute('net.peer.port', $port);
+        }
 
         $converter = new SpanConverter();
         $row = $converter->convert([$span])[0];
 
         $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
-        $this->assertSame((int) pow(2, 32)-1, (int) $row['remoteEndpoint']['ipv4']);
-        $this->assertSame(80, $row['remoteEndpoint']['port']);
+        $this->assertSame($expectedValue, $row['remoteEndpoint'][$expectedKey]);
+        $this->assertSame($expectedPort, $row['remoteEndpoint']['port']);
+        $this->assertIsString(json_encode($row, JSON_THROW_ON_ERROR));
     }
 
-    public function test_should_use_otel_ipv_6_correctly_for_zipkin_remote_endpoint(): void
+    public static function remoteEndpointIpProvider(): array
     {
-        $span = (new SpanData())
-            ->addAttribute('net.peer.ip', '::1')
-            ->setKind(SpanKind::KIND_PRODUCER);
-
-        $converter = new SpanConverter();
-        $row = $converter->convert([$span])[0];
-
-        $this->assertSame('00000000000000000000000000000001', bin2hex((string) $row['remoteEndpoint']['ipv6'])); //Couldn't figure out how to do a direct assertion against binary data
+        return [
+            'ipv4' => ['255.255.255.255', '80', 'ipv4', '255.255.255.255', 80],
+            'ipv6 loopback' => ['::1', null, 'ipv6', '::1', 0],
+            // regression: routable IPv6 addresses used to store raw inet_pton() binary,
+            // which crashed json_encode(..., JSON_THROW_ON_ERROR) for the whole batch
+            'ipv6 routable' => ['2001:db8::1', null, 'ipv6', '2001:db8::1', 0],
+        ];
     }
 
     /**
