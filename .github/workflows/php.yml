@@ -17,9 +17,11 @@ jobs:
       fail-fast: false
       matrix:
         php-version: ['8.1', '8.2', '8.3', '8.4', '8.5']
+        composer_args: ['']
         include:
           - php-version: '8.6'
             experimental: true
+            composer_args: "--ignore-platform-reqs"
     env:
       extensions: ast, grpc, opentelemetry, protobuf
 
@@ -96,13 +98,14 @@ jobs:
 
     - name: Install dependencies
       id: composer
-      if: steps.composer-cache.outputs.cache-hit != 'true'
+      if: steps.composer-cache.outputs.cache-hit != 'true' || steps.test-tools-cache.outputs.cache-hit != 'true'
       run: |
         composer --version
-        composer install --prefer-dist --no-progress
+        composer install --prefer-dist --no-progress ${{ matrix.composer_args }}
 
     - name: Check Style
       id: style
+      continue-on-error: ${{ matrix.experimental }}
       env:
         PHP_CS_FIXER_IGNORE_ENV: 1
       run: |
@@ -111,12 +114,14 @@ jobs:
 
     - name: Check Dependencies
       id: deps
+      continue-on-error: ${{ matrix.experimental }}
       run: |
         vendor-bin/deptrac/vendor/bin/deptrac --version
         vendor-bin/deptrac/vendor/bin/deptrac --formatter=github-actions --report-uncovered
 
     - name: Run Phan
       id: phan
+      continue-on-error: ${{ matrix.experimental }}
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
@@ -126,28 +131,33 @@ jobs:
 
     - name: Run Psalm
       id: psalm
+      continue-on-error: ${{ matrix.experimental }}
       run: |
         vendor-bin/psalm/vendor/bin/psalm --version
         vendor-bin/psalm/vendor/bin/psalm --output-format=github
 
     - name: Run Phpstan
       id: phpstan
+      continue-on-error: ${{ matrix.experimental }}
       run: |
         vendor/bin/phpstan --version
         vendor/bin/phpstan analyse --error-format=github
 
     - name: Run PHPUnit (unit tests)
       id: unit
+      continue-on-error: ${{ matrix.experimental }}
       run: |
         vendor/bin/phpunit --version
         php -dzend.assertions=1 vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover --testsuite unit
 
     - name: Run PHPUnit (integration tests)
       id: integration
+      continue-on-error: ${{ matrix.experimental }}
       run: vendor/bin/phpunit --testsuite integration
 
     - name: Check for outdated SPI package dependencies
       id: spi
+      continue-on-error: ${{ matrix.experimental }}
       run: composer spi:show-outdated-package-dependencies
 
     - name: Code Coverage
