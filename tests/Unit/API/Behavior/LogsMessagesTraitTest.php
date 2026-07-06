@@ -56,6 +56,7 @@ class LogsMessagesTraitTest extends TestCase
     #[TestDox('Proxies logging methods through to logger')]
     public function test_log_methods(string $method, string $expectedLogLevel): void
     {
+        $this->setEnvironmentVariable('OTEL_LOG_LEVEL', LogLevel::DEBUG);
         $instance = $this->createInstance();
         $this->writer->expects($this->once())->method('write')->with(
             $this->equalTo($expectedLogLevel),
