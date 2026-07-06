@@ -163,6 +163,10 @@ final class Span extends API\Span implements ReadWriteSpanInterface
     #[\Override]
     public function setAttributes(iterable $attributes): self
     {
+        if ($this->hasEnded) {
+            return $this;
+        }
+
         foreach ($attributes as $key => $value) {
             $this->attributesBuilder[$key] = $value;
         }

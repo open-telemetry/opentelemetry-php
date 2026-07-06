@@ -484,6 +484,14 @@ class SpanTest extends MockeryTestCase
         $this->assertEmpty($span->toSpanData()->getAttributes());
     }
 
+    public function test_set_attributes_noop_after_end(): void
+    {
+        $span = $this->createTestRootSpan();
+        $span->end();
+        $span->setAttributes(['string' => 'str']);
+        $this->assertEmpty($span->toSpanData()->getAttributes());
+    }
+
     #[DataProvider('nonHomogeneousArrayProvider')]
     public function test_set_attribute_drops_non_homogeneous_array(array $values): void
     {
