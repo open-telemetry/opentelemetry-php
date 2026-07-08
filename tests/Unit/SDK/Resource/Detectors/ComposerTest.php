@@ -32,4 +32,20 @@ class ComposerTest extends TestCase
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
     }
+
+    public function test_reports_service_version_when_set(): void
+    {
+        $resource = (new Composer(['name' => 'foo/bar', 'pretty_version' => '2.3.4']))->getResource();
+
+        $this->assertSame('foo/bar', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertSame('2.3.4', $resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
+    }
+
+    public function test_omits_service_version_when_composer_reports_placeholder(): void
+    {
+        $resource = (new Composer(['name' => 'foo/bar', 'pretty_version' => '1.0.0+no-version-set']))->getResource();
+
+        $this->assertSame('foo/bar', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::SERVICE_VERSION));
+    }
 }
