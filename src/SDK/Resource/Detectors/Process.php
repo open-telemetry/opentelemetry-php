@@ -35,11 +35,15 @@ final class Process implements ResourceDetectorInterface
         ];
 
         /**
+         * process.command_args (and process.command_line) may contain sensitive data such
+         * as secrets or tokens passed as command-line arguments. Per semantic conventions
+         * 1.34.0 they SHOULD NOT be collected by default unless sanitized, so only the
+         * command name (argv[0]) is reported here. See #1604.
+         *
          * @psalm-suppress PossiblyUndefinedArrayOffset
          */
-        if ($_SERVER['argv'] ?? null) {
+        if ($_SERVER['argv'][0] ?? null) {
             $attributes[ProcessIncubatingAttributes::PROCESS_COMMAND] = $_SERVER['argv'][0];
-            $attributes[ProcessIncubatingAttributes::PROCESS_COMMAND_ARGS] = $_SERVER['argv'];
         }
 
         /** @phan-suppress-next-line PhanTypeComparisonFromArray */
