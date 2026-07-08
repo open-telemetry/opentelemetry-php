@@ -1,0 +1,466 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^PHPDoc tag @param has invalid value \(Closure\(\.\.\.\)\: R \$closure closure to invoke\)\: Unexpected token "\(", expected variable at offset 188 on line 8$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/API/Trace/functions.php
+
+		-
+			message: '#^Comparison operation "\<" between int\<80100, 80599\> and 80100 is always false\.$#'
+			identifier: smaller.alwaysFalse
+			count: 1
+			path: src/Context/DebugScope.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<string, string\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Context/Propagation/EnvironmentGetterSetter.php
+
+		-
+			message: '#^Parameter \#1 \$array \(non\-empty\-list\<string\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Context/Propagation/SanitizeCombinedHeadersPropagationGetter.php
+
+		-
+			message: '#^Comparison operation "\<" between int\<80100, 80599\> and 80100 is always false\.$#'
+			identifier: smaller.alwaysFalse
+			count: 1
+			path: src/Context/ZendObserverFiber.php
+
+		-
+			message: '#^Method OpenTelemetry\\Contrib\\Otlp\\MetricExporter\:\:temporality\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/Contrib/Otlp/MetricExporter.php
+
+		-
+			message: '''
+				#^PHPDoc tag @todo has invalid value \(\(https\://github\.com/open\-telemetry/opentelemetry\-specification/blob/main/specification/metrics/sdk\.md\#periodic\-exporting\-metricreader\)
+				\- OTEL_METRIC_EXPORT_INTERVAL\)\: Unexpected token "\:", expected '\)' at offset 27 on line 2$#
+			'''
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/Contrib/Otlp/MetricExporterFactory.php
+
+		-
+			message: '#^Instanceof between Google\\Protobuf\\Descriptor and Google\\Protobuf\\Descriptor will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Contrib/Otlp/ProtobufSerializer.php
+
+		-
+			message: '#^Method OpenTelemetry\\SDK\\Common\\Configuration\\EnvResolver\:\:numeric\(\) never returns int so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/SDK/Common/Configuration/EnvResolver.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/SDK/Common/Export/Http/PsrTransport.php
+
+		-
+			message: '#^Variable \$response in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
+			path: src/SDK/Common/Export/Http/PsrTransport.php
+
+		-
+			message: '#^Method OpenTelemetry\\SDK\\Common\\Export\\Http\\PsrUtils\:\:encode\(\) never assigns null to &\$appliedEncodings so it can be removed from the by\-ref type\.$#'
+			identifier: parameterByRef.unusedType
+			count: 1
+			path: src/SDK/Common/Export/Http/PsrUtils.php
+
+		-
+			message: '#^Call to function is_a\(\) with arguments ''GuzzleHttp\\\\Client'', ''Psr\\\\Http\\\\Client\\\\ClientInterface'' and true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/SDK/Common/Http/Psr/Client/Discovery/Guzzle.php
+
+		-
+			message: '#^Property OpenTelemetry\\SDK\\Logs\\Processor\\BatchLogRecordProcessor\:\:\$flush \(SplQueue\<array\{int, string, OpenTelemetry\\SDK\\Common\\Future\\CancellationInterface\|null, bool, OpenTelemetry\\Context\\ContextInterface\}\>\) does not accept SplQueue\<array\{int, string, OpenTelemetry\\SDK\\Common\\Future\\CancellationInterface\|null, bool, OpenTelemetry\\Context\\ContextInterface\}\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/SDK/Logs/Processor/BatchLogRecordProcessor.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/SDK/Metrics/Meter.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between non\-empty\-list\<OpenTelemetry\\SDK\\Metrics\\Instrument\> and array\{\} will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 1
+			path: src/SDK/Metrics/Meter.php
+
+		-
+			message: '#^Method OpenTelemetry\\SDK\\Metrics\\MetricExporter\\InMemoryExporter\:\:temporality\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/SDK/Metrics/MetricExporter/InMemoryExporter.php
+
+		-
+			message: '#^Property OpenTelemetry\\SDK\\Metrics\\Data\\Metric\:\:\$data \(OpenTelemetry\\SDK\\Metrics\\Data\\DataInterface\) in isset\(\) is not nullable\.$#'
+			identifier: isset.property
+			count: 1
+			path: src/SDK/Metrics/MetricReader/ExportingReader.php
+
+		-
+			message: '#^Method OpenTelemetry\\SDK\\Metrics\\Stream\\AsynchronousMetricStream\:\:temporality\(\) never returns OpenTelemetry\\SDK\\Metrics\\Data\\Temporality so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/SDK/Metrics/Stream/AsynchronousMetricStream.php
+
+		-
+			message: '#^Method OpenTelemetry\\SDK\\Metrics\\Stream\\SynchronousMetricStream\:\:temporality\(\) never returns OpenTelemetry\\SDK\\Metrics\\Data\\Temporality so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: src/SDK/Metrics/Stream/SynchronousMetricStream.php
+
+		-
+			message: '#^Property OpenTelemetry\\SDK\\Trace\\SpanProcessor\\BatchSpanProcessor\:\:\$flush \(SplQueue\<array\{int, string, OpenTelemetry\\SDK\\Common\\Future\\CancellationInterface\|null, bool, OpenTelemetry\\Context\\ContextInterface\}\>\) does not accept SplQueue\<array\{int, string, OpenTelemetry\\SDK\\Common\\Future\\CancellationInterface\|null, bool, OpenTelemetry\\Context\\ContextInterface\}\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/SDK/Trace/SpanProcessor/BatchSpanProcessor.php
+
+		-
+			message: '#^Property OpenTelemetry\\SDK\\Trace\\TracerProviderBuilder\:\:\$spanProcessors \(list\<OpenTelemetry\\SDK\\Trace\\SpanProcessorInterface\>\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/SDK/Trace/TracerProviderBuilder.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertCount\(\) with 1 and array\{OpenTelemetry\\SDK\\Trace\\LinkInterface\} will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Integration/SDK/SpanBuilderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertFalse\(\) with false will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 3
+			path: tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest.php
+
+		-
+			message: '#^Static property OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation@anonymous/tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest\.php\:63\:\:\$context \(OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Context\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest.php
+
+		-
+			message: '#^Expression "new class…" on a separate line does not do anything\.$#'
+			identifier: expr.resultUnused
+			count: 1
+			path: tests/Unit/API/Instrumentation/SpanAttributeTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with OpenTelemetry\\API\\Logs\\Severity will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/API/Logs/Map/Psr3Test.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\API\\\\Logs\\\\NoopLoggerProvider'' and OpenTelemetry\\API\\Logs\\NoopLoggerProvider will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/API/Logs/NoopLoggerProviderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\API\\\\Logs\\\\NoopLogger'' and OpenTelemetry\\API\\Logs\\NoopLogger will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/API/Logs/NoopLoggerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with OpenTelemetry\\API\\Logs\\Severity will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/API/Logs/SeverityTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type array is not subtype of native type array\<non\-falsy\-string\>\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: tests/Unit/API/Trace/TraceStateTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\API\\\\Configuration\\\\Config\\\\ComponentPlugin'' and OpenTelemetry\\API\\Configuration\\Config\\ComponentPlugin\<mixed\> will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 5
+			path: tests/Unit/Config/SDK/Configuration/ConfigurationFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\Context\\\\Propagation\\\\EnvironmentGetterSetter'' and OpenTelemetry\\Context\\Propagation\\EnvironmentGetterSetter will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Context/Propagation/EnvironmentGetterSetterTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Common\\\\Export\\\\TransportInterface'' and OpenTelemetry\\SDK\\Common\\Export\\TransportInterface\<''application/x…''\> will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/Contrib/Grpc/GrpcTransportFactoryTest.php
+
+		-
+			message: '#^Trait OpenTelemetry\\Tests\\Unit\\Contrib\\UsesHttpClientTrait is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: tests/Unit/Contrib/UsesHttpClientTrait.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsString\(\) with string will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/Contrib/Zipkin/ZipkinSpanConverterTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertIsFloat\(\) with float will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Common/Configuration/Parser/RatioParserTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Psr\\\\Http\\\\Client\\\\ClientInterface'' and Psr\\Http\\Client\\ClientInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Common/Http/Psr/Client/Discovery/AbstractDiscoveryTestCase.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Psr\\\\Http\\\\Client\\\\ClientInterface'' and Psr\\Http\\Client\\ClientInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/SDK/Common/Http/Psr/Client/DiscoveryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\Context\\\\Propagation\\\\ResponsePropagatorInterface'' and OpenTelemetry\\Context\\Propagation\\ResponsePropagatorInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/FactoryRegistryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\Context\\\\Propagation\\\\TextMapPropagatorInterface'' and OpenTelemetry\\Context\\Propagation\\TextMapPropagatorInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/FactoryRegistryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Common\\\\Export\\\\TransportFactoryInterface'' and OpenTelemetry\\SDK\\Common\\Export\\TransportFactoryInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/FactoryRegistryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\LogRecordExporterFactoryInterface'' and OpenTelemetry\\SDK\\Logs\\LogRecordExporterFactoryInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/FactoryRegistryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Metrics\\\\MetricExporterFactoryInterface'' and OpenTelemetry\\SDK\\Metrics\\MetricExporterFactoryInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/FactoryRegistryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Trace\\\\SpanExporter\\\\SpanExporterFactoryInterface'' and OpenTelemetry\\SDK\\Trace\\SpanExporter\\SpanExporterFactoryInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/FactoryRegistryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\LogRecordExporterInterface'' and OpenTelemetry\\SDK\\Logs\\LogRecordExporterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/Exporter/InMemoryExporterFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\LoggerProviderInterface'' and OpenTelemetry\\SDK\\Logs\\LoggerProviderInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/LoggerProviderBuilderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\API\\\\Logs\\\\LoggerProviderInterface'' and OpenTelemetry\\SDK\\Logs\\LoggerProviderInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/LoggerProviderFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\LoggerProviderBuilder'' and OpenTelemetry\\SDK\\Logs\\LoggerProviderBuilder will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/LoggerProviderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\NoopEventLoggerProvider'' and OpenTelemetry\\SDK\\Logs\\NoopEventLoggerProvider will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/NoopEventLoggerProviderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\NoopLoggerProvider'' and OpenTelemetry\\SDK\\Logs\\NoopLoggerProvider will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/NoopLoggerProviderTest.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: tests/Unit/SDK/Logs/Processor/BatchLogRecordProcessorTest.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between OpenTelemetry\\SDK\\Metrics\\Data\\NumberDataPoint and false will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 3
+			path: tests/Unit/SDK/Logs/Processor/BatchLogRecordProcessorTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Logs\\\\LogRecordProcessorInterface'' and OpenTelemetry\\SDK\\Logs\\Processor\\NoopLogRecordProcessor will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Logs/Processor/NoopLogRecordProcessorTest.php
+
+		-
+			message: '#^Call to new OpenTelemetry\\SDK\\Metrics\\ObservableCallback\(\) on a separate line has no effect\.$#'
+			identifier: new.resultUnused
+			count: 2
+			path: tests/Unit/SDK/Metrics/InstrumentTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\API\\\\Metrics\\\\MeterInterface'' and OpenTelemetry\\API\\Metrics\\MeterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/MeterProviderFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Metrics\\\\MetricExporterInterface'' and OpenTelemetry\\SDK\\Metrics\\MetricExporterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/MetricExporter/ConsoleMetricExporterFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Metrics\\\\MetricExporterInterface'' and OpenTelemetry\\SDK\\Metrics\\MetricExporterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/MetricExporter/InMemoryExporterFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Metrics\\\\MetricExporterInterface'' and OpenTelemetry\\SDK\\Metrics\\MetricExporterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/MetricExporter/NoopMetricExporterFactoryTest.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/SDK/Metrics/MetricReader/ExportingReaderTest.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between OpenTelemetry\\SDK\\Metrics\\Data\\NumberDataPoint and false will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 2
+			path: tests/Unit/SDK/Metrics/MetricReader/ExportingReaderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertFalse\(\) with false will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/StalenessHandler/DelayedStalenessHandlerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertFalse\(\) with false will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/StalenessHandler/ImmediateStalenessHandlerTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertFalse\(\) with false will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Metrics/StalenessHandler/NoopStalenessHandlerTest.php
+
+		-
+			message: '#^Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy\<OpenTelemetry\\SDK\\Metrics\\View\\SelectionCriteriaInterface\>\:\:accepts\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/Unit/SDK/Metrics/View/SelectionCriteriaTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Resource\\\\ResourceInfo'' and OpenTelemetry\\SDK\\Resource\\ResourceInfo will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 2
+			path: tests/Unit/SDK/Resource/ResourceInfoFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true and ''dummy assertion'' will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Resource/ResourceInfoFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\SdkBuilder'' and OpenTelemetry\\SDK\\SdkBuilder will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/SdkTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type OpenTelemetry\\SDK\\Trace\\ReadableSpanInterface is not subtype of native type OpenTelemetry\\API\\Trace\\SpanInterface\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: tests/Unit/SDK/Trace/SpanBuilderTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Trace\\\\SpanExporterInterface'' and OpenTelemetry\\SDK\\Trace\\SpanExporterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Trace/SpanExporter/ConsoleSpanExporterFactoryTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Trace\\\\SpanExporterInterface'' and OpenTelemetry\\SDK\\Trace\\SpanExporterInterface will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Trace/SpanExporter/InMemorySpanExporterFactoryTest.php
+
+		-
+			message: '#^Property OpenTelemetry\\Tests\\Unit\\SDK\\Trace\\SpanExporter\\LoggerDecoratorTest\:\:\$decorated \(OpenTelemetry\\SDK\\Trace\\SpanExporterInterface\|null\) is never assigned null so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: tests/Unit/SDK/Trace/SpanExporter/LoggerDecoratorTest.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: tests/Unit/SDK/Trace/SpanProcessor/BatchSpanProcessorTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Trace\\\\SpanProcessor\\\\BatchSpanProcessorBuilder'' and OpenTelemetry\\SDK\\Trace\\SpanProcessor\\BatchSpanProcessorBuilder will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Trace/SpanProcessor/BatchSpanProcessorTest.php
+
+		-
+			message: '#^PHPDoc tag @var with type OpenTelemetry\\SDK\\Trace\\SpanExporterInterface is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
+			identifier: varTag.nativeType
+			count: 3
+			path: tests/Unit/SDK/Trace/SpanProcessor/BatchSpanProcessorTest.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between OpenTelemetry\\SDK\\Metrics\\Data\\NumberDataPoint and false will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 3
+			path: tests/Unit/SDK/Trace/SpanProcessor/BatchSpanProcessorTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertNotTrue\(\) with false\|null will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/SDK/Trace/SpanProcessor/SimpleSpanProcessorTest.php
