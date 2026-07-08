@@ -49,7 +49,7 @@ jobs:
           echo "spi=${{steps.spi.outcome}}"
           echo "::endgroup::"
 
-          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.phan.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.spi.outcome == 'failure' }} == true ]; then \
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.psalm.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.spi.outcome == 'failure' }} == true ]; then \
             echo "::error::One or more steps failed"; \
           fi
 
@@ -119,7 +119,8 @@ jobs:
 
     - name: Run Phan
       id: phan
-      continue-on-error: ${{ matrix.experimental || false }}
+      # Phan is not yet fully compatible with PHP 8.5; keep non-blocking until fixed upstream.
+      continue-on-error: true
       env:
         XDEBUG_MODE: off
         PHAN_DISABLE_XDEBUG_WARN: 1
