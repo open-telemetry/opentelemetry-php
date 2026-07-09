@@ -154,12 +154,13 @@ class ResourceInfoFactoryTest extends TestCase
             ->willReturn(ResourceInfo::create(Attributes::create([ResourceAttributes::SERVICE_NAME => 'from-registry'])));
 
         Registry::registerResourceDetector('registry-service-name', $detector);
+
         try {
             $resource = ResourceInfoFactory::defaultResource();
 
             $this->assertSame('from-env', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         } finally {
-            Registry::registerResourceDetector('registry-service-name', new class implements ResourceDetectorInterface {
+            Registry::registerResourceDetector('registry-service-name', new class() implements ResourceDetectorInterface {
                 public function getResource(): ResourceInfo
                 {
                     return ResourceInfoFactory::emptyResource();
