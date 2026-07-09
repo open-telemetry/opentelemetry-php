@@ -73,9 +73,9 @@ class ResourceInfoFactory
             }
         }
 
-        $resourceDetectors [] = new Detectors\Environment();
-        $resourceDetectors [] = new Detectors\Sdk();
-        $resourceDetectors [] = new Detectors\Service();
+        $resourceDetectors[] = new Detectors\Environment();
+        $resourceDetectors[] = new Detectors\Sdk();
+        $resourceDetectors[] = new Detectors\Service();
 
         return (new Detectors\Composite($resourceDetectors))->getResource();
     }
