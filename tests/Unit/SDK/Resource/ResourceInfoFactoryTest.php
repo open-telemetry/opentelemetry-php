@@ -166,6 +166,7 @@ class ResourceInfoFactoryTest extends TestCase
                 }
             });
         }
+    }
 
     public static function registryDetectorModesProvider(): Generator
     {
