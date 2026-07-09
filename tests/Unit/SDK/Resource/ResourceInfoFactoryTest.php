@@ -153,6 +153,11 @@ class ResourceInfoFactoryTest extends TestCase
             ->method('getResource')
             ->willReturn(ResourceInfo::create(Attributes::create([ResourceAttributes::SERVICE_NAME => 'from-registry'])));
 
+        $resourceDetectorsProperty = new \ReflectionProperty(Registry::class, 'resourceDetectors');
+        $resourceDetectorsProperty->setAccessible(true);
+        $originalResourceDetectors = $resourceDetectorsProperty->getValue();
+        $resourceDetectorsProperty->setValue([]);
+
         Registry::registerResourceDetector('registry-service-name', $detector);
 
         try {
@@ -160,13 +165,7 @@ class ResourceInfoFactoryTest extends TestCase
 
             $this->assertSame('from-env', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
         } finally {
-            Registry::registerResourceDetector('registry-service-name', new class() implements ResourceDetectorInterface {
-                #[\Override]
-                public function getResource(): ResourceInfo
-                {
-                    return ResourceInfoFactory::emptyResource();
-                }
-            });
+            $resourceDetectorsProperty->setValue($originalResourceDetectors);
         }
     }
 
