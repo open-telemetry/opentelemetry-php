@@ -143,8 +143,8 @@ class ResourceInfoFactoryTest extends TestCase
         ResourceInfoFactory::defaultResource();
     }
 
-#[Group('compliance')]
-#[DataProvider('registryDetectorModesProvider')]
+    #[Group('compliance')]
+    #[DataProvider('registryDetectorModesProvider')]
     public function test_registry_detector_service_name_does_not_override_service_name_from_env(string $detectors): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', $detectors);
