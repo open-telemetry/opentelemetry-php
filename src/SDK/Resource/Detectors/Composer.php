@@ -19,40 +19,38 @@ use OpenTelemetry\SemConv\Version;
 final class Composer implements ResourceDetectorInterface
 {
     /**
+     * Placeholder name that Composer reports for a root package with no `name`
+     * set in composer.json (Composer\Package\Loader\RootPackageLoader).
+     */
+    private const UNSET_NAME = '__root__';
+
+    /**
      * Placeholder version that Composer reports for a root package with no explicit
      * version (Composer\Package\RootPackage::DEFAULT_PRETTY_VERSION).
      */
     private const UNSET_VERSION = '1.0.0+no-version-set';
 
-    /**
-     * @param array{name?: string, pretty_version?: ?string}|null $rootPackage overrides
-     *        the detected Composer root package; used for testing
-     */
-    public function __construct(private readonly ?array $rootPackage = null)
-    {
-    }
-
     #[\Override]
     public function getResource(): ResourceInfo
     {
-        $rootPackage = $this->rootPackage;
-        if ($rootPackage === null) {
-            if (!class_exists(InstalledVersions::class)) {
-                return ResourceInfoFactory::emptyResource();
-            }
-            $rootPackage = InstalledVersions::getRootPackage();
+        if (!class_exists(InstalledVersions::class)) {
+            return ResourceInfoFactory::emptyResource();
         }
+        $rootPackage = InstalledVersions::getRootPackage();
 
-        $attributes = [
-            ServiceAttributes::SERVICE_NAME => $rootPackage['name'] ?? null,
-        ];
+        $attributes = [];
+
+        // Only report service.name when the root package has an explicit name.
+        // Composer substitutes a placeholder ("__root__") when none is set. See #1320.
+        if ($rootPackage['name'] !== self::UNSET_NAME) {
+            $attributes[ServiceAttributes::SERVICE_NAME] = $rootPackage['name'];
+        }
 
         // Only report service.version when the root package has an explicit version.
         // Composer substitutes a placeholder ("1.0.0+no-version-set") when none is set,
         // and other OpenTelemetry SDKs do not set service.version by default. See #1320.
-        $version = $rootPackage['pretty_version'] ?? null;
-        if ($version !== null && $version !== self::UNSET_VERSION) {
-            $attributes[ServiceAttributes::SERVICE_VERSION] = $version;
+        if ($rootPackage['pretty_version'] !== self::UNSET_VERSION) {
+            $attributes[ServiceAttributes::SERVICE_VERSION] = $rootPackage['pretty_version'];
         }
 
         return ResourceInfo::create(Attributes::create($attributes), Version::VERSION_1_38_0->url());
