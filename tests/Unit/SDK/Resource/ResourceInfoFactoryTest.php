@@ -156,11 +156,11 @@ class ResourceInfoFactoryTest extends TestCase
         $resourceDetectorsProperty = new \ReflectionProperty(Registry::class, 'resourceDetectors');
         $resourceDetectorsProperty->setAccessible(true);
         $originalResourceDetectors = $resourceDetectorsProperty->getValue();
-        $resourceDetectorsProperty->setValue([]);
-
-        Registry::registerResourceDetector('registry-service-name', $detector);
 
         try {
+            $resourceDetectorsProperty->setValue([]);
+            Registry::registerResourceDetector('registry-service-name', $detector);
+
             $resource = ResourceInfoFactory::defaultResource();
 
             $this->assertSame('from-env', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
