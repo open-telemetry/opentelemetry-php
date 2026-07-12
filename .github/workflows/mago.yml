@@ -29,7 +29,7 @@ jobs:
             ${{ runner.os }}-mago-
 
       - name: Setup Mago
-        uses: nhedger/setup-mago@b1b8f89862e133daf595f9ec95c7193c36ccfc14 # v1
+        uses: nhedger/setup-mago@db907a61008831176aa6d71499a8479868edb141 # v1
         with:
           version: "latest"
           token: ${{ github.token }}
