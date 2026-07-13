@@ -29,24 +29,23 @@ class ResourceInfoFactory
             return (new Detectors\Composite([
                 new Detectors\Host(),
                 new Detectors\Process(),
+                ...Registry::resourceDetectors(),
                 new Detectors\Environment(),
                 new Detectors\Sdk(),
                 new Detectors\Service(),
-                ...Registry::resourceDetectors(),
             ]))->getResource();
         }
 
         /**
          * Process env-provided detectors:
-         * - host, process, environment, composer first if requested
-         * - sdk, service always
+         * - host, process, composer, service instance first if requested
          * - any other detectors registered in the registry if requested
+         * - environment, sdk, service always
          */
         $resourceDetectors = [];
         foreach ([
             Values::VALUE_DETECTORS_HOST => Detectors\Host::class,
             Values::VALUE_DETECTORS_PROCESS => Detectors\Process::class,
-            Values::VALUE_DETECTORS_ENVIRONMENT => Detectors\Environment::class,
             Values::VALUE_DETECTORS_COMPOSER => Detectors\Composer::class,
             Values::VALUE_DETECTORS_SERVICE_INSTANCE => Detectors\ServiceInstance::class,
         ] as $detector => $class) {
@@ -55,10 +54,9 @@ class ResourceInfoFactory
                 $detectors = array_diff($detectors, [$detector]);
             }
         }
-        $resourceDetectors [] = new Detectors\Sdk();
-        $resourceDetectors [] = new Detectors\Service();
         // Don't try to load mandatory + deprecated detectors
         $detectors = array_diff($detectors, [
+            Values::VALUE_DETECTORS_ENVIRONMENT,
             Values::VALUE_DETECTORS_SDK,
             Values::VALUE_DETECTORS_SERVICE,
             Values::VALUE_DETECTORS_SDK_PROVIDED, //deprecated
@@ -74,6 +72,10 @@ class ResourceInfoFactory
                 self::logWarning($e->getMessage());
             }
         }
+
+        $resourceDetectors[] = new Detectors\Environment();
+        $resourceDetectors[] = new Detectors\Sdk();
+        $resourceDetectors[] = new Detectors\Service();
 
         return (new Detectors\Composite($resourceDetectors))->getResource();
     }

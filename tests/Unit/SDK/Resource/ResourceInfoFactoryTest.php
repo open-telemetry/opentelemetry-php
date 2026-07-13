@@ -143,6 +143,39 @@ class ResourceInfoFactoryTest extends TestCase
         ResourceInfoFactory::defaultResource();
     }
 
+    #[Group('compliance')]
+    #[DataProvider('registryDetectorModesProvider')]
+    public function test_registry_detector_service_name_does_not_override_service_name_from_env(string $detectors): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', $detectors);
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-env');
+        $detector = $this->createMock(ResourceDetectorInterface::class);
+        $detector->expects($this->once())
+            ->method('getResource')
+            ->willReturn(ResourceInfo::create(Attributes::create([ResourceAttributes::SERVICE_NAME => 'from-registry'])));
+
+        $resourceDetectorsProperty = new \ReflectionProperty(Registry::class, 'resourceDetectors');
+        $resourceDetectorsProperty->setAccessible(true);
+        $originalResourceDetectors = $resourceDetectorsProperty->getValue();
+
+        try {
+            $resourceDetectorsProperty->setValue([]);
+            Registry::registerResourceDetector('registry-service-name', $detector);
+
+            $resource = ResourceInfoFactory::defaultResource();
+
+            $this->assertSame('from-env', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+        } finally {
+            $resourceDetectorsProperty->setValue($originalResourceDetectors);
+        }
+    }
+
+    public static function registryDetectorModesProvider(): Generator
+    {
+        yield 'all detectors' => ['all'];
+        yield 'explicit registry detector' => ['registry-service-name'];
+    }
+
     public function test_composite_default_with_extra_resource_from_registry(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'foo,env');
