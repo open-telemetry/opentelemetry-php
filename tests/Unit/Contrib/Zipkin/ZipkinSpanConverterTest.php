@@ -192,7 +192,7 @@ class ZipkinSpanConverterTest extends TestCase
         $this->assertSame('unknown', $row['remoteEndpoint']['serviceName']);
         $this->assertSame($expectedValue, $row['remoteEndpoint'][$expectedKey]);
         $this->assertSame($expectedPort, $row['remoteEndpoint']['port']);
-        $this->assertIsString(json_encode($row, JSON_THROW_ON_ERROR));
+        json_encode($row, JSON_THROW_ON_ERROR);
     }
 
     public static function remoteEndpointIpProvider(): array
