@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Resource\Detectors;
 
+use function count;
 use function extension_loaded;
 use function getmypid;
+use function is_array;
+use function is_string;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
@@ -21,9 +24,6 @@ use const PHP_VERSION;
  */
 final class Process implements ResourceDetectorInterface
 {
-    /**
-     * @psalm-suppress PossiblyUndefinedArrayOffset
-     */
     #[\Override]
     public function getResource(): ResourceInfo
     {
@@ -34,12 +34,13 @@ final class Process implements ResourceDetectorInterface
             ProcessIncubatingAttributes::PROCESS_EXECUTABLE_PATH => PHP_BINARY,
         ];
 
-        /**
-         * @psalm-suppress PossiblyUndefinedArrayOffset
-         */
-        if ($_SERVER['argv'] ?? null) {
-            $attributes[ProcessIncubatingAttributes::PROCESS_COMMAND] = $_SERVER['argv'][0];
-            $attributes[ProcessIncubatingAttributes::PROCESS_COMMAND_ARGS] = $_SERVER['argv'];
+        $argv = $_SERVER['argv'] ?? null;
+        if (is_array($argv)) {
+            $command = $argv[0] ?? null;
+            if (is_string($command)) {
+                $attributes[ProcessIncubatingAttributes::PROCESS_COMMAND] = $command;
+                $attributes[ProcessIncubatingAttributes::PROCESS_ARGS_COUNT] = count($argv);
+            }
         }
 
         /** @phan-suppress-next-line PhanTypeComparisonFromArray */

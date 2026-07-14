@@ -102,6 +102,7 @@ final class ConfigurationTest extends TestCase
             'process.pid',
             'process.executable.path',
             'process.command',
+            'process.args_count',
             'process.owner',
             'service.name',
             'service.namespace',
@@ -140,6 +141,7 @@ final class ConfigurationTest extends TestCase
         $expectedKeys = [
             'process.pid',
             'process.executable.path',
+            'process.args_count',
             'process.owner',
             'process.runtime.name',
             'service.name',

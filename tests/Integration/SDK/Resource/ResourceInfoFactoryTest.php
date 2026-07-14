@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Integration\SDK\Resource;
 
 use Composer\InstalledVersions;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SemConv\Incubating\Attributes\ProcessIncubatingAttributes;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -31,7 +32,9 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNotNull($resource->getAttributes()->get(ProcessIncubatingAttributes::PROCESS_ARGS_COUNT));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_LINE));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
@@ -70,6 +73,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ProcessIncubatingAttributes::PROCESS_ARGS_COUNT));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
@@ -98,6 +102,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ProcessIncubatingAttributes::PROCESS_ARGS_COUNT));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
@@ -125,6 +130,7 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
+        $this->assertNull($resource->getAttributes()->get(ProcessIncubatingAttributes::PROCESS_ARGS_COUNT));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
         $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
@@ -151,7 +157,9 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_PID));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_EXECUTABLE_PATH));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND));
-        $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNotNull($resource->getAttributes()->get(ProcessIncubatingAttributes::PROCESS_ARGS_COUNT));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_ARGS));
+        $this->assertNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_COMMAND_LINE));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_NAME));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::PROCESS_RUNTIME_VERSION));
         $this->assertNotNull($resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_NAME));
