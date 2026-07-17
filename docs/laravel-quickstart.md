@@ -73,7 +73,7 @@ services:
         ports:
             - "9411:9411"
     jaeger:
-        image: jaegertracing/all-in-one
+        image: jaegertracing/jaeger
         environment:
             COLLECTOR_ZIPKIN_HOST_PORT: 9412
 
