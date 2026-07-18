@@ -12,8 +12,6 @@ services:
     - 9411:9411
   jaeger:
     image: jaegertracing/jaeger:2.19.0@sha256:ede4864215be4cd85bd8c3129a2fea6c5713c5653c7282c429dba123014bc68b
-    environment:
-      COLLECTOR_ZIPKIN_HOST_PORT: 9412
     ports:
     - 9412:9412
     - 16686:16686
