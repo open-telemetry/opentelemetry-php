@@ -7,7 +7,7 @@ services:
     depends_on:
       - collector
   zipkin:
-    image: openzipkin/zipkin-slim3:6.1@sha256:fc29b9862c14f4fc241cf0259c585e1cfd4e9b18f01ad36d86adaabb7d01815c
+    image: openzipkin/zipkin-slim:3:6.1@sha256:fc29b9862c14f4fc241cf0259c585e1cfd4e9b18f01ad36d86adaabb7d01815c
     ports:
     - 9411:9411
   jaeger:
