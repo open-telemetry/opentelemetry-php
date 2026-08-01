@@ -45,6 +45,7 @@ We would love to have you on board, please see our [Contributing README](./CONTR
 - [Ago Allikmaa](https://github.com/agoallikmaa), Approver
 - [Amber Sistla](https://github.com/zsistla), Triager
 - [Beniamin](https://github.com/beniamin), Triager
+- [Brett McBride](https://github.com/brettmc), Maintainer
 - [Cedric Ziel](https://github.com/cedricziel), Approver
 - [Fahmy Mohammed](https://github.com/Fahmy-Mohammed), Triager
 - [Jodee Varney](https://github.com/jodeev), Triager
