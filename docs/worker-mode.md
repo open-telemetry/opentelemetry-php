@@ -60,7 +60,10 @@ future work.
 ## Configuration timing
 
 Automatic instrumentation and SDK configuration can be initialized before a
-framework loads its `.env` files. Set `OTEL_*` configuration in the worker
+framework loads its `.env` files. A `.env` file can provide `OTEL_*`
+configuration when its loader runs before OpenTelemetry initialization; whether
+that is true depends on the installed packages and their initialization order.
+For predictable worker startup, set `OTEL_*` configuration in the worker
 process environment (for example, the container or process-manager
 configuration) before Composer autoloading starts. A framework-specific `.env`
 file may be visible to application code yet still be too late for OpenTelemetry
