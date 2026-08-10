@@ -53,6 +53,6 @@ services:
       - '9411:9411'
 
   jaeger:
-    image: jaegertracing/all-in-one:latest
+    image: jaegertracing/jaeger:latest
     ports:
       - "16686:16686"
