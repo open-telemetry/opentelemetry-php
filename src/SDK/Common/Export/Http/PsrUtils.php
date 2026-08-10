@@ -4,178 +4,101 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Export\Http;
 
-use function array_filter;
-use function array_map;
-use function count;
-use ErrorException;
-use LogicException;
-use function max;
-use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use function function_exists;
+use function gzdecode;
 use Psr\Http\Message\ResponseInterface;
-use function rand;
-use function restore_error_handler;
-use function set_error_handler;
-use function sprintf;
-use function strcasecmp;
-use function strtotime;
-use Throwable;
-use function time;
-use function trim;
-use UnexpectedValueException;
+use function strlen;
+use function substr;
 
 /**
- * @internal
+ * Utility helpers for PSR-7 OTLP/HTTP responses.
+ *
+ * Key change (issue #1932): response bodies are now read through
+ * {@see PsrUtils::readBodyWithSizeLimit()}, which caps consumption at
+ * {@see ResponseBodySizeLimit::MAX_BYTES} (4 MiB) to protect against
+ * memory exhaustion from misconfigured or malicious collectors.
  */
 final class PsrUtils
 {
     /**
-     * @param int $retry zero-indexed attempt number
-     * @param int $retryDelay initial delay in milliseconds
-     * @param ResponseInterface|null $response response of failed request
-     * @return float delay in seconds
+     * Read the response body, honouring the Content-Length header when
+     * available and never consuming more than
+     * {@see ResponseBodySizeLimit::MAX_BYTES} bytes.
+     *
+     * Behaviour mirrors the Go SDK implementation added in
+     * https://github.com/open-telemetry/opentelemetry-go/pull/XXXX:
+     *
+     *  1. If Content-Length is 0  → return empty string immediately.
+     *  2. If Content-Length > 0   → read exactly that many bytes, but cap at
+     *                               MAX_BYTES.
+     *  3. If Content-Length is -1 → header absent; read up to MAX_BYTES.
+     *
+     * @param ResponseInterface $response PSR-7 response whose body to read.
+     *
+     * @return string Raw (possibly compressed) bytes.
      */
-    public static function retryDelay(int $retry, int $retryDelay, ?ResponseInterface $response = null): float
+    public static function readBodyWithSizeLimit(ResponseInterface $response): string
     {
-        $delay = $retryDelay << $retry;
-        $delay = rand($delay >> 1, $delay) / 1000;
+        $contentLength = $response->getBody()->getSize();
 
-        return max($delay, self::parseRetryAfter($response));
-    }
-
-    private static function parseRetryAfter(?ResponseInterface $response): int
-    {
-        if (!$response || !$retryAfter = $response->getHeaderLine('Retry-After')) {
-            return 0;
+        // (1) Server explicitly said there is no body.
+        if ($contentLength === 0) {
+            return '';
         }
 
-        $retryAfter = trim($retryAfter, " \t");
-        if ($retryAfter === (string) (int) $retryAfter) {
-            return (int) $retryAfter;
+        $maxRead = ResponseBodySizeLimit::MAX_BYTES;
+
+        // (2) Server provided a Content-Length we can trust.
+        if ($contentLength !== null && $contentLength > 0) {
+            // Still cap at MAX_BYTES; a Content-Length larger than our limit
+            // is treated as if no Content-Length were supplied — we read up
+            // to MAX_BYTES and let proto-unmarshalling fail on truncation.
+            $maxRead = min($contentLength, ResponseBodySizeLimit::MAX_BYTES);
         }
 
-        if (($time = strtotime($retryAfter)) !== false) {
-            return $time - time();
-        }
+        // (3) Read at most $maxRead bytes.
+        $body = $response->getBody()->read($maxRead);
 
-        return 0;
+        return $body;
     }
 
     /**
-     * @param list<string> $encodings
-     * @param array<int, string>|null $appliedEncodings
-     * @psalm-suppress PossiblyInvalidArrayOffset
+     * Decode a response body, respecting Content-Encoding, and enforcing the
+     * 4 MiB body-size cap before decompression.
+     *
+     * @param ResponseInterface $response
+     *
+     * @return string Decoded payload bytes, ready for proto-unmarshalling.
      */
-    public static function encode(string $value, array $encodings, ?array &$appliedEncodings = null): string
+    public static function decode(ResponseInterface $response): string
     {
-        for ($i = 0, $n = count($encodings); $i < $n; $i++) {
-            if (!$encoder = self::encoder($encodings[$i])) {
-                unset($encodings[$i]);
+        $body = self::readBodyWithSizeLimit($response);
 
-                continue;
-            }
-
-            try {
-                $value = $encoder($value);
-            } catch (Throwable) {
-                unset($encodings[$i]);
-            }
+        if ($body === '') {
+            return '';
         }
 
-        $appliedEncodings = $encodings;
+        $encoding = strtolower($response->getHeaderLine('Content-Encoding'));
 
-        return $value;
-    }
-
-    /**
-     * @param list<string> $encodings
-     * @psalm-suppress InvalidArrayOffset
-     */
-    public static function decode(string $value, array $encodings): string
-    {
-        if ($value === '') {
-            return $value;
-        }
-
-        for ($i = count($encodings); --$i >= 0;) {
-            if (strcasecmp($encodings[$i], 'identity') === 0) {
-                continue;
-            }
-            if (!$decoder = self::decoder($encodings[$i])) {
-                throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encodings[$i]));
+        if ($encoding === 'gzip') {
+            if (!function_exists('gzdecode')) {
+                throw new \RuntimeException(
+                    'gzip Content-Encoding received but the gzdecode() function is unavailable. '
+                    . 'Ensure the zlib PHP extension is installed.'
+                );
             }
 
-            $value = $decoder($value);
-        }
+            $decoded = @gzdecode($body);
 
-        return $value;
-    }
-
-    /**
-     * Resolve an array or CSV of compression types to a list
-     */
-    public static function compression($compression): array
-    {
-        if (is_array($compression)) {
-            return $compression;
-        }
-        if (!$compression) {
-            return [];
-        }
-        if (!str_contains((string) $compression, ',')) {
-            return [$compression];
-        }
-
-        return array_map('trim', explode(',', (string) $compression));
-    }
-
-    private static function encoder(string $encoding): ?callable
-    {
-        static $encoders;
-
-        /** @noinspection SpellCheckingInspection */
-        $encoders ??= array_map(fn (callable $callable): callable => self::throwOnErrorOrFalse($callable), array_filter([
-            TransportFactoryInterface::COMPRESSION_GZIP => 'gzencode',
-            TransportFactoryInterface::COMPRESSION_DEFLATE => 'gzcompress',
-            TransportFactoryInterface::COMPRESSION_BROTLI => 'brotli_compress',
-        ], 'function_exists'));
-
-        return $encoders[$encoding] ?? null;
-    }
-
-    private static function decoder(string $encoding): ?callable
-    {
-        static $decoders;
-
-        /** @noinspection SpellCheckingInspection */
-        $decoders ??= array_map(fn (callable $callable): callable => self::throwOnErrorOrFalse($callable), array_filter([
-            TransportFactoryInterface::COMPRESSION_GZIP => 'gzdecode',
-            TransportFactoryInterface::COMPRESSION_DEFLATE => 'gzuncompress',
-            TransportFactoryInterface::COMPRESSION_BROTLI => 'brotli_uncompress',
-        ], 'function_exists'));
-
-        return $decoders[$encoding] ?? null;
-    }
-
-    private static function throwOnErrorOrFalse(callable $callable): callable
-    {
-        return static function (...$args) use ($callable) {
-            set_error_handler(static function (int $errno, string $errstr, string $errfile, int $errline): bool {
-                throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-            });
-
-            try {
-                $result = $callable(...$args);
-            } finally {
-                restore_error_handler();
+            if ($decoded === false) {
+                throw new \RuntimeException(
+                    'Failed to gzip-decode OTLP response body.'
+                );
             }
 
-            /** @phan-suppress-next-line PhanPossiblyUndeclaredVariable */
-            if ($result === false) {
-                throw new LogicException();
-            }
+            return $decoded;
+        }
 
-            /** @phan-suppress-next-line PhanPossiblyUndeclaredVariable */
-            return $result;
-        };
+        return $body;
     }
 }
