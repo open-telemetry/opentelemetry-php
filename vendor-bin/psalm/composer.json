@@ -2,6 +2,6 @@
     "require-dev": {
         "vimeo/psalm": "^6",
         "psalm/plugin-mockery": "^1",
-        "psalm/plugin-phpunit": "^0.19"
+        "psalm/plugin-phpunit": "^0.20"
     }
 }
