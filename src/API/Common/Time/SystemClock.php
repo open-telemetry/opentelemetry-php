@@ -12,11 +12,14 @@ use function microtime;
  */
 final class SystemClock implements ClockInterface
 {
-    private static int $referenceTime = 0;
+    private readonly int $referenceTime;
 
     public function __construct()
     {
-        self::init();
+        $this->referenceTime = self::calculateReferenceTime(
+            microtime(true),
+            hrtime(true)
+        );
     }
 
     public static function create(): self
@@ -28,19 +31,7 @@ final class SystemClock implements ClockInterface
     #[\Override]
     public function now(): int
     {
-        return self::$referenceTime + hrtime(true);
-    }
-
-    private static function init(): void
-    {
-        if (self::$referenceTime > 0) {
-            return;
-        }
-
-        self::$referenceTime = self::calculateReferenceTime(
-            microtime(true),
-            hrtime(true)
-        );
+        return $this->referenceTime + hrtime(true);
     }
 
     /**
