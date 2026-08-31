@@ -29,6 +29,7 @@ sharing diagnostic output.
 For a first test, use the console exporter and disable the other signals:
 
 ```shell
+OTEL_CONFIG_FILE= \
 OTEL_PHP_AUTOLOAD_ENABLED=true \
 OTEL_TRACES_EXPORTER=console \
 OTEL_METRICS_EXPORTER=none \
