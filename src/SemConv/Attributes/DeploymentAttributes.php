@@ -4,14 +4,13 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\SemConv\Incubating\Attributes;
+namespace OpenTelemetry\SemConv\Attributes;
 
 /**
  * Semantic attributes and corresponding values for deployment.
  * @see https://opentelemetry.io/docs/specs/semconv/registry/attributes/deployment/
- * May contain @experimental Semantic Conventions which may change or be removed in the future.
  */
-interface DeploymentIncubatingAttributes
+interface DeploymentAttributes
 {
     /**
      * Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
@@ -51,38 +50,5 @@ interface DeploymentIncubatingAttributes
      * @stable
      */
     public const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_DEVELOPMENT = 'development';
-
-    /**
-     * The ID of the deployment.
-     *
-     * @experimental
-     */
-    public const DEPLOYMENT_ID = 'deployment.id';
-
-    /**
-     * The name of the deployment.
-     *
-     * @experimental
-     */
-    public const DEPLOYMENT_NAME = 'deployment.name';
-
-    /**
-     * The status of the deployment.
-     *
-     * @experimental
-     */
-    public const DEPLOYMENT_STATUS = 'deployment.status';
-
-    /**
-     * failed
-     * @experimental
-     */
-    public const DEPLOYMENT_STATUS_VALUE_FAILED = 'failed';
-
-    /**
-     * succeeded
-     * @experimental
-     */
-    public const DEPLOYMENT_STATUS_VALUE_SUCCEEDED = 'succeeded';
 
 }

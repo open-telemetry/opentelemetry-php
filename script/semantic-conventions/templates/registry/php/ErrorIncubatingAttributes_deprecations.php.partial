@@ -1,0 +1,8 @@
+    /**
+     * Deprecated. Use a domain-specific error message attribute instead.
+     * For feature flag errors use {@see \OpenTelemetry\SemConv\Incubating\Attributes\FeatureFlagIncubatingAttributes::FEATURE_FLAG_ERROR_MESSAGE}.
+     *
+     * @deprecated
+     */
+    public const ERROR_MESSAGE = 'error.message';
+

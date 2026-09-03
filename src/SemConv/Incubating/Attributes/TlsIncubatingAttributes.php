@@ -128,11 +128,13 @@ interface TlsIncubatingAttributes
     public const TLS_PROTOCOL_NAME = 'tls.protocol.name';
 
     /**
+     * SSL
      * @experimental
      */
     public const TLS_PROTOCOL_NAME_VALUE_SSL = 'ssl';
 
     /**
+     * TLS
      * @experimental
      */
     public const TLS_PROTOCOL_NAME_VALUE_TLS = 'tls';

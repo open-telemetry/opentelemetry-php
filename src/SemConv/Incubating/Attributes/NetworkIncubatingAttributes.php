@@ -104,7 +104,7 @@ interface NetworkIncubatingAttributes
     public const NETWORK_CONNECTION_STATE_VALUE_TIME_WAIT = 'time_wait';
 
     /**
-     * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+     * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a Wi-Fi connection.
      *
      * @experimental
      */
@@ -244,6 +244,7 @@ interface NetworkIncubatingAttributes
     public const NETWORK_CONNECTION_TYPE = 'network.connection.type';
 
     /**
+     * Wi-Fi
      * @experimental
      */
     public const NETWORK_CONNECTION_TYPE_VALUE_WIFI = 'wifi';
@@ -276,7 +277,7 @@ interface NetworkIncubatingAttributes
     public const NETWORK_INTERFACE_NAME = 'network.interface.name';
 
     /**
-     * The network IO operation direction.
+     * The direction of traffic from the perspective of the observing host's physical or virtual network interface. It should not be used to represent the logical direction of a stateful connection or network flow.
      *
      * @experimental
      */
@@ -293,7 +294,7 @@ interface NetworkIncubatingAttributes
     public const NETWORK_IO_DIRECTION_VALUE_RECEIVE = 'receive';
 
     /**
-     * Local address of the network connection - IP address or Unix domain socket name.
+     * Local address of the network connection - IP address or UNIX domain socket name.
      *
      * @stable
      */
@@ -307,7 +308,7 @@ interface NetworkIncubatingAttributes
     public const NETWORK_LOCAL_PORT = 'network.local.port';
 
     /**
-     * Peer address of the network connection - IP address or Unix domain socket name.
+     * Peer address of the network connection - IP address or UNIX domain socket name.
      *
      * @stable
      */
@@ -367,7 +368,7 @@ interface NetworkIncubatingAttributes
     public const NETWORK_TRANSPORT_VALUE_PIPE = 'pipe';
 
     /**
-     * Unix domain socket
+     * UNIX domain socket
      * @stable
      */
     public const NETWORK_TRANSPORT_VALUE_UNIX = 'unix';

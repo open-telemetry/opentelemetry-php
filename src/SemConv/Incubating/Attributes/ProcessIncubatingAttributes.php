@@ -97,7 +97,20 @@ interface ProcessIncubatingAttributes
     public const PROCESS_EXECUTABLE_BUILD_ID_GO = 'process.executable.build_id.go';
 
     /**
-     * Profiling specific build ID for executables. See the OTel specification for Profiles for more information.
+     * Deterministic build ID for executables.
+     *
+     * GNU and Go build IDs may be stripped or unavailable in some environments
+     * (e.g., Alpine Linux, Docker images). This attribute provides a deterministic
+     * build ID computed by hashing the first and last 4096 bytes of the file
+     * along with its length:
+     * ```
+     * Input   ← Concat(File[:4096], File[-4096:], BigEndianUInt64(Len(File)))
+     * Digest  ← SHA256(Input)
+     * BuildID ← Digest[:16]
+     * ```
+     *
+     * The result is the first 16 bytes (128 bits) of the SHA256 digest,
+     * represented as a hex string.
      *
      * @experimental
      */

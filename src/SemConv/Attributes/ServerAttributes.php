@@ -13,7 +13,7 @@ namespace OpenTelemetry\SemConv\Attributes;
 interface ServerAttributes
 {
     /**
-     * Server domain name if available without reverse DNS lookup; otherwise, IP address or Unix domain socket name.
+     * Server domain name if available without reverse DNS lookup; otherwise, IP address or UNIX domain socket name.
      * When observed from the client side, and when communicating through an intermediary, `server.address` SHOULD represent the server address behind any intermediaries, for example proxies, if it's available.
      *
      * @stable

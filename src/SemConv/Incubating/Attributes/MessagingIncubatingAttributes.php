@@ -46,8 +46,8 @@ interface MessagingIncubatingAttributes
 
     /**
      * The message destination name
-     * Destination name SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
-     * the broker doesn't have such notion, the destination name SHOULD uniquely identify the broker.
+     * SHOULD uniquely identify a specific queue, topic or other entity within the broker. If
+     * the broker doesn't have such notion, it SHOULD uniquely identify the broker.
      *
      * @experimental
      */
@@ -70,7 +70,7 @@ interface MessagingIncubatingAttributes
 
     /**
      * Low cardinality representation of the messaging destination name
-     * Destination names could be constructed from templates. An example would be a destination name involving a user name or product id. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
+     * Destination names could be constructed from templates. An example would be a destination name involving a username or product ID. Although the destination name in this case is of high cardinality, the underlying template is of low cardinality and can be effectively used for grouping and aggregation.
      *
      * @experimental
      */
@@ -98,7 +98,7 @@ interface MessagingIncubatingAttributes
     public const MESSAGING_GCP_PUBSUB_MESSAGE_ACK_DEADLINE = 'messaging.gcp_pubsub.message.ack_deadline';
 
     /**
-     * The ack id for a given message.
+     * The ack ID for a given message.
      *
      * @experimental
      */
@@ -117,6 +117,15 @@ interface MessagingIncubatingAttributes
      * @experimental
      */
     public const MESSAGING_GCP_PUBSUB_MESSAGE_ORDERING_KEY = 'messaging.gcp_pubsub.message.ordering_key';
+
+    /**
+     * The Kafka cluster ID, obtained from the broker metadata exposed through the Kafka client (or AdminClient) API.
+     *
+     * The cluster ID is a unique identifier reported by the Kafka broker. It identifies the cluster independently of the individual brokers the client is configured to connect to, and remains stable even if broker hostnames, IP addresses, or ports change.
+     *
+     * @experimental
+     */
+    public const MESSAGING_KAFKA_CLUSTER_ID = 'messaging.kafka.cluster.id';
 
     /**
      * Message keys in Kafka are used for grouping alike messages to ensure they're processed on the same partition. They differ from `messaging.message.id` in that they're not unique. If the key is `null`, the attribute MUST NOT be set.
@@ -280,7 +289,7 @@ interface MessagingIncubatingAttributes
     public const MESSAGING_ROCKETMQ_MESSAGE_GROUP = 'messaging.rocketmq.message.group';
 
     /**
-     * Key(s) of message, another way to mark message besides message id.
+     * Key(s) of message, another way to mark message besides message ID.
      *
      * @experimental
      */
