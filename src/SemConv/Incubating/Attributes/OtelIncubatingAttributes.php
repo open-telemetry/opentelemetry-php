@@ -45,28 +45,28 @@ interface OtelIncubatingAttributes
     public const OTEL_COMPONENT_TYPE = 'otel.component.type';
 
     /**
-     * The builtin SDK batching span processor
+     * The built-in SDK batching span processor
      *
      * @experimental
      */
     public const OTEL_COMPONENT_TYPE_VALUE_BATCHING_SPAN_PROCESSOR = 'batching_span_processor';
 
     /**
-     * The builtin SDK simple span processor
+     * The built-in SDK simple span processor
      *
      * @experimental
      */
     public const OTEL_COMPONENT_TYPE_VALUE_SIMPLE_SPAN_PROCESSOR = 'simple_span_processor';
 
     /**
-     * The builtin SDK batching log record processor
+     * The built-in SDK batching log record processor
      *
      * @experimental
      */
     public const OTEL_COMPONENT_TYPE_VALUE_BATCHING_LOG_PROCESSOR = 'batching_log_processor';
 
     /**
-     * The builtin SDK simple log record processor
+     * The built-in SDK simple log record processor
      *
      * @experimental
      */
@@ -122,7 +122,7 @@ interface OtelIncubatingAttributes
     public const OTEL_COMPONENT_TYPE_VALUE_OTLP_HTTP_JSON_LOG_EXPORTER = 'otlp_http_json_log_exporter';
 
     /**
-     * The builtin SDK periodically exporting metric reader
+     * The built-in SDK periodically exporting metric reader
      *
      * @experimental
      */
@@ -161,7 +161,7 @@ interface OtelIncubatingAttributes
      *
      * This attribute SHOULD be used by non-OTLP exporters when destination does not support `EventName` or equivalent field. This attribute MAY be used by applications using existing logging libraries so that it can be used to set the `EventName` field by Collector or SDK components.
      *
-     * @experimental
+     * @stable
      */
     public const OTEL_EVENT_NAME = 'otel.event.name';
 

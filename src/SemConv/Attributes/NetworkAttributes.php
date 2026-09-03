@@ -13,7 +13,7 @@ namespace OpenTelemetry\SemConv\Attributes;
 interface NetworkAttributes
 {
     /**
-     * Local address of the network connection - IP address or Unix domain socket name.
+     * Local address of the network connection - IP address or UNIX domain socket name.
      *
      * @stable
      */
@@ -27,7 +27,7 @@ interface NetworkAttributes
     public const NETWORK_LOCAL_PORT = 'network.local.port';
 
     /**
-     * Peer address of the network connection - IP address or Unix domain socket name.
+     * Peer address of the network connection - IP address or UNIX domain socket name.
      *
      * @stable
      */
@@ -87,7 +87,7 @@ interface NetworkAttributes
     public const NETWORK_TRANSPORT_VALUE_PIPE = 'pipe';
 
     /**
-     * Unix domain socket
+     * UNIX domain socket
      * @stable
      */
     public const NETWORK_TRANSPORT_VALUE_UNIX = 'unix';

@@ -57,14 +57,14 @@ interface ContainerIncubatingAttributes
     /**
      * Container ID. Usually a UUID, as for example used to [identify Docker containers](https://docs.docker.com/engine/containers/run/#container-identification). The UUID might be abbreviated.
      *
-     * @experimental
+     * @stable
      */
     public const CONTAINER_ID = 'container.id';
 
     /**
      * Runtime specific image identifier. Usually a hash algorithm followed by a UUID.
      *
-     * Docker defines a sha256 of the image id; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Container/operation/ContainerInspect) endpoint.
+     * Docker defines a sha256 of the image ID; `container.image.id` corresponds to the `Image` field from the Docker container inspect [API](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Container/operation/ContainerInspect) endpoint.
      * K8s defines a link to the container registry repository with digest `"imageID": "registry.azurecr.io /namespace/service/dockerfile@sha256:bdeabd40c3a8a492eaf9e8e44d0ebbb84bac7ee25ac0cf8a7159d25f62555625"`.
      * The ID is assigned by the container runtime and can vary in different environments. Consider using `oci.manifest.digest` if it is important to identify the same image in different environments/runtimes.
      *
@@ -75,30 +75,30 @@ interface ContainerIncubatingAttributes
     /**
      * Name of the image the container was built on.
      *
-     * @experimental
+     * @stable
      */
     public const CONTAINER_IMAGE_NAME = 'container.image.name';
 
     /**
-     * Repo digests of the container image as provided by the container runtime.
+     * Repository digests of the container image as provided by the container runtime.
      *
      * [Docker](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Image/operation/ImageInspect) and [CRI](https://github.com/kubernetes/cri-api/blob/c75ef5b473bbe2d0a4fc92f82235efd665ea8e9f/pkg/apis/runtime/v1/api.proto#L1237-L1238) report those under the `RepoDigests` field.
      *
-     * @experimental
+     * @stable
      */
     public const CONTAINER_IMAGE_REPO_DIGESTS = 'container.image.repo_digests';
 
     /**
      * Container image tags. An example can be found in [Docker Image Inspect](https://docs.docker.com/reference/api/engine/version/v1.52/#tag/Image/operation/ImageInspect). Should be only the `<tag>` section of the full name for example from `registry.example.com/my-org/my-image:<tag>`.
      *
-     * @experimental
+     * @stable
      */
     public const CONTAINER_IMAGE_TAGS = 'container.image.tags';
 
     /**
      * Container labels, `<key>` being the label name, the value being the label value.
      *
-     * For example, a docker container label `app` with value `nginx` SHOULD be recorded as the `container.label.app` attribute with value `"nginx"`.
+     * For example, a Docker container label `app` with value `nginx` SHOULD be recorded as the `container.label.app` attribute with value `"nginx"`.
      *
      * @experimental
      */
@@ -112,7 +112,7 @@ interface ContainerIncubatingAttributes
     public const CONTAINER_NAME = 'container.name';
 
     /**
-     * A description about the runtime which could include, for example details about the CRI/API version being used or other customisations.
+     * A description about the runtime which could include, for example details about the CRI/API version being used or other customizations.
      *
      * @experimental
      */
