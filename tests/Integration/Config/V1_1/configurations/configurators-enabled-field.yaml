@@ -1,0 +1,19 @@
+# Fixture: verify that file_format "1.1" enabled: field works in all configurators.
+file_format: "1.1"
+
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_file/development:
+            output_stream: stdout
+  tracer_configurator/development:
+    default_config:
+      enabled: false
+    tracers:
+      - name: "enabled-tracer"
+        config:
+          enabled: true
+      - name: "disabled-tracer"
+        config:
+          enabled: false

@@ -1,0 +1,66 @@
+# Regression fixture: verify that the flat TLS fields from file_format "1.0-rc.2"
+# (certificate_file, client_key_file, client_certificate_file, insecure) continue to
+# be accepted after the migration to the tls: sub-object introduced in 1.1.
+file_format: "1.0-rc.2"
+
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+            certificate_file: /app/cert.pem
+            client_key_file: /app/key.pem
+            client_certificate_file: /app/cert.pem
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+    - batch:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            certificate_file: /app/cert.pem
+            client_key_file: /app/key.pem
+            client_certificate_file: /app/cert.pem
+            insecure: false
+            timeout: 10000
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/logs
+            certificate_file: /app/cert.pem
+            client_key_file: /app/key.pem
+            client_certificate_file: /app/cert.pem
+            timeout: 10000
+    - batch:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            certificate_file: /app/cert.pem
+            client_key_file: /app/key.pem
+            client_certificate_file: /app/cert.pem
+            insecure: false
+            timeout: 10000
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/metrics
+            certificate_file: /app/cert.pem
+            client_key_file: /app/key.pem
+            client_certificate_file: /app/cert.pem
+            timeout: 10000
+    - periodic:
+        exporter:
+          otlp_grpc:
+            endpoint: http://localhost:4317
+            certificate_file: /app/cert.pem
+            client_key_file: /app/key.pem
+            client_certificate_file: /app/cert.pem
+            insecure: false
+            timeout: 10000
