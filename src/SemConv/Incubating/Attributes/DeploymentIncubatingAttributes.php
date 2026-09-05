@@ -24,12 +24,36 @@ interface DeploymentIncubatingAttributes
      * - `service.name=frontend`, `deployment.environment.name=production`
      * - `service.name=frontend`, `deployment.environment.name=staging`.
      *
-     * @experimental
+     * @stable
      */
     public const DEPLOYMENT_ENVIRONMENT_NAME = 'deployment.environment.name';
 
     /**
-     * The id of the deployment.
+     * Production environment
+     * @stable
+     */
+    public const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_PRODUCTION = 'production';
+
+    /**
+     * Staging environment
+     * @stable
+     */
+    public const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_STAGING = 'staging';
+
+    /**
+     * Testing environment
+     * @stable
+     */
+    public const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_TEST = 'test';
+
+    /**
+     * Development environment
+     * @stable
+     */
+    public const DEPLOYMENT_ENVIRONMENT_NAME_VALUE_DEVELOPMENT = 'development';
+
+    /**
+     * The ID of the deployment.
      *
      * @experimental
      */

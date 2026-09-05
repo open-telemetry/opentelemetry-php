@@ -6,6 +6,13 @@ namespace OpenTelemetry\SemConv;
 
 enum Version: string
 {
+    case VERSION_1_44_0 = '1.44.0';
+    case VERSION_1_43_0 = '1.43.0';
+    case VERSION_1_42_0 = '1.42.0';
+    case VERSION_1_41_1 = '1.41.1';
+    case VERSION_1_41_0 = '1.41.0';
+    case VERSION_1_40_0 = '1.40.0';
+    case VERSION_1_39_0 = '1.39.0';
     case VERSION_1_38_0 = '1.38.0';
     case VERSION_1_37_0 = '1.37.0';
     case VERSION_1_36_0 = '1.36.0';

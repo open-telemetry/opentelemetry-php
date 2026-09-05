@@ -1,0 +1,40 @@
+# Fixture: verify that file_format "1.1" tls: sub-object is accepted for all OTLP HTTP exporters.
+file_format: "1.1"
+
+tracer_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/traces
+            tls:
+              ca_file: ~
+              cert_file: ~
+              key_file: ~
+            compression: gzip
+            timeout: 10000
+            encoding: protobuf
+
+logger_provider:
+  processors:
+    - batch:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/logs
+            tls:
+              ca_file: ~
+              cert_file: ~
+              key_file: ~
+            timeout: 10000
+
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          otlp_http:
+            endpoint: http://localhost:4318/v1/metrics
+            tls:
+              ca_file: ~
+              cert_file: ~
+              key_file: ~
+            timeout: 10000

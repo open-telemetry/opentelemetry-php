@@ -1,0 +1,8 @@
+file_format: "1.1"
+meter_provider:
+  exemplar_filter: trace_based
+  readers:
+    - periodic:
+        exporter:
+          otlp_file/development:
+            output_stream: stdout

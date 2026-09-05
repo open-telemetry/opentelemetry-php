@@ -14,6 +14,43 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface ServiceIncubatingAttributes
 {
     /**
+     * The operational criticality of the service.
+     *
+     * Application developers are encouraged to set `service.criticality` to express the operational importance of their services. Telemetry consumers MAY use this attribute to optimize telemetry collection or improve user experience.
+     *
+     * @experimental
+     */
+    public const SERVICE_CRITICALITY = 'service.criticality';
+
+    /**
+     * Service is business-critical; downtime directly impacts revenue, user experience, or core functionality.
+     *
+     * @experimental
+     */
+    public const SERVICE_CRITICALITY_VALUE_CRITICAL = 'critical';
+
+    /**
+     * Service is important but has degradation tolerance or fallback mechanisms.
+     *
+     * @experimental
+     */
+    public const SERVICE_CRITICALITY_VALUE_HIGH = 'high';
+
+    /**
+     * Service provides supplementary functionality; degradation has limited user impact.
+     *
+     * @experimental
+     */
+    public const SERVICE_CRITICALITY_VALUE_MEDIUM = 'medium';
+
+    /**
+     * Service is non-essential to core operations; used for background tasks or internal tools.
+     *
+     * @experimental
+     */
+    public const SERVICE_CRITICALITY_VALUE_LOW = 'low';
+
+    /**
      * The string ID of the service instance.
      *
      * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
@@ -43,14 +80,15 @@ interface ServiceIncubatingAttributes
      * for that telemetry. This is typically the case for scraping receivers, as they know the target address and
      * port.
      *
-     * @experimental
+     * @stable
      */
     public const SERVICE_INSTANCE_ID = 'service.instance.id';
 
     /**
      * Logical name of the service.
      *
-     * MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with [`process.executable.name`](process.md), e.g. `unknown_service:bash`. If `process.executable.name` is not available, the value MUST be set to `unknown_service`.
+     * MUST be the same for all instances of horizontally scaled services. If the value was not specified, SDKs MUST fallback to `unknown_service:` concatenated with the process executable name, e.g. `unknown_service:bash`. If the process executable name is not available, the value MUST be set to `unknown_service`.
+     * The process executable name is the name of the process executable, the same value as described by the [`process.executable.name`](process.md) resource attribute.
      *
      * @stable
      */
@@ -61,7 +99,7 @@ interface ServiceIncubatingAttributes
      *
      * A string value having a meaning that helps to distinguish a group of services, for example the team name that owns a group of services. `service.name` is expected to be unique within the same namespace. If `service.namespace` is not specified in the Resource then `service.name` is expected to be unique for all services that have no explicit namespace defined (so the empty/unspecified namespace is simply one more valid namespace). Zero-length namespace string is assumed equal to unspecified namespace.
      *
-     * @experimental
+     * @stable
      */
     public const SERVICE_NAMESPACE = 'service.namespace';
 

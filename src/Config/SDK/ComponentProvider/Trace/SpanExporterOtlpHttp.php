@@ -27,12 +27,16 @@ final class SpanExporterOtlpHttp implements ComponentProvider
     /**
      * @param array{
      *     endpoint: string,
-     *     certificate_file: ?string,
-     *     client_key_file: ?string,
-     *     client_certificate_file: ?string,
+     *     tls: array{
+     *         ca_file: ?string,
+     *         cert_file: ?string,
+     *         key_file: ?string,
+     *     },
      *     headers: list<array{name: string, value: string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|null,
+     *     max_request_size: ?int<0, max>,
+     *     max_response_size: ?int<1, max>,
      *     timeout: int<0, max>,
      *     encoding: 'protobuf'|'json',
      * } $properties
@@ -51,9 +55,9 @@ final class SpanExporterOtlpHttp implements ComponentProvider
             headers: $headers,
             compression: $properties['compression'],
             timeout: $properties['timeout'] / ClockInterface::MILLIS_PER_SECOND,
-            cacert: $properties['certificate_file'],
-            cert: $properties['client_certificate_file'],
-            key: $properties['client_certificate_file'],
+            cacert: $properties['tls']['ca_file'],
+            cert: $properties['tls']['cert_file'],
+            key: $properties['tls']['key_file'],
         ));
     }
 
@@ -62,12 +66,37 @@ final class SpanExporterOtlpHttp implements ComponentProvider
     {
         $node = $builder->arrayNode('otlp_http');
         $node
+            ->beforeNormalization()
+                ->ifArray()
+                ->then(static function (array $v): array {
+                    // Backward compatibility: migrate 1.0-rc.2 flat TLS fields to 1.1 tls: sub-object
+                    if (!isset($v['tls']) && (
+                        array_key_exists('certificate_file', $v) ||
+                        array_key_exists('client_key_file', $v) ||
+                        array_key_exists('client_certificate_file', $v)
+                    )) {
+                        $v['tls'] = [
+                            'ca_file'   => $v['certificate_file'] ?? null,
+                            'key_file'  => $v['client_key_file'] ?? null,
+                            'cert_file' => $v['client_certificate_file'] ?? null,
+                        ];
+                        unset($v['certificate_file'], $v['client_key_file'], $v['client_certificate_file']);
+                    }
+
+                    return $v;
+                })
+            ->end()
             ->children()
-            ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
-            ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/traces')->validate()->always(Validation::ensureString())->end()->end()
-            ->scalarNode('certificate_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('client_key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('client_certificate_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
+                ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/traces')->validate()->always(Validation::ensureString())->end()->end()
+                ->arrayNode('tls')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                        ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                        ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                    ->end()
+                ->end()
                 ->arrayNode('headers')
                     ->arrayPrototype()
                         ->children()
@@ -78,6 +107,8 @@ final class SpanExporterOtlpHttp implements ComponentProvider
                 ->end()
                 ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('compression')->values(['gzip'])->defaultNull()->end()
+                ->integerNode('max_request_size')->min(0)->defaultNull()->end() // TODO: wire when transport supports it
+                ->integerNode('max_response_size')->min(1)->defaultNull()->end() // TODO: wire when transport supports it
                 ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
             ->end()
         ;

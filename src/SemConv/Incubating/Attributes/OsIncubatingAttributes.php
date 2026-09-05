@@ -84,7 +84,7 @@ interface OsIncubatingAttributes
     public const OS_TYPE_VALUE_DRAGONFLYBSD = 'dragonflybsd';
 
     /**
-     * HP-UX (Hewlett Packard Unix)
+     * HP-UX (Hewlett Packard UNIX)
      * @experimental
      */
     public const OS_TYPE_VALUE_HPUX = 'hpux';

@@ -46,8 +46,9 @@ interface DbIncubatingAttributes
      * when the database system supports query text with multiple collections
      * in non-batch operations.
      *
-     * For batch operations, if the individual operations are known to have the same
-     * collection name then that collection name SHOULD be used.
+     * For batch operations, if the individual operations would all have the same
+     * `db.collection.name` when executed as non-batch operations,
+     * then that collection name SHOULD be used.
      *
      * @stable
      */
@@ -65,8 +66,29 @@ interface DbIncubatingAttributes
     public const DB_NAMESPACE = 'db.namespace';
 
     /**
-     * The number of queries included in a batch operation.
-     * Operations are only considered batches when they contain two or more operations, and so `db.operation.batch.size` SHOULD never be `1`.
+     * The number of database operations included in a batch operation.
+     * Except for empty batch requests described below, a batch operation contains two
+     * or more database operations explicitly submitted as separate operations in a single
+     * client call, protocol message, or database command.
+     *
+     * Requests to batch APIs that contain only one operation SHOULD be modeled as single
+     * operations, not as batch operations.
+     *
+     * A database call is not a batch operation solely because one operation accepts
+     * multiple operands, such as keys, rows, documents, points, or other data elements,
+     * including Redis [`MGET`](https://redis.io/docs/latest/commands/mget/) with
+     * multiple keys.
+     *
+     * In batch APIs that execute the same parameterized operation with parameter sets,
+     * each parameter set represents one database operation for determining whether the
+     * request is a batch operation. Requests with only one parameter set SHOULD be modeled
+     * as single operations, not as batch operations.
+     *
+     * `db.operation.batch.size` SHOULD be set to the number of operations in the batch.
+     * It SHOULD NOT be set for non-batch operations.
+     *
+     * A request to execute a batch operation with no operations SHOULD also be treated
+     * as a batch operation, and `db.operation.batch.size` SHOULD be set to `0`.
      *
      * @stable
      */
@@ -85,9 +107,10 @@ interface DbIncubatingAttributes
      * If spaces can occur in the operation name, multiple consecutive spaces
      * SHOULD be normalized to a single space.
      *
-     * For batch operations, if the individual operations are known to have the same operation name
-     * then that operation name SHOULD be used prepended by `BATCH `,
-     * otherwise `db.operation.name` SHOULD be `BATCH` or some other database
+     * For batch operations, if the individual operations would all have the same
+     * `db.operation.name` when executed as non-batch operations,
+     * then that operation name SHOULD be used prepended by `BATCH `.
+     * Otherwise, `db.operation.name` SHOULD be `BATCH` or some other database
      * system specific term if more applicable.
      *
      * @stable
@@ -117,7 +140,12 @@ interface DbIncubatingAttributes
      * up with the parameterized placeholders present in `db.query.text`.
      *
      * It is RECOMMENDED to capture the value as provided by the application
-     * without attempting to do any case normalization.
+     * without attempting to do any case normalization or sanitization.
+     *
+     * Instrumentations SHOULD NOT capture `db.query.parameter.<key>` by default
+     * since values may contain PII or sensitive details.
+     * Application operators are expected to enable specific keys depending
+     * on their privacy and security considerations.
      *
      * `db.query.parameter.<key>` SHOULD NOT be captured on batch operations.
      *
@@ -145,6 +173,12 @@ interface DbIncubatingAttributes
      * [Generating query summary](/docs/db/database-spans.md#generating-a-summary-of-the-query)
      * section.
      *
+     * For batch operations, if the individual operations would all have the same
+     * `db.query.summary` when executed as non-batch operations,
+     * then that query summary SHOULD be used prepended by `BATCH `.
+     * Otherwise, `db.query.summary` SHOULD be `BATCH` or some other database
+     * system specific term if more applicable.
+     *
      * @stable
      */
     public const DB_QUERY_SUMMARY = 'db.query.summary';
@@ -153,7 +187,7 @@ interface DbIncubatingAttributes
      * The database query being executed.
      *
      * For sanitization see [Sanitization of `db.query.text`](/docs/db/database-spans.md#sanitization-of-dbquerytext).
-     * For batch operations, if the individual operations are known to have the same query text then that query text SHOULD be used, otherwise all of the individual query texts SHOULD be concatenated with separator `; ` or some other database system specific separator if more applicable.
+     * For batch operations, if the individual operations would all have the same `db.query.text` when executed as non-batch operations, then that query text SHOULD be used. Otherwise, all of the individual query texts SHOULD be concatenated with separator `; ` or some other database system specific separator if more applicable.
      * Parameterized query text SHOULD NOT be sanitized. Even though parameterized query text can potentially have sensitive data, by using a parameterized query the user is giving a strong signal that any sensitive data will be passed as parameter values, and the benefit to observability of capturing the static part of the query text by default outweighs the risk.
      *
      * @stable
@@ -181,8 +215,9 @@ interface DbIncubatingAttributes
      * It is RECOMMENDED to capture the value as provided by the application
      * without attempting to do any case normalization.
      *
-     * For batch operations, if the individual operations are known to have the same
-     * stored procedure name then that stored procedure name SHOULD be used.
+     * For batch operations, if the individual operations would all have the same
+     * `db.stored_procedure.name` when executed as non-batch operations,
+     * then that stored procedure name SHOULD be used.
      *
      * @stable
      */
