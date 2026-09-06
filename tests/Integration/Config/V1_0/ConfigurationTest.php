@@ -28,10 +28,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Integration tests for file_format "1.0-rc.2" configuration.
+ * Integration tests for file_format "1.0" configuration.
  *
  * Covers the full kitchen-sink config, version-specific inline-YAML behavior tests,
- * and any features or field shapes specific to the 1.0-rc.2 schema.
+ * and any features or field shapes specific to the 1.0 schema.
  */
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
@@ -68,7 +68,7 @@ final class ConfigurationTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Resource priority tests (inline YAML, file_format "1.0-rc.2")
+    // Resource priority tests (inline YAML, file_format "1.0")
     // -------------------------------------------------------------------------
 
     public function test_resource_attributes_take_precedence_over_default_attributes(): void
@@ -80,7 +80,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -99,7 +99,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               detection/development:
                 detectors:
@@ -121,7 +121,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -135,7 +135,7 @@ final class ConfigurationTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Extension point test (inline YAML, file_format "1.0-rc.2")
+    // Extension point test (inline YAML, file_format "1.0")
     // -------------------------------------------------------------------------
 
     public function test_samplers_have_access_to_resource_info_extension(): void
@@ -165,7 +165,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -179,11 +179,11 @@ final class ConfigurationTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // enabled: guard — must be rejected in file_format "1.0-rc.2"
+    // enabled: guard — must be rejected in file_format "1.0"
     // -------------------------------------------------------------------------
 
     /**
-     * Using the 1.1 `enabled:` field in a 1.0-rc.2 file must throw immediately
+     * Using the 1.1 `enabled:` field in a 1.0 file must throw immediately
      * so that users get a clear error message rather than silent misbehaviour.
      */
     public function test_enabled_field_rejected_in_v1_0(): void
@@ -195,10 +195,10 @@ final class ConfigurationTest extends TestCase
         );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/"1\.0-rc\.2"/');
+        $this->expectExceptionMessageMatches('/"1\.0"/');
 
         $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             tracer_provider:
               tracer_configurator/development:
                 default_config:
@@ -207,7 +207,7 @@ final class ConfigurationTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // 1.1-only field guards — must be rejected in file_format "1.0-rc.2"
+    // 1.1-only field guards — must be rejected in file_format "1.0"
     // -------------------------------------------------------------------------
 
     /**
@@ -224,7 +224,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/"1\.0-rc\.2"/');
+        $this->expectExceptionMessageMatches('/"1\.0"/');
         $this->expectExceptionMessageMatches('/' . preg_quote($fieldPath, '/') . '/');
 
         $factory->process([Yaml::parse($yamlFragment)]);
@@ -234,7 +234,7 @@ final class ConfigurationTest extends TestCase
     {
         yield 'attribute_limits.attribute_value_depth_limit' => [
             /** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             attribute_limits:
               attribute_value_depth_limit: 32
             YAML,
@@ -243,7 +243,7 @@ final class ConfigurationTest extends TestCase
 
         yield 'tracer_provider.limits.attribute_value_depth_limit' => [
             /** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             tracer_provider:
               limits:
                 attribute_value_depth_limit: 32
@@ -253,7 +253,7 @@ final class ConfigurationTest extends TestCase
 
         yield 'logger_provider.limits.attribute_value_depth_limit' => [
             /** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             logger_provider:
               limits:
                 attribute_value_depth_limit: 32
@@ -263,7 +263,7 @@ final class ConfigurationTest extends TestCase
 
         yield 'tracer_provider.id_generator' => [
             /** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             tracer_provider:
               id_generator:
                 random: {}
@@ -281,11 +281,66 @@ final class ConfigurationTest extends TestCase
      * client_certificate_file, insecure) that were the only option in
      * file_format "1.0-rc.2" must continue to be accepted for all OTLP
      * exporters after the migration to the `tls:` sub-object in 1.1.
+     * Using a pre-release file_format emits a deprecation notice.
      */
     public function test_flat_tls_fields_still_work_in_v1_0(): void
     {
-        $this->expectNotToPerformAssertions();
-        Configuration::parseFile(__DIR__ . '/configurations/tls-backward-compat.yaml')->create();
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            if ($errno === E_USER_DEPRECATED) {
+                $deprecations[] = $errstr;
+            }
+
+            return true;
+        }, E_USER_DEPRECATED);
+
+        try {
+            Configuration::parseFile(__DIR__ . '/configurations/tls-backward-compat.yaml')->create();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertNotEmpty($deprecations, 'A deprecation notice must be emitted for pre-release file_format');
+        $this->assertMatchesRegularExpression('/pre-release/', $deprecations[0]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Pre-release file_format deprecation notice
+    // -------------------------------------------------------------------------
+
+    /**
+     * file_format values with a pre-release suffix (e.g. "1.0-rc.2") must still
+     * parse successfully but must emit an E_USER_DEPRECATED notice so that users
+     * know to migrate to a stable version string.
+     */
+    public function test_pre_release_file_format_triggers_deprecation(): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            if ($errno === E_USER_DEPRECATED) {
+                $deprecations[] = $errstr;
+            }
+
+            return true;
+        }, E_USER_DEPRECATED);
+
+        try {
+            $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0-rc.2"
+                YAML)]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertNotEmpty($deprecations, 'A deprecation notice must be emitted for pre-release file_format');
+        $this->assertMatchesRegularExpression('/"1\.0-rc\.2"/', $deprecations[0]);
+        $this->assertMatchesRegularExpression('/deprecated/', $deprecations[0]);
     }
 
     // -------------------------------------------------------------------------

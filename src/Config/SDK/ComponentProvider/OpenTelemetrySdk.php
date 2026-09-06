@@ -6,9 +6,11 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\Config\SDK\Configuration\OtelConfigVersion;
 use OpenTelemetry\Config\SDK\Configuration\SemVer;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
@@ -27,7 +29,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
-use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
+use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
@@ -71,7 +73,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 {
     /**
      * @param array{
-     *     file_format: '1.0-rc.2'|'1.1',
+     *     file_format: string,
      *     disabled: bool,
      *     log_level: ?string,
      *     resource: array{
@@ -409,13 +411,12 @@ final class OpenTelemetrySdk implements ComponentProvider
             );
         }
 
-        $logRecordLimitsBuilder = new LogRecordLimitsBuilder();
-        if ($properties['logger_provider']['limits']['attribute_count_limit'] !== null) {
-            $logRecordLimitsBuilder->setAttributeCountLimit($properties['logger_provider']['limits']['attribute_count_limit']);
-        }
-        if ($properties['logger_provider']['limits']['attribute_value_length_limit'] !== null) {
-            $logRecordLimitsBuilder->setAttributeValueLengthLimit($properties['logger_provider']['limits']['attribute_value_length_limit']);
-        }
+        $attributeCountLimit = $properties['logger_provider']['limits']['attribute_count_limit']
+            ?? $properties['attribute_limits']['attribute_count_limit'];
+        $attributeValueLengthLimit = $properties['logger_provider']['limits']['attribute_value_length_limit']
+            ?? $properties['attribute_limits']['attribute_value_length_limit'];
+
+        $logRecordLimits = new LogRecordLimits(Attributes::factory($attributeCountLimit, $attributeValueLengthLimit));
 
         $loggerProvider = new LoggerProvider(
             processor: new MultiLogRecordProcessor($logRecordProcessors),
@@ -423,7 +424,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             resource: $resource,
             configurator: $configurator,
             meterProvider: $meterProvider,
-            logRecordLimits: $logRecordLimitsBuilder->build(),
+            logRecordLimits: $logRecordLimits,
         );
         $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
 
@@ -459,20 +460,17 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->children()
                 ->scalarNode('file_format')
                     ->isRequired()
-                    ->example('0.1')
+                    ->example('1.0')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['1.0-rc.2', '1.1'])->thenInvalid('unsupported version')->end()
+                    ->validate()->always(static function (string $version): string {
+                        OtelConfigVersion::fromVersion($version);
+
+                        return $version;
+                    })->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
                 ->enumNode('log_level')
-                    ->values([
-                        'trace', 'trace2', 'trace3', 'trace4',
-                        'debug', 'debug2', 'debug3', 'debug4',
-                        'info', 'info2', 'info3', 'info4',
-                        'warn', 'warn2', 'warn3', 'warn4',
-                        'error', 'error2', 'error3', 'error4',
-                        'fatal', 'fatal2', 'fatal3', 'fatal4',
-                    ])
+                    ->values(array_map(strtolower(...), array_column(Severity::cases(), 'name')))
                     ->defaultNull()
                     // TODO: apply to SDK internal logger once a control surface exists
                 ->end()
@@ -888,14 +886,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function (array $value): array {
-                    // Normalize composite entries: bare string "name" → ["name" => null]
                     $normalized = [];
                     foreach ($value['composite'] ?? [] as $item) {
-                        if (is_string($item)) {
-                            $normalized[] = [$item => null];
-                        } else {
-                            $normalized[] = $item;
-                        }
+                        $normalized[] = $item;
                     }
                     $value['composite'] = $normalized;
 
@@ -934,14 +927,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->beforeNormalization()
             ->ifArray()
             ->then(static function (array $value): array {
-                // Normalize composite entries: bare string "name" → ["name" => null]
                 $normalized = [];
                 foreach ($value['composite'] ?? [] as $item) {
-                    if (is_string($item)) {
-                        $normalized[] = [$item => null];
-                    } else {
-                        $normalized[] = $item;
-                    }
+                    $normalized[] = $item;
                 }
                 $value['composite'] = $normalized;
 

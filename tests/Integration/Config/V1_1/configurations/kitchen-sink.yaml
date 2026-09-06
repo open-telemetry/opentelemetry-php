@@ -25,15 +25,16 @@ resource:
       value: my-service
   detection/development:
     attributes:
-      included: ["service.*", "host.*", "process.*", "container.*"]
+      included: ["service.*", "host.*", "process.*"]
     detectors:
       - service:
       - host:
       - process:
-      - container:
 
 propagator:
-  composite: [tracecontext, baggage]
+  composite:
+    - tracecontext:
+    - baggage:
 
 tracer_provider:
   limits:

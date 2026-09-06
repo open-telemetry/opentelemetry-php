@@ -170,7 +170,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorEventToSpanEventBridge",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Container",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
