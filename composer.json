@@ -135,8 +135,10 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\IdGeneratorRandom",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysRecord",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
@@ -165,6 +167,7 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordExporterOtlpHttp",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorBatch",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorSimple",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Logs\\LogRecordProcessorEventToSpanEventBridge",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Composer",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Host",
@@ -178,7 +181,6 @@
 
                 "OpenTelemetry\\Example\\ExampleConfigProvider",
 
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Container",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Os",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
