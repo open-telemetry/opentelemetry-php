@@ -69,10 +69,9 @@ class WithSpanHandlerTest extends TestCase
         $this->assertSame($name, $span->getName());
         $this->assertSame($kind, $span->getKind());
         $this->assertSame([
-            'code.function' => 'some_function',
-            'code.namespace' => 'My\Class',
-            'code.filepath' => 'a_file.php',
-            'code.lineno' => 99,
+            'code.function.name' => 'My\Class::some_function',
+            'code.file.path' => 'a_file.php',
+            'code.line.number' => 99,
             'foo' => 'bar',
         ], $span->getAttributes()->toArray());
     }
