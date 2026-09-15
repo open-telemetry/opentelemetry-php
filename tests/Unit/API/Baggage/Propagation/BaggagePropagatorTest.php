@@ -10,6 +10,7 @@ use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\Context\Context;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BaggagePropagator::class)]
@@ -66,12 +67,13 @@ class BaggagePropagatorTest extends TestCase
                     ->set('key2', 'val2:val3')
                     ->set('key3', 'val4@#$val5')
                     ->set('key4', 'key=value', new Metadata('foo=bar=5'))
+                    ->set('key5', 'a b')
                     ->build()
             )
         );
 
         $this->assertSame(
-            ['baggage' => 'key1=val1,key2=val2%3Aval3,key3=val4%40%23%24val5,key4=key%3Dvalue;foo=bar=5'],
+            ['baggage' => 'key1=val1,key2=val2%3Aval3,key3=val4%40%23%24val5,key4=key%3Dvalue;foo=bar=5,key5=a%20b'],
             $carrier
         );
     }
@@ -90,6 +92,24 @@ class BaggagePropagatorTest extends TestCase
         $propagator = BaggagePropagator::getInstance();
 
         $context = $propagator->extract(['baggage' => $header]);
+
+        $this->assertEquals(
+            $expectedBaggage,
+            Baggage::fromContext($context)
+        );
+    }
+
+    #[DataProvider('headerProvider'), Depends('test_extract')]
+    public function test_round_trip(string $header, Baggage $expectedBaggage): void
+    {
+        $propagator = BaggagePropagator::getInstance();
+
+        $context = $propagator->extract(['baggage' => $header]);
+
+        $carrier = [];
+        $propagator->inject($carrier, context: $context);
+
+        $context = $propagator->extract($carrier);
 
         $this->assertEquals(
             $expectedBaggage,
