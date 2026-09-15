@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Baggage\Propagation;
 
 use function explode;
+use function mb_check_encoding;
+use function mb_scrub;
+use function mb_substitute_character;
 use OpenTelemetry\API\Baggage\BaggageBuilderInterface;
 use OpenTelemetry\API\Baggage\Metadata;
+use function rawurldecode;
 use function str_replace;
 use function strlen;
 use function trim;
-use function urldecode;
 
 final class Parser
 {
@@ -63,9 +66,6 @@ final class Parser
             /** @psalm-suppress PossiblyUndefinedArrayOffset */
             [$key, $value] = explode(self::EQUALS, $keyValue, 2);
 
-            $key = urldecode($key);
-            $value = urldecode($value);
-
             $key = str_replace(self::EXCLUDED_KEY_CHARS, '', trim($key), $invalidKeyCharacters);
             if (empty($key) || $invalidKeyCharacters > 0) {
                 continue;
@@ -74,6 +74,19 @@ final class Parser
             $value = str_replace(self::EXCLUDED_VALUE_CHARS, '', trim($value), $invalidValueCharacters);
             if (empty($value) || $invalidValueCharacters > 0) {
                 continue;
+            }
+
+            // https://www.w3.org/TR/baggage/#value
+            $value = rawurldecode($value);
+            if (!mb_check_encoding($value, 'UTF-8')) {
+                $substitute = mb_substitute_character();
+                mb_substitute_character(0xFFFD);
+
+                try {
+                    $value = mb_scrub($value, 'UTF-8');
+                } finally {
+                    mb_substitute_character($substitute);
+                }
             }
 
             $baggageBuilder->set($key, $value, $metadata);

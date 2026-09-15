@@ -52,7 +52,7 @@ class ParserTest extends TestCase
     {
         return [
             'normal' => ['key1=value1,key2=value2'],
-            'encoded' => ['%6b%65%79%31=value1,%6b%65%79%32=value2'],
+            'encoded' => ['key1=%76%61%6C%75%651,key2=%76%61%6C%75%652'],
         ];
     }
 
