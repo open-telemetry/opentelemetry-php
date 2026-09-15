@@ -105,8 +105,8 @@ class BaggagePropagatorTest extends TestCase
             'key - trailing spaces' => ['key    =value1', Baggage::getBuilder()->set('key', 'value1')->build()],
             'key - only spaces' => ['    =value1', Baggage::getEmpty()],
             'key - inner spaces' => ['k ey=value1', Baggage::getEmpty()],
+            'key - not decoded =' => ['ke%3Dy=value1', Baggage::getBuilder()->set('ke%3Dy', 'value1')->build()], // $ 3.3.1.2 - no decoding of key specified
             'key - invalid character' => ['ke?y=value1', Baggage::getEmpty()],
-            'key - invalid =' => ['ke%3Dy=value1', Baggage::getEmpty()],
             'key - multiple invalid' => ['ke<y=value1, ;sss,key=value;meta1=value1;meta2=value2,ke(y=value;meta=val ', Baggage::getBuilder()->set('key', 'value', new Metadata('meta1=value1;meta2=value2'))->build()],
 
             'value - leading spaces' => ['key=  value1', Baggage::getBuilder()->set('key', 'value1')->build()],
@@ -146,6 +146,36 @@ class BaggagePropagatorTest extends TestCase
                     ->set('key1', 'v', new Metadata('alsdf;-asdflkjasdf===asdlfkjadsf'))
                     ->set('key2', 'value2')
                     ->set('key3', 'value3')
+                    ->build(),
+            ],
+            'value - percent-encoded values' => [
+                'space=a%20b,comma=a%2Cb,semi=a%3Bb,quote=a%22b,percent=a%25b',
+                Baggage::getBuilder()
+                    ->set('space', 'a b')
+                    ->set('comma', 'a,b')
+                    ->set('semi', 'a;b')
+                    ->set('quote', 'a"b')
+                    ->set('percent', 'a%b')
+                    ->build(),
+            ],
+            'value - plus is retained' => [
+                'plus=a+b',
+                Baggage::getBuilder()
+                    ->set('plus', 'a+b')
+                    ->build(),
+            ],
+            'value - invalid utf8 codepoint is replaced' => [
+                'key=a%ffb',
+                Baggage::getBuilder()
+                    ->set('key', "a\u{FFFD}b")
+                    ->build(),
+            ],
+            'w3c example - 3.4' => [
+                'userId=alice,serverNode=DF%2028,isProduction=false',
+                Baggage::getBuilder()
+                    ->set('userId', 'alice')
+                    ->set('serverNode', 'DF 28')
+                    ->set('isProduction', 'false')
                     ->build(),
             ],
         ];
