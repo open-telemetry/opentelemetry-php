@@ -64,11 +64,11 @@ class MeterProviderFactory
     private function createExemplarFilter(string $name): ExemplarFilterInterface
     {
         switch ($name) {
-            case KnownValues::VALUE_WITH_SAMPLED_TRACE:
+            case KnownValues::VALUE_TRACE_BASED:
                 return new WithSampledTraceExemplarFilter();
-            case KnownValues::VALUE_ALL:
+            case KnownValues::VALUE_ALWAYS_ON:
                 return new AllExemplarFilter();
-            case KnownValues::VALUE_NONE:
+            case KnownValues::VALUE_ALWAYS_OFF:
                 return new NoneExemplarFilter();
             default:
                 self::logWarning('Unknown exemplar filter: ' . $name);

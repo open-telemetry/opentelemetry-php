@@ -103,7 +103,7 @@ interface Defaults
      * Metrics SDK Configuration
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration
      */
-    public const OTEL_METRICS_EXEMPLAR_FILTER = 'with_sampled_trace';
+    public const OTEL_METRICS_EXEMPLAR_FILTER = 'trace_based';
     public const OTEL_METRIC_EXPORT_INTERVAL = 60000;
     public const OTEL_METRIC_EXPORT_TIMEOUT = 30000;
     public const OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'cumulative';

@@ -35,6 +35,7 @@ interface KnownValues
     public const VALUE_OTTRACE = 'ottrace';
     public const VALUE_ALWAYS_ON = 'always_on';
     public const VALUE_ALWAYS_OFF = 'always_off';
+    public const VALUE_TRACE_BASED = 'trace_based';
     public const VALUE_TRACE_ID_RATIO = 'traceidratio';
     public const VALUE_PARENT_BASED_ALWAYS_ON = 'parentbased_always_on';
     public const VALUE_PARENT_BASED_ALWAYS_OFF = 'parentbased_always_off';
@@ -169,9 +170,9 @@ interface KnownValues
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#metrics-sdk-configuration
      */
     public const OTEL_METRICS_EXEMPLAR_FILTER = [
-        self::VALUE_WITH_SAMPLED_TRACE,
-        self::VALUE_ALL,
-        self::VALUE_NONE,
+        self::VALUE_ALWAYS_ON,
+        self::VALUE_ALWAYS_OFF,
+        self::VALUE_TRACE_BASED,
     ];
     /**
      * Language Specific Environment Variables
