@@ -37,15 +37,27 @@ class LogRecordLimitsBuilder
         return $this;
     }
 
+    private static function resolveAttributeLimit(string $specific, string $general): int
+    {
+        if (Configuration::has($specific)) {
+            return Configuration::getInt($specific);
+        }
+        if (Configuration::has($general)) {
+            return Configuration::getInt($general);
+        }
+
+        return Configuration::getInt($specific);
+    }
+
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#attribute-limits
      */
     public function build(): LogRecordLimits
     {
         $attributeCountLimit = $this->attributeCountLimit
-            ?: Configuration::getInt(Variables::OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT);
+            ?: self::resolveAttributeLimit(Variables::OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT, Variables::OTEL_ATTRIBUTE_COUNT_LIMIT);
         $attributeValueLengthLimit = $this->attributeValueLengthLimit
-            ?: Configuration::getInt(Variables::OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT);
+            ?: self::resolveAttributeLimit(Variables::OTEL_LOGRECORD_ATTRIBUTE_VALUE_LENGTH_LIMIT, Variables::OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT);
 
         if ($attributeValueLengthLimit === PHP_INT_MAX) {
             $attributeValueLengthLimit = null;
