@@ -8,6 +8,11 @@ use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\AllExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\NoneExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilter\WithSampledTraceExemplarFilter;
+use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderFactory;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,5 +48,32 @@ class MeterProviderFactoryTest extends TestCase
             'none' => [KnownValues::VALUE_NONE],
             'unimplemented' => ['foo'],
         ];
+    }
+
+    /**
+     * @param class-string<ExemplarFilterInterface> $expectedFilter
+     */
+    #[DataProvider('exemplarFilterProvider')]
+    public function test_exemplar_filter(?string $filter, string $expectedFilter): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXPORTER, KnownValues::VALUE_NONE);
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXEMPLAR_FILTER, $filter);
+
+        $provider = (new MeterProviderFactory())->create();
+        self::assertInstanceOf(MeterProvider::class, $provider);
+
+        $reflection = new \ReflectionClass($provider);
+        $property = $reflection->getProperty('exemplarFilter');
+        $property->setAccessible(true);
+
+        self::assertInstanceOf($expectedFilter, $property->getValue($provider));
+    }
+
+    public static function exemplarFilterProvider(): iterable
+    {
+        yield 'default' => [null, WithSampledTraceExemplarFilter::class];
+        yield 'always_on' => [KnownValues::VALUE_ALWAYS_ON, AllExemplarFilter::class];
+        yield 'always_off' => [KnownValues::VALUE_ALWAYS_OFF, NoneExemplarFilter::class];
+        yield 'trace_based' => [KnownValues::VALUE_TRACE_BASED, WithSampledTraceExemplarFilter::class];
     }
 }
