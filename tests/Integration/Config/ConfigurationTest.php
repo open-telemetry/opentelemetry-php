@@ -4,41 +4,32 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config;
 
-use OpenTelemetry\API\Configuration\Config\ComponentProvider;
-use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
-use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
-use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
-use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
-use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
-use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Trace\SamplerInterface;
-use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector\ServiceName;
 use org\bovigo\vfs\vfsStream;
-use Override;
 use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Version-agnostic integration tests for SDK configuration.
+ *
+ * Tests here verify SDK behaviour that applies across all supported file_format versions.
+ * Version-specific tests live in the sibling namespaces:
+ *   - V1_0\ConfigurationTest — file_format "1.0-rc.2"
+ *   - V1_1\ConfigurationTest — file_format "1.1"
+ */
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
     #[\Override]
     public function setUp(): void
     {
-        // set up mock file system with /var/log directory, for otlp_file exporter.
         $root = vfsStream::setup('/', null, ['var' => ['log' => []]])->url();
-
         OutputStreamParser::setRoot($root);
     }
 
@@ -46,20 +37,6 @@ final class ConfigurationTest extends TestCase
     public function tearDown(): void
     {
         OutputStreamParser::reset();
-    }
-
-    #[DataProvider('openTelemetryConfigurationDataProvider')]
-    public function test_open_telemetry_configuration(string $file): void
-    {
-        $this->expectNotToPerformAssertions();
-        Configuration::parseFile($file)->create();
-    }
-
-    public static function openTelemetryConfigurationDataProvider(): iterable
-    {
-        yield 'kitchen-sink' => [__DIR__ . '/configurations/kitchen-sink.yaml'];
-        yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
-        yield 'php-specific' => [__DIR__ . '/configurations/php-specific.yaml'];
     }
 
     public function test_configurators(): void
@@ -215,107 +192,10 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
     }
 
-    public function test_resource_attributes_take_precedence_over_default_attributes(): void
+    #[DoesNotPerformAssertions]
+    public function test_empty_tracer_configurator_config(): void
     {
-        $factory = new ConfigurationFactory(
-            [],
-            new OpenTelemetrySdk(),
-            new EnvSourceReader([]),
-        );
-
-        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
-            resource:
-              attributes:
-              - { name: service.name, value: test-service }
-            YAML)]);
-        $resource = $this->getResource($sdk->create(new Context())->build());
-
-        $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
-    }
-
-    public function test_resource_detectors_take_precedence_over_default_attributes(): void
-    {
-        $factory = new ConfigurationFactory(
-            [new ServiceName('test-service')],
-            new OpenTelemetrySdk(),
-            new EnvSourceReader([]),
-        );
-
-        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
-            resource:
-              detection/development:
-                detectors:
-                - service_name:
-            YAML)]);
-        $resource = $this->getResource($sdk->create(new Context())->build());
-
-        $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
-    }
-
-    #[Depends('test_resource_attributes_take_precedence_over_default_attributes')]
-    #[Depends('test_resource_detectors_take_precedence_over_default_attributes')]
-    public function test_resource_attributes_take_precedence_over_resource_detectors(): void
-    {
-        $factory = new ConfigurationFactory(
-            [new ServiceName('should-be-overridden')],
-            new OpenTelemetrySdk(),
-            new EnvSourceReader([]),
-        );
-
-        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
-            resource:
-              attributes:
-              - { name: service.name, value: test-service }
-              detection/development:
-                detectors:
-                - service_name:
-            YAML)]);
-        $resource = $this->getResource($sdk->create(new Context())->build());
-
-        $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
-    }
-
-    public function test_samplers_have_access_to_resource_info_extension(): void
-    {
-        $samplerProvider = new /** @implements ComponentProvider<SamplerInterface> */ class() implements ComponentProvider {
-            public ?string $serviceName = null;
-
-            #[Override]
-            public function createPlugin(array $properties, Context $context): SamplerInterface
-            {
-                $this->serviceName = $context->getExtension(ResourceInfo::class)?->getAttributes()->get('service.name');
-
-                return new AlwaysOnSampler();
-            }
-
-            #[Override]
-            public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
-            {
-                return $builder->arrayNode('remote_sampler');
-            }
-        };
-
-        $factory = new ConfigurationFactory(
-            [$samplerProvider],
-            new OpenTelemetrySdk(),
-            new EnvSourceReader([]),
-        );
-
-        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
-            resource:
-              attributes:
-              - { name: service.name, value: test-service }
-            tracer_provider:
-              sampler:
-                remote_sampler:
-            YAML)]);
-        $sdk->create(new Context());
-
-        $this->assertSame('test-service', $samplerProvider->serviceName);
+        Configuration::parseFile(__DIR__ . '/configurations/empty-tracer-config.yaml')->create();
     }
 
     private function getResource(Sdk $sdk): ResourceInfo
@@ -330,15 +210,7 @@ final class ConfigurationTest extends TestCase
         $stateReflection = new \ReflectionClass($sharedState);
         $resourceProperty = $stateReflection->getProperty('resource');
         $resourceProperty->setAccessible(true);
-        $resource = $resourceProperty->getValue($sharedState);
 
-        return $resource;
-    }
-
-    public function test_empty_tracer_configurator_config(): void
-    {
-        $file = __DIR__ . '/configurations/empty-tracer-config.yaml';
-        $this->expectNotToPerformAssertions();
-        Configuration::parseFile($file)->create();
+        return $resourceProperty->getValue($sharedState);
     }
 }

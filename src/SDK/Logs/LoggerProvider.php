@@ -28,10 +28,11 @@ class LoggerProvider implements LoggerProviderInterface
         ?ResourceInfo $resource = null,
         private ?Configurator $configurator = null,
         ?MeterProviderInterface $meterProvider = null,
+        ?LogRecordLimits $logRecordLimits = null,
     ) {
         $this->loggerSharedState = new LoggerSharedState(
             $resource ?? ResourceInfoFactory::defaultResource(),
-            (new LogRecordLimitsBuilder())->build(),
+            $logRecordLimits ?? (new LogRecordLimitsBuilder())->build(),
             $processor,
             $meterProvider,
         );

@@ -8,7 +8,7 @@
 # The file format version.
 # The yaml format is documented at
 # https://github.com/open-telemetry/opentelemetry-configuration/tree/main/schema
-file_format: "1.0-rc.2"
+file_format: "1.0"
 # Configure if the SDK is disabled or not.
 # If omitted or null, false is used.
 disabled: false
@@ -51,18 +51,10 @@ logger_provider:
           # Configure exporter to be OTLP with HTTP transport.
           otlp_http:
             endpoint: http://localhost:4318/v1/logs
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              ca_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              key_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -93,18 +85,11 @@ logger_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              ca_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              key_file: /app/cert.pem
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -122,10 +107,6 @@ logger_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a batch log record processor.
       batch:
         # Configure exporter.
@@ -276,18 +257,10 @@ meter_provider:
             # Configure endpoint, including the metric specific path.
             # If omitted or null, http://localhost:4318/v1/metrics is used.
             endpoint: http://localhost:4318/v1/metrics
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              ca_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              key_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -357,18 +330,11 @@ meter_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              ca_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              key_file: /app/cert.pem
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -386,10 +352,6 @@ meter_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
             # Configure temporality preference.
             # Values include: cumulative, delta, low_memory. For behavior of values, see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md.
             # If omitted or null, cumulative is used.
@@ -586,18 +548,10 @@ tracer_provider:
             # Configure endpoint, including the trace specific path.
             # If omitted or null, http://localhost:4318/v1/traces is used.
             endpoint: http://localhost:4318/v1/traces
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              ca_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              key_file: /app/cert.pem
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -628,18 +582,11 @@ tracer_provider:
             # Configure endpoint.
             # If omitted or null, http://localhost:4317 is used.
             endpoint: http://localhost:4317
-            # Configure certificate used to verify a server's TLS credentials.
-            # Absolute path to certificate file in PEM format.
-            # If omitted or null, system default certificate verification is used for secure connections.
-            certificate_file: /app/cert.pem
-            # Configure mTLS private client key.
-            # Absolute path to client key file in PEM format. If set, .client_certificate must also be set.
-            # If omitted or null, mTLS is not used.
-            client_key_file: /app/cert.pem
-            # Configure mTLS client certificate.
-            # Absolute path to client certificate file in PEM format. If set, .client_key must also be set.
-            # If omitted or null, mTLS is not used.
-            client_certificate_file: /app/cert.pem
+            tls:
+              ca_file: /app/cert.pem
+              cert_file: /app/cert.pem
+              key_file: /app/cert.pem
+              insecure: false
             # Configure headers. Entries have higher priority than entries from .headers_list.
             # If an entry's .value is null, the entry is ignored.
             headers:
@@ -657,10 +604,6 @@ tracer_provider:
             # Value must be non-negative. A value of 0 indicates no limit (infinity).
             # If omitted or null, 10000 is used.
             timeout: 10000
-            # Configure client transport security for the exporter's connection.
-            # Only applicable when .endpoint is provided without http or https scheme. Implementations may choose to ignore .insecure.
-            # If omitted or null, false is used.
-            insecure: false
     - # Configure a batch span processor.
       batch:
         # Configure exporter.
@@ -840,8 +783,6 @@ resource:
     # Resource detector names are dependent on the SDK language ecosystem. Please consult documentation for each respective language.
     # If omitted or null, no resource detectors are enabled.
     detectors:
-      - # Enable the container resource detector, which populates container.* attributes.
-        container:
       - # Enable the host resource detector, which populates host.* and os.* attributes.
         host:
       - # Enable the process resource detector, which populates process.* attributes.
