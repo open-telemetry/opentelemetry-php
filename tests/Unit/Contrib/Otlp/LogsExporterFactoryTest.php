@@ -77,12 +77,12 @@ class LogsExporterFactoryTest extends TestCase
         $defaultHeaderKeys = ['User-Agent'];
 
         return [
-            'signal-specific endpoint unchanged' => [
+            'signal-specific endpoint (gRPC) has path appended' => [
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_LOGS_PROTOCOL => KnownValues::VALUE_GRPC,
-                    Variables::OTEL_EXPORTER_OTLP_LOGS_ENDPOINT => 'http://collector:4317/foo/bar', //should not be changed, per spec
+                    Variables::OTEL_EXPORTER_OTLP_LOGS_ENDPOINT => 'http://collector:4317',
                 ],
-                'endpoint' => 'http://collector:4317/foo/bar',
+                'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.logs.v1.LogsService/Export',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
