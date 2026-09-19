@@ -6,7 +6,6 @@ namespace OpenTelemetry\Contrib\Otlp;
 
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
-use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
@@ -14,6 +13,8 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
+use function parse_url;
+use const PHP_URL_SCHEME;
 
 class MetricExporterFactory implements MetricExporterFactoryInterface
 {
@@ -104,15 +105,30 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
 
     private function getEndpoint(string $protocol): string
     {
+        if ($protocol === Protocols::GRPC) {
+            $endpoint = OtlpUtil::getStringVar(
+                Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT,
+                Variables::OTEL_EXPORTER_OTLP_ENDPOINT,
+            ) ?? 'http://localhost:4317';
+
+            if (parse_url($endpoint, PHP_URL_SCHEME) === null) {
+                $insecure = OtlpUtil::getBoolVar(
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_INSECURE,
+                    Variables::OTEL_EXPORTER_OTLP_INSECURE,
+                ) ?? false;
+                $endpoint = $insecure
+                    ? 'http://' . $endpoint
+                    : 'https://' . $endpoint;
+            }
+
+            return $endpoint . OtlpUtil::method(Signals::METRICS);
+        }
+
         if (Configuration::has(Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)) {
             return Configuration::getString(Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT);
         }
-        $endpoint = Configuration::has(Variables::OTEL_EXPORTER_OTLP_ENDPOINT)
-            ? Configuration::getString(Variables::OTEL_EXPORTER_OTLP_ENDPOINT)
-            : Defaults::OTEL_EXPORTER_OTLP_ENDPOINT;
-        if ($protocol === Protocols::GRPC) {
-            return $endpoint . OtlpUtil::method(Signals::METRICS);
-        }
+
+        $endpoint = Configuration::getString(Variables::OTEL_EXPORTER_OTLP_ENDPOINT);
 
         return HttpEndpointResolver::create()->resolveToString($endpoint, Signals::METRICS);
     }
