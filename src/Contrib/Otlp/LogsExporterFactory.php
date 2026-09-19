@@ -48,7 +48,7 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
         $timeout = $this->getTimeout();
 
         $cacert = OtlpUtil::getStringVar(Variables::OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE, Variables::OTEL_EXPORTER_OTLP_CERTIFICATE);
-        $cert = OtlpUtil::getStringVar('OTEL_EXPORTER_OTLP_LOGS_CERTIFICATE', 'OTEL_EXPORTER_OTLP_CERTIFICATE');
+        $cert = OtlpUtil::getStringVar('OTEL_EXPORTER_OTLP_LOGS_CLIENT_CERTIFICATE', 'OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
         $key = OtlpUtil::getStringVar('OTEL_EXPORTER_OTLP_LOGS_CLIENT_KEY', 'OTEL_EXPORTER_OTLP_CLIENT_KEY');
 
         $factoryClass = Registry::transportFactory($protocol);

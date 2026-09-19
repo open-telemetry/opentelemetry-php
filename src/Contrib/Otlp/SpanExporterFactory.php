@@ -51,7 +51,7 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
         $timeout = $this->getTimeout();
 
         $cacert = OtlpUtil::getStringVar(Variables::OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE, Variables::OTEL_EXPORTER_OTLP_CERTIFICATE);
-        $cert = OtlpUtil::getStringVar('OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE', 'OTEL_EXPORTER_OTLP_CERTIFICATE');
+        $cert = OtlpUtil::getStringVar('OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE', 'OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE');
         $key = OtlpUtil::getStringVar('OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY', 'OTEL_EXPORTER_OTLP_CLIENT_KEY');
 
         $factoryClass = Registry::transportFactory($protocol);
