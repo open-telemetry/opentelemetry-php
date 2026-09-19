@@ -81,4 +81,19 @@ class OtlpUtil
 
         return $header;
     }
+
+    /**
+     * @internal
+     */
+    public static function getStringVar(string $specific, string $general): ?string
+    {
+        if (Configuration::has($specific)) {
+            return Configuration::getString($specific);
+        }
+        if (Configuration::has($general)) {
+            return Configuration::getString($general);
+        }
+
+        return null;
+    }
 }
