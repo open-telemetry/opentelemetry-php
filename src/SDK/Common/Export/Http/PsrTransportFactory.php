@@ -46,9 +46,7 @@ final class PsrTransportFactory implements TransportFactoryInterface
         }
         assert(!empty($endpoint));
 
-        $this->client ??= Discovery::find([
-            'timeout' => $timeout,
-        ]);
+        $this->client ??= self::findClient($timeout, $cacert, $cert, $key);
         $this->requestFactory ??= Psr17FactoryDiscovery::findRequestFactory();
         $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
 
@@ -63,6 +61,39 @@ final class PsrTransportFactory implements TransportFactoryInterface
             $retryDelay,
             $maxRetries,
         );
+    }
+
+    private static function findClient(
+        float $timeout,
+        ?string $cacert,
+        ?string $cert,
+        ?string $key,
+    ): ClientInterface {
+        $options = [
+            'timeout' => $timeout,
+        ];
+
+        if ($cacert !== null) {
+            $options['verify'] = $cacert;
+            $options['cafile'] = $cacert;
+        }
+        if ($cert !== null) {
+            $options['cert'] = $cert;
+            $options['local_cert'] = $cert;
+        }
+        if ($key !== null) {
+            $options['ssl_key'] = $key;
+            $options['local_pk'] = $key;
+        }
+
+        try {
+            return Discovery::find($options);
+        } catch (InvalidArgumentException) {
+        }
+
+        return Discovery::find([
+            'timeout' => $timeout,
+        ]);
     }
 
     /**
