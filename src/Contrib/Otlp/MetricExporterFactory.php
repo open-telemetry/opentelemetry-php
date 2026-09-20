@@ -121,6 +121,10 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
                     : 'https://' . $endpoint;
             }
 
+            if (OtlpUtil::grpcEndpointContainsPath($endpoint)) {
+                return $endpoint;
+            }
+
             return $endpoint . OtlpUtil::method(Signals::METRICS);
         }
 

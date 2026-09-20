@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
+use const E_USER_DEPRECATED;
 use function explode;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use function parse_url;
+use function sprintf;
+use function trigger_error;
 use UnexpectedValueException;
 
 class OtlpUtil
@@ -80,6 +84,22 @@ class OtlpUtil
         }
 
         return $header;
+    }
+
+    /**
+     * @internal
+     *
+     * @todo In a future (breaking) change, reject gRPC endpoints containing path
+     */
+    public static function grpcEndpointContainsPath(string $endpoint): bool
+    {
+        if (parse_url($endpoint, PHP_URL_PATH) === null) {
+            return false;
+        }
+
+        trigger_error(sprintf('gRPC endpoint ("%s") contains a path, which is not supported. The path is currently interpreted as the gRPC service method, but this will become an error in a future version. The endpoint URL should contain only the scheme, host, and port.', $endpoint), E_USER_DEPRECATED);
+
+        return true;
     }
 
     /**

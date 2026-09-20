@@ -87,6 +87,16 @@ class LogsExporterFactoryTest extends TestCase
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
             ],
+            'signal-specific endpoint (gRPC) is kept as-is if path is present (backwards compatibility)' => [
+                'env' => [
+                    Variables::OTEL_EXPORTER_OTLP_LOGS_PROTOCOL => KnownValues::VALUE_GRPC,
+                    Variables::OTEL_EXPORTER_OTLP_LOGS_ENDPOINT => 'http://collector:4317/service/method',
+                ],
+                'endpoint' => 'http://collector:4317/service/method',
+                'protocol' => 'application/x-protobuf',
+                'compression' => 'none',
+                'headerKeys' => $defaultHeaderKeys,
+            ],
             'endpoint has path appended' => [
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_LOGS_PROTOCOL => KnownValues::VALUE_GRPC,

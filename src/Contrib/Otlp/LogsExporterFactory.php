@@ -91,6 +91,10 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
                     : 'https://' . $endpoint;
             }
 
+            if (OtlpUtil::grpcEndpointContainsPath($endpoint)) {
+                return $endpoint;
+            }
+
             return $endpoint . OtlpUtil::method(Signals::LOGS);
         }
 

@@ -85,6 +85,10 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
                     : 'https://' . $endpoint;
             }
 
+            if (OtlpUtil::grpcEndpointContainsPath($endpoint)) {
+                return $endpoint;
+            }
+
             return $endpoint . OtlpUtil::method(Signals::TRACE);
         }
 
