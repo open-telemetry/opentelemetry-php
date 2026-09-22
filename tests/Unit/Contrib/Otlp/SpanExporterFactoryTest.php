@@ -76,12 +76,22 @@ class SpanExporterFactoryTest extends TestCase
         $defaultHeaderKeys = ['User-Agent'];
 
         return [
-            'signal-specific endpoint unchanged' => [
+            'signal-specific endpoint (gRPC) has path appended' => [
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => KnownValues::VALUE_GRPC,
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://collector:4317/foo/bar', //should not be changed, per spec
+                    Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://collector:4317',
                 ],
-                'endpoint' => 'http://collector:4317/foo/bar',
+                'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.trace.v1.TraceService/Export',
+                'protocol' => 'application/x-protobuf',
+                'compression' => 'none',
+                'headerKeys' => $defaultHeaderKeys,
+            ],
+            'signal-specific endpoint (gRPC) is kept as-is if path is present (backwards compatibility)' => [
+                'env' => [
+                    Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => KnownValues::VALUE_GRPC,
+                    Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://collector:4317/service/method',
+                ],
+                'endpoint' => 'http://collector:4317/service/method',
                 'protocol' => 'application/x-protobuf',
                 'compression' => 'none',
                 'headerKeys' => $defaultHeaderKeys,
