@@ -87,7 +87,7 @@ final class PsrTransport implements TransportInterface
                     break;
                 }
 
-                if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500 && !in_array($response->getStatusCode(), [408, 429], true)) {
+                if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 600 && !in_array($response->getStatusCode(), [429, 502, 503, 504], true)) {
                     throw new RuntimeException($response->getReasonPhrase(), $response->getStatusCode());
                 }
             } catch (NetworkExceptionInterface $e) {
