@@ -75,5 +75,11 @@ class MeterProviderFactoryTest extends TestCase
         yield 'always_on' => [KnownValues::VALUE_ALWAYS_ON, AllExemplarFilter::class];
         yield 'always_off' => [KnownValues::VALUE_ALWAYS_OFF, NoneExemplarFilter::class];
         yield 'trace_based' => [KnownValues::VALUE_TRACE_BASED, WithSampledTraceExemplarFilter::class];
+        yield 'legacy_all' => [KnownValues::VALUE_ALL, AllExemplarFilter::class];
+        yield 'legacy_none' => [KnownValues::VALUE_NONE, NoneExemplarFilter::class];
+        yield 'legacy_with_sampled_trace' => [
+            KnownValues::VALUE_WITH_SAMPLED_TRACE,
+            WithSampledTraceExemplarFilter::class,
+        ];
     }
 }
