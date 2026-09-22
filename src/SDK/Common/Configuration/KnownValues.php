@@ -173,6 +173,9 @@ interface KnownValues
         self::VALUE_ALWAYS_ON,
         self::VALUE_ALWAYS_OFF,
         self::VALUE_TRACE_BASED,
+        self::VALUE_ALL,
+        self::VALUE_NONE,
+        self::VALUE_WITH_SAMPLED_TRACE,
     ];
     /**
      * Language Specific Environment Variables
