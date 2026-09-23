@@ -34,7 +34,7 @@ class InMemoryStorageManagerWithSKDAutoload extends TestCase
     public function test_in_memory_storage_manager_for_metrics_with_sdk_autoload_enabled(): void
     {
         $this->setEnvironmentVariable('OTEL_METRICS_EXPORTER', 'memory');
-        $this->setEnvironmentVariable('OTEL_METRICS_EXEMPLAR_FILTER', 'all');
+        $this->setEnvironmentVariable('OTEL_METRICS_EXEMPLAR_FILTER', 'always_on');
         $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE', 'cumulative');
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         SdkAutoloader::autoload();
