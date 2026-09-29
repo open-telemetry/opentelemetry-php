@@ -1,4 +1,4 @@
-file_format: '0.3'
+file_format: '1.0'
 
 disabled: ${OTEL_SDK_DISABLED}
 
@@ -6,26 +6,17 @@ resource:
   attributes:
     - name: service.name
       value: ${OTEL_SERVICE_NAME}
+  attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
 
-propagators:
+propagator:
   composite: [ tracecontext, baggage ]
 
 response_propagator/development:
-  composite: [ servertiming, traceresponse ]
+  composite_list: "servertiming,traceresponse"
 
 attribute_limits:
   attribute_value_length_limit: ${OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}
   attribute_count_limit: ${OTEL_ATTRIBUTE_COUNT_LIMIT}
-
-exporters:
-  otlp: &otlp-exporter
-    protocol: ${OTEL_EXPORTER_OTLP_PROTOCOL}
-    endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT}
-    certificate: ${OTEL_EXPORTER_OTLP_CERTIFICATE}
-    client_key: ${OTEL_EXPORTER_OTLP_CLIENT_KEY}
-    client_certificate: ${OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE}
-    compression: ${OTEL_EXPORTER_OTLP_COMPRESSION}
-    timeout: ${OTEL_EXPORTER_OTLP_TIMEOUT}
 
 tracer_provider:
   sampler:
@@ -50,4 +41,12 @@ tracer_provider:
         max_queue_size: ${OTEL_BSP_MAX_QUEUE_SIZE}
         max_export_batch_size: ${OTEL_BSP_MAX_EXPORT_BATCH_SIZE}
         exporter:
-          otlp: *otlp-exporter
+          otlp_http:
+            endpoint: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+            tls:
+              ca_file: ${OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE}
+              cert_file: ${OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE}
+              key_file: ${OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY}
+            headers_list: ${OTEL_EXPORTER_OTLP_TRACES_HEADERS}
+            compression: ${OTEL_EXPORTER_OTLP_TRACES_COMPRESSION}
+            timeout: ${OTEL_EXPORTER_OTLP_TRACES_TIMEOUT}

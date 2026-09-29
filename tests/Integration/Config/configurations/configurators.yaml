@@ -1,13 +1,12 @@
-file_format: '1.0-rc.2'
+file_format: '1.0'
 
-propagators:
-  composite: [ tracecontext, baggage ]
+propagator:
+  composite:
+    - tracecontext:
+    - baggage:
 
 response_propagator/development:
   composite: []
-
-exporters:
-  console:
 
 tracer_provider:
   sampler:
@@ -20,14 +19,14 @@ tracer_provider:
           console:
   tracer_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
     tracers:
       - name: A.*
         config:
-          disabled: false
+          enabled: true
       - name: B.*
         config:
-          disabled: true
+          enabled: false
 meter_provider:
   readers:
     - periodic:
@@ -35,14 +34,14 @@ meter_provider:
           console:
   meter_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
     meters:
       - name: A.*
         config:
-          disabled: false
+          enabled: true
       - name: B.*
         config:
-          disabled: true
+          enabled: false
 logger_provider:
   processors:
     - batch:
@@ -50,11 +49,11 @@ logger_provider:
           console:
   logger_configurator/development:
     default_config:
-      disabled: true
+      enabled: false
     loggers:
       - name: A.*
         config:
-          disabled: false
+          enabled: true
       - name: B.*
         config:
-          disabled: true
+          enabled: false

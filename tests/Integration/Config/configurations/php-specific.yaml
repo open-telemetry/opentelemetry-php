@@ -1,5 +1,5 @@
 # This config tests PHP-specific additions to declarative config, which are not defined in the upstream spec.
-file_format: '1.0-rc.2'
+file_format: '1.0'
 # Configure response propagators.
 # If omitted, a noop response propagator is used.
 response_propagator/development:

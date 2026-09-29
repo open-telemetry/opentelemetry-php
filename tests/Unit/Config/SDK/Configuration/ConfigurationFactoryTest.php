@@ -284,7 +284,6 @@ final class ConfigurationFactoryTest extends TestCase
                 new ComponentProvider\Trace\SamplerTraceIdRatioBased(),
                 new ComponentProvider\Trace\SpanExporterConsole(),
                 new ComponentProvider\Trace\SpanExporterOtlp(),
-                new ComponentProvider\Trace\SpanExporterZipkin(),
                 new ComponentProvider\Trace\SpanProcessorBatch(),
                 new ComponentProvider\Trace\SpanProcessorSimple(),
 

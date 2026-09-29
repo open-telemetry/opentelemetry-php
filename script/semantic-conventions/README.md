@@ -43,5 +43,9 @@ Add an entry to `src/SemConv/Version.php` for the new version.
 
 ## Update tests
 
-Update `tests/Integration/Config/configurations/kitchen-sink.yaml`'s `resource.schema_url` value to the latest, as merging resources
+Update the `resource.schema_url` value in `tests/Integration/Config/configurations/resource.yaml`,
+`resource-include-exclude.yaml` and `resource-default.yaml` to the latest, as merging resources
 with different schema URLs is a merging error, per spec.
+
+Leave the older `schema_url` values under `configurations/upstream/` alone; those files are verbatim
+copies, synced only by `script/config-snippets/sync.sh`.

@@ -59,6 +59,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
                     ->values(['cumulative', 'delta', 'lowmemory'])
                     ->defaultValue('cumulative')
                 ->end()
+                // TODO honour default_histogram_aggregation
                 ->enumNode('default_histogram_aggregation')
                     ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
                     ->defaultValue('explicit_bucket_histogram')

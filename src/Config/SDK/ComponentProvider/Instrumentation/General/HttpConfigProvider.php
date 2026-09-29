@@ -48,6 +48,9 @@ class HttpConfigProvider implements ComponentProvider
                 ->arrayNode('response_captured_headers')
                     ->scalarPrototype()->end()
                 ->end()
+                ->arrayNode('known_methods')
+                    ->scalarPrototype()->end()
+                ->end()
             ->end()
         ;
 
