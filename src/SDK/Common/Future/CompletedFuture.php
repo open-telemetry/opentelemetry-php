@@ -9,7 +9,7 @@ use Throwable;
 
 /**
  * @template T
- * @template-implements FutureInterface<T>
+ * @implements FutureInterface<T>
  */
 final class CompletedFuture implements FutureInterface
 {

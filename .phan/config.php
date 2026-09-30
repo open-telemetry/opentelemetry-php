@@ -288,6 +288,9 @@ return [
         'PhanTemplateTypeNotUsedInFunctionReturn',
         'PhanCompatibleOverrideAttribute',
         'PhanUndeclaredClassAttribute',
+        'PhanUnextractableAnnotation',
+        'PhanUnextractableAnnotationElementName',
+        'PhanUnextractableAnnotationSuffix',
     ],
 
     // A regular expression to match files to be excluded

@@ -67,9 +67,9 @@ final class StackTraceFormatter
 
     /**
      * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
-     * @psalm-param Frames $frames
+     * @param Frames $frames
      * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
-     * @psalm-param Frames|null $enclosing
+     * @param Frames|null $enclosing
      * @psalm-suppress InvalidArrayOffset
      */
     private static function writeFrames(string &$s, array $frames, ?array $enclosing): void

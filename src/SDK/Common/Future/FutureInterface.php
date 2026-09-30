@@ -18,7 +18,7 @@ interface FutureInterface
 
     /**
      * @psalm-template U
-     * @psalm-param Closure(T): U $closure
+     * @param Closure(T): U $closure
      * @psalm-return FutureInterface<U>
      *
      * @psalm-suppress InvalidTemplateParam
@@ -27,7 +27,7 @@ interface FutureInterface
 
     /**
      * @psalm-template U
-     * @psalm-param Closure(\Throwable): U $closure
+     * @param Closure(\Throwable): U $closure
      * @psalm-return FutureInterface<T|U>
      */
     public function catch(Closure $closure): FutureInterface;

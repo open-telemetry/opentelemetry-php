@@ -23,14 +23,14 @@ use Throwable;
  * @internal
  *
  * @psalm-template CONTENT_TYPE of string
- * @template-implements TransportInterface<CONTENT_TYPE>
+ * @implements TransportInterface<CONTENT_TYPE>
  */
 final class StreamTransport implements TransportInterface
 {
     /**
      * @param resource|null $stream
      *
-     * @psalm-param CONTENT_TYPE $contentType
+     * @param CONTENT_TYPE $contentType
      */
     public function __construct(
         private $stream,

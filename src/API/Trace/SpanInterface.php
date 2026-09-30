@@ -100,7 +100,7 @@ interface SpanInterface extends ImplicitContextKeyedInterface
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#set-status
      *
-     * @psalm-param StatusCode::STATUS_* $code
+     * @param StatusCode::STATUS_* $code
      */
     public function setStatus(string $code, ?string $description = null): SpanInterface;
 

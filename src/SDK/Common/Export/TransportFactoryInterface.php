@@ -12,9 +12,9 @@ interface TransportFactoryInterface
 
     /**
      * @psalm-template CONTENT_TYPE of string
-     * @psalm-param CONTENT_TYPE $contentType
-     * @psalm-param array<string, string|string[]> $headers
-     * @psalm-param string|string[]|null $compression
+     * @param CONTENT_TYPE $contentType
+     * @param array<string, string|string[]> $headers
+     * @param string|string[]|null $compression
      * @psalm-return TransportInterface<CONTENT_TYPE>
      */
     public function create(

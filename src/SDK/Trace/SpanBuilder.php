@@ -98,7 +98,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
     /**
      * @inheritDoc
      *
-     * @psalm-param API\SpanKind::KIND_* $spanKind
+     * @param API\SpanKind::KIND_* $spanKind
      */
     #[\Override]
     public function setSpanKind(int $spanKind): API\SpanBuilderInterface

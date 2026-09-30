@@ -811,7 +811,7 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
-     * @psalm-param StatusCode::STATUS_* $code
+     * @param StatusCode::STATUS_* $code
      *
      * When span status is set to Ok it SHOULD be considered final and any further attempts to change it SHOULD be ignored.
      */
@@ -855,8 +855,8 @@ class SpanTest extends MockeryTestCase
     }
 
     /**
+     * @param API\SpanKind::KIND_* $kind
      * @param list<LinkInterface> $links
-     * @psalm-param API\SpanKind::KIND_* $kind
      */
     private function createTestSpan(
         int $kind = API\SpanKind::KIND_INTERNAL,
@@ -905,7 +905,7 @@ class SpanTest extends MockeryTestCase
             );
     }
 
-    /** @psalm-param API\StatusCode::STATUS_* $status */
+    /** @param API\StatusCode::STATUS_* $status */
     private function spanDoWork(Span $span, ?string $status = null, ?string $description = null): void
     {
         $span->setAttribute('single_string_attribute', 'some_string_value');
@@ -937,7 +937,7 @@ class SpanTest extends MockeryTestCase
     /**
      * @param list<EventInterface> $events
      * @param list<LinkInterface> $links
-     * @psalm-param API\StatusCode::STATUS_* $status
+     * @param API\StatusCode::STATUS_* $status
      */
     private function assertSpanData(
         SpanDataInterface $spanData,

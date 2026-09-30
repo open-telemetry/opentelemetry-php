@@ -37,8 +37,8 @@ final class Context
 
     /**
      * @psalm-template T of object
-     * @psalm-param T $extension
-     * @psalm-param class-string<T>|null $type
+     * @param T $extension
+     * @param class-string<T>|null $type
      */
     public function withExtension(object $extension, ?string $type = null): self
     {
@@ -52,7 +52,7 @@ final class Context
 
     /**
      * @psalm-template T of object
-     * @psalm-param class-string<T> $type
+     * @param class-string<T> $type
      * @psalm-return T|null
      */
     public function getExtension(string $type): ?object

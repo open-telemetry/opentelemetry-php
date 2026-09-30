@@ -21,30 +21,30 @@ interface AggregationInterface
     public function initialize();
 
     /**
-     * @psalm-param T $summary
-     * @psalm-param float|int $value
+     * @param T $summary
+     * @param float|int $value
      */
     public function record($summary, $value, AttributesInterface $attributes, ContextInterface $context, int $timestamp): void;
 
     /**
-     * @psalm-param T $left
-     * @psalm-param T $right
+     * @param T $left
+     * @param T $right
      * @psalm-return T
      */
     public function merge($left, $right);
 
     /**
-     * @psalm-param T $left
-     * @psalm-param T $right
+     * @param T $left
+     * @param T $right
      * @psalm-return T
      */
     public function diff($left, $right);
 
     /**
      * @param array<AttributesInterface> $attributes
+     * @param array<T> $summaries
      * @param array<list<Exemplar>> $exemplars
      * @param string|Temporality $temporality
-     * @psalm-param array<T> $summaries
      */
     public function toData(
         array $attributes,

@@ -23,7 +23,7 @@ class LogsExporter implements LogRecordExporterInterface
     private ProtobufSerializer $serializer;
 
     /**
-     * @psalm-param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
+     * @param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
      */
     public function __construct(private TransportInterface $transport)
     {
