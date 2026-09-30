@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 
 /**
- * @psalm-template T
+ * @template T
  */
 interface AggregationInterface
 {

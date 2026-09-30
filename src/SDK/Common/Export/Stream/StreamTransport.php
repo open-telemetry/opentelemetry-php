@@ -22,7 +22,7 @@ use Throwable;
 /**
  * @internal
  *
- * @psalm-template CONTENT_TYPE of string
+ * @template CONTENT_TYPE of string
  * @implements TransportInterface<CONTENT_TYPE>
  */
 final class StreamTransport implements TransportInterface

@@ -11,7 +11,7 @@ interface TransportFactoryInterface
     public const COMPRESSION_BROTLI = 'br';
 
     /**
-     * @psalm-template CONTENT_TYPE of string
+     * @template CONTENT_TYPE of string
      * @param CONTENT_TYPE $contentType
      * @param array<string, string|string[]> $headers
      * @param string|string[]|null $compression

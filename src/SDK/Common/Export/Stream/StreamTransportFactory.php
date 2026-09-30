@@ -27,7 +27,7 @@ final class StreamTransportFactory implements TransportFactoryInterface
      * @param array<string, string|string[]> $headers
      * @param string|string[]|null $compression
      *
-     * @psalm-template CONTENT_TYPE of string
+     * @template CONTENT_TYPE of string
      * @throws ErrorException
      * @psalm-return TransportInterface<CONTENT_TYPE>
      *

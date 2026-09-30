@@ -53,64 +53,64 @@ deptrac:
                   value: proto/otel/.*
       -   name: GoogleProtobuf
           collectors:
-              -   type: className
-                  regex: ^Google\\Protobuf\\*
+              -   type: classNameRegex
+                  value: '#^Google\\Protobuf\\*#'
       -   name: Grpc
           collectors:
-              - type: className
-                regex: ^Grpc\\*
+              - type: classNameRegex
+                value: '#^Grpc\\*#'
       -   name: PsrLog
           collectors:
-              - type: className
-                regex: ^Psr\\Log\\*
+              - type: classNameRegex
+                value: '#^Psr\\Log\\*#'
       -   name: PsrHttp
           collectors:
-              - type: className
-                regex: ^Psr\\Http\\*
+              - type: classNameRegex
+                value: '#^Psr\\Http\\*#'
       -   name: HttpPlug
           collectors:
-              - type: className
-                regex: ^Http\\*
+              - type: classNameRegex
+                value: '#^Http\\*#'
       -   name: Prometheus
           collectors:
-              - type: className
-                regex: ^Prometheus\\*
+              - type: classNameRegex
+                value: '#^Prometheus\\*#'
       -   name: FFI
           collectors:
-              - type: className
-                regex: ^FFI\\*
+              - type: classNameRegex
+                value: '#^FFI\\*#'
       -   name: Composer
           collectors:
-              - type: className
-                regex: ^Composer\\*
+              - type: classNameRegex
+                value: '#^Composer\\*#'
       -   name: HttpClients
           collectors:
-              - type: className
-                value: ^Symfony\\Component\\HttpClient\\*
-              - type: className
-                value: ^GuzzleHttp\\*
-              - type: className
-                value: ^Buzz\\*
+              - type: classNameRegex
+                value: '#^Symfony\\Component\\HttpClient\\*#'
+              - type: classNameRegex
+                value: '#^GuzzleHttp\\*#'
+              - type: classNameRegex
+                value: '#^Buzz\\*#'
       -   name: SPI
           collectors:
-              - type: className
-                value: ^Nevay\\SPI\\*
+              - type: classNameRegex
+                value: '#^Nevay\\SPI\\*#'
       -   name: SymfonyConfig
           collectors:
-              - type: className
-                value: ^Symfony\\Component\\Config\\*
-              - type: className
-                value: ^Symfony\\Component\\Yaml\\*
-              - type: className
-                value: ^Symfony\\Component\\VarExporter\\*
+              - type: classNameRegex
+                value: '#^Symfony\\Component\\Config\\*#'
+              - type: classNameRegex
+                value: '#^Symfony\\Component\\Yaml\\*#'
+              - type: classNameRegex
+                value: '#^Symfony\\Component\\VarExporter\\*#'
       -   name: RamseyUuid
           collectors:
-              - type: className
-                regex: ^Ramsey\\Uuid\\*
+              - type: classNameRegex
+                value: '#^Ramsey\\Uuid\\*#'
       -   name: NyholmPsr7Server
           collectors:
-              - type: className
-                regex: ^Nyholm\\Psr7Server\\*
+              - type: classNameRegex
+                value: '#^Nyholm\\Psr7Server\\*#'
       -   name: Polyfills
           collectors:
               - type: directory
@@ -119,10 +119,10 @@ deptrac:
                 value: vendor/symfony/polyfill-php83
       -   name: DotenvProvider
           collectors:
-            - type: className
-              regex: ^Symfony\\Component\\Dotenv\\*
-            - type: className
-              regex: ^Dotenv\\*
+            - type: classNameRegex
+              value: '#^Symfony\\Component\\Dotenv\\*#'
+            - type: classNameRegex
+              value: '#^Dotenv\\*#'
     ruleset:
       Context:
           - FFI

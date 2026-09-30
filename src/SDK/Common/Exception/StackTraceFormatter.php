@@ -12,13 +12,13 @@ use function str_repeat;
 use Throwable;
 
 /**
- * @psalm-type Frame = array{
+ * @phpstan-type Frame = array{
  *     function: string,
  *     class: ?class-string,
  *     file: ?string,
  *     line: ?int,
  * }
- * @psalm-type Frames = non-empty-list<Frame>
+ * @phpstan-type Frames = non-empty-list<Frame>
  */
 final class StackTraceFormatter
 {

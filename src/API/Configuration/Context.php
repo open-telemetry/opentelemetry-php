@@ -39,7 +39,7 @@ final class Context
     }
 
     /**
-     * @psalm-template T of object
+     * @template T of object
      * @param T $extension
      * @param class-string<T>|null $type
      */
@@ -54,7 +54,7 @@ final class Context
     }
 
     /**
-     * @psalm-template T of object
+     * @template T of object
      * @param class-string<T> $type
      * @psalm-return T|null
      */
