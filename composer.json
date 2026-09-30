@@ -90,7 +90,7 @@
         "bamarni/composer-bin-plugin": "^1.8",
         "dg/bypass-finals": "^1.4",
         "grpc/grpc": "^1.30",
-        "guzzlehttp/guzzle": "^7.4",
+        "guzzlehttp/guzzle": "^8.0",
         "guzzlehttp/psr7": "^2.1",
         "mikey179/vfsstream": "^1.6.11",
         "mockery/mockery": "^1.5.1",
