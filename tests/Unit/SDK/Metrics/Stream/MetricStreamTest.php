@@ -26,6 +26,7 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricAggregator;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use const PHP_INT_SIZE;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
@@ -325,12 +326,9 @@ final class MetricStreamTest extends TestCase
         ], Temporality::DELTA, false), $s->collect($d));
     }
 
+    #[RequiresPhpExtension('gmp')]
     public function test_synchronous_reader_limit_does_not_apply_if_gmp_available(): void
     {
-        if (!extension_loaded('gmp')) {
-            $this->markTestSkipped();
-        }
-
         $s = new SynchronousMetricStream(new SumAggregation(), 3);
 
         for ($i = 0; $i < (PHP_INT_SIZE << 3) - 1; $i++) {

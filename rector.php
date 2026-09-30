@@ -6,6 +6,7 @@ use Rector\CodeQuality\Rector\BooleanAnd\RepeatedAndNotEqualToNotInArrayRector;
 use Rector\CodeQuality\Rector\BooleanNot\NegatedAndsToPositiveOrsRector;
 use Rector\CodeQuality\Rector\BooleanOr\RepeatedOrEqualToInArrayRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
+use Rector\CodeQuality\Rector\Equal\UseIdenticalOverEqualWithSameTypeRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector;
 use Rector\CodingStyle\Rector\FuncCall\FunctionFirstClassCallableRector;
@@ -49,6 +50,9 @@ return static function (RectorConfig $rectorConfig): void {
         ParentTestClassConstructorRector::class, // misfires on test classes, breaking phpunit
         FunctionFirstClassCallableRector::class => [
             __DIR__ . '/src/Context/DebugScope.php',
+        ],
+        UseIdenticalOverEqualWithSameTypeRector::class => [
+            __DIR__ . '/src/SDK/Metrics/Stream', // bitwise ops on int|GMP yield GMP, never identical to int
         ],
     ]);
 };
