@@ -14,7 +14,6 @@ use FFI;
 use const FILTER_VALIDATE_BOOLEAN;
 use function filter_var;
 use function is_string;
-use const PHP_VERSION_ID;
 use const PHP_ZTS;
 use function sprintf;
 use function trigger_error;

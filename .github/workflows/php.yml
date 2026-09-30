@@ -106,8 +106,6 @@ jobs:
     - name: Check Style
       id: style
       continue-on-error: ${{ matrix.experimental || false }}
-      env:
-        PHP_CS_FIXER_IGNORE_ENV: 1
       run: |
         vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer --version
         vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --stop-on-violation --using-cache=no -vvv

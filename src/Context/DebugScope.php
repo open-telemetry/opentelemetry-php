@@ -11,7 +11,6 @@ use function count;
 use function debug_backtrace;
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use Fiber;
-use const PHP_VERSION_ID;
 use function register_shutdown_function;
 use function spl_object_id;
 use function sprintf;
