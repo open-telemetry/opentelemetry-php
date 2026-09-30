@@ -291,6 +291,7 @@ return [
         'PhanUnextractableAnnotation',
         'PhanUnextractableAnnotationElementName',
         'PhanUnextractableAnnotationSuffix',
+        'PhanTemplateTypeVarianceViolation',
     ],
 
     // A regular expression to match files to be excluded

@@ -30,6 +30,8 @@ final class StreamTransportFactory implements TransportFactoryInterface
      * @psalm-template CONTENT_TYPE of string
      * @throws ErrorException
      * @psalm-return TransportInterface<CONTENT_TYPE>
+     *
+     * @phan-suppress PhanParamSignatureMismatch
      */
     #[\Override]
     public function create(

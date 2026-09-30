@@ -17,7 +17,6 @@ use Throwable;
 /**
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/stdout.md#opentelemetry-metrics-exporter---standard-output
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/file-exporter.md#json-file-serialization
- * @psalm-import-type SUPPORTED_CONTENT_TYPES from ProtobufSerializer
  */
 final class MetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {
@@ -25,7 +24,7 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
     private ProtobufSerializer $serializer;
 
     /**
-     * @param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
+     * @param TransportInterface<ContentTypes::*> $transport
      */
     public function __construct(
         private readonly TransportInterface $transport,

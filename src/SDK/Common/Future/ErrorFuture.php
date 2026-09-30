@@ -8,7 +8,7 @@ use Closure;
 use Throwable;
 
 /**
- * @psalm-suppress MissingTemplateParam
+ * @implements FutureInterface<never>
  */
 final class ErrorFuture implements FutureInterface
 {

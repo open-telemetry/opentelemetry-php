@@ -27,7 +27,6 @@ use function ucwords;
 
 /**
  * @internal
- * @psalm-type SUPPORTED_CONTENT_TYPES = ContentTypes::PROTOBUF|ContentTypes::JSON|ContentTypes::NDJSON
  */
 final class ProtobufSerializer
 {
@@ -43,7 +42,7 @@ final class ProtobufSerializer
     }
 
     /**
-     * @param TransportInterface<SUPPORTED_CONTENT_TYPES> $transport
+     * @param TransportInterface<ContentTypes::*> $transport
      */
     public static function forTransport(TransportInterface $transport): ProtobufSerializer
     {

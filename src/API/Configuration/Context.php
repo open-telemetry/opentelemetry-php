@@ -16,7 +16,10 @@ use Psr\Log\NullLogger;
 
 final class Context
 {
-    /** @psalm-var class-string-map<T, T> */
+    /**
+     * @var array<class-string, object>
+     * @psalm-var class-string-map<T, T>
+     */
     private array $extensions = [];
 
     public function __construct(

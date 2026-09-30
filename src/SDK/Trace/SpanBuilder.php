@@ -19,7 +19,8 @@ final class SpanBuilder implements API\SpanBuilderInterface
     private ContextInterface|false|null $parentContext = null;
 
     /**
-     * @psalm-var API\SpanKind::KIND_*
+     * @var int
+     * @phpstan-var API\SpanKind::KIND_*
      */
     private int $spanKind = API\SpanKind::KIND_INTERNAL;
 
