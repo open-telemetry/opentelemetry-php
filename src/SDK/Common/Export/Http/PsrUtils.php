@@ -125,7 +125,7 @@ final class PsrUtils
             return [$compression];
         }
 
-        return array_map('trim', explode(',', (string) $compression));
+        return array_map(trim(...), explode(',', (string) $compression));
     }
 
     private static function encoder(string $encoding): ?callable
@@ -133,11 +133,11 @@ final class PsrUtils
         static $encoders;
 
         /** @noinspection SpellCheckingInspection */
-        $encoders ??= array_map(fn (callable $callable): callable => self::throwOnErrorOrFalse($callable), array_filter([
+        $encoders ??= array_map(self::throwOnErrorOrFalse(...), array_filter([
             TransportFactoryInterface::COMPRESSION_GZIP => 'gzencode',
             TransportFactoryInterface::COMPRESSION_DEFLATE => 'gzcompress',
             TransportFactoryInterface::COMPRESSION_BROTLI => 'brotli_compress',
-        ], 'function_exists'));
+        ], function_exists(...)));
 
         return $encoders[$encoding] ?? null;
     }
@@ -147,11 +147,11 @@ final class PsrUtils
         static $decoders;
 
         /** @noinspection SpellCheckingInspection */
-        $decoders ??= array_map(fn (callable $callable): callable => self::throwOnErrorOrFalse($callable), array_filter([
+        $decoders ??= array_map(self::throwOnErrorOrFalse(...), array_filter([
             TransportFactoryInterface::COMPRESSION_GZIP => 'gzdecode',
             TransportFactoryInterface::COMPRESSION_DEFLATE => 'gzuncompress',
             TransportFactoryInterface::COMPRESSION_BROTLI => 'brotli_uncompress',
-        ], 'function_exists'));
+        ], function_exists(...)));
 
         return $decoders[$encoding] ?? null;
     }

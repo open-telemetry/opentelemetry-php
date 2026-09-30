@@ -26,7 +26,6 @@ class BatchSpanProcessorBuilderTest extends TestCase
             ->build();
         $reflection = new \ReflectionClass($processor);
         $property = $reflection->getProperty('exporter');
-        $property->setAccessible(true);
 
         $this->assertSame($exporter, $property->getValue($processor));
     }

@@ -62,7 +62,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
     public function register($temporality): int
     {
         $reader = 0;
-        for ($r = $this->readers; ($r & 1) != 0; $r >>= 1, $reader++) {
+        for ($r = $this->readers; ($r & 1) !== 0; $r >>= 1, $reader++) {
         }
 
         if ($reader === (PHP_INT_SIZE << 3) - 1 && is_int($this->readers)) {
@@ -89,14 +89,14 @@ final class SynchronousMetricStream implements MetricStreamInterface
     public function unregister(int $reader): void
     {
         $readerMask = ($this->readers & 1 | 1) << $reader;
-        if (($this->readers & $readerMask) == 0) {
+        if (($this->readers & $readerMask) === 0) {
             return;
         }
 
         $this->delta->collect($reader);
 
         $this->readers ^= $readerMask;
-        if (($this->cumulative & $readerMask) != 0) {
+        if (($this->cumulative & $readerMask) !== 0) {
             $this->cumulative ^= $readerMask;
         }
     }
@@ -104,7 +104,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
     #[\Override]
     public function collect(int $reader): DataInterface
     {
-        $cumulative = ($this->cumulative >> $reader & 1) != 0;
+        $cumulative = ($this->cumulative >> $reader & 1) !== 0;
         $metric = $this->delta->collect($reader, $cumulative) ?? new Metric([], [], $this->timestamp);
 
         $temporality = $cumulative

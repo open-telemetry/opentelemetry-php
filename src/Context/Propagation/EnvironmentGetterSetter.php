@@ -30,7 +30,7 @@ final class EnvironmentGetterSetter implements ExtendedPropagationGetterInterfac
             return [];
         }
 
-        return array_map('strtolower', array_keys($envs));
+        return array_map(strtolower(...), array_keys($envs));
     }
 
     #[\Override]

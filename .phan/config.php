@@ -286,6 +286,7 @@ return [
         'PhanAccessPropertyInternal',
         'PhanTypeMismatchPropertyReal',
         'PhanTemplateTypeNotUsedInFunctionReturn',
+        'PhanCompatibleOverrideAttribute',
         'PhanUndeclaredClassAttribute',
     ],
 

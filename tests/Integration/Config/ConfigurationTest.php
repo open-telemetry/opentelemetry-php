@@ -191,7 +191,6 @@ final class ConfigurationTest extends TestCase
         $propagator = $sdk->getPropagator();
         $propagatorReflection = new \ReflectionClass($propagator);
         $propagatorsProperty = $propagatorReflection->getProperty('propagators');
-        $propagatorsProperty->setAccessible(true);
         $propagators = $propagatorsProperty->getValue($propagator);
         $this->assertIsArray($propagators);
         $this->assertCount(1, $propagators, 'duplicate was removed');
@@ -208,7 +207,6 @@ final class ConfigurationTest extends TestCase
         $responsePropagator = $sdk->getResponsePropagator();
         $responsePropagatorReflection = new \ReflectionClass($responsePropagator);
         $responsePropagatorsProperty = $responsePropagatorReflection->getProperty('responsePropagators');
-        $responsePropagatorsProperty->setAccessible(true);
         $responsePropagators = $responsePropagatorsProperty->getValue($responsePropagator);
         $this->assertIsArray($responsePropagators);
         $this->assertCount(1, $responsePropagators, 'duplicate was removed');
@@ -324,12 +322,10 @@ final class ConfigurationTest extends TestCase
 
         $tracerReflection = new \ReflectionClass($tracer);
         $sharedStateProperty = $tracerReflection->getProperty('tracerSharedState');
-        $sharedStateProperty->setAccessible(true);
         $sharedState = $sharedStateProperty->getValue($tracer);
 
         $stateReflection = new \ReflectionClass($sharedState);
         $resourceProperty = $stateReflection->getProperty('resource');
-        $resourceProperty->setAccessible(true);
         $resource = $resourceProperty->getValue($sharedState);
 
         return $resource;

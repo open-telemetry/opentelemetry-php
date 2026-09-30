@@ -43,7 +43,7 @@ final class DeltaStorage
     {
         $n = null;
         for ($d = $this->head; $d->prev; $d = $d->prev) {
-            if (($d->prev->readers >> $reader & 1) != 0) {
+            if (($d->prev->readers >> $reader & 1) !== 0) {
                 if ($n !== null) {
                     assert($n->prev !== null);
                     $n->prev->readers ^= $d->prev->readers;
@@ -81,7 +81,7 @@ final class DeltaStorage
         }
 
         for ($c = $n->prev->prev;
-            $c && ($n->prev->readers & $c->readers) == 0;
+            $c && ($n->prev->readers & $c->readers) === 0;
             $c = $c->prev) {
         }
 

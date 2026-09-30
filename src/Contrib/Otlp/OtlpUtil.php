@@ -65,7 +65,7 @@ class OtlpUtil
             Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
         $headers += self::getUserAgentHeader();
 
-        return array_map('rawurldecode', $headers);
+        return array_map(rawurldecode(...), $headers);
     }
 
     /**

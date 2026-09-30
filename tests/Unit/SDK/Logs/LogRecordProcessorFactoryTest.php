@@ -80,7 +80,6 @@ class LogRecordProcessorFactoryTest extends TestCase
         $reflection = new ReflectionClass($processor);
         foreach ($expected as $propertyName => $value) {
             $property = $reflection->getProperty($propertyName);
-            $property->setAccessible(true);
             $this->assertSame($value, $property->getValue($processor));
         }
     }

@@ -22,7 +22,6 @@ class LogRecordTest extends TestCase
 
         $reflection = new \ReflectionClass($record);
         $property = $reflection->getProperty($propertyName);
-        $property->setAccessible(true);
         $this->assertSame($expected ?? $value, $property->getValue($record));
     }
 
