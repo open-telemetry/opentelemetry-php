@@ -62,7 +62,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
      *
      * @param non-empty-string $name
      * @param list<LinkInterface> $links
-     * @psalm-param API\SpanKind::KIND_* $kind
+     * @param API\SpanKind::KIND_* $kind
      *
      * @internal
      * @psalm-internal OpenTelemetry

@@ -16,7 +16,10 @@ use Psr\Log\NullLogger;
 
 final class Context
 {
-    /** @psalm-var class-string-map<T, T> */
+    /**
+     * @var array<class-string, object>
+     * @psalm-var class-string-map<T, T>
+     */
     private array $extensions = [];
 
     public function __construct(
@@ -36,9 +39,9 @@ final class Context
     }
 
     /**
-     * @psalm-template T of object
-     * @psalm-param T $extension
-     * @psalm-param class-string<T>|null $type
+     * @template T of object
+     * @param T $extension
+     * @param class-string<T>|null $type
      */
     public function withExtension(object $extension, ?string $type = null): self
     {
@@ -51,8 +54,8 @@ final class Context
     }
 
     /**
-     * @psalm-template T of object
-     * @psalm-param class-string<T> $type
+     * @template T of object
+     * @param class-string<T> $type
      * @psalm-return T|null
      */
     public function getExtension(string $type): ?object

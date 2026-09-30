@@ -155,7 +155,6 @@ class ResourceInfoFactoryTest extends TestCase
             ->willReturn(ResourceInfo::create(Attributes::create([ResourceAttributes::SERVICE_NAME => 'from-registry'])));
 
         $resourceDetectorsProperty = new \ReflectionProperty(Registry::class, 'resourceDetectors');
-        $resourceDetectorsProperty->setAccessible(true);
         $originalResourceDetectors = $resourceDetectorsProperty->getValue();
 
         try {

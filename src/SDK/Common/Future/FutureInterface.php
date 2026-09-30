@@ -17,8 +17,8 @@ interface FutureInterface
     public function await();
 
     /**
-     * @psalm-template U
-     * @psalm-param Closure(T): U $closure
+     * @template U
+     * @param Closure(T): U $closure
      * @psalm-return FutureInterface<U>
      *
      * @psalm-suppress InvalidTemplateParam
@@ -26,8 +26,8 @@ interface FutureInterface
     public function map(Closure $closure): FutureInterface;
 
     /**
-     * @psalm-template U
-     * @psalm-param Closure(\Throwable): U $closure
+     * @template U
+     * @param Closure(\Throwable): U $closure
      * @psalm-return FutureInterface<T|U>
      */
     public function catch(Closure $closure): FutureInterface;

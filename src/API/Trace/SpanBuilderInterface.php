@@ -35,7 +35,7 @@ interface SpanBuilderInterface
     public function setStartTimestamp(int $timestampNanos): SpanBuilderInterface;
 
     /**
-     * @psalm-param SpanKind::KIND_* $spanKind
+     * @param SpanKind::KIND_* $spanKind
      */
     public function setSpanKind(int $spanKind): SpanBuilderInterface;
 

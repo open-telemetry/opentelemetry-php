@@ -36,7 +36,7 @@ class ExporterFactoryTest extends TestCase
     }
 
     /**
-     * @psalm-param class-string $expected
+     * @param class-string $expected
      */
     #[DataProvider('envProvider')]
     #[Group('trace-compliance')]

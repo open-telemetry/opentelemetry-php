@@ -27,7 +27,7 @@ final class GrpcTransportFactory implements TransportFactoryInterface
     private const MILLIS_PER_SECOND = 1_000;
 
     /**
-     * @psalm-param "application/x-protobuf" $contentType
+     * @param "application/x-protobuf" $contentType
      * @psalm-return TransportInterface<"application/x-protobuf">
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-suppress ImplementedReturnTypeMismatch

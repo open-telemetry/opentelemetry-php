@@ -7,7 +7,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in('tests/')
     ->in('src/');
 
-$config = new PhpCsFixer\Config();
+$config = (new PhpCsFixer\Config())
+    ->setUnsupportedPhpVersionAllowed(true);
 
 return $config->setRules([
     'concat_space' => ['spacing' => 'one'],

@@ -83,7 +83,7 @@ class DependencyResolverTest extends TestCase
     }
 
     /**
-     *  @psalm-param class-string $interface
+     *  @param class-string $interface
      */
     private static function resolveMethodName(string $interface, array $replacements = []): string
     {

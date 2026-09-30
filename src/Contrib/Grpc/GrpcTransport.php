@@ -31,7 +31,7 @@ use Throwable;
 /**
  * @internal
  *
- * @template-implements TransportInterface<"application/x-protobuf">
+ * @implements TransportInterface<'application/x-protobuf'>
  */
 final class GrpcTransport implements TransportInterface
 {

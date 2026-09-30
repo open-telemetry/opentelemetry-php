@@ -11,7 +11,6 @@ use function count;
 use function debug_backtrace;
 use const DEBUG_BACKTRACE_IGNORE_ARGS;
 use Fiber;
-use const PHP_VERSION_ID;
 use function register_shutdown_function;
 use function spl_object_id;
 use function sprintf;
@@ -90,10 +89,6 @@ final class DebugScope implements ScopeInterface
      */
     private static function currentFiberId(): ?int
     {
-        if (PHP_VERSION_ID < 80100) {
-            return null;
-        }
-
         assert(class_exists(Fiber::class, false));
         if (!$fiber = Fiber::getCurrent()) {
             return null;

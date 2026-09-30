@@ -21,7 +21,7 @@ class ListParser
         }
 
         return array_map(
-            fn ($value) => trim($value),
+            trim(...),
             explode(self::DEFAULT_SEPARATOR, $value)
         );
     }

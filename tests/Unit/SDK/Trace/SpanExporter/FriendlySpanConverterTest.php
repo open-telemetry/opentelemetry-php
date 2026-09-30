@@ -93,9 +93,7 @@ class FriendlySpanConverterTest extends TestCase
 
     private function createSpanDataInterfaceMock(): SpanDataInterface
     {
-        $mock = $this->getMockBuilder(SpanDataInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock = $this->createMock(SpanDataInterface::class);
 
         $mock->method('getName')
             ->willReturn(self::TEST_DATA['name']);
@@ -211,9 +209,7 @@ class FriendlySpanConverterTest extends TestCase
 
     private function createResourceInfoMock(): ResourceInfo
     {
-        $mock = $this->getMockBuilder(ResourceInfo::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock = $this->createMock(ResourceInfo::class);
 
         $mock->method('getAttributes')
             ->willReturn($this->createAttributesInterfaceMock(self::TEST_DATA['resource']));

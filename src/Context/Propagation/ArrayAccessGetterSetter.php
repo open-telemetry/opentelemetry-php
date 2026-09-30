@@ -87,7 +87,7 @@ final class ArrayAccessGetterSetter implements ExtendedPropagationGetterInterfac
         if ($this->isSupportedCarrier($carrier)) {
             $value = $carrier[$this->resolveKey($carrier, $key)] ?? null;
             if (is_array($value) && $value) {
-                return array_values(array_filter($value, 'is_string'));
+                return array_values(array_filter($value, is_string(...)));
             }
 
             return is_string($value)

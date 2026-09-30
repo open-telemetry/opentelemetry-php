@@ -286,7 +286,12 @@ return [
         'PhanAccessPropertyInternal',
         'PhanTypeMismatchPropertyReal',
         'PhanTemplateTypeNotUsedInFunctionReturn',
+        'PhanCompatibleOverrideAttribute',
         'PhanUndeclaredClassAttribute',
+        'PhanUnextractableAnnotation',
+        'PhanUnextractableAnnotationElementName',
+        'PhanUnextractableAnnotationSuffix',
+        'PhanTemplateTypeVarianceViolation',
     ],
 
     // A regular expression to match files to be excluded

@@ -12,13 +12,13 @@ use function str_repeat;
 use Throwable;
 
 /**
- * @psalm-type Frame = array{
+ * @phpstan-type Frame = array{
  *     function: string,
  *     class: ?class-string,
  *     file: ?string,
  *     line: ?int,
  * }
- * @psalm-type Frames = non-empty-list<Frame>
+ * @phpstan-type Frames = non-empty-list<Frame>
  */
 final class StackTraceFormatter
 {
@@ -39,7 +39,7 @@ final class StackTraceFormatter
         $s = '';
         $seen = [];
 
-        /** @psalm-var Frames|null $enclosing */
+        /** @var Frames|null $enclosing */
         $enclosing = null;
         do {
             if ($enclosing) {
@@ -67,9 +67,9 @@ final class StackTraceFormatter
 
     /**
      * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
-     * @psalm-param Frames $frames
+     * @param Frames $frames
      * @phan-suppress-next-line PhanTypeMismatchDeclaredParam
-     * @psalm-param Frames|null $enclosing
+     * @param Frames|null $enclosing
      * @psalm-suppress InvalidArrayOffset
      */
     private static function writeFrames(string &$s, array $frames, ?array $enclosing): void
@@ -124,7 +124,7 @@ final class StackTraceFormatter
     }
 
     /**
-     * @psalm-return Frames
+     * @return Frames
      * @psalm-suppress PossiblyUndefinedArrayOffset
      * @psalm-suppress InvalidArrayOffset
      */
@@ -144,7 +144,7 @@ final class StackTraceFormatter
         $frames[0]['file'] = $e->getFile();
         $frames[0]['line'] = $e->getLine();
 
-        /** @psalm-var Frames $frames */
+        /** @var Frames $frames */
         return $frames;
     }
 

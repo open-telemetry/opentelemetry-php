@@ -115,7 +115,7 @@ final class Utils
             }
             $length = $newlen;
             $result = $newstring[$divide] . $result;
-        } while ($newlen != 0);
+        } while ($newlen !== 0);
 
         return $result;
     }
