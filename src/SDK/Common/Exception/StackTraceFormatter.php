@@ -39,7 +39,7 @@ final class StackTraceFormatter
         $s = '';
         $seen = [];
 
-        /** @psalm-var Frames|null $enclosing */
+        /** @var Frames|null $enclosing */
         $enclosing = null;
         do {
             if ($enclosing) {
@@ -124,7 +124,7 @@ final class StackTraceFormatter
     }
 
     /**
-     * @psalm-return Frames
+     * @return Frames
      * @psalm-suppress PossiblyUndefinedArrayOffset
      * @psalm-suppress InvalidArrayOffset
      */
@@ -144,7 +144,7 @@ final class StackTraceFormatter
         $frames[0]['file'] = $e->getFile();
         $frames[0]['line'] = $e->getLine();
 
-        /** @psalm-var Frames $frames */
+        /** @var Frames $frames */
         return $frames;
     }
 
