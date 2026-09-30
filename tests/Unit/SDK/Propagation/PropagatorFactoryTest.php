@@ -11,7 +11,6 @@ use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
-use OpenTelemetry\Extension\Propagator\CloudTrace\CloudTracePropagator;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Propagation\PropagatorFactory;
