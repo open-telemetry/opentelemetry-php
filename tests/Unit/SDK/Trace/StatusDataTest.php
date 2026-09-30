@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 class StatusDataTest extends TestCase
 {
     /**
-     * @psalm-param StatusCode::STATUS_* $code
+     * @param StatusCode::STATUS_* $code
      */
     #[DataProvider('getStatuses')]
     public function test_statuses(string $code): void
@@ -39,7 +39,7 @@ class StatusDataTest extends TestCase
     }
 
     /**
-     * @psalm-param StatusCode::STATUS_* $code
+     * @param StatusCode::STATUS_* $code
      */
     #[DataProvider('getStatuses')]
     #[Group('trace-compliance')]

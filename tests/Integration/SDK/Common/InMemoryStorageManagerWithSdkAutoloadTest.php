@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Integration\SDK\Common;
+namespace OpenTelemetry\Tests\Integration\SDK\Common;
 
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\LoggerHolder;
@@ -14,11 +14,13 @@ use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\TestState;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class InMemoryStorageManagerWithSKDAutoload extends TestCase
+#[CoversNothing]
+class InMemoryStorageManagerWithSdkAutoloadTest extends TestCase
 {
     use TestState;
 

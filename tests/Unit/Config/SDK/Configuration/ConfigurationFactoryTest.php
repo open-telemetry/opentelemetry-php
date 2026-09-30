@@ -39,7 +39,7 @@ final class ConfigurationFactoryTest extends TestCase
     #[\Override]
     public function tearDown(): void
     {
-        array_map('unlink', array_filter((array) glob($this->cacheDir . '/*cache*')));
+        array_map(unlink(...), array_filter((array) glob($this->cacheDir . '/*cache*')));
     }
 
     /**

@@ -38,7 +38,6 @@ class TracerTest extends TestCase
         $spanBuilder = $this->tracer->spanBuilder($name);
         $reflection = new \ReflectionClass($spanBuilder);
         $property = $reflection->getProperty('spanName');
-        $property->setAccessible(true);
 
         $this->assertSame($expected, $property->getValue($spanBuilder));
     }

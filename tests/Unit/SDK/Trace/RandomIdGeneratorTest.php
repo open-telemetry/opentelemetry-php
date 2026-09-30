@@ -19,7 +19,7 @@ class RandomIdGeneratorTest extends TestCase
         $idGenerator = new RandomIdGenerator();
         $traceId = $idGenerator->generateTraceId();
 
-        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_TRACE, $traceId));
+        $this->assertMatchesRegularExpression(SpanContextValidator::VALID_TRACE, $traceId);
     }
 
     #[Group('trace-compliance')]
@@ -28,7 +28,7 @@ class RandomIdGeneratorTest extends TestCase
         $idGenerator = new RandomIdGenerator();
         $spanId = $idGenerator->generateSpanId();
 
-        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_SPAN, $spanId));
+        $this->assertMatchesRegularExpression(SpanContextValidator::VALID_SPAN, $spanId);
     }
 
     public function test_fallback_algorithm(): void
@@ -36,12 +36,11 @@ class RandomIdGeneratorTest extends TestCase
         $idGenerator = new RandomIdGenerator();
         $reflection = new \ReflectionClass(RandomIdGenerator::class);
         $method = $reflection->getMethod('fallbackAlgorithm');
-        $method->setAccessible(true);
 
         $traceId = $method->invokeArgs($idGenerator, [$reflection->getConstant('TRACE_ID_HEX_LENGTH')]);
-        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_TRACE, (string) $traceId));
+        $this->assertMatchesRegularExpression(SpanContextValidator::VALID_TRACE, (string) $traceId);
 
         $spanId = $method->invokeArgs($idGenerator, [$reflection->getConstant('SPAN_ID_HEX_LENGTH')]);
-        $this->assertEquals(1, preg_match(SpanContextValidator::VALID_SPAN, (string) $spanId));
+        $this->assertMatchesRegularExpression(SpanContextValidator::VALID_SPAN, (string) $spanId);
     }
 }

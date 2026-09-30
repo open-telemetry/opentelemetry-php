@@ -25,15 +25,15 @@ use function time_nanosleep;
 use function trim;
 
 /**
- * @psalm-template CONTENT_TYPE of string
- * @template-implements TransportInterface<CONTENT_TYPE>
+ * @template CONTENT_TYPE of string
+ * @implements TransportInterface<CONTENT_TYPE>
  */
 final class PsrTransport implements TransportInterface
 {
     private bool $closed = false;
 
     /**
-     * @psalm-param CONTENT_TYPE $contentType
+     * @param CONTENT_TYPE $contentType
      */
     public function __construct(
         private readonly ClientInterface $client,

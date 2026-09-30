@@ -23,13 +23,15 @@ final class StreamTransportFactory implements TransportFactoryInterface
 {
     /**
      * @param string|resource $endpoint
+     * @param CONTENT_TYPE $contentType
      * @param array<string, string|string[]> $headers
      * @param string|string[]|null $compression
      *
-     * @psalm-template CONTENT_TYPE of string
-     * @psalm-param CONTENT_TYPE $contentType
+     * @template CONTENT_TYPE of string
      * @throws ErrorException
      * @psalm-return TransportInterface<CONTENT_TYPE>
+     *
+     * @phan-suppress PhanParamSignatureMismatch
      */
     #[\Override]
     public function create(

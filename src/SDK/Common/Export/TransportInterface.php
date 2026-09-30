@@ -8,7 +8,7 @@ use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\FutureInterface;
 
 /**
- * @psalm-template-covariant CONTENT_TYPE of string
+ * @template-covariant CONTENT_TYPE of string
  */
 interface TransportInterface
 {

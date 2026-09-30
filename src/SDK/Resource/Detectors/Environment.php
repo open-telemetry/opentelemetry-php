@@ -28,6 +28,6 @@ final class Environment implements ResourceDetectorInterface
 
     private static function decode(array $attributes): array
     {
-        return array_map('urldecode', $attributes);
+        return array_map(urldecode(...), $attributes);
     }
 }
