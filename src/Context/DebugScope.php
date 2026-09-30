@@ -90,10 +90,6 @@ final class DebugScope implements ScopeInterface
      */
     private static function currentFiberId(): ?int
     {
-        if (PHP_VERSION_ID < 80100) {
-            return null;
-        }
-
         assert(class_exists(Fiber::class, false));
         if (!$fiber = Fiber::getCurrent()) {
             return null;
