@@ -21,13 +21,13 @@ final class MetricExporterPrometheus implements ComponentProvider
      * @param array{
      *     host: string,
      *     port: int,
-     *     without_units: bool,
-     *     without_type_suffix: bool,
      *     without_scope_info: bool,
+     *     "without_target_info/development": bool,
      *     with_resource_constant_labels: array{
      *         included: list<string>,
      *         excluded: list<string>,
      *     },
+     *     translation_strategy: string,
      * } $properties
      */
     #[\Override]
@@ -54,10 +54,10 @@ final class MetricExporterPrometheus implements ComponentProvider
         $node = $builder->arrayNode('prometheus/development');
         $node
             ->children()
-                ->scalarNode('host')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('port')->isRequired()->validate()->always(Validation::ensureNumber())->end()->end()
+                ->scalarNode('host')->defaultValue('localhost')->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('port')->defaultValue(9464)->validate()->always(Validation::ensureNumber())->end()->end()
                 ->booleanNode('without_scope_info')->defaultFalse()->end()
-                ->booleanNode('without_scope_trace')->defaultFalse()->end()
+                ->booleanNode('without_target_info/development')->defaultFalse()->end()
                 ->arrayNode('with_resource_constant_labels')
                     ->children()
                         ->arrayNode('included')
@@ -69,12 +69,12 @@ final class MetricExporterPrometheus implements ComponentProvider
                     ->end()
                 ->end()
                 ->enumNode('translation_strategy')
-                    ->defaultValue('UnderscoreEscapingWithSuffixes')
+                    ->defaultValue('underscore_escaping_with_suffixes')
                     ->values([
-                        'UnderscoreEscapingWithSuffixes',
-                        'UnderscoreEscapingWithoutSuffixes',
-                        'NoUTF8EscapingWithSuffixes',
-                        'NoTranslation',
+                        'underscore_escaping_with_suffixes',
+                        'underscore_escaping_without_suffixes/development',
+                        'no_utf8_escaping_with_suffixes/development',
+                        'no_translation/development',
                     ])
                 ->end()
             ->end()

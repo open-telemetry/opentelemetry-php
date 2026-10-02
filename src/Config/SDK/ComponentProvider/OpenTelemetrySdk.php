@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\API\Logs\Severity;
+use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
@@ -63,10 +66,34 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class OpenTelemetrySdk implements ComponentProvider
 {
+    use LogsMessagesTrait;
+
+    /**
+     * The schema version this SDK targets. `MINOR` versions are additive, so a file declaring a
+     * newer one is accepted with a warning; a different `MAJOR` is an error.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/VERSIONING.md#file-format
+     */
+    private const FILE_FORMAT_MAJOR = 1;
+    private const FILE_FORMAT_MINOR = 0;
+
+    /**
+     * `SeverityNumber` enum values, as defined by the configuration schema. They are the
+     * {@see Severity} names lowercased.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml#L249
+     * @return list<string>
+     */
+    private static function severityNumbers(): array
+    {
+        return array_map(strtolower(...), array_column(Severity::cases(), 'name'));
+    }
+
     /**
      * @param array{
-     *     file_format: '1.0-rc.2',
+     *     file_format: non-empty-string,
      *     disabled: bool,
+     *     log_level: ?string,
      *     resource: array{
      *         attributes: array{
      *             array{
@@ -109,12 +136,12 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         processors: list<ComponentPlugin<SpanProcessorInterface>>,
      *         "tracer_configurator/development": ?array{
      *              default_config: array{
-     *                  disabled: bool,
+     *                  enabled: bool,
      *              },
      *              tracers: list<array{
      *                  name: string,
      *                  config: array{
-     *                      disabled: ?bool,
+     *                      enabled: bool,
      *                  }
      *              }>
      *           }
@@ -144,12 +171,12 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         exemplar_filter: 'trace_based'|'always_on'|'always_off',
      *         "meter_configurator/development": ?array{
      *             default_config: array{
-     *                 disabled: bool,
+     *                 enabled: bool,
      *             },
      *             meters: list<array{
      *                 name: string,
      *                 config: array{
-     *                     disabled: bool,
+     *                     enabled: bool,
      *                 }
      *             }>
      *          },
@@ -162,12 +189,16 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         processors: list<ComponentPlugin<LogRecordProcessorInterface>>,
      *         "logger_configurator/development": ?array{
      *            default_config: array{
-     *                disabled: bool,
+     *                enabled: bool,
+     *                minimum_severity: ?string,
+     *                trace_based: ?bool,
      *            },
      *            loggers: list<array{
      *                name: string,
      *                config: array{
-     *                    disabled: bool,
+     *                    enabled: bool,
+     *                    minimum_severity: ?string,
+     *                    trace_based: ?bool,
      *                }
      *            }>
      *         },
@@ -179,6 +210,8 @@ final class OpenTelemetrySdk implements ComponentProvider
     public function createPlugin(array $properties, Context $context): SdkBuilder
     {
         $sdkBuilder = new SdkBuilder();
+
+        // TODO apply log_level to Logging::logLevel(), which currently only reads OTEL_LOG_LEVEL
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
@@ -285,20 +318,21 @@ final class OpenTelemetrySdk implements ComponentProvider
                 $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
             }
             // TODO Add support for excluded keys to view template
-            if ($view['stream']['attribute_keys']['included']) {
+            if (!empty($view['stream']['attribute_keys']['included'])) {
                 $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']['included']);
             }
             if (isset($view['stream']['aggregation'])) {
                 // TODO Add support for aggregation providers in views to allow usage of advisory
             }
+            // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
 
             $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
         }
 
-        $disabled = $properties['meter_provider']['meter_configurator/development']['default_config']['disabled'] ?? false;
+        $disabled = !($properties['meter_provider']['meter_configurator/development']['default_config']['enabled'] ?? true);
         $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
         foreach ($properties['meter_provider']['meter_configurator/development']['meters'] ?? [] as $meter) {
-            $disabled = $meter['config']['disabled'];
+            $disabled = !$meter['config']['enabled'];
             $configurator = $configurator->with(
                 static fn (MeterConfig $config) => $config->setDisabled($disabled),
                 name: $meter['name'],
@@ -314,6 +348,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             metricReaders: $metricReaders, // @phpstan-ignore-line
             viewRegistry: $viewRegistry,
+            // TODO apply meter_provider.exemplar_filter, see SDK/Metrics/Exemplar/ExemplarFilter
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
             configurator: $configurator,
@@ -328,11 +363,11 @@ final class OpenTelemetrySdk implements ComponentProvider
             $spanProcessors[] = $processor->create($context);
         }
 
-        $disabled = $properties['tracer_provider']['tracer_configurator/development']['default_config']['disabled'] ?? false;
+        $disabled = !($properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'] ?? true);
         $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
         foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
-            $disabled = $tracer['config']['disabled'] ?? false;
+            $disabled = !$tracer['config']['enabled'];
             $configurator = $configurator->with(
                 static fn (TracerConfig $config) => $config->setDisabled($disabled),
                 name: $tracer['name'],
@@ -383,17 +418,18 @@ final class OpenTelemetrySdk implements ComponentProvider
             $logRecordProcessors[] = $processor->create($context);
         }
 
-        $disabled = $properties['logger_provider']['logger_configurator/development']['default_config']['disabled'] ?? false;
+        $disabled = !($properties['logger_provider']['logger_configurator/development']['default_config']['enabled'] ?? true);
         $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
         foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] ?? [] as $logger) {
-            $disabled = $logger['config']['disabled'];
+            $disabled = !$logger['config']['enabled'];
             $configurator = $configurator->with(
                 static fn (LoggerConfig $config) => $config->setDisabled($disabled),
                 name: $logger['name'],
             );
         }
 
-        // TODO Allow injecting log record attributes factory
+        // TODO apply logger_provider.limits; needs LoggerProvider to accept a LogRecordLimits,
+        // which currently hardcodes LogRecordLimitsBuilder (env vars only)
         $loggerProvider = new LoggerProvider(
             processor: new MultiLogRecordProcessor($logRecordProcessors),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
@@ -423,11 +459,12 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->children()
                 ->scalarNode('file_format')
                     ->isRequired()
-                    ->example('0.1')
+                    ->example('1.0')
                     ->validate()->always(Validation::ensureString())->end()
-                    ->validate()->ifNotInArray(['1.0-rc.2'])->thenInvalid('unsupported version')->end()
+                    ->validate()->always(self::ensureSupportedFileFormat())->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
+                ->enumNode('log_level')->values(self::severityNumbers())->defaultNull()->end()
                 ->append($this->getResourceConfig($registry, $builder))
                 ->append($this->getAttributeLimitsConfig($builder))
                 ->append($this->getPropagatorConfig($registry, $builder))
@@ -435,10 +472,58 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
                 ->append($this->getExperimentalResponsePropagatorConfig($registry, $builder))
-                ->append($registry->componentMap('distribution', DistributionConfiguration::class)->defaultValue([]))
+                // Deliberately laxer than `$defs.Distribution`, which sets `minProperties: 1`: an
+                // empty map is accepted, which is also what a map of nothing but foreign keys
+                // normalizes to.
+                ->append(
+                    $registry->componentMap('distribution', DistributionConfiguration::class)
+                        ->attribute(IgnoresUnknownProviders::ATTRIBUTE, true)
+                        ->defaultValue([])
+                )
             ->end();
 
         return $node;
+    }
+
+    /**
+     * Applies the `file_format` compatibility rules from upstream's versioning policy: a matching
+     * `MAJOR` is required, a newer `MINOR` only warns, and anything else — including the `1.0-rc.*`
+     * release candidates and the superseded `0.x` formats — is rejected.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/VERSIONING.md#file-format
+     */
+    private static function ensureSupportedFileFormat(): \Closure
+    {
+        return static function (?string $value): ?string {
+            if ($value === null) {
+                return null;
+            }
+            if (!preg_match('/^(\d+)\.(\d+)$/', $value, $matches)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'unsupported version "%s", expected MAJOR.MINOR',
+                    $value,
+                ));
+            }
+
+            [, $major, $minor] = $matches;
+            if ((int) $major !== self::FILE_FORMAT_MAJOR) {
+                throw new \InvalidArgumentException(sprintf(
+                    'unsupported version "%s", this SDK implements file_format %d.x',
+                    $value,
+                    self::FILE_FORMAT_MAJOR,
+                ));
+            }
+            if ((int) $minor > self::FILE_FORMAT_MINOR) {
+                self::logWarning(sprintf(
+                    'file_format "%s" is newer than the %d.%d implemented by this SDK; configuration it introduces may be ignored',
+                    $value,
+                    self::FILE_FORMAT_MAJOR,
+                    self::FILE_FORMAT_MINOR,
+                ));
+            }
+
+            return $value;
+        };
     }
 
     private function getResourceConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
@@ -521,17 +606,18 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->arrayNode('default_config')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->booleanNode('disabled')->end()
+                                ->booleanNode('enabled')->defaultTrue()->end()
                             ->end()
                         ->end()
                         ->arrayNode('tracers')
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->end()
+                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                     ->arrayNode('config')
+                                        ->isRequired()
                                         ->addDefaultsIfNotSet()
                                         ->children()
-                                            ->booleanNode('disabled')->end()
+                                            ->booleanNode('enabled')->defaultTrue()->end()
                                         ->end()
                                     ->end()
                                 ->end()
@@ -563,6 +649,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->arrayPrototype()
                         ->children()
                             ->arrayNode('stream')
+                                ->isRequired()
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
@@ -582,6 +669,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->end()
                             ->end()
                             ->arrayNode('selector')
+                                ->isRequired()
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->enumNode('instrument_type')
@@ -612,7 +700,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ->arrayNode('default_config')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->booleanNode('disabled')->isRequired()->end()
+                                ->booleanNode('enabled')->defaultTrue()->end()
                             ->end()
                         ->end()
                         ->arrayNode('meters')
@@ -620,9 +708,10 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->children()
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                     ->arrayNode('config')
+                                        ->isRequired()
                                         ->addDefaultsIfNotSet()
                                         ->children()
-                                            ->booleanNode('disabled')->isRequired()->end()
+                                            ->booleanNode('enabled')->defaultTrue()->end()
                                         ->end()
                                     ->end()
                                 ->end()
@@ -653,27 +742,38 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->arrayNode('logger_configurator/development')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('default_config')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->booleanNode('disabled')->isRequired()->end()
-                            ->end()
-                        ->end()
+                        ->append($this->getLoggerConfig($builder, 'default_config'))
                         ->arrayNode('loggers')
                             ->arrayPrototype()
                                 ->children()
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                                    ->arrayNode('config')
-                                        ->addDefaultsIfNotSet()
-                                        ->children()
-                                            ->booleanNode('disabled')->isRequired()->end()
-                                        ->end()
-                                    ->end()
+                                    ->append($this->getLoggerConfig($builder, 'config')->isRequired())
                                 ->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
+            ->end()
+        ;
+
+        return $node;
+    }
+
+    /**
+     * `ExperimentalLoggerConfig`. Unlike the tracer and meter equivalents this carries
+     * `minimum_severity` and `trace_based`; both are accepted so that valid 1.0 files
+     * parse, but are not yet acted on.
+     */
+    private function getLoggerConfig(NodeBuilder $builder, string $name): ArrayNodeDefinition
+    {
+        $node = $builder->arrayNode($name);
+        $node
+            ->addDefaultsIfNotSet()
+            ->children()
+                ->booleanNode('enabled')->defaultTrue()->end()
+                // TODO apply severity and trace based log record filtering
+                ->enumNode('minimum_severity')->values(self::severityNumbers())->defaultNull()->end()
+                ->booleanNode('trace_based')->defaultNull()->end()
             ->end()
         ;
 
@@ -708,10 +808,14 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node
             ->addDefaultsIfNotSet()
             ->children()
+                // `composite_list` is not declared here: beforeNormalization() above folds
+                // it into `composite` and unsets it before validation runs.
+                //
+                // TODO support `${ENV}` in composite_list. Env substitution is attached to
+                //      declared scalar nodes, and a parent's beforeNormalization() runs before
+                //      its children's, so the fold above splits the raw `${OTEL_PROPAGATORS}`
+                //      text on commas and each fragment is looked up as a provider name.
                 ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
-//                ->arrayNode('composite_list')
-//                    ->scalarPrototype()->end()
-//                ->end()
             ->end()
         ;
 
@@ -746,6 +850,8 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node
             ->addDefaultsIfNotSet()
             ->children()
+            // as with `propagator`, `composite_list` is folded in above rather than declared,
+            // and so cannot carry an `${ENV}` reference
             ->append($registry->componentList('composite', ResponsePropagatorInterface::class))
             ->end()
         ;

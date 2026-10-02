@@ -143,7 +143,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpFile",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpGrpc",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpHttp",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySemConv",
@@ -171,7 +170,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk",
 
@@ -182,10 +180,16 @@
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricExporterPrometheus",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Metrics\\MetricReaderPull",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOff",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOn",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\ComposableSamplerParentThreshold",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\ComposableSamplerProbability",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\ComposableSamplerRuleBased",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\SamplerComposite",
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Trace\\SamplerProbability",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\ResponsePropagatorServerTiming",
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\ResponsePropagatorTraceResponse",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray",
-                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorOtTrace"
+                "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Propagator\\TextMapPropagatorXray"
             ],
             "OpenTelemetry\\API\\Configuration\\ConfigEnv\\EnvComponentLoader": [
                 "OpenTelemetry\\API\\Instrumentation\\Configuration\\General\\ConfigEnv\\EnvComponentLoaderHttpConfig",

@@ -1,4 +1,4 @@
-file_format: '1.0-rc.2'
+file_format: '1.0'
 
 tracer_provider:
   processors:
@@ -19,12 +19,6 @@ instrumentation/development:
     example_instrumentation:
       span_name: my-span
   general:
-    peer:
-      service_mapping:
-        - peer: 1.2.3.4
-          service: FooService
-        - peer: 2.3.4.5
-          service: BarService
     http:
       client:
         request_captured_headers:
@@ -34,6 +28,9 @@ instrumentation/development:
           - Content-Type
           - Content-Encoding
       server:
+        known_methods:
+          - GET
+          - POST
         request_captured_headers:
           - Content-Type
           - Accept

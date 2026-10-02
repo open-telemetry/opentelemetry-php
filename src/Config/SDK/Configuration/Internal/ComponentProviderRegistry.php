@@ -11,7 +11,9 @@ use function count;
 use function implode;
 use InvalidArgumentException;
 use LogicException;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use ReflectionClass;
@@ -32,6 +34,8 @@ use Symfony\Component\Config\Definition\Processor;
  */
 final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry, ResourceTrackable
 {
+    use LogsMessagesTrait;
+
     /** @var iterable iterable<Normalization> */
     private readonly iterable $normalizations;
     private readonly NodeBuilder $builder;
@@ -89,13 +93,29 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
     public function componentMap(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name);
+        // Guaranteed by the node class {@see ConfigurationFactory} registers for `array`.
+        \assert($node instanceof IgnoresUnknownProviders);
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
         $node->ignoreExtraKeys(false);
-        $node->validate()->always(function (array|null $value) use ($type): array {
+        // `$node` is read back at finalization rather than now, because the caller opts in via
+        // IgnoresUnknownProviders::ATTRIBUTE after this method has returned.
+        $node->validate()->always(function (array|null $value) use ($node, $name, $type): array {
+            $ignoreUnknown = $node->ignoresUnknownProviders();
             $components = [];
-            foreach ($value ?? [] as $name => $config) {
-                $components[] = $this->process($type, $name, [$name => $config]);
+            foreach ($value ?? [] as $key => $config) {
+                if ($ignoreUnknown && !isset($this->providers[$type][$key])) {
+                    self::logInfo(sprintf(
+                        'Ignoring "%s" entry "%s": no provider is registered for it. Known entries are %s',
+                        $name,
+                        $key,
+                        implode(', ', array_map(json_encode(...), array_keys($this->providers[$type] ?? [])) ?: ['none'])
+                    ));
+
+                    continue;
+                }
+
+                $components[] = $this->process($type, $key, [$key => $config]);
             }
 
             return $components;
