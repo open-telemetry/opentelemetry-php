@@ -49,13 +49,29 @@ class Logging
     }
 
     /**
-     * Get level priority from level name
+     * Get level priority from a PSR-3 level name, or 'none'. An unrecognised name yields the
+     * priority of 'info' rather than an error.
      */
     public static function level(string $level): int
     {
         $value = array_search($level, self::LEVELS);
 
         return $value !== false ? $value : 1; //'info'
+    }
+
+    /**
+     * Set the minimum log level, taking precedence over OTEL_LOG_LEVEL.
+     *
+     * Takes a PSR-3 level name ({@see LogLevel}) or 'none' to log nothing. OpenTelemetry severity
+     * names are not accepted: an unrecognised name is not an error, it silently means 'info'
+     * ({@see self::level()}), so callers holding an OTel severity must map it first
+     * ({@see \OpenTelemetry\API\Logs\Severity::toPsr3()}).
+     *
+     * @param 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'|'none' $level
+     */
+    public static function setLogLevel(string $level): void
+    {
+        self::$logLevel = self::level($level);
     }
 
     /**

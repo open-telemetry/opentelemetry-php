@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -30,6 +31,8 @@ class SdkBuilder
     private ?TextMapPropagatorInterface $propagator = null;
     private ?ResponsePropagatorInterface $responsePropagator = null;
     private bool $autoShutdown = false;
+    /** @var 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'|'none'|null */
+    private ?string $logLevel = null;
 
     /**
      * Automatically shut down providers on process completion. If not set, the user is responsible for calling `shutdown`.
@@ -87,6 +90,23 @@ class SdkBuilder
         return $this;
     }
 
+    /**
+     * Set the minimum level for the SDK's internal logger, as a PSR-3 level name or 'none'; null
+     * leaves it to OTEL_LOG_LEVEL. Not an OpenTelemetry severity name, which has to be mapped
+     * first ({@see \OpenTelemetry\API\Logs\Severity::toPsr3()}).
+     *
+     * Applied only by {@see self::buildAndRegisterGlobal()}, since the internal logger is global
+     * state and building an Sdk should not reconfigure the process.
+     *
+     * @param 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'|'none'|null $logLevel
+     */
+    public function setLogLevel(?string $logLevel): self
+    {
+        $this->logLevel = $logLevel;
+
+        return $this;
+    }
+
     public function build(): Sdk
     {
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
@@ -115,6 +135,10 @@ class SdkBuilder
      */
     public function buildAndRegisterGlobal(): ScopeInterface
     {
+        if ($this->logLevel !== null) {
+            Logging::setLogLevel($this->logLevel);
+        }
+
         $sdk = $this->build();
         $context = Configurator::create()
             ->withPropagator($sdk->getPropagator())

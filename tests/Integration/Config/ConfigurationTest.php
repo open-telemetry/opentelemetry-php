@@ -344,6 +344,34 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * `log_level` is named with an OTel severity but the internal logger is PSR-3, and it is global
+     * state, so it must not be applied until the SDK is registered globally.
+     */
+    public function test_log_level_is_applied_on_register_global_not_on_build(): void
+    {
+        Logging::reset();
+        $default = Logging::logLevel();
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: warn
+                YAML)]);
+
+            $builder = $sdk->create(new Context());
+            $builder->build();
+            $this->assertSame($default, Logging::logLevel(), 'parsing and building must not touch global logging');
+
+            $scope = $builder->buildAndRegisterGlobal();
+            $this->assertSame(Logging::level(LogLevel::WARNING), Logging::logLevel(), 'warn maps onto PSR-3 warning');
+            $scope->detach();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
      * Carrying several distributions' settings is the point of `distribution` being open, so ours
      * must still take effect alongside a key we know nothing about.
      */

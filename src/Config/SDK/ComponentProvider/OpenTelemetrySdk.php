@@ -211,7 +211,9 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $sdkBuilder = new SdkBuilder();
 
-        // TODO apply log_level to Logging::logLevel(), which currently only reads OTEL_LOG_LEVEL
+        if ($properties['log_level'] !== null) {
+            $sdkBuilder->setLogLevel(Severity::fromName($properties['log_level'])->toPsr3());
+        }
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {

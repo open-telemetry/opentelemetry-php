@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -14,6 +15,7 @@ use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 
 #[CoversClass(SdkBuilder::class)]
 class SdkBuilderTest extends TestCase
@@ -66,5 +68,42 @@ class SdkBuilderTest extends TestCase
         $this->assertSame($this->eventLoggerProvider, Globals::eventLoggerProvider());
         $this->assertSame($this->responsePropagator, Globals::responsePropagator());
         $scope->detach();
+    }
+
+    public function test_build_does_not_apply_log_level(): void
+    {
+        Logging::reset();
+        $default = Logging::logLevel();
+
+        $this->builder->setLogLevel(LogLevel::EMERGENCY)->build();
+
+        $this->assertSame($default, Logging::logLevel(), 'building alone leaves global logging untouched');
+
+        Logging::reset();
+    }
+
+    public function test_build_and_register_global_applies_log_level(): void
+    {
+        Logging::reset();
+
+        $scope = $this->builder->setLogLevel(LogLevel::EMERGENCY)->buildAndRegisterGlobal();
+
+        $this->assertSame(Logging::level(LogLevel::EMERGENCY), Logging::logLevel());
+
+        $scope->detach();
+        Logging::reset();
+    }
+
+    public function test_build_and_register_global_without_log_level_keeps_default(): void
+    {
+        Logging::reset();
+        $default = Logging::logLevel();
+
+        $scope = $this->builder->buildAndRegisterGlobal();
+
+        $this->assertSame($default, Logging::logLevel());
+
+        $scope->detach();
+        Logging::reset();
     }
 }
