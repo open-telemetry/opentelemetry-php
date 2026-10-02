@@ -21,6 +21,7 @@ use OpenTelemetry\SDK\Registry;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function sprintf;
 
 /**
  * The `tls` block of the OTLP exporters, as introduced by opentelemetry-configuration 1.0.
@@ -112,6 +113,52 @@ final class OtlpExporterTlsTest extends TestCase
         $this->assertTrue(RecordingTransportFactory::$called, 'a transport was created');
     }
 
+    /**
+     * @param ComponentProvider<object> $provider
+     */
+    #[DataProvider('grpcInsecureProvider')]
+    public function test_insecure_is_applied_as_endpoint_scheme(
+        ComponentProvider $provider,
+        string $endpoint,
+        ?bool $insecure,
+        string $expected,
+    ): void {
+        $provider->createPlugin([
+            'endpoint' => $endpoint,
+            'tls' => [
+                'ca_file' => null,
+                'cert_file' => null,
+                'key_file' => null,
+                'insecure' => $insecure,
+            ],
+            'headers' => [],
+            'headers_list' => null,
+            'compression' => null,
+            'timeout' => 10000,
+            'temporality_preference' => 'cumulative',
+            'default_histogram_aggregation' => 'explicit_bucket_histogram',
+        ], new Context());
+
+        $this->assertSame($expected, RecordingTransportFactory::$endpoint);
+    }
+
+    public static function grpcInsecureProvider(): iterable
+    {
+        $signals = [
+            'traces' => [new SpanExporterOtlpGrpc(), '/opentelemetry.proto.collector.trace.v1.TraceService/Export'],
+            'metrics' => [new MetricExporterOtlpGrpc(), '/opentelemetry.proto.collector.metrics.v1.MetricsService/Export'],
+            'logs' => [new LogRecordExporterOtlpGrpc(), '/opentelemetry.proto.collector.logs.v1.LogsService/Export'],
+        ];
+
+        foreach ($signals as $signal => [$provider, $method]) {
+            yield sprintf('%s insecure true', $signal) => [$provider, 'localhost:4317', true, 'http://localhost:4317' . $method];
+            yield sprintf('%s insecure false', $signal) => [$provider, 'localhost:4317', false, 'https://localhost:4317' . $method];
+            yield sprintf('%s insecure omitted defaults to secure', $signal) => [$provider, 'localhost:4317', null, 'https://localhost:4317' . $method];
+            yield sprintf('%s explicit https kept', $signal) => [$provider, 'https://localhost:4317', true, 'https://localhost:4317' . $method];
+            yield sprintf('%s explicit http kept', $signal) => [$provider, 'http://localhost:4317', false, 'http://localhost:4317' . $method];
+        }
+    }
+
     public static function exporterProvider(): iterable
     {
         yield 'traces otlp_http' => [new SpanExporterOtlpHttp(), 'http://localhost:4318/v1/traces'];
@@ -128,6 +175,7 @@ final class OtlpExporterTlsTest extends TestCase
  */
 final class RecordingTransportFactory implements TransportFactoryInterface
 {
+    public static ?string $endpoint = null;
     public static ?string $cacert = null;
     public static ?string $cert = null;
     public static ?string $key = null;
@@ -135,6 +183,7 @@ final class RecordingTransportFactory implements TransportFactoryInterface
 
     public static function reset(): void
     {
+        self::$endpoint = null;
         self::$cacert = null;
         self::$cert = null;
         self::$key = null;
@@ -154,6 +203,7 @@ final class RecordingTransportFactory implements TransportFactoryInterface
         ?string $cert = null,
         ?string $key = null,
     ): TransportInterface {
+        self::$endpoint = $endpoint;
         self::$cacert = $cacert;
         self::$cert = $cert;
         self::$key = $key;

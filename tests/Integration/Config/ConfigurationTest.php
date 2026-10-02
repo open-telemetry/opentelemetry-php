@@ -319,7 +319,7 @@ final class ConfigurationTest extends TestCase
         $logWriter = $this->createMock(LogWriterInterface::class);
         $logWriter->expects($this->atLeastOnce())
             ->method('write')
-            ->with(LogLevel::INFO, $this->matchesRegularExpression('/Ignoring "distribution" entry "some_vendor"/'));
+            ->with(LogLevel::WARNING, $this->matchesRegularExpression('/Ignoring "distribution" entry "some_vendor"/'));
         Logging::setLogWriter($logWriter);
 
         try {

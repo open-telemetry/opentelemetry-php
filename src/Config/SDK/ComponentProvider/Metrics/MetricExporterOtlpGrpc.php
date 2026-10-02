@@ -58,8 +58,10 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
             'lowmemory' => null,
         };
 
+        $endpoint = OtlpUtil::applyScheme($properties['endpoint'], $properties['tls']['insecure']);
+
         return new MetricExporter(Registry::transportFactory($protocol)->create(
-            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::METRICS, $protocol),
+            endpoint: $endpoint . OtlpUtil::path(Signals::METRICS, $protocol),
             contentType: Protocols::contentType($protocol),
             headers: $headers,
             compression: $properties['compression'],
@@ -84,8 +86,6 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
                         ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                         ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                         ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        // TODO honour insecure: GrpcTransportFactory infers TLS from the endpoint
-                        //      scheme, so there is nowhere to pass this yet
                         ->booleanNode('insecure')->defaultNull()->end()
                     ->end()
                 ->end()

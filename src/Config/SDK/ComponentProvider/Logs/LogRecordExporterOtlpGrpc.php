@@ -47,9 +47,10 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
     {
         $protocol = Protocols::GRPC;
         $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+        $endpoint = OtlpUtil::applyScheme($properties['endpoint'], $properties['tls']['insecure']);
 
         return new LogsExporter(Registry::transportFactory($protocol)->create(
-            endpoint: $properties['endpoint'] . OtlpUtil::path(Signals::LOGS, $protocol),
+            endpoint: $endpoint . OtlpUtil::path(Signals::LOGS, $protocol),
             contentType: Protocols::contentType($protocol),
             headers: $headers,
             compression: $properties['compression'],
@@ -74,8 +75,6 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
                         ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                         ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                         ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        // TODO honour insecure: GrpcTransportFactory infers TLS from the endpoint
-                        //      scheme, so there is nowhere to pass this yet
                         ->booleanNode('insecure')->defaultNull()->end()
                     ->end()
                 ->end()

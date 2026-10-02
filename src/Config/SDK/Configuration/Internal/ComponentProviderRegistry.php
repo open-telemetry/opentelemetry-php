@@ -105,7 +105,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
             $components = [];
             foreach ($value ?? [] as $key => $config) {
                 if ($ignoreUnknown && !isset($this->providers[$type][$key])) {
-                    self::logInfo(sprintf(
+                    self::logWarning(sprintf(
                         'Ignoring "%s" entry "%s": no provider is registered for it. Known entries are %s',
                         $name,
                         $key,

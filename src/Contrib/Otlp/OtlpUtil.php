@@ -87,6 +87,23 @@ class OtlpUtil
     }
 
     /**
+     * Prepends a scheme to a scheme-less endpoint, since transports infer TLS from it.
+     * An endpoint that carries its own scheme is returned unchanged.
+     *
+     * @internal
+     */
+    public static function applyScheme(string $endpoint, ?bool $insecure): string
+    {
+        if (parse_url($endpoint, PHP_URL_SCHEME) !== null) {
+            return $endpoint;
+        }
+
+        return ($insecure ?? false)
+            ? 'http://' . $endpoint
+            : 'https://' . $endpoint;
+    }
+
+    /**
      * @internal
      *
      * @todo In a future (breaking) change, reject gRPC endpoints containing path

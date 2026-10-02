@@ -13,8 +13,6 @@ use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
-use function parse_url;
-use const PHP_URL_SCHEME;
 
 class SpanExporterFactory implements SpanExporterFactoryInterface
 {
@@ -75,15 +73,10 @@ class SpanExporterFactory implements SpanExporterFactoryInterface
                 Variables::OTEL_EXPORTER_OTLP_ENDPOINT,
             ) ?? 'http://localhost:4317';
 
-            if (parse_url($endpoint, PHP_URL_SCHEME) === null) {
-                $insecure = OtlpUtil::getBoolVar(
-                    Variables::OTEL_EXPORTER_OTLP_TRACES_INSECURE,
-                    Variables::OTEL_EXPORTER_OTLP_INSECURE,
-                ) ?? false;
-                $endpoint = $insecure
-                    ? 'http://' . $endpoint
-                    : 'https://' . $endpoint;
-            }
+            $endpoint = OtlpUtil::applyScheme($endpoint, OtlpUtil::getBoolVar(
+                Variables::OTEL_EXPORTER_OTLP_TRACES_INSECURE,
+                Variables::OTEL_EXPORTER_OTLP_INSECURE,
+            ));
 
             if (OtlpUtil::grpcEndpointContainsPath($endpoint)) {
                 return $endpoint;
