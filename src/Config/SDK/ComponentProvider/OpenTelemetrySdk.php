@@ -10,6 +10,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
@@ -77,18 +78,16 @@ final class OpenTelemetrySdk implements ComponentProvider
     private const FILE_FORMAT_MINOR = 0;
 
     /**
-     * `SeverityNumber` enum values, as defined by the configuration schema.
+     * `SeverityNumber` enum values, as defined by the configuration schema. They are the
+     * {@see Severity} names lowercased.
      *
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml#L249
+     * @return list<string>
      */
-    private const SEVERITY_NUMBERS = [
-        'trace', 'trace2', 'trace3', 'trace4',
-        'debug', 'debug2', 'debug3', 'debug4',
-        'info', 'info2', 'info3', 'info4',
-        'warn', 'warn2', 'warn3', 'warn4',
-        'error', 'error2', 'error3', 'error4',
-        'fatal', 'fatal2', 'fatal3', 'fatal4',
-    ];
+    private static function severityNumbers(): array
+    {
+        return array_map(strtolower(...), array_column(Severity::cases(), 'name'));
+    }
 
     /**
      * @param array{
@@ -212,6 +211,8 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $sdkBuilder = new SdkBuilder();
 
+        // TODO apply log_level to Logging::logLevel(), which currently only reads OTEL_LOG_LEVEL
+
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
             $propagators[] = $plugin->create($context);
@@ -323,6 +324,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             if (isset($view['stream']['aggregation'])) {
                 // TODO Add support for aggregation providers in views to allow usage of advisory
             }
+            // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
 
             $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
         }
@@ -346,6 +348,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             metricReaders: $metricReaders, // @phpstan-ignore-line
             viewRegistry: $viewRegistry,
+            // TODO apply meter_provider.exemplar_filter, see SDK/Metrics/Exemplar/ExemplarFilter
             exemplarFilter: null,
             stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
             configurator: $configurator,
@@ -425,7 +428,8 @@ final class OpenTelemetrySdk implements ComponentProvider
             );
         }
 
-        // TODO Allow injecting log record attributes factory
+        // TODO apply logger_provider.limits; needs LoggerProvider to accept a LogRecordLimits,
+        // which currently hardcodes LogRecordLimitsBuilder (env vars only)
         $loggerProvider = new LoggerProvider(
             processor: new MultiLogRecordProcessor($logRecordProcessors),
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
@@ -460,7 +464,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->validate()->always(self::ensureSupportedFileFormat())->end()
                 ->end()
                 ->booleanNode('disabled')->defaultFalse()->end()
-                ->enumNode('log_level')->values(self::SEVERITY_NUMBERS)->defaultNull()->end()
+                ->enumNode('log_level')->values(self::severityNumbers())->defaultNull()->end()
                 ->append($this->getResourceConfig($registry, $builder))
                 ->append($this->getAttributeLimitsConfig($builder))
                 ->append($this->getPropagatorConfig($registry, $builder))
@@ -768,7 +772,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
                 // TODO apply severity and trace based log record filtering
-                ->enumNode('minimum_severity')->values(self::SEVERITY_NUMBERS)->defaultNull()->end()
+                ->enumNode('minimum_severity')->values(self::severityNumbers())->defaultNull()->end()
                 ->booleanNode('trace_based')->defaultNull()->end()
             ->end()
         ;
