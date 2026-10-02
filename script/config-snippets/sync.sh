@@ -27,7 +27,7 @@ git reset -q --hard FETCH_HEAD
 cd "${ROOT_DIR}"
 
 upstream_ls () {
-    ls "${SPEC_DIR}/$1"/*.yaml | xargs -n1 basename
+    find "${SPEC_DIR}/$1" -maxdepth 1 -name '*.yaml' -exec basename {} \; | sort
 }
 
 report () {
