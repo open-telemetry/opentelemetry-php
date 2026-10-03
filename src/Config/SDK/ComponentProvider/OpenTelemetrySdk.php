@@ -118,9 +118,11 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         attribute_count_limit: int<0, max>,
      *     },
      *     propagator: array{
+     *         composite_list: ?string,
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
      *     "response_propagator/development": array{
+     *         composite_list: ?string,
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
      *     tracer_provider: array{
@@ -810,13 +812,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                // `composite_list` is not declared here: beforeNormalization() above folds
-                // it into `composite` and unsets it before validation runs.
-                //
-                // TODO support `${ENV}` in composite_list. Env substitution is attached to
-                //      declared scalar nodes, and a parent's beforeNormalization() runs before
-                //      its children's, so the fold above splits the raw `${OTEL_PROPAGATORS}`
-                //      text on commas and each fragment is looked up as a provider name.
+                ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
             ->end()
         ;
@@ -852,8 +848,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node
             ->addDefaultsIfNotSet()
             ->children()
-            // as with `propagator`, `composite_list` is folded in above rather than declared,
-            // and so cannot carry an `${ENV}` reference
+            ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->append($registry->componentList('composite', ResponsePropagatorInterface::class))
             ->end()
         ;

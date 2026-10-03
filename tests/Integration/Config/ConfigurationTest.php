@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Integration\Config;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
@@ -18,6 +19,7 @@ use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
+use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -26,6 +28,7 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppress
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector\ServiceName;
+use OpenTelemetry\Tests\TestState;
 use org\bovigo\vfs\vfsStream;
 use Override;
 use PHPUnit\Framework\Assert;
@@ -43,6 +46,8 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
+    use TestState;
+
     #[\Override]
     public function setUp(): void
     {
@@ -61,38 +66,8 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('openTelemetryConfigurationDataProvider')]
     public function test_open_telemetry_configuration(string $file): void
     {
-        $expectedFailure = self::knownParseFailures()[basename($file)] ?? null;
-
-        if ($expectedFailure === null) {
-            $this->expectNotToPerformAssertions();
-            Configuration::parseFile($file)->create();
-
-            return;
-        }
-
-        // asserted rather than skipped, so that fixing the underlying limitation fails here and
-        // forces the entry to be removed
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches($expectedFailure);
+        $this->expectNotToPerformAssertions();
         Configuration::parseFile($file)->create();
-    }
-
-    /**
-     * Upstream files that this SDK cannot parse yet. They are still synced verbatim, so the gap is
-     * visible and tracked; remove an entry once its blocker is fixed.
-     *
-     * `otel-sdk-migration-config.yaml` uses `${ENV}` in `propagator.composite_list`, which is
-     * split on commas and folded into `composite` before env substitution runs, so the raw
-     * placeholder is looked up as a provider name. See the TODO in
-     * `src/Config/SDK/ComponentProvider/OpenTelemetrySdk.php`.
-     *
-     * @return array<string, non-empty-string> file name => expected exception message pattern
-     */
-    private static function knownParseFailures(): array
-    {
-        return [
-            'otel-sdk-migration-config.yaml' => '/unknown provider "\$\{OTEL_PROPAGATORS/',
-        ];
     }
 
     #[DataProvider('openTelemetryConfigurationDataProvider')]
@@ -113,8 +88,10 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * As {@see knownParseFailures()}, but for the `instrumentation/development` root, which
+     * Upstream files whose `instrumentation/development` root this SDK cannot parse yet, which
      * {@see Instrumentation::parseFile()} parses and {@see Configuration::parseFile()} discards.
+     * They are still synced verbatim, so the gap stays visible and tracked. Failures are asserted
+     * rather than skipped, so that fixing a blocker fails here and forces its entry to be removed.
      *
      * @return array<string, non-empty-string> file name => expected exception message pattern
      */
@@ -421,6 +398,40 @@ final class ConfigurationTest extends TestCase
         $this->assertCount(2, $propagator->fields());
         $this->assertContains('traceparent', $propagator->fields());
         $this->assertContains('tracestate', $propagator->fields());
+    }
+
+    /**
+     * `composite_list` is folded into `composite` by a `beforeNormalization()` closure on the
+     * `propagator` node, and a parent's closures run before its children's, so substitution has to
+     * happen in `preNormalize()` for the fold to see a resolved value.
+     */
+    public function test_propagators_env_substitution(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PROPAGATORS', 'b3,baggage');
+        $propagators = self::propagatorsFrom(__DIR__ . '/configurations/propagators-env-substitution.yaml');
+
+        $this->assertCount(2, $propagators);
+        $this->assertInstanceOf(B3Propagator::class, $propagators[0]);
+        $this->assertInstanceOf(BaggagePropagator::class, $propagators[1]);
+    }
+
+    public function test_propagators_env_substitution_falls_back_to_default(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PROPAGATORS', null);
+        $propagators = self::propagatorsFrom(__DIR__ . '/configurations/propagators-env-substitution.yaml');
+
+        $this->assertCount(2, $propagators);
+        $this->assertInstanceOf(TraceContextPropagator::class, $propagators[0]);
+        $this->assertInstanceOf(BaggagePropagator::class, $propagators[1]);
+    }
+
+    private static function propagatorsFrom(string $file): array
+    {
+        $propagator = Configuration::parseFile($file)->create()->build()->getPropagator();
+        $propagators = (new \ReflectionClass($propagator))->getProperty('propagators')->getValue($propagator);
+        Assert::assertIsArray($propagators);
+
+        return array_values($propagators);
     }
 
     public function test_duplicate_response_propagators(): void
