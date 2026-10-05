@@ -563,7 +563,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->end()
                             ->end()
                         ->end()
-                        ->append($registry->componentList('detectors', ResourceDetectorInterface::class))
+                        // Unknown detectors warn and are skipped rather than failing startup, so
+                        // that a portable config may name detectors another SDK provides.
+                        ->append(
+                            $registry->componentList('detectors', ResourceDetectorInterface::class)
+                                ->attribute(IgnoresUnknownProviders::ATTRIBUTE, true)
+                        )
                     ->end()
                 ->end()
                 ->scalarNode('schema_url')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()

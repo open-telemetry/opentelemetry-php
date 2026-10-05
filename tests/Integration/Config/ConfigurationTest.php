@@ -321,6 +321,62 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * Resource detectors are the one component the spec marks "warn and skip" rather than "error",
+     * so that a portable configuration may name detectors another SDK provides.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk.md#supported-sdk-plugin-components
+     */
+    public function test_unknown_resource_detector_is_ignored(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->matchesRegularExpression('/Ignoring "detectors" entry "some_other_sdk_detector"/'));
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                resource:
+                  detection/development:
+                    detectors:
+                      - some_other_sdk_detector:
+                      - host:
+                YAML)]);
+
+            $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
+            $resource = (new \ReflectionClass($tracerProvider))
+                ->getProperty('tracerSharedState')
+                ->getValue($tracerProvider);
+            $resource = (new \ReflectionClass($resource))->getProperty('resource')->getValue($resource);
+
+            // the surviving detector still ran, so skipping did not discard the rest of the list
+            $this->assertInstanceOf(ResourceInfo::class, $resource);
+            $this->assertArrayHasKey('host.name', $resource->getAttributes()->toArray());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * Unlike resource detectors, every other component type must fail rather than be skipped.
+     */
+    public function test_unknown_span_processor_is_an_error(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/unknown provider "some_unknown_processor"/');
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+                - some_unknown_processor:
+            YAML)]);
+    }
+
+    /**
      * `log_level` is named with an OTel severity but the internal logger is PSR-3, and it is global
      * state, so it must not be applied until the SDK is registered globally.
      */

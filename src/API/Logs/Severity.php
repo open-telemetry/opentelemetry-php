@@ -80,7 +80,7 @@ enum Severity: int
      * PSR-3 level than INFO2 does. The trade is that a threshold may admit slightly more than
      * asked for, never less.
      *
-     * @see https://opentelemetry.io/docs/specs/otel/logs/data-model-appendix/#appendix-b-severitynumber-example-mappings
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/data-model-appendix.md#appendix-b-severitynumber-example-mappings
      *
      * @return 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'
      */

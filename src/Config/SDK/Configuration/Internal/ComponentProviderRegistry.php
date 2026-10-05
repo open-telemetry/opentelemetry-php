@@ -75,7 +75,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
     public function component(string $name, string $type): NodeDefinition
     {
         $node = $this->builder->arrayNode($name);
-        $this->applyToArrayNode($node, $type);
+        $this->applyToArrayNode($node, $name, $type);
 
         return $node;
     }
@@ -84,7 +84,14 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
     public function componentList(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name)->defaultValue([]);
-        $this->applyToArrayNode($node->arrayPrototype(), $type);
+        // Guaranteed by the node class {@see ConfigurationFactory} registers for `array`.
+        \assert($node instanceof IgnoresUnknownProviders);
+        $this->applyToArrayNode($node->arrayPrototype(), $name, $type, $node);
+        // Prototype finalization runs before this closure, so skipped entries arrive as null.
+        $node->validate()->always(static fn (array $value): array => array_values(array_filter(
+            $value,
+            static fn (mixed $component): bool => $component !== null,
+        )));
 
         return $node;
     }
@@ -105,12 +112,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
             $components = [];
             foreach ($value ?? [] as $key => $config) {
                 if ($ignoreUnknown && !isset($this->providers[$type][$key])) {
-                    self::logWarning(sprintf(
-                        'Ignoring "%s" entry "%s": no provider is registered for it. Known entries are %s',
-                        $name,
-                        $key,
-                        implode(', ', array_map(json_encode(...), array_keys($this->providers[$type] ?? [])) ?: ['none'])
-                    ));
+                    $this->logUnknownProvider($name, (string) $key, $type);
 
                     continue;
                 }
@@ -141,12 +143,17 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         return $node;
     }
 
-    private function applyToArrayNode(ArrayNodeDefinition $node, string $type): void
+    /**
+     * @param ?IgnoresUnknownProviders $optIn node to read the unknown-provider opt-in from at
+     *        finalization, when the caller has had a chance to set the attribute; the prototype
+     *        itself cannot carry it, as callers only see the enclosing list node
+     */
+    private function applyToArrayNode(ArrayNodeDefinition $node, string $name, string $type, ?IgnoresUnknownProviders $optIn = null): void
     {
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
         $node->ignoreExtraKeys(false);
-        $node->validate()->always(function (array $value) use ($type): ComponentPlugin {
+        $node->validate()->always(function (array $value) use ($name, $type, $optIn): ?ComponentPlugin {
             if (count($value) !== 1) {
                 throw new InvalidArgumentException(sprintf(
                     'Component "%s" must have exactly one provider defined, got %s',
@@ -155,8 +162,25 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
                 ));
             }
 
-            return $this->process($type, array_key_first($value), $value);
+            $key = array_key_first($value);
+            if ($optIn?->ignoresUnknownProviders() && !isset($this->providers[$type][$key])) {
+                $this->logUnknownProvider($name, (string) $key, $type);
+
+                return null;
+            }
+
+            return $this->process($type, $key, $value);
         });
+    }
+
+    private function logUnknownProvider(string $name, string $key, string $type): void
+    {
+        self::logWarning(sprintf(
+            'Ignoring "%s" entry "%s": no provider is registered for it. Known entries are %s',
+            $name,
+            $key,
+            implode(', ', array_map(json_encode(...), array_keys($this->providers[$type] ?? [])) ?: ['none'])
+        ));
     }
 
     private function process(string $type, string $name, mixed $configs): ComponentPlugin
