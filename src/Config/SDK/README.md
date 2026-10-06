@@ -54,8 +54,9 @@ distribution:
 
 Any distribution may claim a key there, so one file can carry the settings of several. Keys this SDK
 has no provider for — another distribution's, or one whose package is not installed — are ignored
-and logged at info level, rather than failing the parse. Note that this makes a typo in the key above
-silently fall back to the default instead of raising an error; the info log is where it shows up.
+and logged at warning level, rather than failing the parse. Note that this makes a typo in the key
+above silently fall back to the default instead of raising an error; the warning is where it shows
+up. It is emitted when the SDK is created, so a configured `log_level` applies to it.
 
 #### Performance considerations
 
