@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
@@ -110,7 +111,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *                 included: list<string>,
      *                 excluded: list<string>,
      *             },
-     *             detectors: list<ComponentPlugin<ResourceDetectorInterface>>,
+     *             detectors: list<ComponentPlugin<?ResourceDetectorInterface>>,
      *         }
      *     },
      *     attribute_limits: array{
@@ -205,7 +206,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *            }>
      *         },
      *     },
-     *     distribution: list<ComponentPlugin<DistributionConfiguration>>,
+     *     distribution: list<ComponentPlugin<?DistributionConfiguration>>,
      * } $properties
      */
     #[\Override]
@@ -214,7 +215,11 @@ final class OpenTelemetrySdk implements ComponentProvider
         $sdkBuilder = new SdkBuilder();
 
         if ($properties['log_level'] !== null) {
-            $sdkBuilder->setLogLevel(Severity::fromName($properties['log_level'])->toPsr3());
+            $logLevel = Severity::fromName($properties['log_level'])->toPsr3();
+            $sdkBuilder->setLogLevel($logLevel);
+            // Applies the configured level to messages emitted while creating components, which all
+            // happens before `buildAndRegisterGlobal()` sets the global minimum.
+            $context = $context->withLogger(new ConfiguredLogger($logLevel));
         }
 
         $propagators = [];
@@ -237,7 +242,9 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $distributionProperties = new DistributionRegistry();
         foreach ($properties['distribution'] as $distributionConfiguration) {
-            $distributionProperties->add($distributionConfiguration->create($context));
+            if (($distribution = $distributionConfiguration->create($context)) !== null) {
+                $distributionProperties->add($distribution);
+            }
         }
 
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
@@ -250,7 +257,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             /**
              * @psalm-suppress InvalidMethodCall
              **/
-            $detectors[] = $plugin->create($context);
+            if (($detector = $plugin->create($context)) !== null) {
+                $detectors[] = $detector;
+            }
         }
         $mandatory = (new Detectors\Composite([
             new Detectors\Sdk(),

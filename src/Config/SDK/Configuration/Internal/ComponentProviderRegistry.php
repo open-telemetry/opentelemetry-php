@@ -11,7 +11,6 @@ use function count;
 use function implode;
 use InvalidArgumentException;
 use LogicException;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
@@ -34,8 +33,6 @@ use Symfony\Component\Config\Definition\Processor;
  */
 final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry, ResourceTrackable
 {
-    use LogsMessagesTrait;
-
     /** @var iterable iterable<Normalization> */
     private readonly iterable $normalizations;
     private readonly NodeBuilder $builder;
@@ -87,11 +84,6 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         // Guaranteed by the node class {@see ConfigurationFactory} registers for `array`.
         \assert($node instanceof IgnoresUnknownProviders);
         $this->applyToArrayNode($node->arrayPrototype(), $name, $type, $node);
-        // Prototype finalization runs before this closure, so skipped entries arrive as null.
-        $node->validate()->always(static fn (array $value): array => array_values(array_filter(
-            $value,
-            static fn (mixed $component): bool => $component !== null,
-        )));
 
         return $node;
     }
@@ -111,13 +103,9 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
             $ignoreUnknown = $node->ignoresUnknownProviders();
             $components = [];
             foreach ($value ?? [] as $key => $config) {
-                if ($ignoreUnknown && !isset($this->providers[$type][$key])) {
-                    $this->logUnknownProvider($name, (string) $key, $type);
-
-                    continue;
-                }
-
-                $components[] = $this->process($type, $key, [$key => $config]);
+                $components[] = $ignoreUnknown && !isset($this->providers[$type][$key])
+                    ? $this->skip($name, (string) $key, $type)
+                    : $this->process($type, $key, [$key => $config]);
             }
 
             return $components;
@@ -153,7 +141,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
         $node->ignoreExtraKeys(false);
-        $node->validate()->always(function (array $value) use ($name, $type, $optIn): ?ComponentPlugin {
+        $node->validate()->always(function (array $value) use ($name, $type, $optIn): \OpenTelemetry\API\Configuration\Config\ComponentPlugin {
             if (count($value) !== 1) {
                 throw new InvalidArgumentException(sprintf(
                     'Component "%s" must have exactly one provider defined, got %s',
@@ -164,23 +152,16 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
 
             $key = array_key_first($value);
             if ($optIn?->ignoresUnknownProviders() && !isset($this->providers[$type][$key])) {
-                $this->logUnknownProvider($name, (string) $key, $type);
-
-                return null;
+                return $this->skip($name, (string) $key, $type);
             }
 
             return $this->process($type, $key, $value);
         });
     }
 
-    private function logUnknownProvider(string $name, string $key, string $type): void
+    private function skip(string $name, string $key, string $type): SkippedComponentPlugin
     {
-        self::logWarning(sprintf(
-            'Ignoring "%s" entry "%s": no provider is registered for it. Known entries are %s',
-            $name,
-            $key,
-            implode(', ', array_map(json_encode(...), array_keys($this->providers[$type] ?? [])) ?: ['none'])
-        ));
+        return new SkippedComponentPlugin($name, $key, array_keys($this->providers[$type] ?? []));
     }
 
     private function process(string $type, string $name, mixed $configs): ComponentPlugin

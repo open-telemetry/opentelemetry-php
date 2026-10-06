@@ -324,6 +324,9 @@ final class ConfigurationTest extends TestCase
      * Resource detectors are the one component the spec marks "warn and skip" rather than "error",
      * so that a portable configuration may name detectors another SDK provides.
      *
+     * The warning is emitted while creating the SDK, not while parsing, so that a configured
+     * `log_level` applies to it ({@see self::test_unknown_resource_detector_warning_honours_log_level}).
+     *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk.md#supported-sdk-plugin-components
      */
     public function test_unknown_resource_detector_is_ignored(): void
@@ -332,7 +335,6 @@ final class ConfigurationTest extends TestCase
         $logWriter->expects($this->atLeastOnce())
             ->method('write')
             ->with(LogLevel::WARNING, $this->matchesRegularExpression('/Ignoring "detectors" entry "some_other_sdk_detector"/'));
-        Logging::setLogWriter($logWriter);
 
         try {
             $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
@@ -345,6 +347,7 @@ final class ConfigurationTest extends TestCase
                       - host:
                 YAML)]);
 
+            Logging::setLogWriter($logWriter);
             $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
             $resource = (new \ReflectionClass($tracerProvider))
                 ->getProperty('tracerSharedState')
@@ -354,6 +357,33 @@ final class ConfigurationTest extends TestCase
             // the surviving detector still ran, so skipping did not discard the rest of the list
             $this->assertInstanceOf(ResourceInfo::class, $resource);
             $this->assertArrayHasKey('host.name', $resource->getAttributes()->toArray());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * The point of warning at creation rather than parse time: the message goes through
+     * `$context->logger`, so a configured `log_level` filters it without the global level being set.
+     */
+    public function test_unknown_resource_detector_warning_honours_log_level(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: error
+                resource:
+                  detection/development:
+                    detectors:
+                      - some_other_sdk_detector:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $sdk->create(new Context());
         } finally {
             Logging::reset();
         }
