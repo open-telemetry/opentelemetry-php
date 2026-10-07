@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        PHP_VERSION: ${PHP_VERSION:-8.1}
+        PHP_VERSION: ${PHP_VERSION:-8.5}
     command: sleep infinity
     working_dir: /usr/src/myapp
     user: php

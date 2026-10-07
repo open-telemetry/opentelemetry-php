@@ -6,10 +6,7 @@ PHP version and extension set match what CI runs.
 
 ## Usage
 
-Run **Dev Containers: Reopen in Container** and pick a PHP version. The default
-(`.devcontainer/devcontainer.json`) is PHP 8.1, matching the Makefile's default; 8.2 - 8.5 live
-in the `php82/` … `php85/` subfolders.
-
+Run **Dev Containers: Reopen in Container** and pick a PHP version.
 On first start, `make update` installs dependencies. This takes a few minutes.
 
 ### Rebuilding

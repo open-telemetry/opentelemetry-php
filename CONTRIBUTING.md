@@ -36,9 +36,9 @@ Development tasks are generally run through a `Makefile`. Running `make` or `mak
 ### Developing in a devcontainer
 
 As an alternative to the above, this repository ships [devcontainers](https://containers.dev/) for each supported PHP
-version. In VS Code, run **Dev Containers: Reopen in Container** and pick a version. Dependencies are installed on
-first start, and the usual `make` targets (`make test-unit`, `make phpstan`, `make all-checks`, …) run the tools
-directly inside the container.
+version. In VS Code, run **Dev Containers: Reopen in Container** and pick a version.
+Dependencies are installed on first start, and the usual `make` targets (`make test-unit`, `make phpstan`,
+`make all-checks`, …) run the tools directly inside the container.
 
 A devcontainer reads your `.env`, so variables your own tooling needs are available inside it without changing any
 committed file. See [.devcontainer/README.md](.devcontainer/README.md) for this and other details.

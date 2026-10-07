@@ -1,8 +1,8 @@
 {
   "name": "opentelemetry-php (PHP 8.1)",
   "dockerComposeFile": [
-    "docker-compose.yml",
-    "compose-php81.yml"
+    "../docker-compose.yml",
+    "../compose-php81.yml"
   ],
   "service": "php-dev",
   "workspaceFolder": "/usr/src/myapp",
