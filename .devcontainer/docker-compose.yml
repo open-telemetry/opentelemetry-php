@@ -1,0 +1,48 @@
+services:
+  php-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.1}
+    command: sleep infinity
+    working_dir: /usr/src/myapp
+    user: php
+    env_file:
+      # Optional: the container still starts when .env is absent.
+      - path: ../.env
+        required: false
+    environment:
+      # Makes every Makefile target run the tool directly in this container instead of
+      # shelling out to `docker compose run --rm php`. Passing it through MAKEFLAGS acts as
+      # a command-line override, so the Makefile itself needs no change.
+      MAKEFLAGS: DC_RUN_PHP=
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      COMPOSER_CACHE_DIR: /home/php/.cache/composer
+    volumes:
+      - ..:/usr/src/myapp:cached
+      # Dependencies resolve differently per PHP version, so each version keeps its own
+      # install in named volumes instead of sharing the host's vendor directories.
+      # Each version's devcontainer.json pins these to version-specific volume names.
+      - vendor:/usr/src/myapp/vendor
+      - vendor-bin-deptrac:/usr/src/myapp/vendor-bin/deptrac/vendor
+      - vendor-bin-infection:/usr/src/myapp/vendor-bin/infection/vendor
+      - vendor-bin-phan:/usr/src/myapp/vendor-bin/phan/vendor
+      - vendor-bin-php-cs-fixer:/usr/src/myapp/vendor-bin/php-cs-fixer/vendor
+      - vendor-bin-phpbench:/usr/src/myapp/vendor-bin/phpbench/vendor
+      - vendor-bin-phpmetrics:/usr/src/myapp/vendor-bin/phpmetrics/vendor
+      - vendor-bin-psalm:/usr/src/myapp/vendor-bin/psalm/vendor
+      - vendor-bin-rector:/usr/src/myapp/vendor-bin/rector/vendor
+      - composer-cache:/home/php/.cache/composer
+
+volumes:
+  vendor:
+  vendor-bin-deptrac:
+  vendor-bin-infection:
+  vendor-bin-phan:
+  vendor-bin-php-cs-fixer:
+  vendor-bin-phpbench:
+  vendor-bin-phpmetrics:
+  vendor-bin-psalm:
+  vendor-bin-rector:
+  composer-cache:

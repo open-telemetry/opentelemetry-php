@@ -13,14 +13,14 @@ To contribute effectively, ensure you have the following tools installed:
 * PHP 8.1 or higher (Check supported PHP versions)
 
 We aim to support officially supported PHP versions, according to https://www.php.net/supported-versions.php. The
-developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.1`, `8.2` and `8.3`
-respectively, with `8.1` being the default. You can execute the test suite against other PHP versions by running the
-following command:
+developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.1`, `8.2`, `8.3`,
+`8.4` and `8.5` respectively, with `8.1` being the default. You can execute the test suite against other PHP versions
+by running the following command:
 
 ```bash
 PHP_VERSION=8.1 make all
 #or
-PHP_VERSION=8.3 make all
+PHP_VERSION=8.5 make all
 ```
 For repeatability and consistency across different operating systems, we use the [3 Musketeers pattern](https://3musketeers.pages.dev/). If you're on Windows, it might be a good idea to use Git bash for following the steps below.
 
@@ -32,6 +32,16 @@ We use `docker` and `docker compose` to perform a lot of our static analysis and
 [docker engine](https://docs.docker.com/engine/install/) and the [compose plugin](https://docs.docker.com/compose/install/).
 
 Development tasks are generally run through a `Makefile`. Running `make` or `make help` will list available targets.
+
+### Developing in a devcontainer
+
+As an alternative to the above, this repository ships [devcontainers](https://containers.dev/) for each supported PHP
+version. In VS Code, run **Dev Containers: Reopen in Container** and pick a version. Dependencies are installed on
+first start, and the usual `make` targets (`make test-unit`, `make phpstan`, `make all-checks`, …) run the tools
+directly inside the container.
+
+A devcontainer reads your `.env`, so variables your own tooling needs are available inside it without changing any
+committed file. See [.devcontainer/README.md](.devcontainer/README.md) for this and other details.
 
 ## Workflow
 

@@ -1,0 +1,30 @@
+# Pins the image and the dependency volumes for PHP 8.3. Volume names are explicit so
+# switching between PHP versions never reuses another version's installed dependencies.
+services:
+  php-dev:
+    build:
+      args:
+        PHP_VERSION: "8.3"
+    image: opentelemetry-php-dev:8.3
+
+volumes:
+  vendor:
+    name: otel-php-dev-83-vendor
+  vendor-bin-deptrac:
+    name: otel-php-dev-83-deptrac
+  vendor-bin-infection:
+    name: otel-php-dev-83-infection
+  vendor-bin-phan:
+    name: otel-php-dev-83-phan
+  vendor-bin-php-cs-fixer:
+    name: otel-php-dev-83-php-cs-fixer
+  vendor-bin-phpbench:
+    name: otel-php-dev-83-phpbench
+  vendor-bin-phpmetrics:
+    name: otel-php-dev-83-phpmetrics
+  vendor-bin-psalm:
+    name: otel-php-dev-83-psalm
+  vendor-bin-rector:
+    name: otel-php-dev-83-rector
+  composer-cache:
+    name: otel-php-dev-83-composer-cache

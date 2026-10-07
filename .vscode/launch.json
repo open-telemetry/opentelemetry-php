@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": {
+        "/usr/src/myapp": "${workspaceFolder}"
+      }
+    },
+    {
+      // Runs the file in the active editor under the debugger, so no separate terminal
+      // command is needed. Only works where PHP is on the same machine as the editor,
+      // i.e. inside a devcontainer -- from a local window use "Listen for Xdebug" and
+      // start PHP yourself via `docker compose run`.
+      //
+      // XDEBUG_MODE is `off` for the devcontainer as a whole, and Xdebug only starts a
+      // session when asked, so both have to be overridden for this one run.
+      //
+      // `"port": 0` picks a free port instead of 9003, so this works while "Listen for
+      // Xdebug" holds 9003 -- otherwise starting it second fails with EADDRINUSE. The
+      // chosen port is substituted into ${port} below and handed to Xdebug, so the two
+      // configurations never contend for the same port.
+      "name": "Debug current script",
+      "type": "php",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${fileDirname}",
+      "port": 0,
+      "runtimeArgs": [
+        "-dxdebug.start_with_request=yes"
+      ],
+      "env": {
+        "XDEBUG_MODE": "debug,develop",
+        "XDEBUG_CONFIG": "client_port=${port}"
+      }
+    }
+  ]
+}
