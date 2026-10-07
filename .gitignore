@@ -7,6 +7,7 @@ vendor-bin/**/composer.lock
 coverage.clover
 tests/coverage
 .php-cs-fixer.cache
+.phpunit.cache
 .phpbench
 !tests/coverage/html/.gitkeep
 var/metrics/
@@ -19,7 +20,12 @@ junit.xml
 *.iml
 
 # VS Code
-.vscode
+.vscode/*
+!.vscode/launch.json
+
+# Claude Code (local, per-developer settings)
+.claude/settings.local.json
+CLAUDE.local.md
 
 # OS X
 .DS_Store

@@ -11,7 +11,10 @@ cp .env.dist .env   # Required before first use
 make install        # Install dependencies
 ```
 
-Set `PHP_VERSION` (8.1, 8.2, 8.3) to test against specific PHP versions: `PHP_VERSION=8.1 make all`
+Set `PHP_VERSION` (8.1, 8.2, 8.3, 8.4, 8.5) to test against specific PHP versions: `PHP_VERSION=8.1 make all`
+
+Alternatively, `.devcontainer/` provides a devcontainer per PHP version. Inside one, `MAKEFLAGS=DC_RUN_PHP=` makes the
+`make` targets run tools directly rather than via `docker compose run`. See `.devcontainer/README.md`.
 
 ## Common Commands
 

@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Export;
 
 use ArrayObject;
 use OpenTelemetry\SDK\Common\Export\InMemoryStorageManager;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(\OpenTelemetry\SDK\Common\Export\InMemoryStorageManager::class)]
 class InMemoryStorageManagerTest extends TestCase
 {
+    use TestState;
+
     public static function getStorageName(): array
     {
         return [

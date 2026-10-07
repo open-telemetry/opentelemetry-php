@@ -8,25 +8,32 @@ use ArrayObject;
 
 class InMemoryStorageManager
 {
-    private static ArrayObject $spans;
-    private static ArrayObject $metrics;
-    private static ArrayObject $logs;
+    private static ?ArrayObject $spans = null;
+    private static ?ArrayObject $metrics = null;
+    private static ?ArrayObject $logs = null;
 
     public static function metrics(): ArrayObject
     {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$metrics ??= new ArrayObject();
     }
 
     public static function logs(): ArrayObject
     {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$logs ??= new ArrayObject();
     }
 
     public static function spans(): ArrayObject
     {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
         return self::$spans ??= new ArrayObject();
+    }
+
+    /**
+     * @internal
+     */
+    public static function reset(): void
+    {
+        self::$spans = null;
+        self::$metrics = null;
+        self::$logs = null;
     }
 }

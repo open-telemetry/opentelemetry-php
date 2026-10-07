@@ -1,0 +1,30 @@
+# Pins the image and the dependency volumes for PHP 8.4. Volume names are explicit so
+# switching between PHP versions never reuses another version's installed dependencies.
+services:
+  php-dev:
+    build:
+      args:
+        PHP_VERSION: "8.4"
+    image: opentelemetry-php-dev:8.4
+
+volumes:
+  vendor:
+    name: otel-php-dev-84-vendor
+  vendor-bin-deptrac:
+    name: otel-php-dev-84-deptrac
+  vendor-bin-infection:
+    name: otel-php-dev-84-infection
+  vendor-bin-phan:
+    name: otel-php-dev-84-phan
+  vendor-bin-php-cs-fixer:
+    name: otel-php-dev-84-php-cs-fixer
+  vendor-bin-phpbench:
+    name: otel-php-dev-84-phpbench
+  vendor-bin-phpmetrics:
+    name: otel-php-dev-84-phpmetrics
+  vendor-bin-psalm:
+    name: otel-php-dev-84-psalm
+  vendor-bin-rector:
+    name: otel-php-dev-84-rector
+  composer-cache:
+    name: otel-php-dev-84-composer-cache
