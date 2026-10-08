@@ -106,9 +106,9 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         attributes_list: ?string,
      *         detectors: array,
      *         schema_url: ?string,
-     *         "detection/development": ?array{
+     *         "detection/development"?: array{
      *             attributes: array{
-     *                 included: list<string>,
+     *                 included: ?list<string>,
      *                 excluded: list<string>,
      *             },
      *             detectors: list<ComponentPlugin<?ResourceDetectorInterface>>,
