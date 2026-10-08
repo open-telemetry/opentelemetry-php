@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\API\Unit\Trace;
+namespace OpenTelemetry\Tests\Unit\API\Trace;
 
 use Exception;
 use OpenTelemetry\API\Trace\NonRecordingSpan;

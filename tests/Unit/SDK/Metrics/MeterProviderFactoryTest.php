@@ -64,7 +64,6 @@ class MeterProviderFactoryTest extends TestCase
 
         $reflection = new \ReflectionClass($provider);
         $property = $reflection->getProperty('exemplarFilter');
-        $property->setAccessible(true);
 
         self::assertInstanceOf($expectedFilter, $property->getValue($provider));
     }

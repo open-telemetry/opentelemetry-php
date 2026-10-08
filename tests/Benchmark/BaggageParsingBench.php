@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace OpenTelemetry\Tests\Benchmark;
+
 use OpenTelemetry\API\Baggage\BaggageBuilder;
 use OpenTelemetry\API\Baggage\Propagation\Parser;
 

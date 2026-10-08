@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SDK\Trace;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\SpanSuppression\SemanticConvention;

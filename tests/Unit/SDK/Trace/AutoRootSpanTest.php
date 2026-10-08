@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Trace;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use Nyholm\Psr7\ServerRequest;
 use OpenTelemetry\API\Common\Time\ClockInterface;

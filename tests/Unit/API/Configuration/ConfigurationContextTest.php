@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace API\Configuration;
+namespace OpenTelemetry\Tests\Unit\API\Configuration;
 
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;

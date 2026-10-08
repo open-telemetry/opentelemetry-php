@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Config\SDK\ComponentProvider;
+namespace OpenTelemetry\Tests\Unit\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use PHPUnit\Framework\Attributes\CoversClass;
