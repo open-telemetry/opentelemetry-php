@@ -81,6 +81,7 @@ class ConfigurationTest extends TestCase
     private const DEFAULT_VALUES = [
         'log level' => [Variables::OTEL_LOG_LEVEL, Defaults::OTEL_LOG_LEVEL],
         'attribute count limit' => [Variables::OTEL_ATTRIBUTE_COUNT_LIMIT, Defaults::OTEL_ATTRIBUTE_COUNT_LIMIT],
+        'metrics exemplar filter' => [Variables::OTEL_METRICS_EXEMPLAR_FILTER, Defaults::OTEL_METRICS_EXEMPLAR_FILTER],
         'trace exporter' => [Variables::OTEL_PHP_TRACES_PROCESSOR, Defaults::OTEL_PHP_TRACES_PROCESSOR],
     ];
 
@@ -95,6 +96,7 @@ class ConfigurationTest extends TestCase
         'log level' => [Variables::OTEL_LOG_LEVEL, KnownValues::OTEL_LOG_LEVEL],
         'trace sampler' => [Variables::OTEL_TRACES_SAMPLER, KnownValues::OTEL_TRACES_SAMPLER],
         'trace processor' => [Variables::OTEL_PHP_TRACES_PROCESSOR, KnownValues::OTEL_PHP_TRACES_PROCESSOR],
+        'metrics exemplar filter' => [Variables::OTEL_METRICS_EXEMPLAR_FILTER, KnownValues::OTEL_METRICS_EXEMPLAR_FILTER],
     ];
 
     public function test_has_variable_from_environment(): void

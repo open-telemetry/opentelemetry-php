@@ -1,0 +1,45 @@
+{
+  "name": "opentelemetry-php (PHP 8.1)",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../compose-php81.yml"
+  ],
+  "service": "php-dev",
+  "workspaceFolder": "/usr/src/myapp",
+  "remoteUser": "php",
+  "overrideCommand": false,
+  "initializeCommand": "sh -c 'cd \"${localWorkspaceFolder}\" && [ -f .env ] || cp .env.dist .env'",
+  "postCreateCommand": "make update",
+  "postStartCommand": ".devcontainer/setup-signing-key.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "recca0120.vscode-phpunit",
+        "junstyle.php-cs-fixer",
+        "SanderRonde.phpstan-vscode",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+        "php.validate.executablePath": "/usr/bin/php",
+        "intelephense.environment.phpVersion": "8.1.0",
+        "intelephense.environment.includePaths": [
+          "vendor"
+        ],
+        "phpunit.php": "/usr/bin/php",
+        "phpunit.phpunit": "vendor/bin/phpunit",
+        "phpunit.args": [
+          "--configuration",
+          "phpunit.xml.dist"
+        ],
+        "php-cs-fixer.executablePath": "vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer",
+        "php-cs-fixer.config": ".php-cs-fixer.php",
+        "php-cs-fixer.onsave": false,
+        "phpstan.binPath": "vendor/bin/phpstan",
+        "phpstan.configFile": "phpstan.neon.dist",
+        "makefile.configureOnOpen": false
+      }
+    }
+  }
+}
