@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\SemConv;
+namespace OpenTelemetry\Tests\Unit\SemConv;
 
 use OpenTelemetry\SemConv\Version;
 use PHPUnit\Framework\Attributes\CoversClass;

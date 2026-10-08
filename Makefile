@@ -12,7 +12,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "  \033[32m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 all: update all-checks ## Update to latest and run all checks
 all-lowest: update-lowest all-checks ## Update to lowest dependencies and run all checks
-all-checks: rector style deptrac packages-composer phan psalm phpstan test spi ## Run all checks
+all-checks: rector style deptrac psr4 packages-composer phan psalm phpstan test spi ## Run all checks
 pull: ## Pull latest developer image
 	$(DOCKER_COMPOSE) pull php
 build: ## Build developer image locally
@@ -107,6 +107,8 @@ rector: ## Run rector (dry-run)
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/rector/vendor/bin/rector process --dry-run
 deptrac: ## Run deptrac
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/deptrac/vendor/bin/deptrac --formatter=table --report-uncovered --no-cache
+psr4: ## Check namespaces match PSR-4 autoload rules
+	$(DC_RUN_PHP) env XDEBUG_MODE=off composer dump-autoload --optimize --strict-psr --dry-run
 w3c-test-service:
 	@$(DOCKER_COMPOSE) -f docker-compose.w3cTraceContext.yaml run --rm php ./tests/TraceContext/W3CTestService/trace-context-test.sh
 semconv: ## Generate semconv files

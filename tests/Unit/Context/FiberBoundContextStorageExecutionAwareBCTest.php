@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Context;
+namespace OpenTelemetry\Tests\Unit\Context;
 
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\FiberBoundContextStorageExecutionAwareBC;
+use OpenTelemetry\Context\ScopeInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

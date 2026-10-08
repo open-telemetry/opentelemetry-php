@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler;
 
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;

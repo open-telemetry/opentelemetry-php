@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Test\Unit\Config\SDK\Configuration;
+namespace OpenTelemetry\Tests\Unit\Config\SDK\Configuration;
 
 use BadMethodCallException;
 use ExampleSDK\ComponentProvider;

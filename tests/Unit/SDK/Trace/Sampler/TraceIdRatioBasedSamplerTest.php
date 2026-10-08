@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace\Sampler;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler;
 
 use function bin2hex;
 use InvalidArgumentException;
