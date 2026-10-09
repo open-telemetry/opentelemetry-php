@@ -15,6 +15,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Internal;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -27,6 +28,8 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(ConfigurationFactory::class)]
 final class ConfigurationFactoryTest extends TestCase
 {
+    use TestState;
+
     public string $cacheDir;
     public $properties;
 
@@ -63,7 +66,7 @@ final class ConfigurationFactoryTest extends TestCase
                 #[\Override]
                 public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
                 {
-                    $node = new ArrayNodeDefinition('env_substitution');
+                    $node = $builder->arrayNode('env_substitution');
                     $node
                         ->children()
                             ->scalarNode('string_key')->end()
@@ -239,6 +242,59 @@ final class ConfigurationFactoryTest extends TestCase
         $this->assertSame(128, self::getPropertiesFromPlugin($parsed)['attribute_limits']['attribute_count_limit']);
     }
 
+    #[CoversNothing]
+    public function test_env_substitution_enum_node(): void
+    {
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_PROTOCOL', 'http/protobuf');
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_COMPRESSION', 'gzip');
+        $parsed = self::factory()->process([[
+            'file_format' => '0.1',
+            'tracer_provider' => [
+                'processors' => [
+                    ['batch' => ['exporter' => ['otlp' => [
+                        'protocol' => '${OTEL_EXPORTER_OTLP_PROTOCOL}',
+                        'endpoint' => 'http://localhost:4318',
+                        'compression' => '${OTEL_EXPORTER_OTLP_COMPRESSION}',
+                    ]]]],
+                ],
+            ],
+        ]]);
+
+        $exporter = self::getPropertiesFromPlugin(
+            self::getPropertiesFromPlugin($parsed)['tracer_provider']['processors'][0]
+        )['exporter'];
+        $this->assertSame('gzip', self::getPropertiesFromPlugin($exporter)['compression']);
+    }
+
+    /**
+     * Prototype subtrees were never reached while substitution was attached to node definitions,
+     * because `getChildNodeDefinitions()` does not include the prototype.
+     */
+    #[CoversNothing]
+    public function test_env_substitution_in_array_prototype(): void
+    {
+        $this->setEnvironmentVariable('OTEL_EXPORTER_OTLP_HEADER_VALUE', 'secret');
+        $parsed = self::factory()->process([[
+            'file_format' => '0.1',
+            'tracer_provider' => [
+                'processors' => [
+                    ['batch' => ['exporter' => ['otlp' => [
+                        'protocol' => 'http/protobuf',
+                        'endpoint' => 'http://localhost:4318',
+                        'headers' => [
+                            'authorization' => '${OTEL_EXPORTER_OTLP_HEADER_VALUE}',
+                        ],
+                    ]]]],
+                ],
+            ],
+        ]]);
+
+        $exporter = self::getPropertiesFromPlugin(
+            self::getPropertiesFromPlugin($parsed)['tracer_provider']['processors'][0]
+        )['exporter'];
+        $this->assertSame('secret', self::getPropertiesFromPlugin($exporter)['headers']['authorization']);
+    }
+
     /**
      * @psalm-suppress UndefinedThisPropertyFetch,PossiblyNullFunctionCall
      */
@@ -284,7 +340,6 @@ final class ConfigurationFactoryTest extends TestCase
                 new ComponentProvider\Trace\SamplerTraceIdRatioBased(),
                 new ComponentProvider\Trace\SpanExporterConsole(),
                 new ComponentProvider\Trace\SpanExporterOtlp(),
-                new ComponentProvider\Trace\SpanExporterZipkin(),
                 new ComponentProvider\Trace\SpanProcessorBatch(),
                 new ComponentProvider\Trace\SpanProcessorSimple(),
 

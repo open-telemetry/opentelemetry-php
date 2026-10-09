@@ -27,7 +27,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
     /**
      * @param array{
      *     output_stream: string,
-     *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
+     *     temporality_preference: 'cumulative'|'delta'|'low_memory',
      *      default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
@@ -39,7 +39,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
         $temporality = match ($properties['temporality_preference']) {
             'cumulative' => Temporality::CUMULATIVE,
             'delta' => Temporality::DELTA,
-            'lowmemory' => null,
+            'low_memory' => null,
         };
 
         return new MetricExporter(Registry::transportFactory('stream')->create(
@@ -56,9 +56,10 @@ final class MetricExporterOtlpFile implements ComponentProvider
             ->children()
                 ->scalarNode('output_stream')->defaultValue('stdout')->validate()->always(Validation::ensureString())->end()->end()
                 ->enumNode('temporality_preference')
-                    ->values(['cumulative', 'delta', 'lowmemory'])
+                    ->values(['cumulative', 'delta', 'low_memory'])
                     ->defaultValue('cumulative')
                 ->end()
+                // TODO honour default_histogram_aggregation
                 ->enumNode('default_histogram_aggregation')
                     ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
                     ->defaultValue('explicit_bucket_histogram')

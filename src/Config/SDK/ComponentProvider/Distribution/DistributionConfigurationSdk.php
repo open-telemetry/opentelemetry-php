@@ -22,8 +22,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class DistributionConfigurationSdk implements ComponentProvider
 {
     /**
+     * `span_suppression_strategy/development` is an appended component node, which
+     * `addDefaultsIfNotSet()` does not populate, so it is absent rather than null when another key
+     * is the only one configured.
+     *
      * @param array{
-     *     "span_suppression_strategy/development": ?ComponentPlugin<SpanSuppressionStrategy>,
+     *     "span_suppression_strategy/development"?: ?ComponentPlugin<SpanSuppressionStrategy>,
+     *     internal_metrics_enabled: bool,
      * } $properties
      * @param Context $context
      * @return DistributionConfiguration
@@ -32,7 +37,8 @@ final class DistributionConfigurationSdk implements ComponentProvider
     public function createPlugin(array $properties, Context $context): DistributionConfiguration
     {
         return new SdkDistribution(
-            spanSuppressionStrategy: $properties['span_suppression_strategy/development']?->create($context) ?? new NoopSuppressionStrategy(),
+            spanSuppressionStrategy: ($properties['span_suppression_strategy/development'] ?? null)?->create($context) ?? new NoopSuppressionStrategy(),
+            internalMetricsEnabled: $properties['internal_metrics_enabled'],
         );
     }
 
@@ -41,8 +47,12 @@ final class DistributionConfigurationSdk implements ComponentProvider
     {
         $node = $builder->arrayNode('opentelemetry_php/development');
         $node
+            ->addDefaultsIfNotSet()
             ->children()
                 ->append($registry->component('span_suppression_strategy/development', SpanSuppressionStrategy::class))
+                // Mirrors OTEL_PHP_INTERNAL_METRICS_ENABLED, which gates the same wiring in
+                // environment-based configuration. No 1.0 schema key covers it.
+                ->booleanNode('internal_metrics_enabled')->defaultFalse()->end()
             ->end()
         ;
 

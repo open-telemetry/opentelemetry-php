@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -14,12 +15,14 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
+use OpenTelemetry\SDK\Internal\LogLevelRestoringScope;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use Throwable;
 
 class SdkBuilder
 {
@@ -30,6 +33,8 @@ class SdkBuilder
     private ?TextMapPropagatorInterface $propagator = null;
     private ?ResponsePropagatorInterface $responsePropagator = null;
     private bool $autoShutdown = false;
+    /** @var 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'|'none'|null */
+    private ?string $logLevel = null;
 
     /**
      * Automatically shut down providers on process completion. If not set, the user is responsible for calling `shutdown`.
@@ -87,6 +92,23 @@ class SdkBuilder
         return $this;
     }
 
+    /**
+     * Set the minimum level for the SDK's internal logger, as a PSR-3 level name or 'none'; null
+     * leaves it to OTEL_LOG_LEVEL. Not an OpenTelemetry severity name, which has to be mapped
+     * first ({@see \OpenTelemetry\API\Logs\Severity::toPsr3()}).
+     *
+     * Applied only by {@see self::buildAndRegisterGlobal()}, since the internal logger is global
+     * state and building an Sdk should not reconfigure the process.
+     *
+     * @param 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'|'none'|null $logLevel
+     */
+    public function setLogLevel(?string $logLevel): self
+    {
+        $this->logLevel = $logLevel;
+
+        return $this;
+    }
+
     public function build(): Sdk
     {
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();
@@ -115,16 +137,34 @@ class SdkBuilder
      */
     public function buildAndRegisterGlobal(): ScopeInterface
     {
-        $sdk = $this->build();
-        $context = Configurator::create()
-            ->withPropagator($sdk->getPropagator())
-            ->withTracerProvider($sdk->getTracerProvider())
-            ->withMeterProvider($sdk->getMeterProvider())
-            ->withLoggerProvider($sdk->getLoggerProvider())
-            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
-            ->withResponsePropagator($sdk->getResponsePropagator())
-            ->storeInContext();
+        $previousLogLevel = null;
+        if ($this->logLevel !== null) {
+            $previousLogLevel = Logging::logLevel();
+            Logging::setLogLevel($this->logLevel);
+        }
 
-        return Context::storage()->attach($context);
+        try {
+            $sdk = $this->build();
+            $context = Configurator::create()
+                ->withPropagator($sdk->getPropagator())
+                ->withTracerProvider($sdk->getTracerProvider())
+                ->withMeterProvider($sdk->getMeterProvider())
+                ->withLoggerProvider($sdk->getLoggerProvider())
+                ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+                ->withResponsePropagator($sdk->getResponsePropagator())
+                ->storeInContext();
+
+            $scope = Context::storage()->attach($context);
+        } catch (Throwable $t) {
+            if ($previousLogLevel !== null) {
+                Logging::restoreLogLevel($previousLogLevel);
+            }
+
+            throw $t;
+        }
+
+        return $previousLogLevel === null
+            ? $scope
+            : new LogLevelRestoringScope($scope, $previousLogLevel);
     }
 }

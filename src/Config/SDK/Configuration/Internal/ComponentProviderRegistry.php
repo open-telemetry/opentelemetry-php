@@ -12,6 +12,7 @@ use function implode;
 use InvalidArgumentException;
 use LogicException;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use ReflectionClass;
@@ -71,7 +72,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
     public function component(string $name, string $type): NodeDefinition
     {
         $node = $this->builder->arrayNode($name);
-        $this->applyToArrayNode($node, $type);
+        $this->applyToArrayNode($node, $name, $type);
 
         return $node;
     }
@@ -80,7 +81,9 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
     public function componentList(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name)->defaultValue([]);
-        $this->applyToArrayNode($node->arrayPrototype(), $type);
+        // Guaranteed by the node class {@see ConfigurationFactory} registers for `array`.
+        \assert($node instanceof IgnoresUnknownProviders);
+        $this->applyToArrayNode($node->arrayPrototype(), $name, $type, $node);
 
         return $node;
     }
@@ -89,13 +92,20 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
     public function componentMap(string $name, string $type): ArrayNodeDefinition
     {
         $node = $this->builder->arrayNode($name);
+        // Guaranteed by the node class {@see ConfigurationFactory} registers for `array`.
+        \assert($node instanceof IgnoresUnknownProviders);
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
         $node->ignoreExtraKeys(false);
-        $node->validate()->always(function (array|null $value) use ($type): array {
+        // `$node` is read back at finalization rather than now, because the caller opts in via
+        // IgnoresUnknownProviders::ATTRIBUTE after this method has returned.
+        $node->validate()->always(function (array|null $value) use ($node, $name, $type): array {
+            $ignoreUnknown = $node->ignoresUnknownProviders();
             $components = [];
-            foreach ($value ?? [] as $name => $config) {
-                $components[] = $this->process($type, $name, [$name => $config]);
+            foreach ($value ?? [] as $key => $config) {
+                $components[] = $ignoreUnknown && !isset($this->providers[$type][$key])
+                    ? $this->skip($name, (string) $key, $type)
+                    : $this->process($type, $key, [$key => $config]);
             }
 
             return $components;
@@ -121,12 +131,17 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         return $node;
     }
 
-    private function applyToArrayNode(ArrayNodeDefinition $node, string $type): void
+    /**
+     * @param ?IgnoresUnknownProviders $optIn node to read the unknown-provider opt-in from at
+     *        finalization, when the caller has had a chance to set the attribute; the prototype
+     *        itself cannot carry it, as callers only see the enclosing list node
+     */
+    private function applyToArrayNode(ArrayNodeDefinition $node, string $name, string $type, ?IgnoresUnknownProviders $optIn = null): void
     {
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
         $node->ignoreExtraKeys(false);
-        $node->validate()->always(function (array $value) use ($type): ComponentPlugin {
+        $node->validate()->always(function (array $value) use ($name, $type, $optIn): \OpenTelemetry\API\Configuration\Config\ComponentPlugin {
             if (count($value) !== 1) {
                 throw new InvalidArgumentException(sprintf(
                     'Component "%s" must have exactly one provider defined, got %s',
@@ -135,8 +150,18 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
                 ));
             }
 
-            return $this->process($type, array_key_first($value), $value);
+            $key = array_key_first($value);
+            if ($optIn?->ignoresUnknownProviders() && !isset($this->providers[$type][$key])) {
+                return $this->skip($name, (string) $key, $type);
+            }
+
+            return $this->process($type, $key, $value);
         });
+    }
+
+    private function skip(string $name, string $key, string $type): SkippedComponentPlugin
+    {
+        return new SkippedComponentPlugin($name, $key, array_keys($this->providers[$type] ?? []));
     }
 
     private function process(string $type, string $name, mixed $configs): ComponentPlugin
@@ -151,10 +176,10 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         }
 
         if (!$provider->node instanceof NodeInterface) {
-            foreach ($this->normalizations as $normalization) {
-                $normalization->apply($provider->node);
-            }
             $provider->node = $provider->node->getNode(forceRootNode: true);
+            if ($provider->node instanceof NormalizationsAware) {
+                $provider->node->setNormalizations($this->normalizations);
+            }
         }
 
         try {
