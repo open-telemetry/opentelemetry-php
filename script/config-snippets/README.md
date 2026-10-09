@@ -36,6 +36,9 @@ Every copied file must parse. What to expect:
   `FILE_FORMAT_MAJOR` raised alongside the package's own major version, and affects downstream
   config files and contrib. See `src/Config/SDK/README.md`.
 
-If a file cannot be made to parse yet, keep it and add it to
-`ConfigurationTest::knownParseFailures()` with the expected message and the reason. It is then
-asserted to fail, so the gap is tracked and fixing the blocker tells you to remove the entry.
+Every file is parsed twice: once as SDK configuration and once as instrumentation configuration.
+An SDK-configuration failure has to be fixed — there is no allowlist for it. A file whose
+`instrumentation/development` root cannot be parsed yet can be kept as-is by adding it to
+`ConfigurationTest::knownInstrumentationParseFailures()` with the expected message and the reason.
+It is then asserted to fail, so the gap is tracked and fixing the blocker tells you to remove the
+entry.

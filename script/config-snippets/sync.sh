@@ -71,5 +71,6 @@ grep -rh '^file_format:' "${UPSTREAM_DIR}" | sort -u
 
 echo
 echo "Done. Now run: make test-integration"
-echo "Every upstream file must parse, unless listed in ConfigurationTest::knownParseFailures();"
-echo "add a no-op provider for any component the SDK lacks."
+echo "Every upstream file must parse as SDK configuration; add a no-op provider for any component"
+echo "the SDK lacks. An instrumentation-root gap can instead be listed in"
+echo "ConfigurationTest::knownInstrumentationParseFailures()."

@@ -9,7 +9,9 @@ resource:
   attributes_list: ${OTEL_RESOURCE_ATTRIBUTES}
 
 propagator:
-  composite: [ tracecontext, baggage ]
+  composite:
+    - tracecontext:
+    - baggage:
 
 response_propagator/development:
   composite_list: "servertiming,traceresponse"

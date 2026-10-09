@@ -9,10 +9,11 @@ Everything here is a **verbatim copy** from
 `ConfigurationTest::openTelemetryConfigurationDataProvider()` globs both, so every file is parsed
 and used to build an SDK. Fixtures we maintain ourselves live in the parent directory.
 
-A file this SDK cannot parse yet is still synced, and listed in
-`ConfigurationTest::knownParseFailures()` with the reason — currently
-`otel-sdk-migration-config.yaml`, whose `${ENV}` in `propagator.composite_list` is folded into
-`composite` before env substitution runs.
+Each file is also parsed as instrumentation configuration, which keeps only the
+`instrumentation/development` root that the SDK parse discards. A file whose SDK configuration does
+not parse has to be fixed, but one this SDK cannot parse as instrumentation configuration yet is
+still synced, and listed in `ConfigurationTest::knownInstrumentationParseFailures()` with the reason
+— currently the two experimental-instrumentation snippets and `otel-sdk-migration-config.yaml`.
 
 ## Keeping them in sync
 

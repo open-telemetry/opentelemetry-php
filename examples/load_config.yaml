@@ -44,7 +44,7 @@ meter_provider:
           otlp_http:
             <<: *otlp-exporter
             endpoint: http://collector:4318/v1/metrics
-            temporality_preference: lowmemory
+            temporality_preference: low_memory
 logger_provider:
   processors:
     - simple:

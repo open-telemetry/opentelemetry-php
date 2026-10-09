@@ -41,7 +41,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
      *     headers_list: ?string,
      *     compression: 'gzip'|'none'|null,
      *     timeout: int<0, max>,
-     *     temporality_preference: 'cumulative'|'delta'|'lowmemory',
+     *     temporality_preference: 'cumulative'|'delta'|'low_memory',
      *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
      * } $properties
      */
@@ -55,7 +55,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
         $temporality = match ($properties['temporality_preference']) {
             'cumulative' => Temporality::CUMULATIVE,
             'delta' => Temporality::DELTA,
-            'lowmemory' => null,
+            'low_memory' => null,
         };
 
         $endpoint = OtlpUtil::applyScheme($properties['endpoint'], $properties['tls']['insecure']);
@@ -101,7 +101,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
                 ->enumNode('compression')->values(['gzip', 'none', null])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
                 ->enumNode('temporality_preference')
-                    ->values(['cumulative', 'delta', 'lowmemory'])
+                    ->values(['cumulative', 'delta', 'low_memory'])
                     ->defaultValue('cumulative')
                 ->end()
                 // TODO honour default_histogram_aggregation
