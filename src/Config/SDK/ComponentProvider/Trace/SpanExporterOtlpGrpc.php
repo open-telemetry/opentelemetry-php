@@ -14,7 +14,6 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
 use OpenTelemetry\Contrib\Otlp\SpanExporter;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Registry;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -36,7 +35,7 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
      *         key_file: ?string,
      *         insecure: ?bool,
      *     },
-     *     headers: list<array{name: string, value: string}>,
+     *     headers: list<array{name: non-empty-string, value: ?string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|'none'|null,
      *     timeout: int<0, max>,
@@ -46,7 +45,7 @@ final class SpanExporterOtlpGrpc implements ComponentProvider
     public function createPlugin(array $properties, Context $context): SpanExporterInterface
     {
         $protocol = Protocols::GRPC;
-        $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+        $headers = OtlpUtil::headers($properties['headers'], $properties['headers_list']);
         $endpoint = OtlpUtil::applyScheme($properties['endpoint'], $properties['tls']['insecure']);
 
         return new SpanExporter(Registry::transportFactory($protocol)->create(

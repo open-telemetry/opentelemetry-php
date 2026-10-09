@@ -14,7 +14,6 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
@@ -37,7 +36,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
      *         key_file: ?string,
      *         insecure: ?bool,
      *     },
-     *     headers: list<array{name: string, value: string}>,
+     *     headers: list<array{name: non-empty-string, value: ?string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|'none'|null,
      *     timeout: int<0, max>,
@@ -50,7 +49,7 @@ final class MetricExporterOtlpGrpc implements ComponentProvider
     {
         $protocol = Protocols::GRPC;
 
-        $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+        $headers = OtlpUtil::headers($properties['headers'], $properties['headers_list']);
 
         $temporality = match ($properties['temporality_preference']) {
             'cumulative' => Temporality::CUMULATIVE,

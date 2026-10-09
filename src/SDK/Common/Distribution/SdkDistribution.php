@@ -11,6 +11,7 @@ final class SdkDistribution implements DistributionConfiguration
 {
     public function __construct(
         public readonly SpanSuppressionStrategy $spanSuppressionStrategy = new NoopSuppressionStrategy(),
+        public readonly bool $internalMetricsEnabled = false,
     ) {
     }
 }

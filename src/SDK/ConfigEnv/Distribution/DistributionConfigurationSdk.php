@@ -30,6 +30,7 @@ final class DistributionConfigurationSdk implements EnvComponentLoader
                 'none' => new NoopSuppressionStrategy(),
                 default => $registry->load(SpanSuppressionStrategy::class, $spanSuppressionStrategyName, $env, $context),
             },
+            internalMetricsEnabled: $env->bool(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED) ?? false,
         );
     }
 

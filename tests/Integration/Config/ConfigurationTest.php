@@ -20,6 +20,11 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Metrics\Instrument;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
@@ -407,6 +412,63 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * `gauge` is one of the seven `instrument_type` values in file format 1.0, and was the only one
+     * missing from the view selector enum, so a schema-valid file was rejected. No upstream snippet
+     * selects on it — `View_kitchen_sink.yaml` uses `histogram`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/meter_provider.yaml
+     */
+    #[DataProvider('instrumentTypeSelectorProvider')]
+    public function test_view_selects_on_instrument_type(string $instrumentType, string $expected): void
+    {
+        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(sprintf(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              views:
+              - selector:
+                  instrument_type: %s
+                stream:
+                  name: renamed
+            YAML, $instrumentType))]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+        $scope = new InstrumentationScope('test', null, null, Attributes::create([]));
+
+        foreach (self::instrumentTypeSelectorProvider() as [, $type]) {
+            $views = $viewRegistry->find(new Instrument($type, 'original', null, null), $scope);
+
+            if ($type === $expected) {
+                $this->assertNotNull($views, sprintf('a view matches a %s instrument', $instrumentType));
+                $names = [];
+                foreach ($views as $view) {
+                    $names[] = $view->name;
+                }
+                $this->assertSame(['renamed'], $names);
+            } else {
+                $this->assertNull($views, sprintf('%s does not match %s', $instrumentType, $type));
+            }
+        }
+    }
+
+    /**
+     * The seven `instrument_type` values of file format 1.0, paired with the SDK constant each must
+     * select.
+     */
+    public static function instrumentTypeSelectorProvider(): iterable
+    {
+        yield 'counter' => ['counter', InstrumentType::COUNTER];
+        yield 'gauge' => ['gauge', InstrumentType::GAUGE];
+        yield 'histogram' => ['histogram', InstrumentType::HISTOGRAM];
+        yield 'observable_counter' => ['observable_counter', InstrumentType::ASYNCHRONOUS_COUNTER];
+        yield 'observable_gauge' => ['observable_gauge', InstrumentType::ASYNCHRONOUS_GAUGE];
+        yield 'observable_up_down_counter' => ['observable_up_down_counter', InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER];
+        yield 'up_down_counter' => ['up_down_counter', InstrumentType::UP_DOWN_COUNTER];
+    }
+
+    /**
      * `log_level` is named with an OTel severity but the internal logger is PSR-3, and it is global
      * state, so it must not be applied until the SDK is registered globally.
      */
@@ -432,6 +494,100 @@ final class ConfigurationTest extends TestCase
         } finally {
             Logging::reset();
         }
+    }
+
+    /**
+     * Declarative configuration ignores ambient environment unless explicitly substituted, so an
+     * omitted `log_level` must resolve to the schema default rather than letting OTEL_LOG_LEVEL
+     * configure a declaratively configured SDK.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/opentelemetry_configuration.yaml#L18
+     */
+    public function test_omitted_log_level_defaults_to_info_ignoring_environment(): void
+    {
+        $this->setEnvironmentVariable('OTEL_LOG_LEVEL', 'debug');
+        Logging::reset();
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                YAML)]);
+
+            $scope = $sdk->create(new Context())->buildAndRegisterGlobal();
+            $this->assertSame(Logging::level(LogLevel::INFO), Logging::logLevel());
+            $scope->detach();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * The internal log level is process-global, so it must not outlive the global registration that
+     * asked for it.
+     */
+    public function test_log_level_is_restored_when_registration_scope_detaches(): void
+    {
+        Logging::reset();
+        $default = Logging::logLevel();
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: debug
+                YAML)]);
+
+            $scope = $sdk->create(new Context())->buildAndRegisterGlobal();
+            $this->assertSame(Logging::level(LogLevel::DEBUG), Logging::logLevel());
+
+            $scope->detach();
+            $this->assertSame($default, Logging::logLevel(), 'detaching must restore the previous level');
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * Self-observability is opt-in for environment-based configuration
+     * (`OTEL_PHP_INTERNAL_METRICS_ENABLED`), so declarative configuration must not silently enable
+     * it. No 1.0 schema key covers this, hence the PHP-specific distribution node.
+     */
+    #[DataProvider('internalMetricsDataProvider')]
+    public function test_self_observability_is_opt_in(string $yaml, bool $expected): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $tracerProvider = $factory->process([Yaml::parse($yaml)])->create(new Context())->build()->getTracerProvider();
+
+        $sharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($tracerProvider);
+        $counter = (new \ReflectionProperty($sharedState::class, 'spanStartedCounter'))->getValue($sharedState);
+
+        $this->assertSame($expected, $counter !== null);
+    }
+
+    public static function internalMetricsDataProvider(): iterable
+    {
+        yield 'omitted' => ['file_format: "1.0"', false];
+        yield 'disabled' => [
+            /** @lang yaml */
+            <<<'YAML'
+                file_format: "1.0"
+                distribution:
+                  opentelemetry_php/development:
+                    internal_metrics_enabled: false
+                YAML,
+            false,
+        ];
+        yield 'enabled' => [
+            /** @lang yaml */
+            <<<'YAML'
+                file_format: "1.0"
+                distribution:
+                  opentelemetry_php/development:
+                    internal_metrics_enabled: true
+                YAML,
+            true,
+        ];
     }
 
     /**

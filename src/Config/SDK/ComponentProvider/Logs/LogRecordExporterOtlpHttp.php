@@ -12,7 +12,7 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
+use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -32,7 +32,7 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
      *         cert_file: ?string,
      *         key_file: ?string,
      *     },
-     *     headers: list<array{name: string, value: string}>,
+     *     headers: list<array{name: non-empty-string, value: ?string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|'none'|null,
      *     timeout: int<0, max>,
@@ -42,7 +42,7 @@ final class LogRecordExporterOtlpHttp implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): LogRecordExporterInterface
     {
-        $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+        $headers = OtlpUtil::headers($properties['headers'], $properties['headers_list']);
 
         return new LogsExporter(Registry::transportFactory('http')->create(
             endpoint: $properties['endpoint'],

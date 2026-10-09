@@ -46,6 +46,58 @@ class OtlpUtilTest extends TestCase
         ];
     }
 
+    /**
+     * `headers` entries are nullable in file format 1.0, where a null value means "ignore this
+     * entry" rather than "send an empty header". Letting one through reaches the PSR-7 request and
+     * throws `Header values must be RFC 7230 compatible strings`.
+     *
+     * @param list<array{name: non-empty-string, value: ?string}> $headers
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml
+     */
+    #[DataProvider('declarativeHeadersProvider')]
+    public function test_headers(array $headers, ?string $headersList, array $expected): void
+    {
+        $this->assertSame($expected, OtlpUtil::headers($headers, $headersList));
+    }
+
+    public static function declarativeHeadersProvider(): array
+    {
+        return [
+            'empty' => [[], null, []],
+            'headers only' => [
+                [['name' => 'foo', 'value' => 'bar']],
+                null,
+                ['foo' => 'bar'],
+            ],
+            'headers_list only' => [
+                [],
+                'foo=bar,baz=bat',
+                ['foo' => 'bar', 'baz' => 'bat'],
+            ],
+            'null value is dropped, siblings are kept' => [
+                [
+                    ['name' => 'foo', 'value' => 'bar'],
+                    ['name' => 'unset-by-substitution', 'value' => null],
+                ],
+                null,
+                ['foo' => 'bar'],
+            ],
+            'headers take precedence over headers_list' => [
+                [['name' => 'foo', 'value' => 'from-headers']],
+                'foo=from-list,baz=bat',
+                ['foo' => 'from-headers', 'baz' => 'bat'],
+            ],
+            // a dropped entry leaves no key behind, so a `headers_list` entry of the same name
+            // still applies — "ignore this entry", not "suppress this header"
+            'null value leaves headers_list to supply the name' => [
+                [['name' => 'foo', 'value' => null]],
+                'foo=from-list',
+                ['foo' => 'from-list'],
+            ],
+        ];
+    }
+
     #[DataProvider('headersProvider')]
     public function test_get_headers(string $signal, array $env, array $expected): void
     {

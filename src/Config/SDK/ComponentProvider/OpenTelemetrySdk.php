@@ -79,6 +79,13 @@ final class OpenTelemetrySdk implements ComponentProvider
     private const FILE_FORMAT_MINOR = 0;
 
     /**
+     * The schema's documented default for `log_level`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/opentelemetry_configuration.yaml#L18
+     */
+    private const DEFAULT_LOG_LEVEL = 'info';
+
+    /**
      * `SeverityNumber` enum values, as defined by the configuration schema. They are the
      * {@see Severity} names lowercased.
      *
@@ -162,7 +169,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *                 aggregation: ?ComponentPlugin<DefaultAggregationProviderInterface>,
      *             },
      *             selector: array{
-     *                 instrument_type: 'counter'|'histogram'|'observable_counter'|'observable_gauge'|'observable_up_down_counter'|'up_down_counter'|null,
+     *                 instrument_type: 'counter'|'gauge'|'histogram'|'observable_counter'|'observable_gauge'|'observable_up_down_counter'|'up_down_counter'|null,
      *                 instrument_name: ?non-empty-string,
      *                 unit: ?string,
      *                 meter_name: ?string,
@@ -214,13 +221,14 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $sdkBuilder = new SdkBuilder();
 
-        if ($properties['log_level'] !== null) {
-            $logLevel = Severity::fromName($properties['log_level'])->toPsr3();
-            $sdkBuilder->setLogLevel($logLevel);
-            // Applies the configured level to messages emitted while creating components, which all
-            // happens before `buildAndRegisterGlobal()` sets the global minimum.
-            $context = $context->withLogger(new ConfiguredLogger($logLevel));
-        }
+        // Declarative configuration ignores ambient environment unless explicitly substituted, so an
+        // omitted `log_level` resolves to the schema default rather than leaving OTEL_LOG_LEVEL to
+        // decide.
+        $logLevel = Severity::fromName($properties['log_level'] ?? self::DEFAULT_LOG_LEVEL)->toPsr3();
+        $sdkBuilder->setLogLevel($logLevel);
+        // Applies the configured level to messages emitted while creating components, which all
+        // happens before `buildAndRegisterGlobal()` sets the global minimum.
+        $context = $context->withLogger(new ConfiguredLogger($logLevel));
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
@@ -300,6 +308,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             if (isset($view['selector']['instrument_type'])) {
                 $criteria[] = new InstrumentTypeCriteria(match ($view['selector']['instrument_type']) {
                     'counter' => InstrumentType::COUNTER,
+                    'gauge' => InstrumentType::GAUGE,
                     'histogram' => InstrumentType::HISTOGRAM,
                     'observable_counter' => InstrumentType::ASYNCHRONOUS_COUNTER,
                     'observable_gauge' => InstrumentType::ASYNCHRONOUS_GAUGE,
@@ -371,6 +380,10 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $context = $context->withMeterProvider($meterProvider);
 
+        // Self-observability is opt-in, as it is for environment-based configuration. Passing the
+        // meter provider to the tracer/logger providers is what turns it on.
+        $selfObservabilityMeterProvider = $distributionConfiguration->internalMetricsEnabled ? $meterProvider : null;
+
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
             $spanProcessors[] = $processor->create($context);
@@ -419,7 +432,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             ),
             configurator: $configurator,
             spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
-            meterProvider: $meterProvider,
+            meterProvider: $selfObservabilityMeterProvider,
         );
 
         // </editor-fold>
@@ -448,7 +461,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
             resource: $resource,
             configurator: $configurator,
-            meterProvider: $meterProvider,
+            meterProvider: $selfObservabilityMeterProvider,
         );
         $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
 
@@ -693,6 +706,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->enumNode('instrument_type')
                                         ->values([
                                             'counter',
+                                            'gauge',
                                             'histogram',
                                             'observable_counter',
                                             'observable_gauge',

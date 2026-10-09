@@ -15,12 +15,14 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
+use OpenTelemetry\SDK\Internal\LogLevelRestoringScope;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use Throwable;
 
 class SdkBuilder
 {
@@ -135,20 +137,34 @@ class SdkBuilder
      */
     public function buildAndRegisterGlobal(): ScopeInterface
     {
+        $previousLogLevel = null;
         if ($this->logLevel !== null) {
+            $previousLogLevel = Logging::logLevel();
             Logging::setLogLevel($this->logLevel);
         }
 
-        $sdk = $this->build();
-        $context = Configurator::create()
-            ->withPropagator($sdk->getPropagator())
-            ->withTracerProvider($sdk->getTracerProvider())
-            ->withMeterProvider($sdk->getMeterProvider())
-            ->withLoggerProvider($sdk->getLoggerProvider())
-            ->withEventLoggerProvider($sdk->getEventLoggerProvider())
-            ->withResponsePropagator($sdk->getResponsePropagator())
-            ->storeInContext();
+        try {
+            $sdk = $this->build();
+            $context = Configurator::create()
+                ->withPropagator($sdk->getPropagator())
+                ->withTracerProvider($sdk->getTracerProvider())
+                ->withMeterProvider($sdk->getMeterProvider())
+                ->withLoggerProvider($sdk->getLoggerProvider())
+                ->withEventLoggerProvider($sdk->getEventLoggerProvider())
+                ->withResponsePropagator($sdk->getResponsePropagator())
+                ->storeInContext();
 
-        return Context::storage()->attach($context);
+            $scope = Context::storage()->attach($context);
+        } catch (Throwable $t) {
+            if ($previousLogLevel !== null) {
+                Logging::restoreLogLevel($previousLogLevel);
+            }
+
+            throw $t;
+        }
+
+        return $previousLogLevel === null
+            ? $scope
+            : new LogLevelRestoringScope($scope, $previousLogLevel);
     }
 }

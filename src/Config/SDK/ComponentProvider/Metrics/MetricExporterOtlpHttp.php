@@ -12,7 +12,7 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
-use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
+use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
@@ -34,7 +34,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
      *         cert_file: ?string,
      *         key_file: ?string,
      *     },
-     *     headers: list<array{name: string, value: string}>,
+     *     headers: list<array{name: non-empty-string, value: ?string}>,
      *     headers_list: ?string,
      *     compression: 'gzip'|'none'|null,
      *     timeout: int<0, max>,
@@ -45,7 +45,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        $headers = array_column($properties['headers'], 'value', 'name') + MapParser::parse($properties['headers_list']);
+        $headers = OtlpUtil::headers($properties['headers'], $properties['headers_list']);
 
         $temporality = match ($properties['temporality_preference']) {
             'cumulative' => Temporality::CUMULATIVE,

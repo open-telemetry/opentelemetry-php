@@ -84,6 +84,16 @@ class Logging
         return self::$logLevel;
     }
 
+    /**
+     * Restores a level previously captured from {@see self::logLevel()}, so that a caller which
+     * set the level for the lifetime of a scope can undo it. Unlike {@see self::reset()} this
+     * does not re-resolve `OTEL_LOG_LEVEL`.
+     */
+    public static function restoreLogLevel(int $level): void
+    {
+        self::$logLevel = $level;
+    }
+
     private static function getLogLevel(): int
     {
         $level = array_key_exists(self::OTEL_LOG_LEVEL, $_SERVER)
