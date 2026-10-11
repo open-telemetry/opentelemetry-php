@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.5@sha256:24efcc50bb3f1f9c143b5110386c057609b3cefb31adbcf3ca69277c42ffcec2
 FROM ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION}
 
 USER root
