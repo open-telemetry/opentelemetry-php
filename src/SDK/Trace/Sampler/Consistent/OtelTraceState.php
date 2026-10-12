@@ -123,7 +123,7 @@ final class OtelTraceState
         // Append other k:v pairs, stopping if we would exceed the size limit
         $currentLength = $parts !== [] ? strlen(implode(';', $parts)) : 0;
         foreach ($this->otherKeyValuePairs as $pair) {
-            $pairLength = ($currentLength > 0 ? 1 : 0) + strlen($pair);
+            $pairLength = ($currentLength > 0 ? 1 : 0) + strlen((string) $pair);
             if ($currentLength + $pairLength > self::TRACE_STATE_SIZE_LIMIT) {
                 break;
             }

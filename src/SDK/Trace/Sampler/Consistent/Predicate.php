@@ -4,11 +4,21 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Sampler\Consistent;
 
+use function array_map;
+use function array_values;
 use Closure;
+use function implode;
+use function in_array;
+use function is_array;
+use function is_bool;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
 use OpenTelemetry\SDK\Trace\Span;
+use function preg_match;
+use function preg_quote;
+use function sprintf;
+use function strtr;
 
 /**
  * Factory for common {@see PredicateInterface} implementations backed by closures.
@@ -71,6 +81,97 @@ final class Predicate implements PredicateInterface
     }
 
     /**
+     * Returns a predicate that matches spans with a remote parent.
+     */
+    public static function hasRemoteParent(): self
+    {
+        return new self(
+            static function (ContextInterface $ctx): bool {
+                $sc = Span::fromContext($ctx)->getContext();
+
+                return $sc->isValid() && $sc->isRemote();
+            },
+            'hasRemoteParent',
+        );
+    }
+
+    /**
+     * Returns a predicate that matches spans with a valid, local (non-remote) parent. Root spans do not match.
+     */
+    public static function hasLocalSpanParent(): self
+    {
+        return new self(
+            static function (ContextInterface $ctx): bool {
+                $sc = Span::fromContext($ctx)->getContext();
+
+                return $sc->isValid() && !$sc->isRemote();
+            },
+            'hasLocalSpanParent',
+        );
+    }
+
+    /**
+     * Returns a predicate that matches spans of any of the given {@see \OpenTelemetry\API\Trace\SpanKind} values.
+     */
+    public static function spanKindIn(int ...$spanKinds): self
+    {
+        return new self(
+            static fn (ContextInterface $ctx, string $name, int $kind) => in_array($kind, $spanKinds, true),
+            sprintf('spanKindIn(%s)', implode(',', $spanKinds)),
+        );
+    }
+
+    /**
+     * Returns a predicate that matches when the attribute $key is present and its string representation
+     * equals one of $values. For array attributes, a match on any item is a match.
+     *
+     * @param list<string> $values
+     */
+    public static function attributeValues(string $key, array $values): self
+    {
+        return new self(
+            static function (ContextInterface $ctx, string $name, int $kind, AttributesInterface $attrs) use ($key, $values): bool {
+                foreach (self::attributeStrings($attrs, $key) as $candidate) {
+                    if (in_array($candidate, $values, true)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+            sprintf('attributeValues(%s,[%s])', $key, implode(',', $values)),
+        );
+    }
+
+    /**
+     * Returns a predicate that matches when the attribute $key is present and its string representation
+     * matches one of the $included patterns (all values if empty) and none of the $excluded patterns.
+     * Patterns are case-sensitive; '?' matches any single character and '*' any sequence of characters.
+     * For array attributes, a match on any item is a match.
+     *
+     * @param list<string> $included
+     * @param list<string> $excluded
+     */
+    public static function attributePatterns(string $key, array $included = [], array $excluded = []): self
+    {
+        $includedRegexes = array_map(self::wildcardToRegex(...), $included);
+        $excludedRegexes = array_map(self::wildcardToRegex(...), $excluded);
+
+        return new self(
+            static function (ContextInterface $ctx, string $name, int $kind, AttributesInterface $attrs) use ($key, $includedRegexes, $excludedRegexes): bool {
+                foreach (self::attributeStrings($attrs, $key) as $candidate) {
+                    if (self::matchesAny($includedRegexes, $candidate, true) && !self::matchesAny($excludedRegexes, $candidate, false)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+            sprintf('attributePatterns(%s,[%s],[%s])', $key, implode(',', $included), implode(',', $excluded)),
+        );
+    }
+
+    /**
      * Returns a predicate that matches all spans.
      */
     public static function anySpan(): self
@@ -117,6 +218,59 @@ final class Predicate implements PredicateInterface
                 => !$p->spanMatches($ctx, $name, $kind, $attrs, $links),
             sprintf('not(%s)', self::describe($p)),
         );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function attributeStrings(AttributesInterface $attributes, string $key): array
+    {
+        if (!$attributes->has($key)) {
+            return [];
+        }
+
+        $value = $attributes->get($key);
+
+        return array_map(
+            self::attributeValueToString(...),
+            is_array($value) ? array_values($value) : [$value],
+        );
+    }
+
+    /**
+     * String representation used to compare attribute values: booleans as "true"/"false", everything else cast.
+     */
+    public static function attributeValueToString(mixed $value): string
+    {
+        return is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
+    }
+
+    private static function wildcardToRegex(string $pattern): string
+    {
+        return '/\A' . strtr(preg_quote($pattern, '/'), ['\\?' => '.', '\\*' => '.*']) . '\z/s';
+    }
+
+    /**
+     * @param list<string> $regexes
+     */
+    private static function matchesAny(array $regexes, string $candidate, bool $defaultIfEmpty): bool
+    {
+        if ($regexes === []) {
+            return $defaultIfEmpty;
+        }
+        foreach ($regexes as $regex) {
+            // Prefer unicode matching so that '?' matches one character; for candidates that are not valid UTF-8
+            // preg_match() fails, so fall back to byte-wise matching instead of silently not matching.
+            $result = preg_match($regex . 'u', $candidate);
+            if ($result === false) {
+                $result = preg_match($regex, $candidate);
+            }
+            if ($result === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function describe(PredicateInterface $p): string
