@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Metrics\MeterProviderInterface;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -22,6 +23,8 @@ use RuntimeException;
 #[CoversClass(SdkBuilder::class)]
 class SdkBuilderTest extends TestCase
 {
+    use TestState;
+
     private TextMapPropagatorInterface $propagator;
     private TracerProviderInterface $tracerProvider;
     private MeterProviderInterface $meterProvider;
@@ -74,31 +77,24 @@ class SdkBuilderTest extends TestCase
 
     public function test_build_does_not_apply_log_level(): void
     {
-        Logging::reset();
         $default = Logging::logLevel();
 
         $this->builder->setLogLevel(LogLevel::EMERGENCY)->build();
 
         $this->assertSame($default, Logging::logLevel(), 'building alone leaves global logging untouched');
-
-        Logging::reset();
     }
 
     public function test_build_and_register_global_applies_log_level(): void
     {
-        Logging::reset();
-
         $scope = $this->builder->setLogLevel(LogLevel::EMERGENCY)->buildAndRegisterGlobal();
 
         $this->assertSame(Logging::level(LogLevel::EMERGENCY), Logging::logLevel());
 
         $scope->detach();
-        Logging::reset();
     }
 
     public function test_build_and_register_global_without_log_level_keeps_default(): void
     {
-        Logging::reset();
         $default = Logging::logLevel();
 
         $scope = $this->builder->buildAndRegisterGlobal();
@@ -106,7 +102,6 @@ class SdkBuilderTest extends TestCase
         $this->assertSame($default, Logging::logLevel());
 
         $scope->detach();
-        Logging::reset();
     }
 
     /**
@@ -115,7 +110,6 @@ class SdkBuilderTest extends TestCase
      */
     public function test_detaching_restores_the_previous_log_level(): void
     {
-        Logging::reset();
         Logging::setLogLevel(LogLevel::WARNING);
 
         $scope = $this->builder->setLogLevel(LogLevel::EMERGENCY)->buildAndRegisterGlobal();
@@ -123,8 +117,6 @@ class SdkBuilderTest extends TestCase
 
         $scope->detach();
         $this->assertSame(Logging::level(LogLevel::WARNING), Logging::logLevel());
-
-        Logging::reset();
     }
 
     /**
@@ -133,7 +125,6 @@ class SdkBuilderTest extends TestCase
      */
     public function test_failed_registration_restores_the_previous_log_level(): void
     {
-        Logging::reset();
         Logging::setLogLevel(LogLevel::WARNING);
 
         $builder = new class() extends SdkBuilder {
@@ -144,13 +135,12 @@ class SdkBuilderTest extends TestCase
             }
         };
 
+        $this->expectException(RuntimeException::class);
+
         try {
             $builder->setLogLevel(LogLevel::EMERGENCY)->buildAndRegisterGlobal();
-            $this->fail('registration should have thrown');
-        } catch (RuntimeException) {
-            $this->assertSame(Logging::level(LogLevel::WARNING), Logging::logLevel());
         } finally {
-            Logging::reset();
+            $this->assertSame(Logging::level(LogLevel::WARNING), Logging::logLevel());
         }
     }
 }
