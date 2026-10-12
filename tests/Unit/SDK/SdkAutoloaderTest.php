@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\LoggerHolder;
@@ -187,5 +189,34 @@ class SdkAutoloaderTest extends TestCase
 
         $this->assertSame($propagator, Globals::propagator());
         $this->assertSame($responsePropagator, Globals::responsePropagator());
+    }
+
+    #[DataProvider('unusableConfigFileProvider')]
+    public function test_autoload_with_unusable_config_file(string $file): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())->method('write')->with(
+            $this->anything(),
+            $this->stringContains('Error during opentelemetry initialization'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, $file);
+
+        try {
+            $this->assertTrue(SdkAutoloader::autoload());
+            $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public static function unusableConfigFileProvider(): iterable
+    {
+        yield 'missing' => [__DIR__ . '/fixtures/does-not-exist.yaml'];
+        yield 'malformed' => [__DIR__ . '/fixtures/otel-sdk-malformed.yaml'];
+        yield 'schema-invalid' => [__DIR__ . '/fixtures/otel-sdk-invalid.yaml'];
     }
 }

@@ -4,32 +4,67 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK;
 
+use function is_array;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
+use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
+use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationFileLoader;
 use OpenTelemetry\SDK\SdkBuilder;
 use WeakMap;
 
 final class Configuration
 {
+    /** @var array|null loaded configurations, null until the file is read */
+    private ?array $configs;
+
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
+     * @param string|list<string> $file
      */
     private function __construct(
         private readonly ComponentPlugin $sdkPlugin,
+        private readonly string|array $file,
+        private readonly ?EnvReader $envReader,
+        ?array $configs,
     ) {
+        $this->configs = $configs;
     }
 
     public function create(Context $context = new Context()): SdkBuilder
     {
         return $this->sdkPlugin->create($context);
+    }
+
+    /**
+     * Instrumentation configuration from the `instrumentation/development` node of the same
+     * document, or an empty {@see ConfigProperties} if the node is absent.
+     *
+     * @experimental
+     * @return ConfigurationRegistry
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/api.md#get-instrumentation-config
+     */
+    public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties
+    {
+        // Processed here rather than in parseFile() because the two roots legitimately disagree
+        // about the same document: the SDK root ignores extra keys and discards
+        // instrumentation/development, while this root validates it and rejects unknown providers.
+        // Deferring keeps a file whose instrumentation block we cannot parse from breaking the SDK.
+        $configs = $this->configs ??= ConfigurationFileLoader::load($this->file);
+
+        return self::instrumentationFactory($this->envReader)
+            ->process(self::copy($configs))
+            ->create($context);
     }
 
     /**
@@ -41,27 +76,71 @@ final class Configuration
         bool $debug = true,
         ?EnvReader $envReader = null,
     ): Configuration {
-        return new self(self::factory($envReader)->parseFile($file, $cacheFile, $debug));
+        if ($cacheFile !== null) {
+            // The on-disk cache holds the SDK root only, so leave its load to parseFile() and read
+            // the file again if and when instrumentation configuration is asked for.
+            return new self(self::sdkFactory($envReader)->parseFile($file, $cacheFile, $debug), $file, $envReader, null);
+        }
+
+        $configs = ConfigurationFileLoader::load($file);
+
+        return new self(self::sdkFactory($envReader)->process(self::copy($configs)), $file, $envReader, $configs);
+    }
+
+    /**
+     * YAML aliases can materialise as PHP references, which survive the by-value copy
+     * {@see \Symfony\Component\Config\Definition\Processor::process()} makes. Environment
+     * substitution writes back into the array it is given, so without a deep copy the first root
+     * processed would mutate what the second sees.
+     */
+    private static function copy(array $configs): array
+    {
+        $copy = [];
+        foreach ($configs as $key => $value) {
+            $copy[$key] = is_array($value) ? self::copy($value) : $value;
+        }
+
+        return $copy;
     }
 
     /**
      * @return ConfigurationFactory<SdkBuilder>
      */
-    private static function factory(?EnvReader $envReader): ConfigurationFactory
+    private static function sdkFactory(?EnvReader $envReader): ConfigurationFactory
     {
-        static $defaultEnvReader;
         static $factories = new WeakMap();
-
-        $envReader ??= $defaultEnvReader ??= new EnvSourceReader([
-            new ServerEnvSource(),
-            new PhpIniEnvSource(),
-        ]);
+        $envReader = self::envReader($envReader);
 
         return $factories[$envReader] ??= new ConfigurationFactory(
             self::loadComponentProviders(),
             new OpenTelemetrySdk(),
             $envReader,
         );
+    }
+
+    /**
+     * @return ConfigurationFactory<ConfigurationRegistry>
+     */
+    private static function instrumentationFactory(?EnvReader $envReader): ConfigurationFactory
+    {
+        static $factories = new WeakMap();
+        $envReader = self::envReader($envReader);
+
+        return $factories[$envReader] ??= new ConfigurationFactory(
+            self::loadComponentProviders(),
+            new InstrumentationConfigurationRegistry(),
+            $envReader,
+        );
+    }
+
+    private static function envReader(?EnvReader $envReader): EnvReader
+    {
+        static $defaultEnvReader;
+
+        return $envReader ?? $defaultEnvReader ??= new EnvSourceReader([
+            new ServerEnvSource(),
+            new PhpIniEnvSource(),
+        ]);
     }
 
     private static function loadComponentProviders(): iterable

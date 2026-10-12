@@ -82,9 +82,10 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
 
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
-
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk"
+            ],
+            "OpenTelemetry\\API\\Configuration\\ConfigProviderInterface": [
+                "OpenTelemetry\\Config\\SDK\\ConfigProvider"
             ],
             "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
                 "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",

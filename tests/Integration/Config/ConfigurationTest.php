@@ -11,7 +11,9 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
@@ -42,6 +44,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -82,31 +85,135 @@ final class ConfigurationTest extends TestCase
 
         if ($expectedFailure === null) {
             $this->expectNotToPerformAssertions();
-            Instrumentation::parseFile($file)->create();
+            Configuration::parseFile($file)->getInstrumentationConfig();
 
             return;
         }
 
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches($expectedFailure);
-        Instrumentation::parseFile($file)->create();
+        Configuration::parseFile($file)->getInstrumentationConfig();
     }
 
     /**
-     * Upstream files whose `instrumentation/development` root this SDK cannot parse yet, which
-     * {@see Instrumentation::parseFile()} parses and {@see Configuration::parseFile()} discards.
-     * They are still synced verbatim, so the gap stays visible and tracked. Failures are asserted
-     * rather than skipped, so that fixing a blocker fails here and forces its entry to be removed.
+     * Upstream files whose `instrumentation/development` node this SDK cannot parse yet, which
+     * {@see Configuration::getInstrumentationConfig()} parses and {@see Configuration::create()}
+     * discards. They are still synced verbatim, so the gap stays visible and tracked. Failures are
+     * asserted rather than skipped, so that fixing a blocker fails here and forces its entry to be
+     * removed.
      *
      * @return array<string, non-empty-string> file name => expected exception message pattern
      */
     private static function knownInstrumentationParseFailures(): array
     {
-        return [
-            'ExperimentalGeneralInstrumentation_semconv_stability_opt_in.yaml' => '/unknown provider "stability_opt_in_list"/',
-            'ExperimentalInstrumentation_kitchen_sink.yaml' => '/unknown provider "example"/',
-            'otel-sdk-migration-config.yaml' => '/unknown provider "stability_opt_in_list"/',
-        ];
+        return [];
+    }
+
+    public function test_one_load_serves_both_roots(): void
+    {
+        $config = Configuration::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml');
+
+        $this->assertInstanceOf(TracerProvider::class, $config->create()->build()->getTracerProvider());
+        $this->assertInstanceOf(
+            HttpConfig::class,
+            $config->getInstrumentationConfig()->get(HttpConfig::class),
+        );
+    }
+
+    /**
+     * Both roots must see the same values; YAML aliases can materialise as PHP references, which
+     * would let the first root processed mutate what the second sees.
+     */
+    public function test_anchors_are_not_shared_between_roots(): void
+    {
+        $config = Configuration::parseFile(__DIR__ . '/configurations/anchors.yaml');
+        $first = $config->getInstrumentationConfig();
+        $config->create();
+
+        $this->assertEquals($first, $config->getInstrumentationConfig());
+    }
+
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
+    public function test_deprecated_instrumentation_entry_point(): void
+    {
+        $registry = Instrumentation::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml')->create();
+
+        $this->assertInstanceOf(HttpConfig::class, $registry->get(HttpConfig::class));
+    }
+
+    public function test_unknown_php_instrumentation_is_skipped_with_warning(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('Ignoring "php" entry "not_installed"'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $registry = self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+                instrumentation/development:
+                  php:
+                    not_installed:
+                      span_name: whatever
+                YAML)])->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+
+        $this->assertNull($registry->get(HttpConfig::class));
+    }
+
+    public function test_unknown_general_key_is_dropped(): void
+    {
+        $registry = self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              general:
+                not_a_semconv_domain:
+                  whatever: true
+                http:
+                  client:
+                    request_captured_headers:
+                      - Content-Type
+            YAML)])->create(new Context());
+
+        $http = $registry->get(HttpConfig::class);
+        $this->assertNotNull($http);
+        $this->assertSame(['Content-Type'], $http->config['client']['request_captured_headers']);
+    }
+
+    /**
+     * The `Context` passed to {@see Configuration::getInstrumentationConfig()} must reach
+     * {@see \OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin}, which is how
+     * a file-configured `log_level` will be honoured once the caller has one.
+     */
+    public function test_context_logger_receives_skipped_component_warning(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(
+            LogLevel::WARNING,
+            $this->stringContains('Ignoring "php" entry "not_installed"'),
+        );
+
+        $registry = self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              php:
+                not_installed: {}
+            YAML)])->create((new Context())->withLogger($logger));
+
+        $this->assertNull($registry->get(HttpConfig::class));
+    }
+
+    private static function instrumentationFactory(): ConfigurationFactory
+    {
+        return new ConfigurationFactory(
+            ServiceLoader::load(ComponentProvider::class),
+            new InstrumentationConfigurationRegistry(),
+            new EnvSourceReader([]),
+        );
     }
 
     public static function openTelemetryConfigurationDataProvider(): iterable

@@ -9,6 +9,8 @@ use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\ConfigEnv\EnvComponentLoader;
 use OpenTelemetry\API\Configuration\ConfigProperties;
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context as InstrumentationContext;
@@ -26,7 +28,6 @@ use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
-use OpenTelemetry\Config\SDK\Instrumentation as SdkInstrumentation;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -52,7 +53,6 @@ use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
-use RuntimeException;
 use Throwable;
 
 /**
@@ -69,9 +69,10 @@ class SdkAutoloader
         }
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
-                throw new RuntimeException('File-based configuration requires open-telemetry/sdk-configuration');
+                self::logWarning('Error during opentelemetry initialization: file-based configuration requires open-telemetry/sdk-configuration');
+            } else {
+                Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
             }
-            Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator));
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
         }
@@ -136,11 +137,11 @@ class SdkAutoloader
 
     /**
      * @phan-suppress PhanPossiblyUndeclaredVariable,PhanDeprecatedFunction
+     * @psalm-suppress ArgumentTypeCoercion
      */
     private static function fileBasedInitializer(Configurator $configurator): Configurator
     {
-        $file = Configuration::getString(Variables::OTEL_CONFIG_FILE);
-        $config = SdkConfiguration::parseFile($file);
+        $config = SdkConfiguration::parseFile(Configuration::getList(Variables::OTEL_CONFIG_FILE));
 
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
         $scope = HookManager::disable(Context::getCurrent())->activate();
@@ -170,14 +171,12 @@ class SdkAutoloader
      */
     private static function registerInstrumentations(): void
     {
-        $files = Configuration::has(Variables::OTEL_CONFIG_FILE)
-            ? Configuration::getList(Variables::OTEL_CONFIG_FILE)
-            : [];
-        if (class_exists(SdkInstrumentation::class) && $files) {
-            $configuration = SdkInstrumentation::parseFile($files)->create();
-        } else {
-            $configuration = self::loadConfigPropertiesFromEnv();
-        }
+        // Instrumentation config is resolved eagerly, during autoload, because instrumentations
+        // registered through composer.autoload.files need it now; the SDK itself is deferred to a
+        // Globals initializer. SPI-based instrumentation registration removes that split.
+        $configuration = Configuration::has(Variables::OTEL_CONFIG_FILE)
+            ? self::getConfigProvider()->getInstrumentationConfig()
+            : self::loadConfigPropertiesFromEnv();
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();
@@ -297,6 +296,16 @@ class SdkAutoloader
                 $scope->detach();
             }
         });
+    }
+
+    private static function getConfigProvider(): ConfigProviderInterface
+    {
+        /** @var ConfigProviderInterface $configProvider */
+        foreach (ServiceLoader::load(ConfigProviderInterface::class) as $configProvider) {
+            return $configProvider;
+        }
+
+        return new NoopConfigProvider();
     }
 
     private static function getHookManager(): HookManagerInterface

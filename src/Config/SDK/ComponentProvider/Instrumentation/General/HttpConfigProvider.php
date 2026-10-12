@@ -29,6 +29,7 @@ class HttpConfigProvider implements ComponentProvider
         $node = $builder->arrayNode('http');
         $node
             ->children()
+                ->append(SemconvConfig::node($builder))
                 ->append($this->capturedHeaders('client', $builder))
                 ->append($this->capturedHeaders('server', $builder))
             ->end()

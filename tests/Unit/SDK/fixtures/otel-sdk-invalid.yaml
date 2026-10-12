@@ -1,0 +1,4 @@
+file_format: '1.0'
+
+tracer_provider:
+  processors: not-a-list
