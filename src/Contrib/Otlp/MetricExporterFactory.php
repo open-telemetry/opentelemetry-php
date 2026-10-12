@@ -13,8 +13,6 @@ use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Registry;
-use function parse_url;
-use const PHP_URL_SCHEME;
 
 class MetricExporterFactory implements MetricExporterFactoryInterface
 {
@@ -111,15 +109,10 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
                 Variables::OTEL_EXPORTER_OTLP_ENDPOINT,
             ) ?? 'http://localhost:4317';
 
-            if (parse_url($endpoint, PHP_URL_SCHEME) === null) {
-                $insecure = OtlpUtil::getBoolVar(
-                    Variables::OTEL_EXPORTER_OTLP_METRICS_INSECURE,
-                    Variables::OTEL_EXPORTER_OTLP_INSECURE,
-                ) ?? false;
-                $endpoint = $insecure
-                    ? 'http://' . $endpoint
-                    : 'https://' . $endpoint;
-            }
+            $endpoint = OtlpUtil::applyScheme($endpoint, OtlpUtil::getBoolVar(
+                Variables::OTEL_EXPORTER_OTLP_METRICS_INSECURE,
+                Variables::OTEL_EXPORTER_OTLP_INSECURE,
+            ));
 
             if (OtlpUtil::grpcEndpointContainsPath($endpoint)) {
                 return $endpoint;

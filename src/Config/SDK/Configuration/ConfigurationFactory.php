@@ -18,11 +18,13 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationLoader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ArrayNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\BooleanNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\EnumNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\FloatNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\IntegerNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ScalarNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\StringNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\VariableNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NormalizationsAware;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Loader\YamlExtensionFileLoader;
@@ -147,6 +149,7 @@ final class ConfigurationFactory
         $builder->setNodeClass('float', FloatNodeDefinition::class);
         $builder->setNodeClass('array', ArrayNodeDefinition::class);
         $builder->setNodeClass('string', StringNodeDefinition::class);
+        $builder->setNodeClass('enum', EnumNodeDefinition::class);
 
         $registry = new ComponentProviderRegistry($normalizations, $builder);
 
@@ -154,12 +157,10 @@ final class ConfigurationFactory
             $registry->register($provider);
         }
 
-        $root = $this->rootComponent->getConfig($registry, $builder);
-        foreach ($normalizations as $normalization) {
-            $normalization->apply($root);
+        $node = $this->rootComponent->getConfig($registry, $builder)->getNode(forceRootNode: true);
+        if ($node instanceof NormalizationsAware) {
+            $node->setNormalizations($normalizations);
         }
-
-        $node = $root->getNode(forceRootNode: true);
 
         return new CompiledConfigurationFactory(
             $this->rootComponent,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition;
 
+use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Node\ArrayNode;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Node\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\Builder\NodeParentInterface;
@@ -11,19 +12,37 @@ use Symfony\Component\Config\Definition\NodeInterface;
 
 /**
  * @internal
- * @extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition<NodeParentInterface|null>
+ * @template TParent of NodeParentInterface|null = null
+ * @extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition<TParent>
  */
-class ArrayNodeDefinition extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+class ArrayNodeDefinition extends \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition implements IgnoresUnknownProviders
 {
     use NodeDefinitionTrait;
 
     private bool $defaultValueSet = false;
+    private bool $ignoreUnknownProviders = false;
 
     public function __construct(?string $name, ?NodeParentInterface $parent = null)
     {
         parent::__construct($name, $parent);
 
         $this->nullEquivalent = null;
+    }
+
+    #[\Override]
+    public function attribute(string $key, mixed $value): static
+    {
+        if ($key === IgnoresUnknownProviders::ATTRIBUTE) {
+            $this->ignoreUnknownProviders = (bool) $value;
+        }
+
+        return parent::attribute($key, $value);
+    }
+
+    #[\Override]
+    public function ignoresUnknownProviders(): bool
+    {
+        return $this->ignoreUnknownProviders;
     }
 
     #[\Override]

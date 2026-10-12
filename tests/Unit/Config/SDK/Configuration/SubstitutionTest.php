@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Config\SDK\Configuration;
 
+use function assert;
 use InvalidArgumentException;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
+use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ArrayNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NormalizationsAware;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Substitution;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
@@ -37,11 +41,7 @@ final class SubstitutionTest extends TestCase
             'VALUE_WITH_ESCAPE' => 'value$$',
         ])]);
 
-        $node = new ArrayNodeDefinition('');
-        $node->children()->scalarNode('key');
-        (new EnvSubstitutionNormalization($envReader))->apply($node);
-
-        $result = (new Processor())->process($node->getNode(true), [[
+        $result = (new Processor())->process(self::node($envReader), [[
             'key' => $value,
         ]]);
 
@@ -63,13 +63,9 @@ final class SubstitutionTest extends TestCase
             'VALUE_WITH_ESCAPE' => 'value$$',
         ])]);
 
-        $node = new ArrayNodeDefinition('');
-        $node->children()->scalarNode('key');
-        (new EnvSubstitutionNormalization($envReader))->apply($node);
-
         $this->expectException(InvalidArgumentException::class);
 
-        (new Processor())->process($node->getNode(true), [[
+        (new Processor())->process(self::node($envReader), [[
             'key' => $value,
         ]]);
     }
@@ -112,5 +108,17 @@ final class SubstitutionTest extends TestCase
 
         yield ['${file:test}'];
         yield ['${0abc}'];
+    }
+
+    private static function node(EnvReader $envReader): NodeInterface
+    {
+        $node = new ArrayNodeDefinition('');
+        $node->children()->scalarNode('key');
+
+        $node = $node->getNode(true);
+        assert($node instanceof NormalizationsAware);
+        $node->setNormalizations([new EnvSubstitutionNormalization($envReader)]);
+
+        return $node;
     }
 }

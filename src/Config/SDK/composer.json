@@ -56,7 +56,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpFile",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpGrpc",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterOtlpHttp",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterZipkin",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorBatch",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanProcessorSimple",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySemConv",
@@ -84,7 +83,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\PeerConfigProvider",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk"
             ],

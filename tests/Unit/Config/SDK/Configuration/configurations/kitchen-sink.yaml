@@ -299,22 +299,6 @@ tracer_provider:
             #
             # Environment variable: OTEL_EXPORTER_OTLP_TIMEOUT, OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
             timeout: 10000
-    # Configure a batch span processor.
-    - batch:
-        # Configure exporter.
-        #
-        # Environment variable: OTEL_TRACES_EXPORTER
-        exporter:
-          # Configure exporter to be zipkin.
-          zipkin:
-            # Configure endpoint.
-            #
-            # Environment variable: OTEL_EXPORTER_ZIPKIN_ENDPOINT
-            endpoint: http://localhost:9411/api/v2/spans
-            # Configure max time (in milliseconds) to wait for each export.
-            #
-            # Environment variable: OTEL_EXPORTER_ZIPKIN_TIMEOUT
-            timeout: 10000
     # Configure a simple span processor.
     - simple:
         # Configure exporter.

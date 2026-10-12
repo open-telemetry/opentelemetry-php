@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Contrib\Otlp;
 
+use function array_column;
+use function array_filter;
 use const E_USER_DEPRECATED;
 use function explode;
 use OpenTelemetry\API\Signals;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
+use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
@@ -84,6 +87,45 @@ class OtlpUtil
         }
 
         return $header;
+    }
+
+    /**
+     * Merges declarative configuration `headers` over `headers_list`, dropping null-valued entries.
+     *
+     * A null value means "ignore this entry" rather than "send an empty header"; passing one
+     * through reaches the PSR-7 request and throws `Header values must be RFC 7230 compatible
+     * strings`.
+     *
+     * @param list<array{name: non-empty-string, value: ?string}> $headers
+     * @return array<non-empty-string, string>
+     *
+     * @internal
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml
+     */
+    public static function headers(array $headers, ?string $headersList): array
+    {
+        return array_filter(
+            array_column($headers, 'value', 'name'),
+            static fn (?string $value): bool => $value !== null,
+        ) + MapParser::parse($headersList);
+    }
+
+    /**
+     * Prepends a scheme to a scheme-less endpoint, since transports infer TLS from it.
+     * An endpoint that carries its own scheme is returned unchanged.
+     *
+     * @internal
+     */
+    public static function applyScheme(string $endpoint, ?bool $insecure): string
+    {
+        if (parse_url($endpoint, PHP_URL_SCHEME) !== null) {
+            return $endpoint;
+        }
+
+        return ($insecure ?? false)
+            ? 'http://' . $endpoint
+            : 'https://' . $endpoint;
     }
 
     /**

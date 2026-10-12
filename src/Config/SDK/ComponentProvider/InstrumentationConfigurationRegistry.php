@@ -55,6 +55,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
                 ->arrayNode('instrumentation/development')
                     ->ignoreExtraKeys()
                     ->append($registry->componentMap('php', InstrumentationConfiguration::class))
+                    // TODO support ExperimentalSemconvConfig, added in file format 1.0
                     ->append($registry->componentMap('general', GeneralInstrumentationConfiguration::class))
                 ->end()
             ->end()

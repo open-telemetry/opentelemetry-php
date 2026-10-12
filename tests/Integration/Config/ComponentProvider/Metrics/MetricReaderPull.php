@@ -8,8 +8,14 @@ use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
+use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceProviderInterface;
+use OpenTelemetry\SDK\Metrics\MetricSourceRegistryInterface;
+use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -28,7 +34,15 @@ final class MetricReaderPull implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): MetricReaderInterface
     {
-        return new class() implements MetricReaderInterface {
+        return new class() implements MetricReaderInterface, MetricSourceRegistryInterface, DefaultAggregationProviderInterface {
+            use DefaultAggregationProviderTrait;
+
+            #[\Override]
+            public function add(MetricSourceProviderInterface $provider, MetricMetadataInterface $metadata, StalenessHandlerInterface $stalenessHandler): void
+            {
+                //no-op
+            }
+
             #[\Override]
             public function collect(): bool
             {

@@ -1,4 +1,4 @@
-file_format: '0.4'
+file_format: '1.0'
 
 propagator:
   composite: []
@@ -14,7 +14,7 @@ tracer_provider:
   sampler:
     always_on:
 
-instrumentation:
+instrumentation/development:
   general:
   php:
     example_instrumentation:

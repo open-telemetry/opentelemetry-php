@@ -1,0 +1,6 @@
+file_format: '1.0'
+
+distribution:
+  opentelemetry_php/development:
+    span_suppression_strategy/development:
+      semconv:

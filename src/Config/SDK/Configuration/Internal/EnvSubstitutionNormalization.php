@@ -13,14 +13,14 @@ use function filter_var;
 use function is_array;
 use function is_string;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\Definition\Builder\ParentNodeDefinitionInterface;
-use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
-use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\Node\BooleanNode;
+use OpenTelemetry\Config\SDK\Configuration\Internal\Node\FloatNode;
+use OpenTelemetry\Config\SDK\Configuration\Internal\Node\IntegerNode;
+use OpenTelemetry\Config\SDK\Configuration\Internal\Node\VariableNode;
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\NodeInterface;
+use Symfony\Component\Config\Definition\PrototypedArrayNode;
+use Symfony\Component\Config\Definition\ScalarNode;
 
 /**
  * @internal
@@ -33,32 +33,46 @@ final class EnvSubstitutionNormalization implements Normalization
     }
 
     #[\Override]
-    public function apply(ArrayNodeDefinition $root): void
+    public function applyToNode(NodeInterface $node, mixed $value): mixed
     {
-        foreach ($root->getChildNodeDefinitions() as $childNode) {
-            $this->doApply($childNode);
-        }
-    }
+        if ($node instanceof PrototypedArrayNode && is_array($value)) {
+            foreach ($value as $k => $v) {
+                if (($r = $this->applyToNode($node->getPrototype(), $v)) !== $v) {
+                    $value[$k] = $r;
+                }
+            }
 
-    private function doApply(NodeDefinition $node): void
-    {
-        if ($node instanceof ScalarNodeDefinition) {
+            return $value;
+        }
+        if ($node instanceof ArrayNode && is_array($value)) {
+            foreach ($value as $k => $v) {
+                // Keys with no declared child are left alone: either they are unknown and about to
+                // be rejected, or a `beforeNormalization()` closure is going to fold them away.
+                if (!$child = $node->getChildren()[$k] ?? null) {
+                    continue;
+                }
+                if (($r = $this->applyToNode($child, $v)) !== $v) {
+                    $value[$k] = $r;
+                }
+            }
+
+            return $value;
+        }
+        if ($node instanceof ScalarNode && is_string($value)) {
             $filter = match (true) {
-                $node instanceof BooleanNodeDefinition => FILTER_VALIDATE_BOOLEAN,
-                $node instanceof IntegerNodeDefinition => FILTER_VALIDATE_INT,
-                $node instanceof FloatNodeDefinition => FILTER_VALIDATE_FLOAT,
+                $node instanceof BooleanNode => FILTER_VALIDATE_BOOLEAN,
+                $node instanceof IntegerNode => FILTER_VALIDATE_INT,
+                $node instanceof FloatNode => FILTER_VALIDATE_FLOAT,
                 default => FILTER_DEFAULT,
             };
-            $node->beforeNormalization()->ifString()->then(fn (string $v) => $this->replaceEnvVariables($v, $filter))->end();
-        } elseif ($node instanceof VariableNodeDefinition) {
-            $node->beforeNormalization()->always($this->replaceEnvVariablesRecursive(...))->end();
+
+            return $this->replaceEnvVariables($value, $filter);
+        }
+        if ($node instanceof VariableNode) {
+            return $this->replaceEnvVariablesRecursive($value);
         }
 
-        if ($node instanceof ParentNodeDefinitionInterface) {
-            foreach ($node->getChildNodeDefinitions() as $childNode) {
-                $this->doApply($childNode);
-            }
-        }
+        return $value;
     }
 
     private function replaceEnvVariables(string $value, int $filter = FILTER_DEFAULT): mixed

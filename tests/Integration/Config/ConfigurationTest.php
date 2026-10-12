@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config;
 
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
@@ -13,26 +17,42 @@ use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
+use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Metrics\Instrument;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector\ServiceName;
+use OpenTelemetry\Tests\TestState;
 use org\bovigo\vfs\vfsStream;
 use Override;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Yaml\Yaml;
 
 #[CoversNothing]
 final class ConfigurationTest extends TestCase
 {
+    use TestState;
+
     #[\Override]
     public function setUp(): void
     {
@@ -55,11 +75,53 @@ final class ConfigurationTest extends TestCase
         Configuration::parseFile($file)->create();
     }
 
+    #[DataProvider('openTelemetryConfigurationDataProvider')]
+    public function test_instrumentation_configuration(string $file): void
+    {
+        $expectedFailure = self::knownInstrumentationParseFailures()[basename($file)] ?? null;
+
+        if ($expectedFailure === null) {
+            $this->expectNotToPerformAssertions();
+            Instrumentation::parseFile($file)->create();
+
+            return;
+        }
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedFailure);
+        Instrumentation::parseFile($file)->create();
+    }
+
+    /**
+     * Upstream files whose `instrumentation/development` root this SDK cannot parse yet, which
+     * {@see Instrumentation::parseFile()} parses and {@see Configuration::parseFile()} discards.
+     * They are still synced verbatim, so the gap stays visible and tracked. Failures are asserted
+     * rather than skipped, so that fixing a blocker fails here and forces its entry to be removed.
+     *
+     * @return array<string, non-empty-string> file name => expected exception message pattern
+     */
+    private static function knownInstrumentationParseFailures(): array
+    {
+        return [
+            'ExperimentalGeneralInstrumentation_semconv_stability_opt_in.yaml' => '/unknown provider "stability_opt_in_list"/',
+            'ExperimentalInstrumentation_kitchen_sink.yaml' => '/unknown provider "example"/',
+            'otel-sdk-migration-config.yaml' => '/unknown provider "stability_opt_in_list"/',
+        ];
+    }
+
     public static function openTelemetryConfigurationDataProvider(): iterable
     {
-        yield 'kitchen-sink' => [__DIR__ . '/configurations/kitchen-sink.yaml'];
         yield 'anchors' => [__DIR__ . '/configurations/anchors.yaml'];
         yield 'php-specific' => [__DIR__ . '/configurations/php-specific.yaml'];
+
+        foreach (['snippets', 'examples'] as $dir) {
+            $files = glob(__DIR__ . '/configurations/upstream/' . $dir . '/*.yaml') ?: [];
+            Assert::assertNotEmpty($files, sprintf('no upstream %s found to parse', $dir));
+
+            foreach ($files as $file) {
+                yield $dir . ': ' . basename($file) => [$file];
+            }
+        }
     }
 
     public function test_configurators(): void
@@ -185,6 +247,385 @@ final class ConfigurationTest extends TestCase
         Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml')->create()->build();
     }
 
+    /**
+     * `distribution` is the extension point for vendor-specific settings, and
+     * `opentelemetry_php/development` is our entry in it. No upstream snippet or example uses the
+     * key, so nothing else covers it.
+     */
+    public function test_distribution_configures_span_suppression_strategy(): void
+    {
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/distribution.yaml')->create()->build();
+        $tracerProvider = $sdk->getTracerProvider();
+
+        $strategy = (new \ReflectionClass($tracerProvider))
+            ->getProperty('spanSuppressionStrategy')
+            ->getValue($tracerProvider);
+
+        $this->assertInstanceOf(SemanticConventionSuppressionStrategy::class, $strategy);
+    }
+
+    /**
+     * The schema sets `minProperties: 1` on `distribution`, but an empty map is indistinguishable
+     * from an absent one once the node default has been applied, so both are accepted and behave
+     * the same way.
+     */
+    #[DataProvider('emptyDistributionProvider')]
+    public function test_empty_distribution_falls_back_to_the_default_strategy(string $distribution): void
+    {
+        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(sprintf("file_format: \"1.0\"\n%s", $distribution))]);
+        $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
+
+        $strategy = (new \ReflectionClass($tracerProvider))
+            ->getProperty('spanSuppressionStrategy')
+            ->getValue($tracerProvider);
+
+        $this->assertInstanceOf(NoopSuppressionStrategy::class, $strategy);
+    }
+
+    public static function emptyDistributionProvider(): iterable
+    {
+        yield 'omitted' => [''];
+        yield 'empty map' => ['distribution: {}'];
+        yield 'null' => ['distribution:'];
+    }
+
+    /**
+     * `distribution` is open to any vendor by schema, and the SDK only exposes the data rather than
+     * owning it, so another distribution's key must not stop the file parsing — otherwise a
+     * configuration file shared between distributions is not portable. The value is an unvalidated
+     * object, so a nested one is tolerated too.
+     */
+    public function test_unknown_distribution_is_ignored(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->matchesRegularExpression('/Ignoring "distribution" entry "some_vendor"/'));
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                distribution:
+                  some_vendor:
+                    profiler:
+                      enabled: true
+                YAML)]);
+
+            $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
+            $strategy = (new \ReflectionClass($tracerProvider))
+                ->getProperty('spanSuppressionStrategy')
+                ->getValue($tracerProvider);
+
+            $this->assertInstanceOf(NoopSuppressionStrategy::class, $strategy);
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * Resource detectors are the one component the spec marks "warn and skip" rather than "error",
+     * so that a portable configuration may name detectors another SDK provides.
+     *
+     * The warning is emitted while creating the SDK, not while parsing, so that a configured
+     * `log_level` applies to it ({@see self::test_unknown_resource_detector_warning_honours_log_level}).
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk.md#supported-sdk-plugin-components
+     */
+    public function test_unknown_resource_detector_is_ignored(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->matchesRegularExpression('/Ignoring "detectors" entry "some_other_sdk_detector"/'));
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                resource:
+                  detection/development:
+                    detectors:
+                      - some_other_sdk_detector:
+                      - host:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
+            $resource = (new \ReflectionClass($tracerProvider))
+                ->getProperty('tracerSharedState')
+                ->getValue($tracerProvider);
+            $resource = (new \ReflectionClass($resource))->getProperty('resource')->getValue($resource);
+
+            // the surviving detector still ran, so skipping did not discard the rest of the list
+            $this->assertInstanceOf(ResourceInfo::class, $resource);
+            $this->assertArrayHasKey('host.name', $resource->getAttributes()->toArray());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * The point of warning at creation rather than parse time: the message goes through
+     * `$context->logger`, so a configured `log_level` filters it without the global level being set.
+     */
+    public function test_unknown_resource_detector_warning_honours_log_level(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: error
+                resource:
+                  detection/development:
+                    detectors:
+                      - some_other_sdk_detector:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $sdk->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * Unlike resource detectors, every other component type must fail rather than be skipped.
+     */
+    public function test_unknown_span_processor_is_an_error(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/unknown provider "some_unknown_processor"/');
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+                - some_unknown_processor:
+            YAML)]);
+    }
+
+    /**
+     * `gauge` is one of the seven `instrument_type` values in file format 1.0, and was the only one
+     * missing from the view selector enum, so a schema-valid file was rejected. No upstream snippet
+     * selects on it — `View_kitchen_sink.yaml` uses `histogram`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/meter_provider.yaml
+     */
+    #[DataProvider('instrumentTypeSelectorProvider')]
+    public function test_view_selects_on_instrument_type(string $instrumentType, string $expected): void
+    {
+        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(sprintf(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              views:
+              - selector:
+                  instrument_type: %s
+                stream:
+                  name: renamed
+            YAML, $instrumentType))]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+        $scope = new InstrumentationScope('test', null, null, Attributes::create([]));
+
+        foreach (self::instrumentTypeSelectorProvider() as [, $type]) {
+            $views = $viewRegistry->find(new Instrument($type, 'original', null, null), $scope);
+
+            if ($type === $expected) {
+                $this->assertNotNull($views, sprintf('a view matches a %s instrument', $instrumentType));
+                $names = [];
+                foreach ($views as $view) {
+                    $names[] = $view->name;
+                }
+                $this->assertSame(['renamed'], $names);
+            } else {
+                $this->assertNull($views, sprintf('%s does not match %s', $instrumentType, $type));
+            }
+        }
+    }
+
+    /**
+     * The seven `instrument_type` values of file format 1.0, paired with the SDK constant each must
+     * select.
+     */
+    public static function instrumentTypeSelectorProvider(): iterable
+    {
+        yield 'counter' => ['counter', InstrumentType::COUNTER];
+        yield 'gauge' => ['gauge', InstrumentType::GAUGE];
+        yield 'histogram' => ['histogram', InstrumentType::HISTOGRAM];
+        yield 'observable_counter' => ['observable_counter', InstrumentType::ASYNCHRONOUS_COUNTER];
+        yield 'observable_gauge' => ['observable_gauge', InstrumentType::ASYNCHRONOUS_GAUGE];
+        yield 'observable_up_down_counter' => ['observable_up_down_counter', InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER];
+        yield 'up_down_counter' => ['up_down_counter', InstrumentType::UP_DOWN_COUNTER];
+    }
+
+    /**
+     * `log_level` is named with an OTel severity but the internal logger is PSR-3, and it is global
+     * state, so it must not be applied until the SDK is registered globally.
+     */
+    public function test_log_level_is_applied_on_register_global_not_on_build(): void
+    {
+        Logging::reset();
+        $default = Logging::logLevel();
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: warn
+                YAML)]);
+
+            $builder = $sdk->create(new Context());
+            $builder->build();
+            $this->assertSame($default, Logging::logLevel(), 'parsing and building must not touch global logging');
+
+            $scope = $builder->buildAndRegisterGlobal();
+            $this->assertSame(Logging::level(LogLevel::WARNING), Logging::logLevel(), 'warn maps onto PSR-3 warning');
+            $scope->detach();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * Declarative configuration ignores ambient environment unless explicitly substituted, so an
+     * omitted `log_level` must resolve to the schema default rather than letting OTEL_LOG_LEVEL
+     * configure a declaratively configured SDK.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/opentelemetry_configuration.yaml#L18
+     */
+    public function test_omitted_log_level_defaults_to_info_ignoring_environment(): void
+    {
+        $this->setEnvironmentVariable('OTEL_LOG_LEVEL', 'debug');
+        Logging::reset();
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                YAML)]);
+
+            $scope = $sdk->create(new Context())->buildAndRegisterGlobal();
+            $this->assertSame(Logging::level(LogLevel::INFO), Logging::logLevel());
+            $scope->detach();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * The internal log level is process-global, so it must not outlive the global registration that
+     * asked for it.
+     */
+    public function test_log_level_is_restored_when_registration_scope_detaches(): void
+    {
+        Logging::reset();
+        $default = Logging::logLevel();
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: debug
+                YAML)]);
+
+            $scope = $sdk->create(new Context())->buildAndRegisterGlobal();
+            $this->assertSame(Logging::level(LogLevel::DEBUG), Logging::logLevel());
+
+            $scope->detach();
+            $this->assertSame($default, Logging::logLevel(), 'detaching must restore the previous level');
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * Self-observability is opt-in for environment-based configuration
+     * (`OTEL_PHP_INTERNAL_METRICS_ENABLED`), so declarative configuration must not silently enable
+     * it. No 1.0 schema key covers this, hence the PHP-specific distribution node.
+     */
+    #[DataProvider('internalMetricsDataProvider')]
+    public function test_self_observability_is_opt_in(string $yaml, bool $expected): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $tracerProvider = $factory->process([Yaml::parse($yaml)])->create(new Context())->build()->getTracerProvider();
+
+        $sharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($tracerProvider);
+        $counter = (new \ReflectionProperty($sharedState::class, 'spanStartedCounter'))->getValue($sharedState);
+
+        $this->assertSame($expected, $counter !== null);
+    }
+
+    public static function internalMetricsDataProvider(): iterable
+    {
+        yield 'omitted' => ['file_format: "1.0"', false];
+        yield 'disabled' => [
+            /** @lang yaml */
+            <<<'YAML'
+                file_format: "1.0"
+                distribution:
+                  opentelemetry_php/development:
+                    internal_metrics_enabled: false
+                YAML,
+            false,
+        ];
+        yield 'enabled' => [
+            /** @lang yaml */
+            <<<'YAML'
+                file_format: "1.0"
+                distribution:
+                  opentelemetry_php/development:
+                    internal_metrics_enabled: true
+                YAML,
+            true,
+        ];
+    }
+
+    /**
+     * Carrying several distributions' settings is the point of `distribution` being open, so ours
+     * must still take effect alongside a key we know nothing about.
+     */
+    public function test_known_distribution_is_applied_alongside_another_vendors(): void
+    {
+        Logging::setLogWriter($this->createMock(LogWriterInterface::class));
+
+        try {
+            $factory = new ConfigurationFactory(
+                self::spiComponentProviders(),
+                new OpenTelemetrySdk(),
+                new EnvSourceReader([]),
+            );
+            $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                distribution:
+                  some_vendor:
+                    profiler:
+                      enabled: true
+                  opentelemetry_php/development:
+                    span_suppression_strategy/development:
+                      semconv:
+                YAML)]);
+
+            $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
+            $strategy = (new \ReflectionClass($tracerProvider))
+                ->getProperty('spanSuppressionStrategy')
+                ->getValue($tracerProvider);
+
+            $this->assertInstanceOf(SemanticConventionSuppressionStrategy::class, $strategy);
+        } finally {
+            Logging::reset();
+        }
+    }
+
     public function test_duplicate_propagators(): void
     {
         $sdk = Configuration::parseFile(__DIR__ . '/configurations/propagators-duplicate.yaml')->create()->build();
@@ -201,6 +642,40 @@ final class ConfigurationTest extends TestCase
         $this->assertContains('tracestate', $propagator->fields());
     }
 
+    /**
+     * `composite_list` is folded into `composite` by a `beforeNormalization()` closure on the
+     * `propagator` node, and a parent's closures run before its children's, so substitution has to
+     * happen in `preNormalize()` for the fold to see a resolved value.
+     */
+    public function test_propagators_env_substitution(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PROPAGATORS', 'b3,baggage');
+        $propagators = self::propagatorsFrom(__DIR__ . '/configurations/propagators-env-substitution.yaml');
+
+        $this->assertCount(2, $propagators);
+        $this->assertInstanceOf(B3Propagator::class, $propagators[0]);
+        $this->assertInstanceOf(BaggagePropagator::class, $propagators[1]);
+    }
+
+    public function test_propagators_env_substitution_falls_back_to_default(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PROPAGATORS', null);
+        $propagators = self::propagatorsFrom(__DIR__ . '/configurations/propagators-env-substitution.yaml');
+
+        $this->assertCount(2, $propagators);
+        $this->assertInstanceOf(TraceContextPropagator::class, $propagators[0]);
+        $this->assertInstanceOf(BaggagePropagator::class, $propagators[1]);
+    }
+
+    private static function propagatorsFrom(string $file): array
+    {
+        $propagator = Configuration::parseFile($file)->create()->build()->getPropagator();
+        $propagators = (new \ReflectionClass($propagator))->getProperty('propagators')->getValue($propagator);
+        Assert::assertIsArray($propagators);
+
+        return array_values($propagators);
+    }
+
     public function test_duplicate_response_propagators(): void
     {
         $sdk = Configuration::parseFile(__DIR__ . '/configurations/experimental-response-propagators-duplicate.yaml')->create()->build();
@@ -213,6 +688,58 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
     }
 
+    #[DataProvider('unsupportedFileFormatProvider')]
+    public function test_unsupported_file_format_is_rejected(string $fileFormat, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse(sprintf('file_format: %s', $fileFormat))]);
+    }
+
+    public static function unsupportedFileFormatProvider(): iterable
+    {
+        // a differing MAJOR may reinterpret properties, so it is an error rather than a warning
+        yield 'superseded major' => ['"0.4"', '/unsupported version/'];
+        // deliberately far ahead of any plausible schema version, so that implementing a future
+        // MAJOR does not turn this row into a false failure
+        yield 'future major' => ['"999.0"', '/unsupported version/'];
+        // the release candidates carry a meta tag, which 1.0 superseded
+        yield 'release candidate rc.1' => ['"1.0-rc.1"', '/expected MAJOR\.MINOR/'];
+        yield 'release candidate rc.2' => ['"1.0-rc.2"', '/expected MAJOR\.MINOR/'];
+        // an unquoted 1.0 is a YAML float, and would stringify to "1"; it must be rejected
+        // outright rather than coerced into something that looks like a version
+        yield 'unquoted, parsed as a float' => ['1.0', '/must be of type string/'];
+    }
+
+    /**
+     * MINOR schema versions are additive, so a file declaring one this SDK does not implement is
+     * parsed rather than rejected, with a warning that some of it may be ignored.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/VERSIONING.md#file-format
+     */
+    public function test_newer_minor_file_format_warns_but_is_accepted(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->matchesRegularExpression('/file_format "1.999" is newer/'));
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse('file_format: "1.999"')]);
+
+            $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
+
+            $this->assertInstanceOf(TracerProvider::class, $tracerProvider, 'parsed, not rejected');
+        } finally {
+            Logging::reset();
+        }
+    }
+
     public function test_resource_attributes_take_precedence_over_default_attributes(): void
     {
         $factory = new ConfigurationFactory(
@@ -222,7 +749,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -241,7 +768,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               detection/development:
                 detectors:
@@ -263,7 +790,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -303,7 +830,7 @@ final class ConfigurationTest extends TestCase
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-            file_format: "1.0-rc.2"
+            file_format: "1.0"
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -336,5 +863,152 @@ final class ConfigurationTest extends TestCase
         $file = __DIR__ . '/configurations/empty-tracer-config.yaml';
         $this->expectNotToPerformAssertions();
         Configuration::parseFile($file)->create();
+    }
+
+    /**
+     * The composable samplers are nested several levels below `sampler`, where a node that is
+     * not really validated still lets its snippet parse. These assert the nesting rejects what
+     * the schema rejects, so that `Sampler_rule_based_kitchen_sink.yaml` passing is meaningful.
+     */
+    #[DataProvider('invalidComposableSamplerProvider')]
+    public function test_invalid_composable_sampler_is_rejected(string $sampler, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse(sprintf(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+              sampler:
+            %s
+            YAML, $sampler))]);
+    }
+
+    public static function invalidComposableSamplerProvider(): iterable
+    {
+        // the schema pins ExperimentalComposableSampler to minProperties/maxProperties 1, which
+        // componentMap() does not enforce for us
+        yield 'two composable samplers' => ['    composite/development:
+                  always_on:
+                  always_off:', '/exactly one composable sampler/'];
+        yield 'no composable sampler' => ['    composite/development: {}', '/exactly one composable sampler/'];
+        yield 'unknown composable sampler' => ['    composite/development:
+                  not_a_sampler:', '/unknown provider "not_a_sampler"/'];
+        // a composable sampler is a distinct schema type: the top-level-only samplers must not
+        // be reachable here, nor the composable-only ones reachable at the top level
+        yield 'top-level sampler nested as composable' => ['    composite/development:
+                  parent_based:
+                    root:
+                      always_on:', '/unknown provider "parent_based"/'];
+        yield 'composable sampler used at top level' => ['    rule_based:
+                  rules:
+                  - sampler:
+                      always_on:', '/unknown provider "rule_based"/'];
+        // rules and their match conditions
+        yield 'rule without a sampler' => ['    composite/development:
+                  rule_based:
+                    rules:
+                    - span_kinds: [server]', '/"sampler" .* must be configured/'];
+        yield 'unknown match condition' => ['    composite/development:
+                  rule_based:
+                    rules:
+                    - not_a_condition: true
+                      sampler:
+                        always_on:', '/Unrecognized option "not_a_condition"/'];
+        yield 'invalid span kind' => ['    composite/development:
+                  rule_based:
+                    rules:
+                    - span_kinds: [not_a_kind]
+                      sampler:
+                        always_on:', '/"not_a_kind" is not allowed/'];
+        yield 'invalid parent' => ['    composite/development:
+                  rule_based:
+                    rules:
+                    - parent: [not_a_parent]
+                      sampler:
+                        always_on:', '/"not_a_parent" is not allowed/'];
+        yield 'attribute_values without values' => ['    composite/development:
+                  rule_based:
+                    rules:
+                    - attribute_values:
+                        key: http.route
+                      sampler:
+                        always_on:', '/"values" .* must be configured/'];
+        // ratio bounds, on both the composable and the top-level probability sampler
+        yield 'composable ratio above one' => ['    composite/development:
+                  rule_based:
+                    rules:
+                    - sampler:
+                        probability:
+                          ratio: 1.5', '/value 1\.5 is too big for path "probability\.ratio"/'];
+        yield 'probability ratio above one' => ['    probability/development:
+                  ratio: 1.5', '/value 1\.5 is too big for path "probability\/development\.ratio"/'];
+        yield 'probability ratio below zero' => ['    probability/development:
+                  ratio: -0.5', '/value -0\.5 is too small for path "probability\/development\.ratio"/'];
+    }
+
+    /**
+     * `probability/development` is the one composable-sampler provider that is not a no-op, so
+     * the configured ratio should reach the sampler rather than being parsed and dropped.
+     */
+    public function test_probability_sampler_honours_ratio(): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+              sampler:
+                probability/development:
+                  ratio: 0.001
+            YAML)]);
+
+        $sampler = $this->getSampler($sdk->create(new Context())->build());
+
+        $this->assertSame('TraceIdRatioBasedSampler{0.001000}', $sampler->getDescription());
+    }
+
+    /**
+     * This directory's test-only providers are registered via SPI, like the SDK's own, so loading
+     * that yields both. Needed by tests whose configuration names a provider the SDK does not ship,
+     * such as the composable samplers.
+     *
+     * @return array<class-string, ComponentProvider>
+     */
+    private static function spiComponentProviders(): array
+    {
+        return [...ServiceLoader::load(ComponentProvider::class)];
+    }
+
+    private function getSampler(Sdk $sdk): SamplerInterface
+    {
+        $tracer = $sdk->getTracerProvider()->getTracer('test');
+
+        $tracerReflection = new \ReflectionClass($tracer);
+        $sharedStateProperty = $tracerReflection->getProperty('tracerSharedState');
+        $sharedState = $sharedStateProperty->getValue($tracer);
+
+        $stateReflection = new \ReflectionClass($sharedState);
+        $samplerProperty = $stateReflection->getProperty('sampler');
+
+        return $samplerProperty->getValue($sharedState);
     }
 }

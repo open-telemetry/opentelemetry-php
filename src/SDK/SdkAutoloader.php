@@ -99,10 +99,9 @@ class SdkAutoloader
             //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
             return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
         }
-        $emitMetrics = Configuration::getBoolean(Variables::OTEL_PHP_INTERNAL_METRICS_ENABLED);
-
         $distributionProperties = self::loadDistributionPropertiesFromEnv();
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
+        $emitMetrics = $distributionConfiguration->internalMetricsEnabled;
 
         $resource = ResourceInfoFactory::defaultResource();
         $exporter = (new ExporterFactory())->create();
