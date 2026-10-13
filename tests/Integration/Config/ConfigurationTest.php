@@ -81,32 +81,8 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('openTelemetryConfigurationDataProvider')]
     public function test_instrumentation_configuration(string $file): void
     {
-        $expectedFailure = self::knownInstrumentationParseFailures()[basename($file)] ?? null;
-
-        if ($expectedFailure === null) {
-            $this->expectNotToPerformAssertions();
-            Configuration::parseFile($file)->getInstrumentationConfig();
-
-            return;
-        }
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches($expectedFailure);
+        $this->expectNotToPerformAssertions();
         Configuration::parseFile($file)->getInstrumentationConfig();
-    }
-
-    /**
-     * Upstream files whose `instrumentation/development` node this SDK cannot parse yet, which
-     * {@see Configuration::getInstrumentationConfig()} parses and {@see Configuration::create()}
-     * discards. They are still synced verbatim, so the gap stays visible and tracked. Failures are
-     * asserted rather than skipped, so that fixing a blocker fails here and forces its entry to be
-     * removed.
-     *
-     * @return array<string, non-empty-string> file name => expected exception message pattern
-     */
-    private static function knownInstrumentationParseFailures(): array
-    {
-        return [];
     }
 
     public function test_one_load_serves_both_roots(): void
