@@ -60,6 +60,14 @@ abstract class ConsistentSampler implements SamplerInterface, ComposableInterfac
     }
 
     /**
+     * Returns a sampler (CompositeSampler) that makes the final decision for any composable sampler.
+     */
+    public static function composite(ComposableInterface $delegate): self
+    {
+        return new ConsistentCompositeSampler($delegate);
+    }
+
+    /**
      * Returns a sampler that delegates the decision to $delegate and adds $attributes to sampled spans.
      *
      * @param array<non-empty-string, mixed> $attributes Attributes to add to sampled spans

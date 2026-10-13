@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\Config;
 
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
@@ -18,11 +20,16 @@ use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Context\Context as OtelContext;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -154,6 +161,39 @@ final class ConsistentSamplerConfigurationTest extends TestCase
         $this->assertSame(SamplingResult::DROP, $this->decide($sampler, attributes: ['cache.stale' => true])->getDecision());
     }
 
+    public function test_composite_wraps_a_custom_composable_sampler(): void
+    {
+        $custom = new class() implements ComponentProvider {
+            #[\Override]
+            public function createPlugin(array $properties, Context $context): ComposableInterface
+            {
+                return new class() implements ComposableInterface {
+                    public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+                    {
+                        return new SamplingIntent(0, true, ['custom' => true]);
+                    }
+
+                    public function getDescription(): string
+                    {
+                        return 'Custom';
+                    }
+                };
+            }
+
+            #[\Override]
+            public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+            {
+                return $builder->arrayNode('custom_composable');
+            }
+        };
+
+        $sampler = $this->sampler("composite/development:\n  custom_composable:\n", $custom);
+
+        $result = $this->decide($sampler);
+        $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
+        $this->assertSame(['custom' => true], $result->getAttributes());
+    }
+
     public function test_invalid_ratio_is_rejected(): void
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -173,10 +213,11 @@ final class ConsistentSamplerConfigurationTest extends TestCase
             YAML);
     }
 
-    private function sampler(string $samplerYaml): SamplerInterface
+    private function sampler(string $samplerYaml, ComponentProvider ...$extraProviders): SamplerInterface
     {
         $factory = new ConfigurationFactory(
             [
+                ...$extraProviders,
                 new SamplerProbability(),
                 new SamplerComposite(),
                 new ComposableSamplerAlwaysOn(),

@@ -9,12 +9,13 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * Wraps a composable (consistent probability) sampler as a {@see SamplerInterface}.
+ * Wraps a composable (consistent probability) sampler as a {@see SamplerInterface} (the spec's CompositeSampler).
  *
  * @experimental
  * @implements ComponentProvider<SamplerInterface>
@@ -32,11 +33,9 @@ final class SamplerComposite implements ComponentProvider
         }
 
         $sampler = $properties[0]->create($context);
-        if (!$sampler instanceof SamplerInterface) {
-            throw new \InvalidArgumentException(\sprintf('Composable sampler "%s" cannot be used as a sampler', \get_debug_type($sampler)));
-        }
 
-        return $sampler;
+        // Built-in composable samplers already are samplers; any other composable sampler is wrapped
+        return $sampler instanceof SamplerInterface ? $sampler : ConsistentSampler::composite($sampler);
     }
 
     #[\Override]
