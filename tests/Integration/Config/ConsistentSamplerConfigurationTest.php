@@ -27,6 +27,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -192,6 +193,36 @@ final class ConsistentSamplerConfigurationTest extends TestCase
         $result = $this->decide($sampler);
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
         $this->assertSame(['custom' => true], $result->getAttributes());
+    }
+
+    #[DataProvider('emptyListProvider')]
+    public function test_explicitly_empty_lists_are_rejected(string $yaml): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->sampler($yaml);
+    }
+
+    public static function emptyListProvider(): iterable
+    {
+        yield 'rules' => ["composite/development:\n  rule_based:\n    rules: []\n"];
+        yield 'span_kinds' => ["composite/development:\n  rule_based:\n    rules:\n    - span_kinds: []\n      sampler:\n        always_on:\n"];
+        yield 'parent' => ["composite/development:\n  rule_based:\n    rules:\n    - parent: []\n      sampler:\n        always_on:\n"];
+        yield 'included' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        included: []\n      sampler:\n        always_on:\n"];
+        yield 'excluded' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        excluded: []\n      sampler:\n        always_on:\n"];
+        yield 'values' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_values:\n        key: k\n        values: []\n      sampler:\n        always_on:\n"];
+    }
+
+    public function test_rule_based_without_rules_drops_everything(): void
+    {
+        // omitting rules (or the whole rule_based body) is valid: "no span is sampled"
+        $this->assertSame(SamplingResult::DROP, $this->decide($this->sampler("composite/development:\n  rule_based:\n"))->getDecision());
+    }
+
+    public function test_omitted_filters_are_valid_and_match_everything(): void
+    {
+        $sampler = $this->sampler("composite/development:\n  rule_based:\n    rules:\n    - sampler:\n        always_on:\n");
+
+        $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $this->decide($sampler)->getDecision());
     }
 
     public function test_invalid_ratio_is_rejected(): void

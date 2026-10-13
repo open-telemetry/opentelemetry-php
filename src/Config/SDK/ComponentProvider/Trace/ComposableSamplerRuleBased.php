@@ -17,6 +17,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicatedSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * @experimental
@@ -62,41 +63,58 @@ final class ComposableSamplerRuleBased implements ComponentProvider
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('rule_based');
-        $node
+        self::rejectExplicitlyEmpty($node, 'rules');
+
+        $rule = $node->children()->arrayNode('rules')->defaultValue([])->arrayPrototype();
+        self::rejectExplicitlyEmpty($rule, 'span_kinds', 'parent');
+
+        $ruleChildren = $rule->children();
+        $ruleChildren->append($registry->component('sampler', ComposableInterface::class)->isRequired());
+        $ruleChildren->arrayNode('span_kinds')
+            ->defaultValue([])
+            ->enumPrototype()->values(array_keys(self::SPAN_KINDS))->end()
+        ->end();
+        $ruleChildren->arrayNode('parent')
+            ->defaultValue([])
+            ->enumPrototype()->values(self::PARENTS)->end()
+        ->end();
+        $ruleChildren->arrayNode('attribute_values')
             ->children()
-                ->arrayNode('rules')
-                    ->defaultValue([])
-                    ->arrayPrototype()
-                        ->children()
-                            ->append($registry->component('sampler', ComposableInterface::class)->isRequired())
-                            ->arrayNode('span_kinds')
-                                ->defaultValue([])
-                                ->enumPrototype()->values(array_keys(self::SPAN_KINDS))->end()
-                            ->end()
-                            ->arrayNode('parent')
-                                ->defaultValue([])
-                                ->enumPrototype()->values(self::PARENTS)->end()
-                            ->end()
-                            ->arrayNode('attribute_values')
-                                ->children()
-                                    ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
-                                    ->arrayNode('values')->isRequired()->cannotBeEmpty()->scalarPrototype()->end()->end()
-                                ->end()
-                            ->end()
-                            ->arrayNode('attribute_patterns')
-                                ->children()
-                                    ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
-                                    ->arrayNode('included')->defaultValue([])->scalarPrototype()->end()->end()
-                                    ->arrayNode('excluded')->defaultValue([])->scalarPrototype()->end()->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+                ->arrayNode('values')->isRequired()->cannotBeEmpty()->scalarPrototype()->end()->end()
+            ->end()
+        ->end();
+
+        $patterns = $ruleChildren->arrayNode('attribute_patterns');
+        self::rejectExplicitlyEmpty($patterns, 'included', 'excluded');
+        $patterns
+            ->children()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+                ->arrayNode('included')->defaultValue([])->scalarPrototype()->end()->end()
+                ->arrayNode('excluded')->defaultValue([])->scalarPrototype()->end()->end()
             ->end()
         ;
 
         return $node;
+    }
+
+    /**
+     * The schema requires at least one item (minItems: 1) when one of these lists is set; omitting it is fine.
+     * An explicit empty list must not silently widen a rule (no filter) or drop every span (no rules).
+     */
+    private static function rejectExplicitlyEmpty(ArrayNodeDefinition $node, string ...$keys): void
+    {
+        $node->beforeNormalization()->always(static function (mixed $value) use ($keys): mixed {
+            if (is_array($value)) {
+                foreach ($keys as $key) {
+                    if (array_key_exists($key, $value) && ($value[$key] === [] || $value[$key] === null)) {
+                        throw new InvalidConfigurationException(sprintf('"%s" must contain at least one item when set.', $key));
+                    }
+                }
+            }
+
+            return $value;
+        })->end();
     }
 
     /**
