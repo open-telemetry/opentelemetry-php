@@ -10,7 +10,9 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
@@ -36,16 +38,18 @@ class UseCaseTest extends TestCase
     private static function buildSampler(): ConsistentSampler
     {
         $isHealthCheck = new class() implements \OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface {
-            public function spanMatches($ctx, string $name, int $kind, $attrs, array $links): bool
+            #[\Override]
+            public function spanMatches(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): bool
             {
-                return $name === 'health-check';
+                return $spanName === 'health-check';
             }
         };
 
         $isCheckout = new class() implements \OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface {
-            public function spanMatches($ctx, string $name, int $kind, $attrs, array $links): bool
+            #[\Override]
+            public function spanMatches(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): bool
             {
-                return $name === 'checkout';
+                return $spanName === 'checkout';
             }
         };
 

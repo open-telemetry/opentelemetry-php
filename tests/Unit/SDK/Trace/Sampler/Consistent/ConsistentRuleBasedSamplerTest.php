@@ -6,7 +6,9 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\Sampler\Consistent;
 
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentFixedThresholdSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
@@ -115,7 +117,8 @@ class ConsistentRuleBasedSamplerTest extends TestCase
     {
         $always = Predicate::anySpan();
         $never = new class() implements \OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface {
-            public function spanMatches($ctx, $name, $kind, $attrs, $links): bool
+            #[\Override]
+            public function spanMatches(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): bool
             {
                 return false;
             }
@@ -132,7 +135,8 @@ class ConsistentRuleBasedSamplerTest extends TestCase
     {
         $always = Predicate::anySpan();
         $never = new class() implements \OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface {
-            public function spanMatches($ctx, $name, $kind, $attrs, $links): bool
+            #[\Override]
+            public function spanMatches(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): bool
             {
                 return false;
             }

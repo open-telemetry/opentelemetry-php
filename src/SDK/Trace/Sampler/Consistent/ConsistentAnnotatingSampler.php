@@ -30,7 +30,7 @@ final class ConsistentAnnotatingSampler extends ConsistentSampler
         $this->description = sprintf(
             'ConsistentAnnotatingSampler{%s,%s}',
             $delegate->getDescription(),
-            json_encode($attributes, JSON_PARTIAL_OUTPUT_ON_ERROR),
+            (string) json_encode($attributes, JSON_PARTIAL_OUTPUT_ON_ERROR),
         );
     }
 

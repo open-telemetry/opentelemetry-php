@@ -34,6 +34,9 @@ final class OtelTraceState
     /** @var list<string> other k:v pairs found in the `ot` value, preserved as-is */
     private readonly array $otherKeyValuePairs;
 
+    /**
+     * @param list<string> $otherKeyValuePairs
+     */
     private function __construct(int $randomValue, int $threshold, array $otherKeyValuePairs)
     {
         $this->randomValue = $randomValue;

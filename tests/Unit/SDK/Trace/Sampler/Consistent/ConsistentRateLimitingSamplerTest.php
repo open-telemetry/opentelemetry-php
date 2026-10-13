@@ -10,7 +10,9 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentRateLimitingSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
@@ -19,6 +21,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConsistentRateLimitingSampler::class)]
@@ -59,6 +62,14 @@ final class ConsistentRateLimitingSamplerTest extends TestCase
         $this->assertInstanceOf(ConsistentRateLimitingSampler::class, $sampler);
 
         return new ConsistentRateLimitingSampler($delegate, $limit, $adaptationSeconds, fn (): int => $this->now);
+    }
+
+    private static function traceState(SamplingResult $result): TraceStateInterface
+    {
+        $traceState = $result->getTraceState();
+        self::assertNotNull($traceState);
+
+        return $traceState;
     }
 
     public function test_traffic_below_the_limit_keeps_the_delegate_probability(): void
@@ -141,7 +152,8 @@ final class ConsistentRateLimitingSamplerTest extends TestCase
     public function test_passes_through_reliability_attributes_and_trace_state_updates(): void
     {
         $delegate = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(
                     0,
@@ -151,6 +163,7 @@ final class ConsistentRateLimitingSamplerTest extends TestCase
                 );
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D';
@@ -181,19 +194,25 @@ final class ConsistentRateLimitingSamplerTest extends TestCase
         );
 
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
-        $this->assertSame('th:0', $result->getTraceState()->get('ot'));
+        $this->assertSame('th:0', self::traceState($result)->get('ot'));
     }
 
-    public function test_invalid_arguments_are_rejected(): void
+    #[DataProvider('invalidArgumentsProvider')]
+    public function test_invalid_arguments_are_rejected(float $limit, float $adaptationSeconds): void
     {
-        foreach ([[0.0, 1.0], [-1.0, 1.0], [10.0, 0.0], [10.0, -1.0], [NAN, 1.0]] as [$limit, $adaptation]) {
-            try {
-                ConsistentSampler::rateLimited(ConsistentSampler::alwaysOn(), $limit, $adaptation);
-                $this->fail("Expected InvalidArgumentException for limit=$limit, adaptation=$adaptation");
-            } catch (InvalidArgumentException) {
-                $this->addToAssertionCount(1);
-            }
-        }
+        $this->expectException(InvalidArgumentException::class);
+
+        ConsistentSampler::rateLimited(ConsistentSampler::alwaysOn(), $limit, $adaptationSeconds);
+    }
+
+    public static function invalidArgumentsProvider(): iterable
+    {
+        yield 'zero limit' => [0.0, 1.0];
+        yield 'negative limit' => [-1.0, 1.0];
+        yield 'zero adaptation time' => [10.0, 0.0];
+        yield 'negative adaptation time' => [10.0, -1.0];
+        yield 'NaN limit' => [NAN, 1.0];
+        yield 'NaN adaptation time' => [10.0, NAN];
     }
 
     public function test_description(): void

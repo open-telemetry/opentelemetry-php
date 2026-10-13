@@ -7,8 +7,11 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\Sampler\Consistent;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentCompositeSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
@@ -30,11 +33,13 @@ final class ConsistentCompositeSamplerTest extends TestCase
             {
             }
 
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent($this->threshold, $this->reliable, ['custom' => true]);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'PlainComposable';
@@ -54,16 +59,23 @@ final class ConsistentCompositeSamplerTest extends TestCase
         );
     }
 
+    private static function traceState(SamplingResult $result): TraceStateInterface
+    {
+        $traceState = $result->getTraceState();
+        self::assertNotNull($traceState);
+
+        return $traceState;
+    }
+
     public function test_wraps_any_composable_sampler(): void
     {
         $sampler = ConsistentSampler::composite(self::plainComposable(0x80000000000000));
 
-        $this->assertInstanceOf(SamplerInterface::class, $sampler);
         $this->assertSame('PlainComposable', $sampler->getDescription());
 
         $sampled = $this->sample($sampler, '0011223344556677ffffffffffffffff');
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $sampled->getDecision());
-        $this->assertSame('th:8', $sampled->getTraceState()->get('ot'));
+        $this->assertSame('th:8', self::traceState($sampled)->get('ot'));
         $this->assertSame(['custom' => true], $sampled->getAttributes());
 
         $dropped = $this->sample($sampler, '00112233445566770000000000000000');
@@ -75,6 +87,6 @@ final class ConsistentCompositeSamplerTest extends TestCase
         $result = $this->sample(ConsistentSampler::composite(self::plainComposable(0, false)), '0011223344556677ffffffffffffffff');
 
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
-        $this->assertNull($result->getTraceState()->get('ot'));
+        $this->assertNull(self::traceState($result)->get('ot'));
     }
 }

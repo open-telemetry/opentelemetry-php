@@ -11,7 +11,9 @@ use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\API\Trace\TraceState;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentFixedThresholdSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
@@ -99,6 +101,14 @@ class ConsistentSamplerTest extends TestCase
     }
 
     // ─── Tests ────────────────────────────────────────────────────────────────
+
+    private static function traceState(SamplingResult $result): TraceStateInterface
+    {
+        $traceState = $result->getTraceState();
+        self::assertNotNull($traceState);
+
+        return $traceState;
+    }
 
     public function test_always_on_sampled_no_parent_rv(): void
     {
@@ -286,7 +296,8 @@ class ConsistentSamplerTest extends TestCase
             /** @var list<bool> */
             public array $decisions = [];
 
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(
                     ConsistentSamplingUtil::MAX_THRESHOLD - 1,
@@ -300,6 +311,7 @@ class ConsistentSamplerTest extends TestCase
                 );
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D';
@@ -312,9 +324,9 @@ class ConsistentSamplerTest extends TestCase
         $sampled = $this->sample($sampler, Context::getRoot()->withContextValue(new NonRecordingSpan(SpanContext::getInvalid())), traceId: '001122334455667788ffffffffffffff');
 
         $this->assertSame(SamplingResult::DROP, $dropped->getDecision());
-        $this->assertSame('dropped', $dropped->getTraceState()->get('vendor'));
+        $this->assertSame('dropped', self::traceState($dropped)->get('vendor'));
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $sampled->getDecision());
-        $this->assertSame('sampled', $sampled->getTraceState()->get('vendor'));
+        $this->assertSame('sampled', self::traceState($sampled)->get('vendor'));
         $this->assertSame([false, true], $delegate->decisions);
     }
 
@@ -334,7 +346,7 @@ class ConsistentSamplerTest extends TestCase
 
         $result = $this->sample(ConsistentSampler::alwaysOn(), $context);
 
-        $traceState = $result->getTraceState();
+        $traceState = self::traceState($result);
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
         $this->assertSame('th:0', $traceState->get('ot'), 'ot was added');
         $this->assertSame(32, $traceState->getListMemberCount());
@@ -350,18 +362,18 @@ class ConsistentSamplerTest extends TestCase
 
         $result = $this->sample(ConsistentSampler::alwaysOn(), self::createContextWithTraceState($traceState));
 
-        $this->assertSame('th:0', $result->getTraceState()->get('ot'));
-        $this->assertSame(32, $result->getTraceState()->getListMemberCount());
-        $this->assertSame('v31', $result->getTraceState()->get('k31'), 'nothing evicted');
+        $this->assertSame('th:0', self::traceState($result)->get('ot'));
+        $this->assertSame(32, self::traceState($result)->getListMemberCount());
+        $this->assertSame('v31', self::traceState($result)->get('k31'), 'nothing evicted');
     }
 
     public function test_trace_state_below_the_limit_keeps_all_members(): void
     {
         $result = $this->sample(ConsistentSampler::alwaysOn(), self::createContextWithTraceState(self::fullTraceState(31)));
 
-        $this->assertSame(32, $result->getTraceState()->getListMemberCount());
-        $this->assertSame('v31', $result->getTraceState()->get('k31'));
-        $this->assertSame('th:0', $result->getTraceState()->get('ot'));
+        $this->assertSame(32, self::traceState($result)->getListMemberCount());
+        $this->assertSame('v31', self::traceState($result)->get('k31'));
+        $this->assertSame('th:0', self::traceState($result)->get('ot'));
     }
 
     public function test_malformed_ot_member_does_not_discard_other_valid_sub_keys(): void
@@ -371,7 +383,7 @@ class ConsistentSamplerTest extends TestCase
 
         $result = $this->sample(ConsistentSampler::alwaysOn(), self::createContextWithTraceState($traceState));
 
-        $this->assertSame('th:0;rv:1234567890abcd;x:1', $result->getTraceState()->get('ot'));
+        $this->assertSame('th:0;rv:1234567890abcd;x:1', self::traceState($result)->get('ot'));
     }
 
     public function test_duplicate_th_in_incoming_ot_is_not_trusted(): void
@@ -382,7 +394,7 @@ class ConsistentSamplerTest extends TestCase
         $result = $this->sample(ConsistentSampler::parentBased(ConsistentSampler::alwaysOn()), self::createContextWithTraceState($traceState));
 
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
-        $this->assertSame('rv:ffffffffffffff;x:1', $result->getTraceState()->get('ot'), 'no th, rv kept, duplicate x discarded');
+        $this->assertSame('rv:ffffffffffffff;x:1', self::traceState($result)->get('ot'), 'no th, rv kept, duplicate x discarded');
     }
 
     public function test_dropped_span_keeps_a_full_trace_state_untouched(): void
@@ -391,8 +403,8 @@ class ConsistentSamplerTest extends TestCase
         $result = $this->sample(ConsistentSampler::alwaysOff(), self::createContextWithTraceState(self::fullTraceState(32)));
 
         $this->assertSame(SamplingResult::DROP, $result->getDecision());
-        $this->assertSame(32, $result->getTraceState()->getListMemberCount());
-        $this->assertNull($result->getTraceState()->get('ot'));
+        $this->assertSame(32, self::traceState($result)->getListMemberCount());
+        $this->assertNull(self::traceState($result)->get('ot'));
     }
 
     public function test_rv_never_modified(): void

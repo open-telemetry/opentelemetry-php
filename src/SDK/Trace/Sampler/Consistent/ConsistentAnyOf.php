@@ -39,7 +39,7 @@ final class ConsistentAnyOf extends ConsistentSampler
             throw new InvalidArgumentException('ConsistentAnyOf requires at least one delegate sampler.');
         }
 
-        $this->delegates = $delegates;
+        $this->delegates = array_values($delegates);
         $this->description = sprintf(
             'ConsistentAnyOf{%s}',
             implode(',', array_map(static fn (ComposableInterface $d) => $d->getDescription(), $delegates)),

@@ -7,7 +7,9 @@ namespace OpenTelemetry\Tests\SDK\Unit\Trace\Sampler\Consistent;
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAnyOf;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
@@ -29,11 +31,13 @@ class ConsistentAnyOfTest extends TestCase
             ) {
             }
 
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent($this->threshold, $this->reliable);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'Mock';
@@ -96,22 +100,26 @@ class ConsistentAnyOfTest extends TestCase
     public function test_attributes_merged_from_all_delegates(): void
     {
         $d1 = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(0x30000000000000, true, ['tag1' => 'a']);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D1';
             }
         };
         $d2 = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(0x50000000000000, true, ['tag2' => 'b']);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D2';
@@ -134,22 +142,26 @@ class ConsistentAnyOfTest extends TestCase
     public function test_attribute_last_delegate_wins_on_conflict(): void
     {
         $d1 = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(0x30000000000000, true, ['shared' => 'first']);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D1';
             }
         };
         $d2 = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(0x50000000000000, true, ['shared' => 'second']);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D2';
@@ -169,7 +181,8 @@ class ConsistentAnyOfTest extends TestCase
     public function test_trace_state_chained_across_delegates(): void
     {
         $d1 = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(
                     0x30000000000000,
@@ -179,13 +192,15 @@ class ConsistentAnyOfTest extends TestCase
                 );
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D1';
             }
         };
         $d2 = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(
                     0x50000000000000,
@@ -195,6 +210,7 @@ class ConsistentAnyOfTest extends TestCase
                 );
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D2';
@@ -212,7 +228,8 @@ class ConsistentAnyOfTest extends TestCase
     public function test_trace_state_updaters_receive_the_decision(): void
     {
         $delegate = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(
                     0,
@@ -222,6 +239,7 @@ class ConsistentAnyOfTest extends TestCase
                 );
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D';

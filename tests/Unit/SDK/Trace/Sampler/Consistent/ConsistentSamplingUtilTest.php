@@ -12,13 +12,14 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ConsistentSamplingUtil::class)]
 class ConsistentSamplingUtilTest extends TestCase
 {
-    public function test_constants(): void
+    public function test_sentinels_are_outside_the_valid_ranges(): void
     {
-        $this->assertSame(0, ConsistentSamplingUtil::MIN_THRESHOLD);
-        $this->assertSame(1 << 56, ConsistentSamplingUtil::MAX_THRESHOLD);
-        $this->assertSame((1 << 56) - 1, ConsistentSamplingUtil::MAX_RANDOM_VALUE);
-        $this->assertSame(-1, ConsistentSamplingUtil::INVALID_THRESHOLD);
-        $this->assertSame(-1, ConsistentSamplingUtil::INVALID_RANDOM_VALUE);
+        $this->assertFalse(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::INVALID_THRESHOLD));
+        $this->assertFalse(ConsistentSamplingUtil::isValidRandomValue(ConsistentSamplingUtil::INVALID_RANDOM_VALUE));
+        $this->assertTrue(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::MIN_THRESHOLD));
+        $this->assertTrue(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::MAX_THRESHOLD));
+        $this->assertTrue(ConsistentSamplingUtil::isValidRandomValue(ConsistentSamplingUtil::MAX_RANDOM_VALUE));
+        $this->assertFalse(ConsistentSamplingUtil::isValidRandomValue(ConsistentSamplingUtil::MAX_THRESHOLD));
     }
 
     public function test_invalid_threshold_is_invalid(): void

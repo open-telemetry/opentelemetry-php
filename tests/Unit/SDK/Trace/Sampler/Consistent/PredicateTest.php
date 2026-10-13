@@ -60,6 +60,10 @@ final class PredicateTest extends TestCase
         $this->assertTrue($this->check(Predicate::attributeValues('k', ['true']), attributes: ['k' => true]), 'bool is true/false');
     }
 
+    /**
+     * @param list<string> $included
+     * @param list<string> $excluded
+     */
     #[DataProvider('patternProvider')]
     public function test_attribute_patterns(array $included, array $excluded, string $value, bool $expected): void
     {

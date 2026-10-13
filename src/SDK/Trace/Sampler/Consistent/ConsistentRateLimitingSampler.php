@@ -123,9 +123,9 @@ final class ConsistentRateLimitingSampler extends ConsistentSampler
             return;
         }
 
-        $decayFactor = exp(-$nanoTimeDelta * $this->inverseAdaptationTimeNanos);
+        $decayFactor = exp(-(float) $nanoTimeDelta * $this->inverseAdaptationTimeNanos);
         $this->effectiveWindowCount = $this->effectiveWindowCount * $decayFactor + 1.0;
-        $this->effectiveWindowNanos = $this->effectiveWindowNanos * $decayFactor + $nanoTimeDelta;
+        $this->effectiveWindowNanos = $this->effectiveWindowNanos * $decayFactor + (float) $nanoTimeDelta;
         $this->lastNanoTime = $currentNanoTime;
     }
 

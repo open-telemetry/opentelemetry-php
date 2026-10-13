@@ -19,7 +19,9 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SamplerProbability;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Context\Context as OtelContext;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
@@ -81,7 +83,6 @@ final class ConsistentSamplerConfigurationTest extends TestCase
                     ratio: 0.0
             YAML);
 
-        $this->assertInstanceOf(SamplerInterface::class, $sampler);
         $this->assertSame(SamplingResult::DROP, $this->decide($sampler)->getDecision());
     }
 
@@ -164,16 +165,18 @@ final class ConsistentSamplerConfigurationTest extends TestCase
 
     public function test_composite_wraps_a_custom_composable_sampler(): void
     {
-        $custom = new class() implements ComponentProvider {
+        $custom = new /** @implements ComponentProvider<ComposableInterface> */ class() implements ComponentProvider {
             #[\Override]
             public function createPlugin(array $properties, Context $context): ComposableInterface
             {
                 return new class() implements ComposableInterface {
-                    public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+                    #[\Override]
+                    public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
                     {
                         return new SamplingIntent(0, true, ['custom' => true]);
                     }
 
+                    #[\Override]
                     public function getDescription(): string
                     {
                         return 'Custom';

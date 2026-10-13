@@ -9,7 +9,9 @@ use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 use OpenTelemetry\Context\Context;
+use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAnnotatingSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
@@ -37,6 +39,14 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
         );
     }
 
+    private static function traceState(SamplingResult $result): TraceStateInterface
+    {
+        $traceState = $result->getTraceState();
+        self::assertNotNull($traceState);
+
+        return $traceState;
+    }
+
     public function test_adds_attributes_to_sampled_spans(): void
     {
         $sampler = ConsistentSampler::annotating(['team' => 'checkout'], ConsistentSampler::alwaysOn());
@@ -45,7 +55,7 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
 
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
         $this->assertSame(['team' => 'checkout'], $result->getAttributes());
-        $this->assertSame('th:0', $result->getTraceState()->get('ot'), 'delegate threshold is used');
+        $this->assertSame('th:0', self::traceState($result)->get('ot'), 'delegate threshold is used');
     }
 
     public function test_does_not_add_attributes_to_dropped_spans(): void
@@ -67,11 +77,13 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
     public function test_merges_delegate_attributes_and_own_attributes_win(): void
     {
         $delegate = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(0, true, ['shared' => 'delegate', 'only.delegate' => 1]);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D';
@@ -86,7 +98,8 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
     public function test_delegates_trace_state_updates(): void
     {
         $delegate = new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(
                     0,
@@ -96,6 +109,7 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
                 );
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D';
@@ -104,18 +118,20 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
 
         $result = $this->sample(ConsistentSampler::annotating(['a' => 1], $delegate));
 
-        $this->assertSame('sampled', $result->getTraceState()->get('vendor'));
+        $this->assertSame('sampled', self::traceState($result)->get('vendor'));
     }
 
     public function test_preserves_unreliable_adjusted_count(): void
     {
         // An unreliable delegate (e.g. parent-based without th) must stay unreliable: no th is written
         $sampler = ConsistentSampler::annotating(['a' => 1], new class() implements ComposableInterface {
-            public function getSamplingIntent($ctx, $name, $kind, $attrs, $links): SamplingIntentInterface
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
             {
                 return new SamplingIntent(ConsistentSamplingUtil::MIN_THRESHOLD, false);
             }
 
+            #[\Override]
             public function getDescription(): string
             {
                 return 'D';
@@ -125,7 +141,7 @@ final class ConsistentAnnotatingSamplerTest extends TestCase
         $result = $this->sample($sampler);
 
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
-        $this->assertNull($result->getTraceState()->get('ot'));
+        $this->assertNull(self::traceState($result)->get('ot'));
     }
 
     public function test_description(): void

@@ -245,13 +245,16 @@ final class Predicate implements PredicateInterface
         return is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
     }
 
+    /**
+     * @return non-empty-string
+     */
     private static function wildcardToRegex(string $pattern): string
     {
         return '/\A' . strtr(preg_quote($pattern, '/'), ['\\?' => '.', '\\*' => '.*']) . '\z/s';
     }
 
     /**
-     * @param list<string> $regexes
+     * @param list<non-empty-string> $regexes
      */
     private static function matchesAny(array $regexes, string $candidate, bool $defaultIfEmpty): bool
     {

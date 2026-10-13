@@ -130,19 +130,19 @@ final class ComposableSamplerRuleBased implements ComponentProvider
                 $rule['span_kinds'],
             ));
         }
-        if (($rule['parent'] ?? []) !== []) {
-            $predicates[] = array_reduce(
-                array_map(
-                    static fn (string $parent): Predicate => match ($parent) {
-                        'none' => Predicate::isRootSpan(),
-                        'remote' => Predicate::hasRemoteParent(),
-                        'local' => Predicate::hasLocalSpanParent(),
-                        default => throw new InvalidArgumentException(sprintf('Unknown parent type "%s"', $parent)),
-                    },
-                    $rule['parent'],
-                ),
-                static fn (?Predicate $carry, Predicate $next): Predicate => $carry === null ? $next : Predicate::or($carry, $next),
-            );
+        // any of the listed parent types matches
+        $parentPredicate = null;
+        foreach ($rule['parent'] ?? [] as $parent) {
+            $predicate = match ($parent) {
+                'none' => Predicate::isRootSpan(),
+                'remote' => Predicate::hasRemoteParent(),
+                'local' => Predicate::hasLocalSpanParent(),
+                default => throw new InvalidArgumentException(sprintf('Unknown parent type "%s"', $parent)),
+            };
+            $parentPredicate = $parentPredicate === null ? $predicate : Predicate::or($parentPredicate, $predicate);
+        }
+        if ($parentPredicate !== null) {
+            $predicates[] = $parentPredicate;
         }
         if (isset($rule['attribute_values'])) {
             $predicates[] = Predicate::attributeValues($rule['attribute_values']['key'], array_values(array_map(Predicate::attributeValueToString(...), $rule['attribute_values']['values'])));
@@ -155,9 +155,11 @@ final class ComposableSamplerRuleBased implements ComponentProvider
             );
         }
 
-        return array_reduce(
-            $predicates,
-            static fn (?Predicate $carry, Predicate $next): Predicate => $carry === null ? $next : Predicate::and($carry, $next),
-        ) ?? Predicate::anySpan();
+        $result = null;
+        foreach ($predicates as $predicate) {
+            $result = $result === null ? $predicate : Predicate::and($result, $predicate);
+        }
+
+        return $result ?? Predicate::anySpan();
     }
 }

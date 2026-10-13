@@ -32,7 +32,7 @@ final class ConsistentRuleBasedSampler extends ConsistentSampler
         private readonly ?int $spanKindToMatch,
         PredicatedSampler ...$samplers,
     ) {
-        $this->samplers = $samplers;
+        $this->samplers = array_values($samplers);
         $this->description = sprintf(
             'ConsistentRuleBasedSampler{%s}',
             implode(',', array_map(
