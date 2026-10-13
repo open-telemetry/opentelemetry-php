@@ -13,6 +13,9 @@ use InvalidArgumentException;
  * @experimental
  *
  * @see https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/
+  *
+ * Thresholds and random values are 56-bit integers held in native PHP integers, so this requires 64-bit PHP
+ * (as does the SDK as a whole, e.g. its nanosecond timestamps).
  */
 final class ConsistentSamplingUtil
 {

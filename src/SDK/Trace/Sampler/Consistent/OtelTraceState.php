@@ -139,7 +139,9 @@ final class OtelTraceState
      *
      * Parsing is lenient: a member (`key:value`) that is syntactically invalid is discarded, the valid
      * members (including other vendors' sub-keys and `rv`) are preserved. An invalid `th` or `rv` value is
-     * treated as absent. Members that would make the value exceed the 256 character limit are discarded.
+     * treated as absent. Keys must be unique: a repeated th or rv is ambiguous and both are treated as absent,
+     * for other sub-keys the first occurrence is kept. Members that would make the value exceed the 256 character
+     * limit are discarded.
      */
     public static function parse(?string $ts): self
     {
@@ -150,6 +152,8 @@ final class OtelTraceState
         $threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
         $randomValue = ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
         $otherKeyValuePairs = [];
+        $seenKeys = [];
+        $ambiguousKeys = [];
         $length = 0;
 
         foreach (explode(';', $ts) as $member) {
@@ -168,6 +172,16 @@ final class OtelTraceState
             }
 
             [, $key, $value] = $matches;
+
+            // Keys must be unique. A repeated th or rv is ambiguous, so none of its values is trusted;
+            // for other sub-keys the first occurrence is kept and the repeated ones are discarded.
+            if (isset($seenKeys[$key])) {
+                $ambiguousKeys[$key] = true;
+
+                continue;
+            }
+            $seenKeys[$key] = true;
+
             if ($key === self::SUBKEY_THRESHOLD) {
                 $threshold = self::parseThreshold($value, 0, strlen($value));
             } elseif ($key === self::SUBKEY_RANDOM_VALUE) {
@@ -175,6 +189,13 @@ final class OtelTraceState
             } else {
                 $otherKeyValuePairs[] = $member;
             }
+        }
+
+        if (isset($ambiguousKeys[self::SUBKEY_THRESHOLD])) {
+            $threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
+        }
+        if (isset($ambiguousKeys[self::SUBKEY_RANDOM_VALUE])) {
+            $randomValue = ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
         }
 
         return new self($randomValue, $threshold, $otherKeyValuePairs);

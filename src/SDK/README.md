@@ -64,6 +64,7 @@ Use it only in long-running processes (CLI workers, Swoole, RoadRunner, FrankenP
 
 The samplers `probability/development` and `composite/development` (with `always_on`, `always_off`, `probability`,
 `parent_threshold` and `rule_based`) are available in declarative configuration (`open-telemetry/sdk-configuration`).
+These samplers hold 56-bit values in native integers and therefore require 64-bit PHP.
 All of this is experimental and may change.
 
 ## Contributing

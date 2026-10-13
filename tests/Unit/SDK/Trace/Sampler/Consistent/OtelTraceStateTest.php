@@ -54,6 +54,35 @@ class OtelTraceStateTest extends TestCase
         $this->assertSame('rv:1234567890abcd;x:1', OtelTraceState::parse('th:8A;rv:1234567890abcd;x:1')->serialize());
     }
 
+    public function test_duplicate_th_is_ambiguous_and_ignored(): void
+    {
+        // th:f;th:0 must neither be read as th:0 (sample everything) nor as th:f; the threshold is unknown
+        $this->assertSame('x:1', OtelTraceState::parse('th:f;th:0;x:1')->serialize());
+        $this->assertSame('', OtelTraceState::parse('th:8;th:8')->serialize());
+        $this->assertFalse(OtelTraceState::parse('th:f;th:0')->hasValidThreshold());
+        // three occurrences stay ambiguous
+        $this->assertFalse(OtelTraceState::parse('th:f;th:0;th:8')->hasValidThreshold());
+    }
+
+    public function test_duplicate_rv_is_ambiguous_and_ignored(): void
+    {
+        $state = OtelTraceState::parse('rv:1234567890abcd;rv:00000000000001;th:8');
+
+        $this->assertFalse($state->hasValidRandomValue());
+        $this->assertSame('th:8', $state->serialize());
+    }
+
+    public function test_duplicate_other_keys_keep_the_first_occurrence(): void
+    {
+        $this->assertSame('th:8;x:1;y:3', OtelTraceState::parse('x:1;th:8;x:2;y:3;x:1')->serialize());
+    }
+
+    public function test_duplicate_of_a_valid_key_with_an_invalid_first_value_is_still_ambiguous(): void
+    {
+        // first th has an invalid value, the repeated one must not "fix" it
+        $this->assertFalse(OtelTraceState::parse('th:zz;th:8')->hasValidThreshold());
+    }
+
     public function test_rv_roundtrip(): void
     {
         $this->assertSame('rv:1234567890abcd', OtelTraceState::parse('rv:1234567890abcd')->serialize());

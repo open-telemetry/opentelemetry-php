@@ -374,6 +374,17 @@ class ConsistentSamplerTest extends TestCase
         $this->assertSame('th:0;rv:1234567890abcd;x:1', $result->getTraceState()->get('ot'));
     }
 
+    public function test_duplicate_th_in_incoming_ot_is_not_trusted(): void
+    {
+        // th:0;th:f is ambiguous: parent-based must not inherit either value, it only follows the sampled flag
+        $traceState = (new TraceState())->with('ot', 'th:0;th:f;rv:ffffffffffffff;x:1;x:2');
+
+        $result = $this->sample(ConsistentSampler::parentBased(ConsistentSampler::alwaysOn()), self::createContextWithTraceState($traceState));
+
+        $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
+        $this->assertSame('rv:ffffffffffffff;x:1', $result->getTraceState()->get('ot'), 'no th, rv kept, duplicate x discarded');
+    }
+
     public function test_dropped_span_keeps_a_full_trace_state_untouched(): void
     {
         // th is erased on drop, there is no ot to add, so nothing must be evicted
