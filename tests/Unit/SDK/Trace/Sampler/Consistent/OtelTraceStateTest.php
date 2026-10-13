@@ -35,8 +35,23 @@ class OtelTraceStateTest extends TestCase
         $this->assertSame('', OtelTraceState::parse('#')->serialize());
         // Space
         $this->assertSame('', OtelTraceState::parse(' ')->serialize());
-        // Trailing semicolon is invalid
-        $this->assertSame('', OtelTraceState::parse('th:0;')->serialize());
+        // Garbage only
+        $this->assertSame('', OtelTraceState::parse('A:b;1:2;:;;x')->serialize());
+    }
+
+    public function test_invalid_members_are_discarded_but_valid_ones_are_kept(): void
+    {
+        // Upper-case key
+        $this->assertSame('th:8;x:1', OtelTraceState::parse('th:8;RV:1;x:1')->serialize());
+        // Invalid value character
+        $this->assertSame('th:8;y:1', OtelTraceState::parse('th:8;x:a b;y:1')->serialize());
+        // Missing colon / empty key
+        $this->assertSame('th:8;x:1', OtelTraceState::parse('th:8;novalue;:1;x:1')->serialize());
+        // Empty members (double and trailing semicolon) are skipped
+        $this->assertSame('th:8;x:1', OtelTraceState::parse('th:8;;x:1;')->serialize());
+        $this->assertSame('th:0', OtelTraceState::parse('th:0;')->serialize());
+        // Invalid th (upper-case digit) is treated as absent, valid rv is kept
+        $this->assertSame('rv:1234567890abcd;x:1', OtelTraceState::parse('th:8A;rv:1234567890abcd;x:1')->serialize());
     }
 
     public function test_rv_roundtrip(): void
@@ -132,11 +147,13 @@ class OtelTraceStateTest extends TestCase
         $this->assertSame($expected, OtelTraceState::parse($input)->serialize());
     }
 
-    public function test_exceeds_256_char_limit_returns_empty(): void
+    public function test_members_exceeding_the_256_char_limit_are_dropped(): void
     {
+        // 'a:' + 215 'X' = 217 chars, th and rv bring it to 253; 'x:3' would exceed 256 and is dropped
         $xStr = self::xString(215);
         $input = "a:{$xStr};rv:1234567890abcd;th:1234567890abcd;x:3";
-        $this->assertSame('', OtelTraceState::parse($input)->serialize());
+        $expected = "th:1234567890abcd;rv:1234567890abcd;a:{$xStr}";
+        $this->assertSame($expected, OtelTraceState::parse($input)->serialize());
     }
 
     public function test_set_threshold(): void

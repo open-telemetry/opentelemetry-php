@@ -137,7 +137,9 @@ final class OtelTraceState
     /**
      * Parses an OtelTraceState from the value of the `ot` tracestate sub-key.
      *
-     * Returns an empty instance (no threshold, no randomValue) if parsing fails.
+     * Parsing is lenient: a member (`key:value`) that is syntactically invalid is discarded, the valid
+     * members (including other vendors' sub-keys and `rv`) are preserved. An invalid `th` or `rv` value is
+     * treated as absent. Members that would make the value exceed the 256 character limit are discarded.
      */
     public static function parse(?string $ts): self
     {
@@ -145,70 +147,33 @@ final class OtelTraceState
             return self::empty();
         }
 
-        if (strlen($ts) > self::TRACE_STATE_SIZE_LIMIT) {
-            return self::empty();
-        }
-
         $threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
         $randomValue = ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
         $otherKeyValuePairs = [];
+        $length = 0;
 
-        $startPos = 0;
-        $len = strlen($ts);
-
-        while (true) {
-            // Parse the key: must start with lowercase alpha, then lowercase alnum
-            $colonPos = $startPos;
-            while ($colonPos < $len) {
-                $c = $ts[$colonPos];
-                if ($colonPos === $startPos) {
-                    if (!self::isLowerCaseAlpha($c)) {
-                        return self::empty();
-                    }
-                } elseif (!self::isLowerCaseAlphaNum($c)) {
-                    break;
-                }
-                $colonPos++;
+        foreach (explode(';', $ts) as $member) {
+            if ($member === '') {
+                continue;
             }
 
-            // Must have found at least one character, and the next must be a colon
-            // @phpstan-ignore-next-line (startPos=0 on first iteration but PHPStan infers int<1,256>)
-            if ($colonPos <= $startPos || $colonPos === $len || $ts[$colonPos] !== ':') {
-                return self::empty();
-            }
-
-            // Parse the value: all "value bytes"
-            $separatorPos = $colonPos + 1;
-            while ($separatorPos < $len && self::isValueByte($ts[$separatorPos])) {
-                $separatorPos++;
-            }
-
-            $key = substr($ts, $startPos, $colonPos - $startPos);
-            $valueStart = $colonPos + 1;
-            $valueLen = $separatorPos - $valueStart;
-
-            if ($key === self::SUBKEY_THRESHOLD) {
-                $threshold = self::parseThreshold($ts, $valueStart, $valueLen);
-            } elseif ($key === self::SUBKEY_RANDOM_VALUE) {
-                $randomValue = self::parseRandomValue($ts, $valueStart, $valueLen);
-            } else {
-                $otherKeyValuePairs[] = substr($ts, $startPos, $separatorPos - $startPos);
-            }
-
-            // After the value we must have ';' or end-of-string
-            if ($separatorPos < $len && $ts[$separatorPos] !== ';') {
-                return self::empty();
-            }
-
-            if ($separatorPos === $len) {
+            $length += ($length > 0 ? 1 : 0) + strlen($member);
+            if ($length > self::TRACE_STATE_SIZE_LIMIT) {
                 break;
             }
 
-            $startPos = $separatorPos + 1;
+            // key = lcalpha *(lcalpha / DIGIT); value = *(ucalpha / lcalpha / DIGIT / "." / "_" / "-")
+            if (preg_match('/\A([a-z][a-z0-9]*):([A-Za-z0-9._-]*)\z/', $member, $matches) !== 1) {
+                continue;
+            }
 
-            // Trailing ';' is not allowed
-            if ($startPos === $len) {
-                return self::empty();
+            [, $key, $value] = $matches;
+            if ($key === self::SUBKEY_THRESHOLD) {
+                $threshold = self::parseThreshold($value, 0, strlen($value));
+            } elseif ($key === self::SUBKEY_RANDOM_VALUE) {
+                $randomValue = self::parseRandomValue($value, 0, strlen($value));
+            } else {
+                $otherKeyValuePairs[] = $member;
             }
         }
 
@@ -256,31 +221,5 @@ final class OtelTraceState
         }
 
         return $r;
-    }
-
-    private static function isValueByte(string $c): bool
-    {
-        return self::isLowerCaseAlphaNum($c) || self::isUpperCaseAlpha($c)
-            || $c === '.' || $c === '_' || $c === '-';
-    }
-
-    private static function isLowerCaseAlphaNum(string $c): bool
-    {
-        return self::isLowerCaseAlpha($c) || self::isDigit($c);
-    }
-
-    private static function isDigit(string $c): bool
-    {
-        return $c >= '0' && $c <= '9';
-    }
-
-    private static function isLowerCaseAlpha(string $c): bool
-    {
-        return $c >= 'a' && $c <= 'z';
-    }
-
-    private static function isUpperCaseAlpha(string $c): bool
-    {
-        return $c >= 'A' && $c <= 'Z';
     }
 }

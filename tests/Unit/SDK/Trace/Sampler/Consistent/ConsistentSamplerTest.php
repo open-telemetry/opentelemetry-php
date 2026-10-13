@@ -364,6 +364,16 @@ class ConsistentSamplerTest extends TestCase
         $this->assertSame('th:0', $result->getTraceState()->get('ot'));
     }
 
+    public function test_malformed_ot_member_does_not_discard_other_valid_sub_keys(): void
+    {
+        // 'RV:1' is invalid and is discarded; the valid rv and the other vendor's sub-key are preserved
+        $traceState = (new TraceState())->with('ot', 'th:8;RV:1;rv:1234567890abcd;x:1');
+
+        $result = $this->sample(ConsistentSampler::alwaysOn(), self::createContextWithTraceState($traceState));
+
+        $this->assertSame('th:0;rv:1234567890abcd;x:1', $result->getTraceState()->get('ot'));
+    }
+
     public function test_dropped_span_keeps_a_full_trace_state_untouched(): void
     {
         // th is erased on drop, there is no ot to add, so nothing must be evicted
