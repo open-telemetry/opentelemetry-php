@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Test\Unit\Config\SDK;
+namespace OpenTelemetry\Tests\Unit\Config\SDK;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
@@ -49,13 +49,9 @@ class ConfigProviderTest extends TestCase
 
         $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/does-not-exist.yaml');
 
-        try {
-            $this->assertInstanceOf(
-                NoopConfigProperties::class,
-                (new ConfigProvider())->getInstrumentationConfig(),
-            );
-        } finally {
-            Logging::reset();
-        }
+        $this->assertInstanceOf(
+            NoopConfigProperties::class,
+            (new ConfigProvider())->getInstrumentationConfig(),
+        );
     }
 }
