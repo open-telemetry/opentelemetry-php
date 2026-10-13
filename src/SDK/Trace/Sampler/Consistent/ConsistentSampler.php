@@ -60,6 +60,20 @@ abstract class ConsistentSampler implements SamplerInterface, ComposableInterfac
     }
 
     /**
+     * Returns a sampler that limits the rate of sampled spans of $delegate to about $targetSpansPerSecondLimit.
+     *
+     * Stateful, so it only works in long-running PHP processes; it does NOT work with PHP-FPM or Apache.
+     * See {@see ConsistentRateLimitingSampler}.
+     *
+     * @param float $targetSpansPerSecondLimit Desired maximum of sampled spans per second
+     * @param float $adaptationTimeSeconds Typical time to adapt to a new load
+     */
+    public static function rateLimited(ComposableInterface $delegate, float $targetSpansPerSecondLimit, float $adaptationTimeSeconds): self
+    {
+        return new ConsistentRateLimitingSampler($delegate, $targetSpansPerSecondLimit, $adaptationTimeSeconds);
+    }
+
+    /**
      * Returns a sampler (CompositeSampler) that makes the final decision for any composable sampler.
      */
     public static function composite(ComposableInterface $delegate): self
