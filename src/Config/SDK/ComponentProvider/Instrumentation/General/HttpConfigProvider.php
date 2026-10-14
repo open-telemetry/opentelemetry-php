@@ -28,6 +28,7 @@ class HttpConfigProvider implements ComponentProvider
     {
         $node = $builder->arrayNode('http');
         $node
+            ->ignoreExtraKeys()
             ->children()
                 ->append(SemconvConfig::node($builder))
                 ->append($this->capturedHeaders('client', $builder))
@@ -42,6 +43,7 @@ class HttpConfigProvider implements ComponentProvider
     {
         $node = $builder->arrayNode($name);
         $node
+            ->ignoreExtraKeys()
             ->children()
                 ->arrayNode('request_captured_headers')
                     ->scalarPrototype()->end()

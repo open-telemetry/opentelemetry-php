@@ -151,6 +151,100 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * `ignoreExtraKeys()` applies only to a node's direct children, so tolerance has to be declared
+     * at every depth. A key added to any of these nodes in an upstream minor release must not take
+     * the SDK down.
+     */
+    #[DataProvider('unknownNestedKeyProvider')]
+    public function test_unknown_nested_general_key_is_dropped(string $yaml): void
+    {
+        $registry = self::instrumentationFactory()
+            ->process([Yaml::parse($yaml)])
+            ->create(new Context());
+
+        $this->assertNotNull($registry->get(HttpConfig::class));
+    }
+
+    public static function unknownNestedKeyProvider(): iterable
+    {
+        // `http` is always declared, so the assertion has a HttpConfig to find; the unknown key
+        // moves around it.
+        yield 'general.http' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  brand_new: true
+            YAML];
+        yield 'general.http.client' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    brand_new: true
+            YAML];
+        yield 'general.http.server' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  server:
+                    brand_new: true
+            YAML];
+        yield 'general.http.semconv' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  semconv:
+                    brand_new: true
+            YAML];
+        yield 'general.code' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                code:
+                  brand_new: true
+            YAML];
+        yield 'general.code.semconv' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                code:
+                  semconv:
+                    brand_new: true
+            YAML];
+        yield 'general.sanitization' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                sanitization:
+                  brand_new: true
+            YAML];
+        yield 'general.sanitization.url' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                sanitization:
+                  url:
+                    brand_new: true
+            YAML];
+    }
+
+    /**
+     * Tolerating unknown keys must not become tolerating anything: a declared key with the wrong
+     * type is still a configuration error.
+     */
+    public function test_nested_known_key_is_still_validated(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  semconv:
+                    version: not_an_integer
+            YAML)])->create(new Context());
+    }
+
+    /**
      * The `Context` passed to {@see Configuration::getInstrumentationConfig()} must reach
      * {@see \OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin}, which is how
      * a file-configured `log_level` will be honoured once the caller has one.

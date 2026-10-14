@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use function class_exists;
-use Error;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\ConfigEnv\EnvComponentLoader;
@@ -188,13 +187,12 @@ class SdkAutoloader
                 // Catching here, rather than letting this join the parse above, is what keeps an
                 // unparseable instrumentation node from also costing us the already-registered SDK.
                 $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
-            } catch (Error $t) {
-                // An Error here means the installed sdk-configuration does not offer the API we
-                // call, rather than that the file is wrong: `sdk` can only suggest that package, so
-                // its version cannot be constrained from here and the two are released separately.
-                self::logWarning(sprintf('Error during opentelemetry initialization: instrumentation configuration requires a newer open-telemetry/sdk-configuration: %s', $t->getMessage()), ['exception' => $t]);
-                $configuration = new NoopConfigProperties();
             } catch (Throwable $t) {
+                // Reported verbatim, including the Error raised when an older sdk-configuration
+                // lacks getInstrumentationConfig() — PHP's own message names the missing method, and
+                // `sdk` can only suggest that package, so its version cannot be constrained from
+                // here. Singling Error out to blame the version instead would also catch faults
+                // raised *by* the configuration, such as a TypeError from a plugin's create().
                 self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
                 $configuration = new NoopConfigProperties();
             }

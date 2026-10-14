@@ -91,6 +91,8 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
             // Unknown keys are dropped rather than rejected throughout this node: the other
             // languages' keys are siblings of `php`, and `/development` is exempt from upstream's
             // versioning guarantees, so a key added in a minor release must not take the SDK down.
+            // ignoreExtraKeys() only covers direct children, so every nested array node declared
+            // under here has to repeat it for that to hold at depth.
             ->ignoreExtraKeys()
             // A portable config naming an instrumentation this SDK does not ship should warn and
             // skip, matching the schema's open per-language node.
@@ -134,6 +136,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
     {
         $node = $builder->arrayNode($name);
         $node
+            ->ignoreExtraKeys()
             ->children()
                 ->append(SemconvConfig::node($builder))
             ->end()
@@ -146,8 +149,10 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
     {
         $node = $builder->arrayNode('sanitization');
         $node
+            ->ignoreExtraKeys()
             ->children()
                 ->arrayNode('url')
+                    ->ignoreExtraKeys()
                     ->children()
                         ->arrayNode('sensitive_query_parameters')
                             ->scalarPrototype()->end()

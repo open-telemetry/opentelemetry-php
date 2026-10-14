@@ -21,6 +21,7 @@ final class SemconvConfig
     {
         $node = $builder->arrayNode('semconv');
         $node
+            ->ignoreExtraKeys()
             ->children()
                 ->integerNode('version')->min(0)->defaultNull()->end()
                 ->booleanNode('experimental')->defaultNull()->end()
