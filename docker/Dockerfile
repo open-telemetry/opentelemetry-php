@@ -43,6 +43,7 @@ RUN apt-get install -y \
     php${PHP_VERSION}-sockets \
     php${PHP_VERSION}-sqlite3 \
     php${PHP_VERSION}-xdebug \
+    php${PHP_VERSION}-yaml \
     php${PHP_VERSION}-zip \
     unzip
 
