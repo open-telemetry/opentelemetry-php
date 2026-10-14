@@ -18,6 +18,7 @@ use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
+use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -281,6 +282,80 @@ final class ConfigurationTest extends TestCase
                   semconv:
                     version: not_an_integer
             YAML)])->create(new Context());
+    }
+
+    /**
+     * The schema declares these lists as `items: type: string`, but Symfony's `scalarPrototype()`
+     * accepts any scalar, so each needs {@see Validation::ensureString()} to reject the rest.
+     */
+    #[DataProvider('nonStringListProvider')]
+    public function test_string_lists_reject_non_string_items(string $yaml): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        self::instrumentationFactory()->process([Yaml::parse($yaml)])->create(new Context());
+    }
+
+    public static function nonStringListProvider(): iterable
+    {
+        yield 'sensitive_query_parameters' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                sanitization:
+                  url:
+                    sensitive_query_parameters: [123]
+            YAML];
+        yield 'request_captured_headers' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    request_captured_headers: [123]
+            YAML];
+        yield 'response_captured_headers' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  server:
+                    response_captured_headers: [true]
+            YAML];
+        yield 'known_methods' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    known_methods: [4.5]
+            YAML];
+    }
+
+    /**
+     * The counterpart to the above: an environment placeholder resolves to a string, so a variable
+     * whose value merely looks numeric must still pass.
+     */
+    public function test_string_lists_accept_substituted_values(): void
+    {
+        $factory = new ConfigurationFactory(
+            ServiceLoader::load(ComponentProvider::class),
+            new InstrumentationConfigurationRegistry(),
+            new EnvSourceReader([new ArrayEnvSource([
+                'TEST_HEADER_NAME' => 'x-request-id',
+                'TEST_NUMERIC_HEADER' => '8080',
+            ])]),
+        );
+
+        $registry = $factory->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    request_captured_headers:
+                      - ${TEST_HEADER_NAME}
+                      - ${TEST_NUMERIC_HEADER}
+            YAML)])->create(new Context());
+
+        $this->assertSame(
+            ['x-request-id', '8080'],
+            $registry->get(HttpConfig::class)?->config['client']['request_captured_headers'],
+        );
     }
 
     /**

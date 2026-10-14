@@ -155,7 +155,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
                     ->ignoreExtraKeys()
                     ->children()
                         ->arrayNode('sensitive_query_parameters')
-                            ->scalarPrototype()->end()
+                            ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                         ->end()
                     ->end()
                 ->end()

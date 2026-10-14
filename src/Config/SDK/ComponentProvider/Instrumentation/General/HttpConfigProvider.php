@@ -9,6 +9,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
+use OpenTelemetry\Config\SDK\Configuration\Validation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -46,13 +47,13 @@ class HttpConfigProvider implements ComponentProvider
             ->ignoreExtraKeys()
             ->children()
                 ->arrayNode('request_captured_headers')
-                    ->scalarPrototype()->end()
+                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                 ->end()
                 ->arrayNode('response_captured_headers')
-                    ->scalarPrototype()->end()
+                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                 ->end()
                 ->arrayNode('known_methods')
-                    ->scalarPrototype()->end()
+                    ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                 ->end()
             ->end()
         ;
