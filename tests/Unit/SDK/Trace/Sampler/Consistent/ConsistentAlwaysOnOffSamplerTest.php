@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
 use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAlwaysOffSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConsistentAlwaysOnSampler::class)]
+#[CoversClass(ConsistentAlwaysOffSampler::class)]
 class ConsistentAlwaysOnOffSamplerTest extends TestCase
 {
     private const TRACE_ID = '4bf92f3577b34da6a3ce929d0e0e4736';

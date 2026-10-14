@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
 
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -109,6 +110,16 @@ class ConsistentSamplingUtilTest extends TestCase
         // 2^56 (no spans sampled) must not silently encode as "0" (always sample)
         $this->expectException(\InvalidArgumentException::class);
         ConsistentSamplingUtil::encodeThreshold(ConsistentSamplingUtil::MAX_THRESHOLD);
+    }
+
+    public function test_randomness_value_uses_rv_or_the_trace_id(): void
+    {
+        $traceId = '00112233445566778899aabbccddeeff'; // last 14 hex digits: 8899aabbccddeeff -> 99aabbccddeeff
+        $withoutRv = OtelTraceState::parse('th:8');
+        $withRv = OtelTraceState::parse('rv:1234567890abcd');
+
+        $this->assertSame(0x99aabbccddeeff, ConsistentSamplingUtil::getRandomnessValue($withoutRv, $traceId));
+        $this->assertSame(0x1234567890abcd, ConsistentSamplingUtil::getRandomnessValue($withRv, $traceId));
     }
 
     public function test_encode_random_value(): void

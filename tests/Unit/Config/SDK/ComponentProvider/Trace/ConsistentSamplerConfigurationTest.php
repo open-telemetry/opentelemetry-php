@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration\Config;
+namespace OpenTelemetry\Tests\Unit\Config\SDK\ComponentProvider\Trace;
 
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
@@ -28,7 +28,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
-use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -36,7 +36,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Yaml\Yaml;
 
-#[CoversNothing]
+#[CoversClass(ComposableSamplerAlwaysOff::class)]
+#[CoversClass(ComposableSamplerAlwaysOn::class)]
+#[CoversClass(ComposableSamplerParentThreshold::class)]
+#[CoversClass(ComposableSamplerProbability::class)]
+#[CoversClass(ComposableSamplerRuleBased::class)]
+#[CoversClass(SamplerComposite::class)]
+#[CoversClass(SamplerProbability::class)]
 final class ConsistentSamplerConfigurationTest extends TestCase
 {
     private const TRACE_ID = '0af7651916cd43dd8448eb211c80319c';

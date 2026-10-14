@@ -15,7 +15,10 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAlwaysOffSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentFixedThresholdSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentParentBasedSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
@@ -26,6 +29,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConsistentSampler::class)]
+#[CoversClass(ConsistentParentBasedSampler::class)]
+#[CoversClass(ConsistentFixedThresholdSampler::class)]
+#[CoversClass(ConsistentAlwaysOffSampler::class)]
+#[CoversClass(ConsistentAlwaysOnSampler::class)]
+#[CoversClass(SamplingIntent::class)]
 class ConsistentSamplerTest extends TestCase
 {
     private const TRACE_ID = '00112233445566778800000000000000';
@@ -108,6 +116,17 @@ class ConsistentSamplerTest extends TestCase
         self::assertNotNull($traceState);
 
         return $traceState;
+    }
+
+    public function test_factories_create_the_expected_samplers(): void
+    {
+        $on = ConsistentSampler::alwaysOn();
+
+        $this->assertInstanceOf(\OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentRateLimitingSampler::class, ConsistentSampler::rateLimited($on, 10.0, 1.0));
+        $this->assertInstanceOf(\OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentCompositeSampler::class, ConsistentSampler::composite($on));
+        $this->assertInstanceOf(\OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAnnotatingSampler::class, ConsistentSampler::annotating(['a' => 1], $on));
+        $this->assertInstanceOf(\OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentRuleBasedSampler::class, ConsistentSampler::ruleBased(null));
+        $this->assertInstanceOf(\OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentAnyOf::class, ConsistentSampler::anyOf($on));
     }
 
     public function test_always_on_sampled_no_parent_rv(): void

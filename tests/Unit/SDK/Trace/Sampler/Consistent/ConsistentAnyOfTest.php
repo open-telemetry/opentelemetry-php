@@ -251,6 +251,13 @@ class ConsistentAnyOfTest extends TestCase
         $this->assertSame('dropped', $intent->updateTraceState(new \OpenTelemetry\API\Trace\TraceState(), false)->get('seen'));
     }
 
+    public function test_description_lists_the_delegates(): void
+    {
+        $sampler = ConsistentSampler::anyOf(ConsistentSampler::alwaysOn(), ConsistentSampler::alwaysOff());
+
+        $this->assertSame('ConsistentAnyOf{ConsistentAlwaysOnSampler,ConsistentAlwaysOffSampler}', $sampler->getDescription());
+    }
+
     public function test_order_of_delegates_does_not_affect_minimum(): void
     {
         $d1 = self::makeSampler(0x80000000000000, false);

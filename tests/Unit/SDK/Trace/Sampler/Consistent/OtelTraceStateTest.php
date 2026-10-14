@@ -83,6 +83,29 @@ class OtelTraceStateTest extends TestCase
         $this->assertFalse(OtelTraceState::parse('th:zz;th:8')->hasValidThreshold());
     }
 
+    public function test_set_invalid_random_value_invalidates_it(): void
+    {
+        $state = OtelTraceState::parse('rv:1234567890abcd');
+
+        $state->setRandomValue(-5);
+
+        $this->assertFalse($state->hasValidRandomValue());
+        $this->assertSame('', $state->serialize());
+    }
+
+    public function test_serialize_stops_before_exceeding_the_size_limit(): void
+    {
+        // each pair is 'kN:' plus 70 value characters; only as many fit next to th as the 256 character limit allows
+        $pairs = array_map(static fn (int $i): string => sprintf('k%d:%s', $i, str_repeat('x', 70)), [1, 2, 3, 4]);
+        $state = OtelTraceState::parse('th:8;' . implode(';', $pairs));
+
+        $serialized = $state->serialize();
+
+        $this->assertLessThanOrEqual(256, strlen($serialized));
+        $this->assertStringStartsWith('th:8;k1:', $serialized);
+        $this->assertStringNotContainsString('k4:', $serialized);
+    }
+
     public function test_rv_roundtrip(): void
     {
         $this->assertSame('rv:1234567890abcd', OtelTraceState::parse('rv:1234567890abcd')->serialize());

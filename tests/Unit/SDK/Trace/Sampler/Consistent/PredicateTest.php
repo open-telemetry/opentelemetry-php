@@ -9,7 +9,9 @@ use OpenTelemetry\API\Trace\SpanKind;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface;
 use OpenTelemetry\SDK\Trace\Span;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -52,6 +54,35 @@ final class PredicateTest extends TestCase
         $this->assertFalse($this->check(Predicate::hasRemoteParent(), $root));
         $this->assertFalse($this->check(Predicate::hasRemoteParent(), $local));
         $this->assertTrue($this->check(Predicate::hasRemoteParent(), $remote));
+    }
+
+    public function test_any_span_and_boolean_combinators(): void
+    {
+        $true = Predicate::anySpan();
+        $false = Predicate::not($true);
+        $custom = new class() implements PredicateInterface {
+            #[\Override]
+            public function spanMatches(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): bool
+            {
+                return true;
+            }
+        };
+
+        $this->assertTrue($this->check($true));
+        $this->assertFalse($this->check($false));
+        $this->assertTrue($this->check(Predicate::and($true, $true)));
+        $this->assertFalse($this->check(Predicate::and($true, $false)));
+        $this->assertTrue($this->check(Predicate::or($false, $true)));
+        $this->assertFalse($this->check(Predicate::or($false, $false)));
+        $this->assertTrue($this->check(Predicate::not($false)));
+        $this->assertTrue($this->check(Predicate::and($true, Predicate::or($false, Predicate::not($false)))));
+
+        $this->assertSame('anySpan', (string) $true);
+        $this->assertSame('not(anySpan)', (string) $false);
+        $this->assertSame('and(anySpan,not(anySpan))', (string) Predicate::and($true, $false));
+        $this->assertSame('or(anySpan,not(anySpan))', (string) Predicate::or($true, $false));
+        // predicates that are not created by the factories are described by their class name
+        $this->assertSame('not(' . $custom::class . ')', (string) Predicate::not($custom));
     }
 
     public function test_attribute_values(): void

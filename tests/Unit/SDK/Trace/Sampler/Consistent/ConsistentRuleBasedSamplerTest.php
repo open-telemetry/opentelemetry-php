@@ -18,6 +18,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(\OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentRuleBasedSampler::class)]
+#[CoversClass(PredicatedSampler::class)]
 class ConsistentRuleBasedSamplerTest extends TestCase
 {
     private static function matchSpanName(string $nameToMatch): Predicate
