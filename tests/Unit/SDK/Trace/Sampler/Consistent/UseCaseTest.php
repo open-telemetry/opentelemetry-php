@@ -14,6 +14,7 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicatedSampler;
@@ -119,44 +120,33 @@ class UseCaseTest extends TestCase
         $this->assertSame(0, $ot->getThreshold()); // th=0 = always sample
     }
 
-    public function test_root_other_uses_probabilistic_sampler(): void
+    public function test_root_other_is_sampled_with_10_percent_probability(): void
     {
-        // With th = 10% = 0xe666666666666 approx, we can control outcome via rv
-        // Use rv < threshold → drop; rv >= threshold → sample
         $sampler = self::buildSampler();
 
-        // Root span: randomness comes from traceId last 14 chars
-        // traceId = '4bf92f3577b34da6a3ce929d0e0e4736', last 14 = 'e929d0e0e4736'... wait, last 14 chars
-        // '4bf92f3577b34da6a3ce929d0e0e4736' → last 14 = '0e0e4736' is 8, let me count
-        // 32 chars total: 4bf92f3577b34da6a3ce929d0e0e4736
-        // positions 18-31 (0-indexed) = 'a3ce929d0e0e4736' → 16 chars, not 14
-        // last 14: '9d0e0e4736' is 10, so 14 from end: '929d0e0e4736' = 12... let me just count:
-        // '4bf92f3577b34da6a3ce929d0e0e4736' len=32, last 14 = chars at pos 18..31 = 'a3ce929d0e0e4736' = 16 chars
-        // Actually last 14 = substr(-14) = '929d0e0e4736' wait:
-        //   32 - 14 = 18, so from index 18: '929d0e0e4736' has 12 chars... no.
-        //   Let me be explicit: '4bf92f3577b34da6a3ce929d0e0e4736'
-        //                                                 ^18          ^31
-        //   Positions 18-31 = 'a3ce929d0e0e4736' = 14 chars. hexdec = 0xa3ce929d0e0e4736 & 0xffffffffffffff = 0x3ce929d0e0e4736? No wait...
-        // PHP hexdec('929d0e0e4736') isn't 14 chars. Let me verify:
-        // The traceId is 32 hex chars. substr($traceId, -14) gives the last 14 chars.
-        // '4bf92f3577b34da6a3ce929d0e0e4736'
-        //  0         1         2         3
-        //  0123456789012345678901234567890123
-        //                   ^^18       ^^31
-        // chars 18-31: 'a3ce929d0e0e47' → hmm, 14 chars from position 18 = 'a3ce929d0e0e47'
-        // But actually 32 - 14 = 18, so substr(-14) starts at position 18.
-        // Let me just test the actual decisions programmatically:
-        $result = $sampler->shouldSample(
+        // The randomness of a root span is the last 14 hex digits of the trace ID. The 10% rejection threshold is
+        // 0xe6666666666666, so a lower randomness is dropped and a higher one is sampled.
+        $dropped = $this->sampleRootSpan($sampler, '4bf92f3577b34da6a3ce929d0e0e4736'); // R = 0xce929d0e0e4736
+        $sampled = $this->sampleRootSpan($sampler, '4bf92f3577b34da6a3ffffffffffffff'); // R = 0xffffffffffffff
+
+        $this->assertSame(SamplingResult::DROP, $dropped->getDecision());
+        $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $sampled->getDecision());
+        $this->assertSame(
+            ConsistentSamplingUtil::calculateThreshold(0.1),
+            OtelTraceState::parse($sampled->getTraceState()?->get(OtelTraceState::TRACE_STATE_KEY))->getThreshold(),
+        );
+    }
+
+    private function sampleRootSpan(ConsistentSampler $sampler, string $traceId): SamplingResult
+    {
+        return $sampler->shouldSample(
             Context::getRoot(),
-            self::TRACE_ID,
+            $traceId,
             'other-span',
             SpanKind::KIND_SERVER,
             Attributes::create([]),
             [],
         );
-
-        // Just verify the decision is one of the two valid outcomes (not an exception)
-        $this->assertContains($result->getDecision(), [SamplingResult::RECORD_AND_SAMPLE, SamplingResult::DROP]);
     }
 
     // ─── Child span tests ─────────────────────────────────────────────────────

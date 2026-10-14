@@ -130,7 +130,7 @@ final class ConsistentSamplingUtil
     /**
      * Encodes a 56-bit threshold as a hex string with trailing zeros removed.
      *
-     * Examples: 0 → "0", 0x8000000000000 → "8", 0xfd70a3d70a3d71 → "fd70a3d70a3d71"
+     * Examples: 0 → "0", 0x80000000000000 → "8", 0xfd70a3d70a3d71 → "fd70a3d70a3d71"
      *
      * {@see self::MAX_THRESHOLD} (no spans sampled) has no `th` encoding, as it does not fit in 56 bits.
      *

@@ -44,6 +44,11 @@ final class PredicateTest extends TestCase
         $this->assertTrue($this->check(Predicate::hasLocalSpanParent(), $local));
         $this->assertFalse($this->check(Predicate::hasLocalSpanParent(), $remote));
 
+        // hasLocalParent() also matches root spans, unlike hasLocalSpanParent()
+        $this->assertTrue($this->check(Predicate::hasLocalParent(), $root));
+        $this->assertTrue($this->check(Predicate::hasLocalParent(), $local));
+        $this->assertFalse($this->check(Predicate::hasLocalParent(), $remote));
+
         $this->assertFalse($this->check(Predicate::hasRemoteParent(), $root));
         $this->assertFalse($this->check(Predicate::hasRemoteParent(), $local));
         $this->assertTrue($this->check(Predicate::hasRemoteParent(), $remote));
