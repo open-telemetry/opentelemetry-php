@@ -88,7 +88,7 @@ final class ConsistentSamplerConfigurationTest extends TestCase
 
     public function test_composite_requires_exactly_one_sampler(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->sampler("composite/development:\n  always_on:\n  always_off:\n");
     }
 
@@ -265,7 +265,7 @@ final class ConsistentSamplerConfigurationTest extends TestCase
         );
 
         $indented = preg_replace('/^/m', '    ', $samplerYaml);
-        $sdk = $factory->process([Yaml::parse("file_format: \"1.0-rc.2\"\ntracer_provider:\n  processors: []\n  sampler:\n" . $indented)])
+        $sdk = $factory->process([Yaml::parse("file_format: \"1.0\"\ntracer_provider:\n  processors: []\n  sampler:\n" . $indented)])
             ->create(new Context())
             ->build();
 
