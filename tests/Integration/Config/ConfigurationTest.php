@@ -28,6 +28,7 @@ use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
@@ -958,8 +959,8 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * `probability/development` is the one composable-sampler provider that is not a no-op, so
-     * the configured ratio should reach the sampler rather than being parsed and dropped.
+     * The configured `probability/development` ratio should reach the sampler rather than being
+     * parsed and dropped.
      */
     public function test_probability_sampler_honours_ratio(): void
     {
@@ -983,7 +984,8 @@ final class ConfigurationTest extends TestCase
 
         $sampler = $this->getSampler($sdk->create(new Context())->build());
 
-        $this->assertSame('TraceIdRatioBasedSampler{0.001000}', $sampler->getDescription());
+        $this->assertInstanceOf(ConsistentSampler::class, $sampler);
+        $this->assertStringContainsString('sampling probability=0.001', $sampler->getDescription());
     }
 
     /**
