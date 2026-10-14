@@ -133,9 +133,9 @@ final class ConsistentRateLimitingSampler extends ConsistentSampler
     {
         // The smoothing factor alpha is the weight of the newly observed probability; (1 - alpha) is the weight of the
         // cumulative average. It is inversely proportional to the adaptation time and to the expected span rate
-        // (assumed to be of the order of the limit), and "bent" so that it always stays below 1.
-        $t = 1.0 / ($targetSpansPerSecondLimit * $adaptationTimeSeconds);
-
-        return $t / (1.0 + $t);
+        // (assumed to be of the order of the limit), and "bent" so that it always stays below 1:
+        // with t = 1 / (limit * adaptation), alpha = t / (1 + t) = 1 / (1 + limit * adaptation).
+        // The reciprocal is not taken first, so that a product that underflows to 0 does not divide by zero.
+        return 1.0 / (1.0 + $targetSpansPerSecondLimit * $adaptationTimeSeconds);
     }
 }

@@ -49,7 +49,8 @@ See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/autol
 [TraceState probability sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/):
 the sampling threshold is propagated in the `ot` entry of the W3C `tracestate`, so that sampling decisions are consistent across
 services and the adjusted count of sampled spans is known. Start with `ConsistentSampler`, which offers factories for
-`alwaysOn()`, `alwaysOff()`, `probabilityBased()`, `parentBased()`, `ruleBased()`, `annotating()`, `anyOf()` and `rateLimited()`.
+`alwaysOn()`, `alwaysOff()`, `probabilityBased()`, `parentBased()`, `ruleBased()`, `annotating()`, `composite()` (adapts any
+`ComposableInterface` to a `SamplerInterface`), `anyOf()` and `rateLimited()`.
 
 ```php
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;

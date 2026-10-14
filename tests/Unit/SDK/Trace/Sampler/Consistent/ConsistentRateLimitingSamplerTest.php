@@ -215,6 +215,17 @@ final class ConsistentRateLimitingSamplerTest extends TestCase
         yield 'NaN adaptation time' => [10.0, NAN];
     }
 
+    public function test_tiny_positive_arguments_are_accepted(): void
+    {
+        // limit * adaptation underflows to 0.0, which must not make the construction fail
+        $sampler = $this->create(ConsistentSampler::alwaysOn(), 1e-200, 1e-200);
+
+        [$last] = $this->feed($sampler, 3, self::MILLISECOND);
+
+        $this->assertGreaterThanOrEqual(0.0, $last);
+        $this->assertLessThanOrEqual(1.0, $last);
+    }
+
     public function test_description(): void
     {
         $this->assertSame(
