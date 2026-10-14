@@ -62,9 +62,6 @@ class SdkAutoloader
 {
     use LogsMessagesTrait;
 
-    /**
-     * @psalm-suppress ArgumentTypeCoercion
-     */
     public static function autoload(): bool
     {
         if (!self::isEnabled() || self::isExcludedUrl()) {

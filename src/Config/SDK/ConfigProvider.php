@@ -29,9 +29,6 @@ final class ConfigProvider implements ConfigProviderInterface
 {
     use LogsMessagesTrait;
 
-    /**
-     * @psalm-suppress ArgumentTypeCoercion
-     */
     #[\Override]
     public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties
     {

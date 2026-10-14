@@ -88,6 +88,9 @@ class Configuration
         );
     }
 
+    /**
+     * @return list<string>
+     */
     public static function getList(string $key, ?array $default = null): array
     {
         return ListParser::parse(
