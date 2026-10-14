@@ -15,3 +15,8 @@ each one is for. Two are parsed without assertions, as a check that they remain 
 
 When adding a fixture, prefer asserting on the built SDK over parse-only coverage: an upstream file
 probably already proves the keys parse.
+
+Every `.yaml` here is also parsed by both YAML backends and asserted to produce identical results
+(`tests/Unit/.../Loader/YamlBackendParityTest.php`). ext-yaml follows YAML 1.1 scalar typing and
+symfony/yaml the 1.2 core schema, so avoid forms they read differently — `yes`/`on`, `017`, `0o17`,
+`1:30`, bare dates, out-of-range integers. Quote the value, or use `true`/`false`.

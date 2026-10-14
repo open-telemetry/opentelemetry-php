@@ -15,14 +15,17 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Internal;
+use OpenTelemetry\Config\SDK\Configuration\Loader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
 #[CoversClass(ConfigurationFactory::class)]
@@ -220,6 +223,92 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->assertInstanceOf(ComponentPlugin::class, $parsed);
         $this->assertSame('${DO_NOT_REPLACE_ME}', self::getPropertiesFromPlugin($parsed)['resource']['attributes']['service.name']);
+    }
+
+    /**
+     * The same invariant as above, but reached through a YAML alias. ext-yaml turns a direct alias
+     * into a PHP reference, so substitution's write-back used to hand the alias partner
+     * already-substituted text and substitute it a second time — resolving an escaped `$${FOO}` to
+     * the value of `FOO`, and expanding a value that itself looks like a placeholder.
+     *
+     * Needs a real file, and ext-yaml specifically: symfony/yaml deep-copies aliases and so never
+     * produced the reference.
+     */
+    #[BackupGlobals(true)]
+    #[RequiresPhpExtension('yaml')]
+    #[CoversNothing]
+    public function test_env_substitution_through_yaml_alias_does_not_inject_environment_variables(): void
+    {
+        $_SERVER['DO_NOT_REPLACE_ME'] = 'Never use this value';
+        $_SERVER['REPLACE_ME'] = '${DO_NOT_REPLACE_ME}';
+
+        $file = $this->cacheDir . '/alias-substitution.yaml';
+        file_put_contents($file, <<<'YAML'
+            file_format: "0.1"
+            resource:
+              attributes: &shared
+                - name: escaped
+                  value: $${DO_NOT_REPLACE_ME}
+                - name: indirect
+                  value: ${REPLACE_ME}
+              attributes_list: *shared
+            YAML);
+
+        try {
+            $loader = new Internal\ConfigurationLoader(null);
+            (new Loader\YamlExtensionFileLoader($loader, new FileLocator($this->cacheDir)))->load($file);
+            $configs = $loader->getConfigurations();
+
+            // The alias partner must hold the same literals, not twice-substituted values.
+            $this->assertSame(
+                $configs[0]['resource']['attributes'],
+                $configs[0]['resource']['attributes_list'],
+            );
+            $this->assertSame('$${DO_NOT_REPLACE_ME}', $configs[0]['resource']['attributes'][0]['value']);
+
+            // Mutating one side must not reach the other.
+            $configs[0]['resource']['attributes'][0]['value'] = 'probe';
+            $this->assertSame('$${DO_NOT_REPLACE_ME}', $configs[0]['resource']['attributes_list'][0]['value']);
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    /**
+     * End-to-end form of the above, driving the ext-yaml loader explicitly: `parseFile()` resolves
+     * loaders with symfony/yaml first, so in a checkout that has it the extension loader — and this
+     * bug — is never reached. An ext-yaml-only install is a supported deployment (both are merely
+     * suggested), which is the case this covers.
+     */
+    #[BackupGlobals(true)]
+    #[RequiresPhpExtension('yaml')]
+    #[CoversNothing]
+    public function test_escaped_substitution_under_yaml_alias_is_not_resolved(): void
+    {
+        $_SERVER['DO_NOT_REPLACE_ME'] = 'Never use this value';
+
+        $file = $this->cacheDir . '/alias-escape.yaml';
+        file_put_contents($file, <<<'YAML'
+            file_format: "0.1"
+            resource:
+              attributes:
+                - &shared
+                  name: escaped
+                  value: $${DO_NOT_REPLACE_ME}
+                - *shared
+            YAML);
+
+        try {
+            $loader = new Internal\ConfigurationLoader(null);
+            (new Loader\YamlExtensionFileLoader($loader, new FileLocator($this->cacheDir)))->load($file);
+            $parsed = self::factory()->process($loader->getConfigurations());
+
+            $attributes = self::getPropertiesFromPlugin($parsed)['resource']['attributes'];
+            $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes[0]['value']);
+            $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes[1]['value']);
+        } finally {
+            @unlink($file);
+        }
     }
 
     /**

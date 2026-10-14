@@ -42,6 +42,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -96,8 +97,8 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * Both roots must see the same values; YAML aliases can materialise as PHP references, which
-     * would let the first root processed mutate what the second sees.
+     * Reading instrumentation configuration must not disturb what the SDK root sees, and vice
+     * versa: both roots are processed from the one parsed document.
      */
     public function test_anchors_are_not_shared_between_roots(): void
     {
@@ -106,6 +107,33 @@ final class ConfigurationTest extends TestCase
         $config->create();
 
         $this->assertEquals($first, $config->getInstrumentationConfig());
+    }
+
+    /**
+     * An escaped `$${FOO}` is a request for the literal `${FOO}`, so it must survive into the built
+     * SDK unresolved even when the value sits under a YAML alias.
+     *
+     * Note this exercises whichever backend `parseFile()` selects, which is symfony/yaml wherever
+     * that is installed — so it does *not* on its own guard the ext-yaml reference bug this fixture
+     * was written for. Keeping it anyway: it pins the user-visible contract through a real built
+     * SDK under the backend most installs actually use. The ext-yaml half, where an alias becomes a
+     * PHP reference and substitution's write-back could resolve the escape, is guarded by
+     * `ConfigurationFactoryTest::test_escaped_substitution_under_yaml_alias_is_not_resolved()`,
+     * which drives that loader directly.
+     */
+    #[RequiresPhpExtension('yaml')]
+    public function test_escaped_substitution_under_yaml_alias_survives_into_built_sdk(): void
+    {
+        $this->setEnvironmentVariable('DO_NOT_REPLACE_ME', 'Never use this value');
+
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/alias-escaped-substitution.yaml')
+            ->create()
+            ->build();
+
+        $attributes = $this->getResource($sdk)->getAttributes()->toArray();
+
+        $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes['escaped'] ?? null);
+        $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes['escaped_via_alias'] ?? null);
     }
 
     public function test_unknown_php_instrumentation_is_skipped_with_warning(): void

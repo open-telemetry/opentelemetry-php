@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK;
 
-use function is_array;
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
@@ -60,7 +59,7 @@ final class Configuration
         $configs = $this->configs ??= ConfigurationFileLoader::load($this->file);
 
         return self::instrumentationFactory($this->envReader)
-            ->process(self::copy($configs))
+            ->process($configs)
             ->create($context);
     }
 
@@ -81,24 +80,7 @@ final class Configuration
 
         $configs = ConfigurationFileLoader::load($file);
 
-        return new self(self::sdkFactory($envReader)->process(self::copy($configs)), $file, $envReader, $configs);
-    }
-
-    /**
-     * YAML aliases materialise as PHP references under ext-yaml (symfony/yaml deep-copies
-     * instead), and references survive the by-value copy
-     * {@see \Symfony\Component\Config\Definition\Processor::process()} makes. Environment
-     * substitution writes back into the array it is given, so without a deep copy the first root
-     * processed would mutate what the second sees.
-     */
-    private static function copy(array $configs): array
-    {
-        $copy = [];
-        foreach ($configs as $key => $value) {
-            $copy[$key] = is_array($value) ? self::copy($value) : $value;
-        }
-
-        return $copy;
+        return new self(self::sdkFactory($envReader)->process($configs), $file, $envReader, $configs);
     }
 
     /**
