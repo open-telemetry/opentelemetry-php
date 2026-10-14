@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\Config\SDK\Configuration;
 
 use BadMethodCallException;
 use ExampleSDK\ComponentProvider;
+use InvalidArgumentException;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
@@ -306,6 +307,36 @@ final class ConfigurationFactoryTest extends TestCase
             $attributes = self::getPropertiesFromPlugin($parsed)['resource']['attributes'];
             $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes[0]['value']);
             $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes[1]['value']);
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    /**
+     * A recursive alias resolves to a genuinely self-referential array under ext-yaml, which has no
+     * finite by-value copy. It must be rejected with an exception the caller can catch, not left to
+     * exhaust memory — autoload degrades to a noop configuration on `Throwable`, and a memory
+     * fatal would take the process with it instead. symfony/yaml rejects these at parse time.
+     */
+    #[RequiresPhpExtension('yaml')]
+    #[CoversNothing]
+    public function test_recursive_yaml_alias_is_rejected(): void
+    {
+        $file = $this->cacheDir . '/recursive-alias.yaml';
+        file_put_contents($file, <<<'YAML'
+            file_format: "0.1"
+            resource: &recursive
+              attributes:
+                - *recursive
+            YAML);
+
+        try {
+            $loader = new Internal\ConfigurationLoader(null);
+
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionMessageMatches('/recursive YAML alias/');
+
+            (new Loader\YamlExtensionFileLoader($loader, new FileLocator($this->cacheDir)))->load($file);
         } finally {
             @unlink($file);
         }
