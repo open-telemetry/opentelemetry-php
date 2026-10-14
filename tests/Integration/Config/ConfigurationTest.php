@@ -19,7 +19,6 @@ use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
-use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -107,16 +106,6 @@ final class ConfigurationTest extends TestCase
         $config->create();
 
         $this->assertEquals($first, $config->getInstrumentationConfig());
-    }
-
-    /**
-     * @phan-suppress PhanDeprecatedClass
-     */
-    public function test_deprecated_instrumentation_entry_point(): void
-    {
-        $registry = Instrumentation::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml')->create();
-
-        $this->assertInstanceOf(HttpConfig::class, $registry->get(HttpConfig::class));
     }
 
     public function test_unknown_php_instrumentation_is_skipped_with_warning(): void
