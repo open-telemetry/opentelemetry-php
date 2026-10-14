@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK;
 
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Configuration\ConfigProviderInterface;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\SDK\Common\Configuration\Configuration as EnvConfiguration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use Psr\Log\LogLevel;
 use function sprintf;
 use Throwable;
 
@@ -27,8 +27,6 @@ use Throwable;
  */
 final class ConfigProvider implements ConfigProviderInterface
 {
-    use LogsMessagesTrait;
-
     #[\Override]
     public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties
     {
@@ -40,7 +38,7 @@ final class ConfigProvider implements ConfigProviderInterface
             return Configuration::parseFile(EnvConfiguration::getList(Variables::OTEL_CONFIG_FILE))
                 ->getInstrumentationConfig($context);
         } catch (Throwable $e) {
-            self::logWarning(sprintf('Error during opentelemetry initialization: %s', $e->getMessage()), ['exception' => $e]);
+            $context->logger->log(LogLevel::WARNING, sprintf('Error during opentelemetry initialization: %s', $e->getMessage()), ['exception' => $e]);
 
             return new NoopConfigProperties();
         }
