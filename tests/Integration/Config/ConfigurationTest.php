@@ -352,10 +352,9 @@ final class ConfigurationTest extends TestCase
                       - ${TEST_NUMERIC_HEADER}
             YAML)])->create(new Context());
 
-        $this->assertSame(
-            ['x-request-id', '8080'],
-            $registry->get(HttpConfig::class)?->config['client']['request_captured_headers'],
-        );
+        $http = $registry->get(HttpConfig::class);
+        $this->assertNotNull($http);
+        $this->assertSame(['x-request-id', '8080'], $http->config['client']['request_captured_headers']);
     }
 
     /**
