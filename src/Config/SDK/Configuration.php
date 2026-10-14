@@ -88,7 +88,8 @@ final class Configuration
     }
 
     /**
-     * YAML aliases can materialise as PHP references, which survive the by-value copy
+     * YAML aliases materialise as PHP references under ext-yaml (symfony/yaml deep-copies
+     * instead), and references survive the by-value copy
      * {@see \Symfony\Component\Config\Definition\Processor::process()} makes. Environment
      * substitution writes back into the array it is given, so without a deep copy the first root
      * processed would mutate what the second sees.
