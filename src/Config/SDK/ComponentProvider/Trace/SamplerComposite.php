@@ -28,10 +28,6 @@ final class SamplerComposite implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        if (\count($properties) !== 1) {
-            throw new \InvalidArgumentException('composite/development must have exactly one composable sampler defined');
-        }
-
         $sampler = $properties[0]->create($context);
 
         // Built-in composable samplers already are samplers; any other composable sampler is wrapped
@@ -43,6 +39,14 @@ final class SamplerComposite implements ComponentProvider
     {
         $node = $registry->componentMap('composite/development', ComposableInterface::class);
         $node->isRequired();
+        // The schema requires exactly one composable sampler (minProperties: 1, maxProperties: 1)
+        $node->validate()->always(static function (array $value): array {
+            if (\count($value) !== 1) {
+                throw new \InvalidArgumentException(\sprintf('Composite sampler must have exactly one composable sampler defined, got %d', \count($value)));
+            }
+
+            return $value;
+        });
 
         return $node;
     }
