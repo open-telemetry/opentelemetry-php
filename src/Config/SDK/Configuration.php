@@ -56,10 +56,10 @@ final class Configuration
      */
     public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties
     {
-        // Processed here rather than in parseFile() because the two roots legitimately disagree
-        // about the same document: the SDK root ignores extra keys and discards
-        // instrumentation/development, while this root validates it and rejects unknown providers.
-        // Deferring keeps a file whose instrumentation block we cannot parse from breaking the SDK.
+        // Processed on demand rather than in parseFile() so that a node we cannot parse costs the
+        // caller its instrumentation config and nothing else; see
+        // {@see InstrumentationConfigurationRegistry} for why that independence is worth a second
+        // pass over the same document.
         $configs = $this->configs ??= ConfigurationFileLoader::load($this->file);
 
         return self::instrumentationFactory($this->envReader)

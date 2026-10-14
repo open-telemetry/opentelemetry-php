@@ -219,4 +219,29 @@ class SdkAutoloaderTest extends TestCase
         yield 'malformed' => [__DIR__ . '/fixtures/otel-sdk-malformed.yaml'];
         yield 'schema-invalid' => [__DIR__ . '/fixtures/otel-sdk-invalid.yaml'];
     }
+
+    /**
+     * The SDK and instrumentation roots are processed separately, so an `instrumentation/development`
+     * node that does not validate must not cost us the SDK configured by the same document.
+     */
+    public function test_autoload_with_unusable_instrumentation_config(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())->method('write')->with(
+            $this->anything(),
+            $this->stringContains('Error during opentelemetry initialization'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk-invalid-instrumentation.yaml');
+
+        try {
+            $this->assertTrue(SdkAutoloader::autoload());
+            $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        } finally {
+            Logging::reset();
+        }
+    }
 }

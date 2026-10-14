@@ -19,10 +19,27 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * Root for the `instrumentation/development` node, processed separately from {@see OpenTelemetrySdk}
+ * even though both describe the same document.
+ *
+ * The separation buys independent failure: a node that does not validate costs us the
+ * instrumentation config and nothing else, leaving the SDK configured. That matters because
+ * `/development` is exempt from the file format's versioning guarantees, so this node is the part
+ * of the document most likely to disagree with what we can parse. Appending it to the SDK root
+ * instead would make one bad header list fatal to tracing — `ignoreExtraKeys()` and
+ * {@see IgnoresUnknownProviders} only tolerate unknown keys and unregistered providers, not a known
+ * node that fails type validation.
+ *
  * @internal
- * @todo In a future release, when all instrumentations use SPI (and not autoload.files), the
- *       `instrumentation/development` node could be appended by {@see OpenTelemetrySdk} and this
- *       provider removed. The API side is settled by the spec and stays in `API`.
+ * @todo Append `instrumentation/development` to {@see OpenTelemetrySdk} and remove this provider,
+ *       once that node graduates into the versioned schema — losing its `/development` suffix — and
+ *       so no longer needs to fail on its own. Merging is already possible without losing the
+ *       independence (declare the node as a variable node and run this schema through a nested
+ *       processor inside its validation closure, as
+ *       {@see \OpenTelemetry\Config\SDK\Configuration\Internal\ComponentProviderRegistry::process()}
+ *       already does), but until the versioning caveat lifts it trades a statically declared schema
+ *       for a hand-rolled closure to save one tree walk, now that
+ *       {@see \OpenTelemetry\Config\SDK\Configuration} reads the file once.
  * @implements ComponentProvider<ConfigurationRegistry>
  */
 class InstrumentationConfigurationRegistry implements ComponentProvider

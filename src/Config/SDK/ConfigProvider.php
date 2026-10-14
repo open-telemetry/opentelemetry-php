@@ -15,15 +15,15 @@ use function sprintf;
 use Throwable;
 
 /**
- * SPI service giving {@see \OpenTelemetry\SDK\SdkAutoloader} access to file-based instrumentation
- * configuration without a hard dependency on this package. Registered under
- * {@see ConfigProviderInterface}; the autoloader falls back to the API's noop provider when this
- * package is absent.
+ * Reads file-based instrumentation configuration from `OTEL_CONFIG_FILE`, registered under
+ * {@see ConfigProviderInterface} via SPI.
+ *
+ * This is the spec's entry point for instrumentations that read their own configuration without
+ * depending on the SDK. It is deliberately not on {@see \OpenTelemetry\SDK\SdkAutoloader}'s path:
+ * the autoloader parses the document once and reads both configuration roots off that single
+ * {@see Configuration}, so resolving this service there would cost it a second parse.
  *
  * @experimental
- * @todo Remove once the SDK can parse both configuration roots in one pass, which SPI-based
- *       instrumentation registration in SDK 2.0 makes possible. The indirection exists only
- *       because `open-telemetry/sdk` merely suggests `open-telemetry/sdk-configuration`.
  */
 final class ConfigProvider implements ConfigProviderInterface
 {
