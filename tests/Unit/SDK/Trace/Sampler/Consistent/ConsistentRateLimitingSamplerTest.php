@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\SDK\Unit\Trace\Sampler\Consistent;
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
 
 use InvalidArgumentException;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
