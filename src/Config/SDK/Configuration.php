@@ -24,20 +24,17 @@ use WeakMap;
 
 final class Configuration
 {
-    /** @var array|null loaded configurations, null until the file is read */
-    private ?array $configs;
-
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
      * @param string|list<string> $file
+     * @param array|null $configs loaded configurations, null until the file is read
      */
     private function __construct(
         private readonly ComponentPlugin $sdkPlugin,
         private readonly string|array $file,
         private readonly ?EnvReader $envReader,
-        ?array $configs,
+        private ?array $configs = null,
     ) {
-        $this->configs = $configs;
     }
 
     public function create(Context $context = new Context()): SdkBuilder
@@ -79,7 +76,7 @@ final class Configuration
         if ($cacheFile !== null) {
             // The on-disk cache holds the SDK root only, so leave its load to parseFile() and read
             // the file again if and when instrumentation configuration is asked for.
-            return new self(self::sdkFactory($envReader)->parseFile($file, $cacheFile, $debug), $file, $envReader, null);
+            return new self(self::sdkFactory($envReader)->parseFile($file, $cacheFile, $debug), $file, $envReader);
         }
 
         $configs = ConfigurationFileLoader::load($file);
