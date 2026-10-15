@@ -77,13 +77,7 @@ class SdkAutoloader
         }
         self::registerInstrumentations();
 
-        if (AutoRootSpan::isEnabled()) {
-            $request = AutoRootSpan::createRequest();
-            if ($request) {
-                AutoRootSpan::create($request);
-                AutoRootSpan::registerShutdownHandler();
-            }
-        }
+        AutoRootSpan::start();
 
         return true;
     }

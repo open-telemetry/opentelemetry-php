@@ -382,4 +382,58 @@ class AutoRootSpanTest extends TestCase
 
         Context::storage()->scope()?->detach();
     }
+
+    #[BackupGlobals(true)]
+    public function test_is_enabled_by_transaction_span_flag_and_experimental_alias(): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $this->assertFalse(AutoRootSpan::isEnabled());
+
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, 'true');
+        $this->assertTrue(AutoRootSpan::isEnabled());
+    }
+
+    public function test_start_does_nothing_when_root_span_already_started(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $span = $this->createMock(SpanInterface::class);
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $spanBuilder->method('setSpanKind')->willReturnSelf();
+        $spanBuilder->method('setStartTimestamp')->willReturnSelf();
+        $spanBuilder->method('setParent')->willReturnSelf();
+        $spanBuilder->method('startSpan')->willReturn($span);
+        $this->tracer->expects($this->once())->method('spanBuilder')->willReturn($spanBuilder);
+
+        AutoRootSpan::start();
+        AutoRootSpan::start();
+
+        Context::storage()->scope()?->detach();
+    }
+
+    #[BackupGlobals(true)]
+    #[DataProvider('conflictingFlagsProvider')]
+    public function test_transaction_span_flag_wins_over_experimental_alias(?string $transaction, ?string $experimental, bool $expected): void
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        if ($transaction !== null) {
+            $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, $transaction);
+        }
+        if ($experimental !== null) {
+            $this->setEnvironmentVariable(Variables::OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN, $experimental);
+        }
+
+        $this->assertSame($expected, AutoRootSpan::isEnabled());
+    }
+
+    public static function conflictingFlagsProvider(): array
+    {
+        return [
+            'both unset' => [null, null, false],
+            'only alias true' => [null, 'true', true],
+            'only alias false' => [null, 'false', false],
+            'new true, alias false' => ['true', 'false', true],
+            'new false, alias true' => ['false', 'true', false],
+            'both true' => ['true', 'true', true],
+        ];
+    }
 }

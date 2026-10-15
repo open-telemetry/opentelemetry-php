@@ -35,30 +35,50 @@ class AutoRootSpan
 
     private static bool $responseHeaderHookRegistered = false;
 
+    /**
+     * Whether a root span should be created for the current web request.
+     * OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN is a legacy alias of OTEL_PHP_TRANSACTION_SPAN_ENABLED, used only when the latter is unset.
+     */
     public static function isEnabled(): bool
     {
         return
             !empty($_SERVER['REQUEST_METHOD'] ?? null)
-            && Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN);
+            && self::isWebSpanEnabled();
+    }
+
+    /**
+     * OTEL_PHP_TRANSACTION_SPAN_ENABLED wins when it is set (also to false), otherwise the legacy alias decides.
+     */
+    private static function isWebSpanEnabled(): bool
+    {
+        return Configuration::has(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED)
+            ? Configuration::getBoolean(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED)
+            : Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN);
     }
 
     /**
      * Creates the root span for the current request or CLI script, the same way the OpenTelemetry PHP distro does.
-     * Enabled by OTEL_PHP_TRANSACTION_SPAN_ENABLED (web) or OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI (CLI),
-     * which a distro can default to true.
+     * Enabled by OTEL_PHP_TRANSACTION_SPAN_ENABLED (web; OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN is a legacy alias used only when it is unset) or
+     * OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI (CLI). Both default to false, a distro can default them to true.
+     * Does nothing when a root span was already started by this class.
      *
      * @param callable|null $notifySpanEnded called at shutdown, right before the root span ends
      */
     public static function start(?callable $notifySpanEnded = null): void
     {
+        if (self::$rootScope !== null) {
+            self::logDebug('Root span already started');
+
+            return;
+        }
         if (self::isCliSapi()) {
-            if (!Configuration::getBoolean(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, false)) {
+            if (!Configuration::getBoolean(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI)) {
                 self::logDebug('OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI not set to true');
 
                 return;
             }
-        } elseif (!Configuration::getBoolean(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, false)) {
-            self::logDebug('OTEL_PHP_TRANSACTION_SPAN_ENABLED not set to true');
+        } elseif (!self::isWebSpanEnabled()) {
+            self::logDebug('neither OTEL_PHP_TRANSACTION_SPAN_ENABLED nor OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN set to true');
 
             return;
         }
