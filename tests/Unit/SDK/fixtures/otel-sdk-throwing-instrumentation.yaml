@@ -1,0 +1,14 @@
+file_format: '1.0'
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    always_off:
+
+# Schema-valid, but the provider backing this entry throws from createPlugin().
+instrumentation/development:
+  php:
+    throwing_instrumentation:

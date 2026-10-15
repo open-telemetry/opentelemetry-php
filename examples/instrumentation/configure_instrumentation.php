@@ -20,8 +20,9 @@ use const PHP_EOL;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-Configuration::parseFile(__DIR__ . '/otel-sdk.yaml')->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
-$configuration = \OpenTelemetry\Config\SDK\Instrumentation::parseFile(__DIR__ . '/otel-sdk.yaml')->create();
+$config = Configuration::parseFile(__DIR__ . '/otel-sdk.yaml');
+$config->create(new Context())->setAutoShutdown(true)->buildAndRegisterGlobal();
+$configuration = $config->getInstrumentationConfig();
 $hookManager = new ExtensionHookManager();
 $context = new \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Context(Globals::tracerProvider(), Globals::meterProvider(), Globals::loggerProvider(), Globals::propagator());
 

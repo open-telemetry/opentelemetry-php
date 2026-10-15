@@ -10,10 +10,7 @@ Everything here is a **verbatim copy** from
 and used to build an SDK. Fixtures we maintain ourselves live in the parent directory.
 
 Each file is also parsed as instrumentation configuration, which keeps only the
-`instrumentation/development` root that the SDK parse discards. A file whose SDK configuration does
-not parse has to be fixed, but one this SDK cannot parse as instrumentation configuration yet is
-still synced, and listed in `ConfigurationTest::knownInstrumentationParseFailures()` with the reason
-— currently the two experimental-instrumentation snippets and `otel-sdk-migration-config.yaml`.
+`instrumentation/development` root that the SDK parse discards.
 
 ## Keeping them in sync
 

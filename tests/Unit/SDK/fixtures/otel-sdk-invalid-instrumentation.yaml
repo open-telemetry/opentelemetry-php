@@ -1,0 +1,18 @@
+file_format: '1.0'
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  sampler:
+    always_off:
+
+# `request_captured_headers` is a list of header names; a map is a schema violation. The SDK root
+# above is valid, so the SDK must still be configured from this file.
+instrumentation/development:
+  general:
+    http:
+      client:
+        request_captured_headers:
+          - Content-Type: text/plain

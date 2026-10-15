@@ -11,11 +11,14 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
+use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -41,7 +44,9 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -78,35 +83,309 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('openTelemetryConfigurationDataProvider')]
     public function test_instrumentation_configuration(string $file): void
     {
-        $expectedFailure = self::knownInstrumentationParseFailures()[basename($file)] ?? null;
+        $this->expectNotToPerformAssertions();
+        Configuration::parseFile($file)->getInstrumentationConfig();
+    }
 
-        if ($expectedFailure === null) {
-            $this->expectNotToPerformAssertions();
-            Instrumentation::parseFile($file)->create();
+    public function test_one_load_serves_both_roots(): void
+    {
+        $config = Configuration::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml');
 
-            return;
-        }
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessageMatches($expectedFailure);
-        Instrumentation::parseFile($file)->create();
+        $this->assertInstanceOf(TracerProvider::class, $config->create()->build()->getTracerProvider());
+        $this->assertInstanceOf(
+            HttpConfig::class,
+            $config->getInstrumentationConfig()->get(HttpConfig::class),
+        );
     }
 
     /**
-     * Upstream files whose `instrumentation/development` root this SDK cannot parse yet, which
-     * {@see Instrumentation::parseFile()} parses and {@see Configuration::parseFile()} discards.
-     * They are still synced verbatim, so the gap stays visible and tracked. Failures are asserted
-     * rather than skipped, so that fixing a blocker fails here and forces its entry to be removed.
-     *
-     * @return array<string, non-empty-string> file name => expected exception message pattern
+     * Reading instrumentation configuration must not disturb what the SDK root sees, and vice
+     * versa: both roots are processed from the one parsed document.
      */
-    private static function knownInstrumentationParseFailures(): array
+    public function test_anchors_are_not_shared_between_roots(): void
     {
-        return [
-            'ExperimentalGeneralInstrumentation_semconv_stability_opt_in.yaml' => '/unknown provider "stability_opt_in_list"/',
-            'ExperimentalInstrumentation_kitchen_sink.yaml' => '/unknown provider "example"/',
-            'otel-sdk-migration-config.yaml' => '/unknown provider "stability_opt_in_list"/',
-        ];
+        $config = Configuration::parseFile(__DIR__ . '/configurations/anchors.yaml');
+        $first = $config->getInstrumentationConfig();
+        $config->create();
+
+        $this->assertEquals($first, $config->getInstrumentationConfig());
+    }
+
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
+    public function test_deprecated_instrumentation_entry_point(): void
+    {
+        $registry = Instrumentation::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml')->create();
+
+        $this->assertInstanceOf(HttpConfig::class, $registry->get(HttpConfig::class));
+    }
+
+    /**
+     * An escaped `$${FOO}` is a request for the literal `${FOO}`, so it must survive into the built
+     * SDK unresolved even when the value sits under a YAML alias.
+     *
+     * Note this exercises whichever backend `parseFile()` selects, which is symfony/yaml wherever
+     * that is installed — so it does *not* on its own guard the ext-yaml reference bug this fixture
+     * was written for. Keeping it anyway: it pins the user-visible contract through a real built
+     * SDK under the backend most installs actually use. The ext-yaml half, where an alias becomes a
+     * PHP reference and substitution's write-back could resolve the escape, is guarded by
+     * `ConfigurationFactoryTest::test_escaped_substitution_under_yaml_alias_is_not_resolved()`,
+     * which drives that loader directly.
+     */
+    #[RequiresPhpExtension('yaml')]
+    public function test_escaped_substitution_under_yaml_alias_survives_into_built_sdk(): void
+    {
+        $this->setEnvironmentVariable('DO_NOT_REPLACE_ME', 'Never use this value');
+
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/alias-escaped-substitution.yaml')
+            ->create()
+            ->build();
+
+        $attributes = $this->getResource($sdk)->getAttributes()->toArray();
+
+        $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes['escaped'] ?? null);
+        $this->assertSame('${DO_NOT_REPLACE_ME}', $attributes['escaped_via_alias'] ?? null);
+    }
+
+    public function test_unknown_php_instrumentation_is_skipped_with_warning(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('Ignoring "php" entry "not_installed"'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $registry = self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+                instrumentation/development:
+                  php:
+                    not_installed:
+                      span_name: whatever
+                YAML)])->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+
+        $this->assertNull($registry->get(HttpConfig::class));
+    }
+
+    public function test_unknown_general_key_is_dropped(): void
+    {
+        $registry = self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              general:
+                not_a_semconv_domain:
+                  whatever: true
+                http:
+                  client:
+                    request_captured_headers:
+                      - Content-Type
+            YAML)])->create(new Context());
+
+        $http = $registry->get(HttpConfig::class);
+        $this->assertNotNull($http);
+        $this->assertSame(['Content-Type'], $http->config['client']['request_captured_headers']);
+    }
+
+    /**
+     * `ignoreExtraKeys()` applies only to a node's direct children, so tolerance has to be declared
+     * at every depth. A key added to any of these nodes in an upstream minor release must not take
+     * the SDK down.
+     */
+    #[DataProvider('unknownNestedKeyProvider')]
+    public function test_unknown_nested_general_key_is_dropped(string $yaml): void
+    {
+        $registry = self::instrumentationFactory()
+            ->process([Yaml::parse($yaml)])
+            ->create(new Context());
+
+        $this->assertNotNull($registry->get(HttpConfig::class));
+    }
+
+    public static function unknownNestedKeyProvider(): iterable
+    {
+        // `http` is always declared, so the assertion has a HttpConfig to find; the unknown key
+        // moves around it.
+        yield 'general.http' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  brand_new: true
+            YAML];
+        yield 'general.http.client' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    brand_new: true
+            YAML];
+        yield 'general.http.server' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  server:
+                    brand_new: true
+            YAML];
+        yield 'general.http.semconv' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  semconv:
+                    brand_new: true
+            YAML];
+        yield 'general.code' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                code:
+                  brand_new: true
+            YAML];
+        yield 'general.code.semconv' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                code:
+                  semconv:
+                    brand_new: true
+            YAML];
+        yield 'general.sanitization' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                sanitization:
+                  brand_new: true
+            YAML];
+        yield 'general.sanitization.url' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http: {}
+                sanitization:
+                  url:
+                    brand_new: true
+            YAML];
+    }
+
+    /**
+     * Tolerating unknown keys must not become tolerating anything: a declared key with the wrong
+     * type is still a configuration error.
+     */
+    public function test_nested_known_key_is_still_validated(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  semconv:
+                    version: not_an_integer
+            YAML)])->create(new Context());
+    }
+
+    /**
+     * The schema declares these lists as `items: type: string`, but Symfony's `scalarPrototype()`
+     * accepts any scalar, so each needs {@see Validation::ensureString()} to reject the rest.
+     */
+    #[DataProvider('nonStringListProvider')]
+    public function test_string_lists_reject_non_string_items(string $yaml): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        self::instrumentationFactory()->process([Yaml::parse($yaml)])->create(new Context());
+    }
+
+    public static function nonStringListProvider(): iterable
+    {
+        yield 'sensitive_query_parameters' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                sanitization:
+                  url:
+                    sensitive_query_parameters: [123]
+            YAML];
+        yield 'request_captured_headers' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    request_captured_headers: [123]
+            YAML];
+        yield 'response_captured_headers' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  server:
+                    response_captured_headers: [true]
+            YAML];
+        yield 'known_methods' => [<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    known_methods: [4.5]
+            YAML];
+    }
+
+    /**
+     * The counterpart to the above: an environment placeholder resolves to a string, so a variable
+     * whose value merely looks numeric must still pass.
+     */
+    public function test_string_lists_accept_substituted_values(): void
+    {
+        $factory = new ConfigurationFactory(
+            ServiceLoader::load(ComponentProvider::class),
+            new InstrumentationConfigurationRegistry(),
+            new EnvSourceReader([new ArrayEnvSource([
+                'TEST_HEADER_NAME' => 'x-request-id',
+                'TEST_NUMERIC_HEADER' => '8080',
+            ])]),
+        );
+
+        $registry = $factory->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              general:
+                http:
+                  client:
+                    request_captured_headers:
+                      - ${TEST_HEADER_NAME}
+                      - ${TEST_NUMERIC_HEADER}
+            YAML)])->create(new Context());
+
+        $http = $registry->get(HttpConfig::class);
+        $this->assertNotNull($http);
+        $this->assertSame(['x-request-id', '8080'], $http->config['client']['request_captured_headers']);
+    }
+
+    /**
+     * The `Context` passed to {@see Configuration::getInstrumentationConfig()} must reach
+     * {@see \OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin}, which is how
+     * a file-configured `log_level` will be honoured once the caller has one.
+     */
+    public function test_context_logger_receives_skipped_component_warning(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(
+            LogLevel::WARNING,
+            $this->stringContains('Ignoring "php" entry "not_installed"'),
+        );
+
+        $registry = self::instrumentationFactory()->process([Yaml::parse(<<<'YAML'
+            instrumentation/development:
+              php:
+                not_installed: {}
+            YAML)])->create((new Context())->withLogger($logger));
+
+        $this->assertNull($registry->get(HttpConfig::class));
+    }
+
+    private static function instrumentationFactory(): ConfigurationFactory
+    {
+        return new ConfigurationFactory(
+            ServiceLoader::load(ComponentProvider::class),
+            new InstrumentationConfigurationRegistry(),
+            new EnvSourceReader([]),
+        );
     }
 
     public static function openTelemetryConfigurationDataProvider(): iterable

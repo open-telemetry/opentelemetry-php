@@ -169,8 +169,6 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Process",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Detector\\Service",
 
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Instrumentation\\General\\HttpConfigProvider",
-
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk",
 
                 "OpenTelemetry\\Example\\ExampleConfigProvider",
@@ -201,6 +199,9 @@
                 "OpenTelemetry\\SDK\\ConfigEnv\\Distribution\\DistributionConfigurationSdk",
 
                 "OpenTelemetry\\Example\\ExampleConfigLoader"
+            ],
+            "OpenTelemetry\\API\\Configuration\\ConfigProviderInterface": [
+                "OpenTelemetry\\Config\\SDK\\ConfigProvider"
             ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
               "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"

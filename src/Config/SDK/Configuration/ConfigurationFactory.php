@@ -6,7 +6,6 @@ namespace OpenTelemetry\Config\SDK\Configuration;
 
 use function class_exists;
 use Exception;
-use function getcwd;
 use function is_file;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
@@ -14,7 +13,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvResourceChecker;
 use OpenTelemetry\Config\SDK\Configuration\Internal\CompiledConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ComponentProviderRegistry;
-use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationLoader;
+use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationFileLoader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ArrayNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\BooleanNodeDefinition;
@@ -27,15 +26,10 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\VariableNodeD
 use OpenTelemetry\Config\SDK\Configuration\Internal\NormalizationsAware;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
-use OpenTelemetry\Config\SDK\Configuration\Loader\YamlExtensionFileLoader;
-use OpenTelemetry\Config\SDK\Configuration\Loader\YamlSymfonyFileLoader;
 use function serialize;
 use function sprintf;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\VarExporter\VarExporter;
@@ -108,20 +102,8 @@ final class ConfigurationFactory
             $resources->addClassResource(VarExporter::class);
         }
 
-        $loader = new ConfigurationLoader($resources);
-        $cwd = getcwd() ?: [];
-        $locator = new FileLocator($cwd);
-        $fileLoader = new DelegatingLoader(new LoaderResolver([
-            new YamlSymfonyFileLoader($loader, $locator),
-            new YamlExtensionFileLoader($loader, $locator),
-        ]));
-
-        foreach ((array) $file as $path) {
-            $fileLoader->load($path);
-        }
-
         $configuration = $this->compiledFactory
-            ->process($loader->getConfigurations(), $resources);
+            ->process(ConfigurationFileLoader::load($file, $resources), $resources);
 
         $cache?->write(
             class_exists(VarExporter::class)

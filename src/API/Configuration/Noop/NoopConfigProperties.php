@@ -6,6 +6,9 @@ namespace OpenTelemetry\API\Configuration\Noop;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
 
+/**
+ * @experimental
+ */
 class NoopConfigProperties implements ConfigProperties
 {
     #[\Override]
