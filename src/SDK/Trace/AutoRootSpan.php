@@ -53,6 +53,7 @@ class AutoRootSpan
     {
         return Configuration::has(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED)
             ? Configuration::getBoolean(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED)
+            // @phan-suppress-next-line PhanDeprecatedClassConstant the deprecated alias is supported on purpose
             : Configuration::getBoolean(Variables::OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN);
     }
 

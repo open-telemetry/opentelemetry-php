@@ -119,6 +119,9 @@ interface Defaults
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = [];
     public const OTEL_PHP_LOGS_PROCESSOR = 'batch';
     public const OTEL_PHP_LOG_DESTINATION = 'default';
+    /**
+     * @deprecated use OTEL_PHP_TRANSACTION_SPAN_ENABLED, this will be removed in SDK v2
+     */
     public const OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN = 'false';
     public const OTEL_PHP_TRANSACTION_SPAN_ENABLED = 'false';
     public const OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI = 'false';
