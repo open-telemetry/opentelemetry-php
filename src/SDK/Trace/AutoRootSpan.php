@@ -75,7 +75,8 @@ class AutoRootSpan
 
             return;
         }
-        if (self::isCliSapi()) {
+        $cli = self::isCliScript();
+        if ($cli) {
             if (!Configuration::getBoolean(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI)) {
                 self::logDebug('OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI not set to true');
 
@@ -99,13 +100,17 @@ class AutoRootSpan
 
             return;
         }
-        self::create($request, self::isCliSapi());
+        self::create($request, $cli);
         self::registerShutdownHandler($notifySpanEnded);
     }
 
-    private static function isCliSapi(): bool
+    /**
+     * A script run in the CLI SAPI that does not emulate a web request (it has no REQUEST_METHOD).
+     * A request emulated in the CLI (e.g. by a test harness) is still treated as a web request, as it always was.
+     */
+    private static function isCliScript(): bool
     {
-        return php_sapi_name() === 'cli';
+        return php_sapi_name() === 'cli' && empty($_SERVER['REQUEST_METHOD'] ?? null);
     }
 
     /**

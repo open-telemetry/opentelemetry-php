@@ -508,6 +508,37 @@ class AutoRootSpanTest extends TestCase
         );
     }
 
+    #[BackupGlobals(true)]
+    public function test_start_treats_an_emulated_web_request_in_the_cli_as_a_web_request(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, 'true');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/foo?bar=baz';
+
+        $span = $this->createMock(SpanInterface::class);
+        $this->tracer
+            ->expects($this->once())
+            ->method('spanBuilder')
+            ->with($this->equalTo('GET /foo'))
+            ->willReturn($this->spanBuilderReturning($span));
+
+        AutoRootSpan::start();
+
+        Context::storage()->scope()?->detach();
+    }
+
+    #[BackupGlobals(true)]
+    public function test_start_does_not_create_a_web_span_for_an_emulated_request_when_web_spans_are_disabled(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, 'false');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $this->tracer->expects($this->never())->method('spanBuilder');
+
+        AutoRootSpan::start();
+    }
+
     /**
      * @param SpanInterface&MockObject $span
      */
