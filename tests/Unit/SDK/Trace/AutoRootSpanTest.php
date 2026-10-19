@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\SDK\Trace;
 
 use Nyholm\Psr7\ServerRequest;
 use OpenTelemetry\API\Common\Time\ClockInterface;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\Span;
@@ -53,6 +54,9 @@ class AutoRootSpanTest extends TestCase
     public function tearDown(): void
     {
         (new \ReflectionProperty(AutoRootSpan::class, 'rootScope'))->setValue(null, null);
+        (new \ReflectionProperty(AutoRootSpan::class, 'hookManager'))->setValue(null, null);
+        (new \ReflectionProperty(AutoRootSpan::class, 'responseHeaderHookRegistered'))->setValue(null, false);
+        (new \ReflectionProperty(AutoRootSpan::class, 'capturedResponseHeaders'))->setValue(null, []);
         $this->scope->detach();
     }
 
@@ -435,5 +439,110 @@ class AutoRootSpanTest extends TestCase
             'new false, alias true' => ['false', 'true', false],
             'both true' => ['true', 'true', true],
         ];
+    }
+
+    public function test_response_header_hook_is_registered_on_the_hook_manager(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_RESPONSE_HEADERS, 'X-Foo');
+        $hookManager = $this->useFakeHookManager();
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($this->createMock(SpanInterface::class)));
+
+        AutoRootSpan::create(new ServerRequest('GET', 'https://example.com/'));
+        // the hook is registered only once, even when the root span is created again
+        AutoRootSpan::create(new ServerRequest('GET', 'https://example.com/'));
+
+        $this->assertCount(1, $hookManager->hooks);
+        $this->assertNull($hookManager->hooks[0]['class']);
+        $this->assertSame('header', $hookManager->hooks[0]['function']);
+        $this->assertNotNull($hookManager->hooks[0]['pre']);
+        $this->assertNull($hookManager->hooks[0]['post']);
+
+        Context::storage()->scope()?->detach();
+        Context::storage()->scope()?->detach();
+    }
+
+    public function test_response_header_hook_is_not_registered_without_configured_headers(): void
+    {
+        $hookManager = $this->useFakeHookManager();
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($this->createMock(SpanInterface::class)));
+
+        AutoRootSpan::create(new ServerRequest('GET', 'https://example.com/'));
+
+        $this->assertSame([], $hookManager->hooks);
+
+        Context::storage()->scope()?->detach();
+    }
+
+    public function test_response_header_hook_records_configured_headers_only(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_INSTRUMENTATION_HTTP_SERVER_CAPTURE_RESPONSE_HEADERS, 'X-Foo,X-Multi');
+        $hookManager = $this->useFakeHookManager();
+        $recorded = [];
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('setAttribute')->willReturnCallback(
+            static function (string $key, mixed $value) use (&$recorded, $span): SpanInterface {
+                $recorded[$key] = $value;
+
+                return $span;
+            },
+        );
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        AutoRootSpan::create(new ServerRequest('GET', 'https://example.com/'));
+        $pre = $hookManager->hooks[0]['pre'];
+        $this->assertInstanceOf(\Closure::class, $pre);
+        $pre(null, ['X-Foo: bar'], null, 'header', null, null);
+        $pre(null, ['X-Foo: replaced'], null, 'header', null, null);
+        $pre(null, ['X-Multi: a'], null, 'header', null, null);
+        $pre(null, ['X-Multi:  b ', false], null, 'header', null, null);
+        $pre(null, ['X-Other: ignored'], null, 'header', null, null);
+        $pre(null, ['no colon'], null, 'header', null, null);
+        $pre(null, [], null, 'header', null, null);
+        $pre(null, [42], null, 'header', null, null);
+        AutoRootSpan::shutdownHandler();
+
+        $this->assertSame(
+            ['http.response.header.x-foo' => ['replaced'], 'http.response.header.x-multi' => ['a', 'b']],
+            $recorded,
+        );
+    }
+
+    /**
+     * @param SpanInterface&MockObject $span
+     */
+    private function spanBuilderReturning(SpanInterface $span): SpanBuilderInterface
+    {
+        $span->method('storeInContext')->willReturnCallback(
+            static fn (ContextInterface $context): ContextInterface => $context->with(ContextKeys::span(), $span),
+        );
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $spanBuilder->method('setSpanKind')->willReturnSelf();
+        $spanBuilder->method('setStartTimestamp')->willReturnSelf();
+        $spanBuilder->method('setParent')->willReturnSelf();
+        $spanBuilder->method('setAttribute')->willReturnSelf();
+        $spanBuilder->method('startSpan')->willReturn($span);
+
+        return $spanBuilder;
+    }
+
+    /**
+     * @return object{hooks: list<array{class: ?string, function: string, pre: ?\Closure, post: ?\Closure}>} a hook manager that records the hooks registered on it
+     */
+    private function useFakeHookManager(): object
+    {
+        $manager = new class() implements HookManagerInterface {
+            /** @var list<array{class: ?string, function: string, pre: ?\Closure, post: ?\Closure}> */
+            public array $hooks = [];
+
+            #[\Override]
+            public function hook(?string $class, string $function, ?\Closure $preHook = null, ?\Closure $postHook = null): void
+            {
+                $this->hooks[] = ['class' => $class, 'function' => $function, 'pre' => $preHook, 'post' => $postHook];
+            }
+        };
+        (new \ReflectionProperty(AutoRootSpan::class, 'hookManager'))->setValue(null, $manager);
+
+        return $manager;
     }
 }

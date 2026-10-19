@@ -294,7 +294,10 @@ class SdkAutoloader
         });
     }
 
-    private static function getHookManager(): HookManagerInterface
+    /**
+     * @internal
+     */
+    public static function getHookManager(): HookManagerInterface
     {
         /** @var HookManagerInterface $hookManager */
         foreach (ServiceLoader::load(HookManagerInterface::class) as $hookManager) {

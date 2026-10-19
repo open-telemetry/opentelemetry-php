@@ -10,6 +10,7 @@ use Nyholm\Psr7Server\ServerRequestCreator;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -34,6 +35,8 @@ class AutoRootSpan
     private static array $capturedResponseHeaders = [];
 
     private static bool $responseHeaderHookRegistered = false;
+
+    private static ?HookManagerInterface $hookManager = null;
 
     /**
      * Whether a root span should be created for the current web request.
@@ -187,7 +190,7 @@ class AutoRootSpan
 
     private static function registerResponseHeaderHookIfNeeded(): void
     {
-        if (self::$responseHeaderHookRegistered || !function_exists('OpenTelemetry\Instrumentation\hook')) {
+        if (self::$responseHeaderHookRegistered) {
             return;
         }
         /** @var string[] $headerNames */
@@ -197,10 +200,11 @@ class AutoRootSpan
         }
         self::$responseHeaderHookRegistered = true;
         $namesLower = array_map('strtolower', $headerNames);
-        \OpenTelemetry\Instrumentation\hook(
+        self::$hookManager ??= SdkAutoloader::getHookManager();
+        self::$hookManager->hook(
             null,
             'header',
-            static function (?object $object, array $params) use ($namesLower): void {
+            static function (object|string|null $objectOrClass, array $params) use ($namesLower): void {
                 $header = $params[0] ?? null;
                 $replace = $params[1] ?? true;
                 if (!is_string($header) || ($colon = strpos($header, ':')) === false) {
