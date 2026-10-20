@@ -1,6 +1,8 @@
 ARG PHP_VERSION=8.5
 FROM ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION}
 
+ENV LANG=C.UTF-8
+
 USER root
 
 # The base image has no ssh client. Git needs `ssh-keygen` to create SSH-format commit
