@@ -14,6 +14,7 @@ var/metrics/
 !var/metrics/.gitkeep
 junit.xml
 .env
+.devcontainer/compose.local.yml
 
 # IntelliJ IDEA
 .idea

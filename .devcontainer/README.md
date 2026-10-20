@@ -47,6 +47,23 @@ PHP version or `XDEBUG_MODE` for a devcontainer.
 Keep your own variables out of `.env.dist`: it is committed, and is copied to `.env` for anyone who
 does not have one yet.
 
+### Your own mounts and services
+
+Every devcontainer also loads `.devcontainer/compose.local.yml`, which is not committed. It is
+created as an empty `services: {}` on first start, and is merged over the committed Compose files.
+Use it to mount files from your home directory, or to change anything else about the container:
+
+```yaml
+services:
+  php-dev:
+    volumes:
+      - ${HOME}/.config/your-tool:/home/php/.config/your-tool:ro
+```
+
+Volumes listed here are added to the committed ones rather than replacing them. A mount whose host
+path does not exist makes Docker create that path as an empty directory, so only mount paths that
+you know exist. Like extensions, a change here needs a rebuild before it takes effect.
+
 ## Git over SSH
 
 VS Code forwards your SSH agent into the container, so pushing to an `ssh://` or `git@github.com:`

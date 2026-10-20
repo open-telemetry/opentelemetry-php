@@ -2,13 +2,14 @@
   "name": "opentelemetry-php (PHP 8.1)",
   "dockerComposeFile": [
     "../docker-compose.yml",
-    "../compose-php81.yml"
+    "../compose-php81.yml",
+    "../compose.local.yml"
   ],
   "service": "php-dev",
   "workspaceFolder": "/usr/src/myapp",
   "remoteUser": "php",
   "overrideCommand": false,
-  "initializeCommand": "sh -c 'cd \"${localWorkspaceFolder}\" && [ -f .env ] || cp .env.dist .env'",
+  "initializeCommand": "sh -c 'cd \"${localWorkspaceFolder}\" && { [ -f .env ] || cp .env.dist .env; } && { [ -f .devcontainer/compose.local.yml ] || printf \"services: {}\\n\" > .devcontainer/compose.local.yml; }'",
   "postCreateCommand": "make update",
   "postStartCommand": ".devcontainer/setup-signing-key.sh",
   "customizations": {
