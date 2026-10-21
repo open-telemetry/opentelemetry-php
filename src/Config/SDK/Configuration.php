@@ -52,14 +52,12 @@ final class Configuration
      */
     public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties
     {
-        // Processed on demand rather than in parseFile() so that a node we cannot parse costs the
-        // caller its instrumentation config and nothing else; see
-        // {@see InstrumentationConfigurationRegistry} for why that independence is worth a second
-        // pass over the same document.
-        $configs = $this->configs ??= ConfigurationFileLoader::load($this->file);
+        // Processed on demand so an unparseable node costs only the instrumentation config; see
+        // {@see InstrumentationConfigurationRegistry}.
+        $this->configs ??= ConfigurationFileLoader::load($this->file);
 
         return self::instrumentationFactory($this->envReader)
-            ->process($configs)
+            ->process($this->configs)
             ->create($context);
     }
 
