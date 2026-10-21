@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
+use function count;
 use function str_starts_with;
+use function strcasecmp;
+use function strcmp;
+use function stripos;
 use function strlen;
+use function strpos;
+use function substr;
+use function substr_compare;
 
 /**
  * Code in this file is part of implementation internals and thus it is not covered by the backward compatibility.

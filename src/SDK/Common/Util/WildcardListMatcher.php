@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Util;
 
+use function implode;
+
 /**
  * Code in this file is part of implementation internals and thus it is not covered by the backward compatibility.
  *
