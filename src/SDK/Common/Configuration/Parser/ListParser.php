@@ -10,11 +10,12 @@ class ListParser
 
     /**
      * @param string|array $value
+     * @return list<string>
      */
     public static function parse($value): array
     {
         if (is_array($value)) {
-            return $value;
+            return array_values(array_map(strval(...), $value));
         }
         if (trim($value) === '') {
             return [];

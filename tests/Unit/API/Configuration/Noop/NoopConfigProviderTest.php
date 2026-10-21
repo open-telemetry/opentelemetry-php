@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\API\Configuration\Noop;
 
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,5 +17,11 @@ class NoopConfigProviderTest extends TestCase
     {
         $provider = new NoopConfigProvider();
         $this->assertInstanceOf(NoopConfigProperties::class, $provider->getInstrumentationConfig());
+    }
+
+    public function test_get_instrumentation_config_with_context(): void
+    {
+        $provider = new NoopConfigProvider();
+        $this->assertInstanceOf(NoopConfigProperties::class, $provider->getInstrumentationConfig(new Context()));
     }
 }
