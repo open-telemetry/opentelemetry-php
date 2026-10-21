@@ -4,6 +4,7 @@ on:
     - cron: "0 0 * * 0"
   workflow_dispatch:
   push:
+    branches: [ main ]
     paths:
       - docker/Dockerfile
       - .github/workflows/publish-otel-php-base-docker-image.yml
@@ -13,9 +14,46 @@ on:
       - .github/workflows/publish-otel-php-base-docker-image.yml
 permissions:
   contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
+  build:
+    name: Build ${{ matrix.php-version }} on ${{ matrix.runner }}
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      matrix:
+        php-version:
+          - "8.1"
+          - "8.2"
+          - "8.3"
+          - "8.4"
+          - "8.5"
+        runner:
+          - ubuntu-latest
+          - ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+
+      - name: check out the repo
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Build ${{ matrix.php-version }}
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          push: false
+          file: docker/Dockerfile
+          build-args: PHP_VERSION=${{ matrix.php-version }}
+
   push_to_registry:
     name: OpenTelemetry PHP base docker image creation
+    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         php-version:
@@ -46,21 +84,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # arm64 is emulated here so that one build can push a multi-platform tag.
       - name: Build and push ${{ matrix.php-version }} to ghcr.io
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
-        if: github.ref != 'refs/heads/main'
-        with:
-          push: false
-          file: docker/Dockerfile
-          build-args: PHP_VERSION=${{ matrix.php-version }}
-          platforms: linux/amd64,linux/arm/v8,linux/arm64
-
-      - name: Build and push ${{ matrix.php-version }} to ghcr.io
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
-        if: github.ref == 'refs/heads/main'
         with:
           push: true
           file: docker/Dockerfile
           build-args: PHP_VERSION=${{ matrix.php-version }}
-          platforms: linux/amd64,linux/arm/v8,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${{ matrix.php-version }}
