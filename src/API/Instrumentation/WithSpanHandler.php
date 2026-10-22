@@ -21,9 +21,10 @@ class WithSpanHandler
     public static function pre(mixed $target, array $params, ?string $class, string $function, ?string $filename, ?int $lineno, ?array $span_args = [], ?array $attributes = []): void
     {
         static $instrumentation;
-        $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.25.0');
+        $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.40.0');
 
-        $name = $span_args['name'] ?? null;
+        $functionName = $class !== null ? $class . '::' . $function : $function;
+        $name = $span_args['name'] ?? $functionName;
         if ($name === null) {
             $name = empty($class)
                 ? $function
@@ -36,10 +37,9 @@ class WithSpanHandler
             ->tracer()
             ->spanBuilder($name)
             ->setSpanKind($kind)
-            ->setAttribute('code.function', $function)
-            ->setAttribute('code.namespace', $class)
-            ->setAttribute('code.filepath', $filename)
-            ->setAttribute('code.lineno', $lineno)
+            ->setAttribute('code.function.name', $functionName)
+            ->setAttribute('code.file.path', $filename)
+            ->setAttribute('code.line.number', $lineno)
             ->setAttributes($attributes ?? [])
             ->startSpan();
         $context = $span->storeInContext(Context::getCurrent());
