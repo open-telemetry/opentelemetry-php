@@ -14,8 +14,12 @@ use Rector\Config\RectorConfig;
 use Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector;
 use Rector\EarlyReturn\Rector\StmtsAwareInterface\ReturnEarlyIfVariableRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
+use Rector\Php82\Rector\Class_\ReadOnlyClassRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\PHPUnit\PHPUnit100\Rector\Class_\ParentTestClassConstructorRector;
+use Rector\PHPUnit\PHPUnit120\Rector\CallLike\CreateStubOverCreateMockArgRector;
+use Rector\PHPUnit\PHPUnit120\Rector\Class_\PropertyCreateMockToCreateStubRector;
+use Rector\PHPUnit\PHPUnit120\Rector\ClassMethod\ExpressionCreateMockToCreateStubRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\SetList;
@@ -30,6 +34,7 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->sets([
         SetList::PHP_81,
+        SetList::PHP_82,
         SetList::CODE_QUALITY,
         PHPUnitSetList::COMPOSER_BASED,
     ]);
@@ -40,6 +45,7 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/SDK/Metrics/Stream/SynchronousMetricStream.php',
             __DIR__ . '/tests/Unit/Extension/Propagator',
         ],
+        ReadOnlyClassRector::class, // a class may need a mutable property later
         LocallyCalledStaticMethodToNonStaticRector::class,
         ObjectExplicitBoolCompareRector::class,
         RepeatedOrEqualToInArrayRector::class,
