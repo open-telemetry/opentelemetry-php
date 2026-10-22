@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\SdkBuilder;
 use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use RuntimeException;
@@ -26,29 +27,29 @@ class SdkBuilderTest extends TestCase
     use TestState;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\Context\Propagation\TextMapPropagatorInterface
+     * @var Stub&TextMapPropagatorInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $propagator;
+    private Stub $propagator;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Trace\TracerProviderInterface
+     * @var Stub&TracerProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $tracerProvider;
+    private Stub $tracerProvider;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Metrics\MeterProviderInterface
+     * @var Stub&MeterProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $meterProvider;
+    private Stub $meterProvider;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Logs\LoggerProviderInterface
+     * @var Stub&LoggerProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $loggerProvider;
+    private Stub $loggerProvider;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\API\Logs\EventLoggerProviderInterface
+     * @var Stub&EventLoggerProviderInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $eventLoggerProvider;
+    private Stub $eventLoggerProvider;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\Context\Propagation\ResponsePropagatorInterface
+     * @var Stub&ResponsePropagatorInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $responsePropagator;
+    private Stub $responsePropagator;
     private SdkBuilder $builder;
 
     #[\Override]

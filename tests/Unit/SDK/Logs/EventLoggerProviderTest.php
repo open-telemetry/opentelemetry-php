@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(EventLoggerProvider::class)]
@@ -18,9 +19,9 @@ class EventLoggerProviderTest extends TestCase
     /** @var LoggerProviderInterface&MockObject $loggerProvider */
     private LoggerProviderInterface $loggerProvider;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\API\Logs\LoggerInterface
+     * @var Stub&LoggerInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $logger;
+    private Stub $logger;
 
     #[\Override]
     public function setUp(): void

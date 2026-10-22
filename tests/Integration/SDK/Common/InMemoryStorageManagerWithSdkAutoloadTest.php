@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -23,7 +24,7 @@ class InMemoryStorageManagerWithSdkAutoloadTest extends TestCase
 {
     use TestState;
 
-    protected LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
+    protected LoggerInterface&Stub $logger;
 
     #[\Override]
     public function setUp(): void

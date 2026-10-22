@@ -14,24 +14,25 @@ use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ReadableLogRecord::class)]
 class ReadableLogRecordTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface
+     * @var Stub&InstrumentationScopeInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $scope;
+    private Stub $scope;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\Context\ContextInterface
+     * @var Stub&ContextInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $context;
+    private Stub $context;
     private LoggerSharedState $sharedState;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Resource\ResourceInfo
+     * @var Stub&ResourceInfo
      */
-    private \PHPUnit\Framework\MockObject\Stub $resource;
+    private Stub $resource;
     #[\Override]
     public function setUp(): void
     {

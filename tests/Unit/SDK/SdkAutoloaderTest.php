@@ -48,7 +48,7 @@ class SdkAutoloaderTest extends TestCase
      */
     private LoggerInterface $logger;
 
-    #[\Override]
+    #[Override]
     public function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

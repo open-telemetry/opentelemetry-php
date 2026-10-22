@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,14 +19,14 @@ use PHPUnit\Framework\TestCase;
 class LoggerSharedStateTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Resource\ResourceInfo
+     * @var Stub&ResourceInfo
      */
-    private \PHPUnit\Framework\MockObject\Stub $resource;
+    private Stub $resource;
     private LogRecordProcessorInterface $processor;
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Logs\LogRecordLimits
+     * @var Stub&LogRecordLimits
      */
-    private \PHPUnit\Framework\MockObject\Stub $limits;
+    private Stub $limits;
     private LoggerSharedState $loggerSharedState;
 
     #[\Override]

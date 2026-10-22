@@ -133,12 +133,12 @@ class InstrumentationTraitTest extends TestCase
 
     private function createValidImplementation(): InstrumentationInterface
     {
-        return new \OpenTelemetry\Tests\Unit\API\Instrumentation\ValidInstrumentation();
+        return new ValidInstrumentation();
     }
 
     private function createInvalidImplementation(): object
     {
-        return new \OpenTelemetry\Tests\Unit\API\Instrumentation\InvalidInstrumentation();
+        return new InvalidInstrumentation();
     }
 }
 

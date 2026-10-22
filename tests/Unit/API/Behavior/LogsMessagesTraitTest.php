@@ -21,7 +21,7 @@ class LogsMessagesTraitTest extends TestCase
     use TestState;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&\OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface
+     * @var MockObject&LogWriterInterface
      */
     protected MockObject $writer;
 

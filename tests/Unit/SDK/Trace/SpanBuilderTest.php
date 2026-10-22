@@ -24,6 +24,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerSharedState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(SpanBuilder::class)]
@@ -36,8 +37,8 @@ class SpanBuilderTest extends TestCase
     private SamplerInterface $sampler;
     /** @var IdGeneratorInterface&MockObject $idGenerator */
     private IdGeneratorInterface $idGenerator;
-    /** @var SpanProcessorInterface&\PHPUnit\Framework\MockObject\Stub $spanProcessor */
-    private \PHPUnit\Framework\MockObject\Stub $spanProcessor;
+    /** @var SpanProcessorInterface&Stub $spanProcessor */
+    private Stub $spanProcessor;
     #[\Override]
     public function setUp(): void
     {
