@@ -34,7 +34,7 @@ class DiscoveryTest extends TestCase
         $two->expects($this->once())
             ->method('create')
             ->with($this->equalTo(['timeout' => $timeout]))
-            ->willReturn($this->createMock(ClientInterface::class));
+            ->willReturn($this->createStub(ClientInterface::class));
 
         Discovery::setDiscoverers([$one, $two]);
         Discovery::find(['timeout' => 31415]);

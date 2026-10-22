@@ -17,9 +17,9 @@ class BatchSpanProcessorBuilderTest extends TestCase
 {
     public function test_build(): void
     {
-        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter = $this->createStub(SpanExporterInterface::class);
         $meterProvider = $this->createMock(MeterProviderInterface::class);
-        $meter = $this->createMock(MeterInterface::class);
+        $meter = $this->createStub(MeterInterface::class);
         $meterProvider->expects($this->once())->method('getMeter')->willReturn($meter);
         $processor = BatchSpanProcessor::builder($exporter)
             ->setMeterProvider($meterProvider)

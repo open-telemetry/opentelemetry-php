@@ -19,17 +19,26 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ReadableLogRecord::class)]
 class ReadableLogRecordTest extends TestCase
 {
-    private InstrumentationScopeInterface $scope;
-    private ContextInterface $context;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $scope;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\Context\ContextInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $context;
     private LoggerSharedState $sharedState;
-    private ResourceInfo $resource;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Resource\ResourceInfo
+     */
+    private \PHPUnit\Framework\MockObject\Stub $resource;
     #[\Override]
     public function setUp(): void
     {
-        $this->scope = $this->createMock(InstrumentationScopeInterface::class);
+        $this->scope = $this->createStub(InstrumentationScopeInterface::class);
         $this->sharedState = $this->createMock(LoggerSharedState::class);
-        $this->context = $this->createMock(ContextInterface::class);
-        $this->resource = $this->createMock(ResourceInfo::class);
+        $this->context = $this->createStub(ContextInterface::class);
+        $this->resource = $this->createStub(ResourceInfo::class);
         $limits = $this->createMock(LogRecordLimits::class);
         $attributeFactory = new AttributesFactory();
         $limits->method('getAttributeFactory')->willReturn($attributeFactory); //final

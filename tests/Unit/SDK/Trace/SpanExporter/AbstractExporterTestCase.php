@@ -74,7 +74,7 @@ abstract class AbstractExporterTestCase extends MockeryTestCase
     {
         $transport = Mockery::mock(TransportInterface::class);
         $exporter = $this->createExporterWithTransport($transport);
-        $span = $this->createMock(SpanData::class);
+        $span = $this->createStub(SpanData::class);
         $transport->shouldReceive('send')->andReturn($future);
 
         $this->assertSame($expected, $exporter->export([$span])->await());

@@ -37,8 +37,8 @@ trait LoggerAwareTestTrait
     protected function createSpanMocks(): array
     {
         return [
-            $this->createMock(SpanDataInterface::class),
-            $this->createMock(SpanDataInterface::class),
+            $this->createStub(SpanDataInterface::class),
+            $this->createStub(SpanDataInterface::class),
         ];
     }
 

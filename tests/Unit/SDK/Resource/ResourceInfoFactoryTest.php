@@ -126,7 +126,7 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'foo');
         $detector = $this->createMock(ResourceDetectorInterface::class);
-        $detector->expects($this->once())->method('getResource')->willReturn($this->createMock(ResourceInfo::class));
+        $detector->expects($this->once())->method('getResource')->willReturn($this->createStub(ResourceInfo::class));
 
         Registry::registerResourceDetector('foo', $detector);
         ResourceInfoFactory::defaultResource();
@@ -136,7 +136,7 @@ class ResourceInfoFactoryTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'all');
         $detector = $this->createMock(ResourceDetectorInterface::class);
-        $resource = $this->createMock(ResourceInfo::class);
+        $resource = $this->createStub(ResourceInfo::class);
         $detector->expects($this->once())->method('getResource')->willReturn($resource);
 
         Registry::registerResourceDetector('foo', $detector);
@@ -178,7 +178,7 @@ class ResourceInfoFactoryTest extends TestCase
     public function test_composite_default_with_extra_resource_from_registry(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DETECTORS', 'foo,env');
-        $resource = $this->createMock(ResourceInfo::class);
+        $resource = $this->createStub(ResourceInfo::class);
         $detector = $this->createMock(ResourceDetectorInterface::class);
         $detector->expects($this->once())->method('getResource')->willReturn($resource);
 

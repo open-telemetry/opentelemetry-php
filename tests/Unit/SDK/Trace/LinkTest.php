@@ -13,13 +13,16 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Link::class)]
 class LinkTest extends TestCase
 {
-    private API\SpanContextInterface $context;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\API\Trace\SpanContextInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $context;
     private AttributesInterface $attributes;
 
     #[\Override]
     public function setUp(): void
     {
-        $this->context = $this->createMock(API\SpanContextInterface::class);
+        $this->context = $this->createStub(API\SpanContextInterface::class);
         $this->attributes = $this->createMock(AttributesInterface::class);
         $this->attributes->method('count')->willReturn(5);
     }

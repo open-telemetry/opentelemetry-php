@@ -16,6 +16,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LogsExporter::class)]
 class LogsExporterTest extends TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&\OpenTelemetry\SDK\Common\Export\TransportInterface
+     */
     private MockObject $transport;
     private LogsExporter $exporter;
 

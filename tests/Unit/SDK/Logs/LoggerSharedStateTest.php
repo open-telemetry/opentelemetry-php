@@ -17,17 +17,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LoggerSharedState::class)]
 class LoggerSharedStateTest extends TestCase
 {
-    private ResourceInfo $resource;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Resource\ResourceInfo
+     */
+    private \PHPUnit\Framework\MockObject\Stub $resource;
     private LogRecordProcessorInterface $processor;
-    private LogRecordLimits $limits;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Logs\LogRecordLimits
+     */
+    private \PHPUnit\Framework\MockObject\Stub $limits;
     private LoggerSharedState $loggerSharedState;
 
     #[\Override]
     public function setUp(): void
     {
-        $this->resource = $this->createMock(ResourceInfo::class);
+        $this->resource = $this->createStub(ResourceInfo::class);
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
-        $this->limits = $this->createMock(LogRecordLimits::class);
+        $this->limits = $this->createStub(LogRecordLimits::class);
         $this->loggerSharedState = new LoggerSharedState(
             $this->resource,
             $this->limits,

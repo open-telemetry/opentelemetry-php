@@ -36,8 +36,8 @@ class SpanBuilderTest extends TestCase
     private SamplerInterface $sampler;
     /** @var IdGeneratorInterface&MockObject $idGenerator */
     private IdGeneratorInterface $idGenerator;
-    /** @var SpanProcessorInterface&MockObject $spanProcessor */
-    private SpanProcessorInterface $spanProcessor;
+    /** @var SpanProcessorInterface&\PHPUnit\Framework\MockObject\Stub $spanProcessor */
+    private \PHPUnit\Framework\MockObject\Stub $spanProcessor;
     #[\Override]
     public function setUp(): void
     {
@@ -45,7 +45,7 @@ class SpanBuilderTest extends TestCase
             's',
             '1.0',
             'https://example.com/schema',
-            $this->createMock(AttributesInterface::class)
+            $this->createStub(AttributesInterface::class)
         ); //final
         $attributesFactory = $this->createMock(AttributesFactoryInterface::class);
         $spanLimits = new SpanLimits(
@@ -57,10 +57,10 @@ class SpanBuilderTest extends TestCase
         );
         $this->sampler = $this->createMock(SamplerInterface::class);
         $this->idGenerator = $this->createMock(IdGeneratorInterface::class);
-        $this->spanProcessor = $this->createMock(SpanProcessorInterface::class);
+        $this->spanProcessor = $this->createStub(SpanProcessorInterface::class);
         $sharedState = new TracerSharedState(
             $this->idGenerator,
-            $this->createMock(ResourceInfo::class),
+            $this->createStub(ResourceInfo::class),
             $spanLimits,
             $this->sampler,
             [$this->spanProcessor]

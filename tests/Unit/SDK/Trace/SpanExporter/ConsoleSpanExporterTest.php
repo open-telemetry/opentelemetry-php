@@ -72,7 +72,7 @@ class ConsoleSpanExporterTest extends AbstractExporterTestCase
             ->willReturn(self::TEST_DATA);
 
         (new ConsoleSpanExporter($this->transport, $converter))->export([
-            $this->createMock(SpanDataInterface::class),
+            $this->createStub(SpanDataInterface::class),
         ])->await();
 
         $this->transport->shouldHaveReceived('send')->with($expected);

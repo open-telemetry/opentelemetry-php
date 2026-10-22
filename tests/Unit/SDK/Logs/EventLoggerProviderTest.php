@@ -17,13 +17,16 @@ class EventLoggerProviderTest extends TestCase
     private EventLoggerProvider $eventLoggerProvider;
     /** @var LoggerProviderInterface&MockObject $loggerProvider */
     private LoggerProviderInterface $loggerProvider;
-    private LoggerInterface $logger;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\API\Logs\LoggerInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $logger;
 
     #[\Override]
     public function setUp(): void
     {
         $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->logger = $this->createStub(LoggerInterface::class);
         $this->eventLoggerProvider = new EventLoggerProvider($this->loggerProvider);
     }
 

@@ -21,13 +21,16 @@ class SimpleLogRecordProcessorTest extends TestCase
     private SimpleLogRecordProcessor $processor;
     /** @var LogRecordExporterInterface&MockObject $exporter */
     private LogRecordExporterInterface $exporter;
-    private ReadWriteLogRecord $readWriteLogRecord;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Logs\ReadWriteLogRecord
+     */
+    private \PHPUnit\Framework\MockObject\Stub $readWriteLogRecord;
 
     #[\Override]
     public function setUp(): void
     {
         $this->exporter = $this->createMock(LogRecordExporterInterface::class);
-        $this->readWriteLogRecord = $this->createMock(ReadWriteLogRecord::class);
+        $this->readWriteLogRecord = $this->createStub(ReadWriteLogRecord::class);
         $this->processor = new SimpleLogRecordProcessor($this->exporter);
     }
 

@@ -596,7 +596,7 @@ final class ConfigurationTest extends TestCase
      */
     public function test_known_distribution_is_applied_alongside_another_vendors(): void
     {
-        Logging::setLogWriter($this->createMock(LogWriterInterface::class));
+        Logging::setLogWriter($this->createStub(LogWriterInterface::class));
 
         try {
             $factory = new ConfigurationFactory(

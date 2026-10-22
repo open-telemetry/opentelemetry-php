@@ -35,7 +35,7 @@ class InstrumentationTraitTest extends TestCase
 
         $this->assertInstanceOf(NoopTextMapPropagator::class, $instrumentation->getPropagator());
 
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $propagator = $this->createStub(TextMapPropagatorInterface::class);
 
         $instrumentation->setPropagator($propagator);
 
@@ -51,7 +51,7 @@ class InstrumentationTraitTest extends TestCase
 
         $this->assertInstanceOf(NoopTracer::class, $instrumentation->getTracer());
 
-        $tracer = $this->createMock(TracerInterface::class);
+        $tracer = $this->createStub(TracerInterface::class);
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
         $tracerProvider->expects($this->once())
             ->method('getTracer')
@@ -71,7 +71,7 @@ class InstrumentationTraitTest extends TestCase
 
         $this->assertInstanceOf(NoopMeter::class, $instrumentation->getMeter());
 
-        $meter = $this->createMock(MeterInterface::class);
+        $meter = $this->createStub(MeterInterface::class);
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $meterProvider->expects($this->once())
             ->method('getMeter')
@@ -91,7 +91,7 @@ class InstrumentationTraitTest extends TestCase
 
         $this->assertInstanceOf(NullLogger::class, $instrumentation->getLogger());
 
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         $instrumentation->setLogger($logger);
 
@@ -107,7 +107,7 @@ class InstrumentationTraitTest extends TestCase
 
         $this->assertInstanceOf(NoopResponsePropagator::class, $instrumentation->getResponsePropagator());
 
-        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        $responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
 
         $instrumentation->setResponsePropagator($responsePropagator);
 

@@ -60,5 +60,20 @@ return static function (RectorConfig $rectorConfig): void {
         UseIdenticalOverEqualWithSameTypeRector::class => [
             __DIR__ . '/src/SDK/Metrics/Stream', // bitwise ops on int|GMP yield GMP, never identical to int
         ],
+        // misses expectations set on the doubles in another method
+        CreateStubOverCreateMockArgRector::class => [
+            __DIR__ . '/tests/Unit/SDK/Logs/Processor/MultiLogRecordProcessorTest.php',
+            __DIR__ . '/tests/Unit/SDK/Trace/SpanProcessor/MultiSpanProcessorTest.php',
+        ],
+        // assertEquals() against createMock() doubles fails once these become stubs
+        ExpressionCreateMockToCreateStubRector::class => [
+            __DIR__ . '/tests/Unit/SDK/Trace/SpanProcessor/MultiSpanProcessorTest.php',
+        ],
+        // types the property as Stub&FinalClass, which PHPStan can't resolve
+        PropertyCreateMockToCreateStubRector::class => [
+            __DIR__ . '/tests/Unit/SDK/Trace/ImmutableSpanTest.php',
+            __DIR__ . '/tests/Unit/SDK/Trace/TracerSharedStateTest.php',
+            __DIR__ . '/tests/Unit/SDK/Trace/TracerTest.php',
+        ],
     ]);
 };

@@ -179,8 +179,8 @@ class SdkAutoloaderTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
         $this->assertTrue(SdkAutoloader::autoload());
         //SDK is configured, but globals have not been initialized yet, so we can add more initializers
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        $propagator = $this->createStub(TextMapPropagatorInterface::class);
+        $responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
         Globals::registerInitializer(function (Configurator $configurator) use ($propagator, $responsePropagator) {
             return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);
         });

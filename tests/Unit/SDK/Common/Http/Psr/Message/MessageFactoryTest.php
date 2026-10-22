@@ -29,7 +29,7 @@ class MessageFactoryTest extends TestCase
         $requestFactory->expects($this->once())
             ->method('createRequest')
             ->willReturn(
-                $this->createMock(RequestInterface::class)
+                $this->createStub(RequestInterface::class)
             );
 
         MessageFactory::create(
@@ -47,7 +47,7 @@ class MessageFactoryTest extends TestCase
         $serverRequestFactory->expects($this->once())
             ->method('createServerRequest')
             ->willReturn(
-                $this->createMock(ServerRequestInterface::class)
+                $this->createStub(ServerRequestInterface::class)
             );
 
         MessageFactory::create(
@@ -65,7 +65,7 @@ class MessageFactoryTest extends TestCase
         $responseFactory->expects($this->once())
             ->method('createResponse')
             ->willReturn(
-                $this->createMock(ResponseInterface::class)
+                $this->createStub(ResponseInterface::class)
             );
 
         MessageFactory::create(

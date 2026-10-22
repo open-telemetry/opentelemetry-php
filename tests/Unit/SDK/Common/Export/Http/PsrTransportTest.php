@@ -27,6 +27,9 @@ use Psr\Http\Message\ResponseInterface;
 #[CoversClass(PsrTransport::class)]
 final class PsrTransportTest extends TestCase
 {
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&\Psr\Http\Client\ClientInterface
+     */
     private MockObject $client;
     private PsrTransportFactory $factory;
 

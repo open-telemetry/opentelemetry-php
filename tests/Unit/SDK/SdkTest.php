@@ -23,22 +23,40 @@ class SdkTest extends TestCase
 {
     use TestState;
 
-    private TextMapPropagatorInterface $propagator;
-    private MeterProviderInterface $meterProvider;
-    private TracerProviderInterface $tracerProvider;
-    private LoggerProviderInterface $loggerProvider;
-    private EventLoggerProviderInterface $eventLoggerProvider;
-    private ResponsePropagatorInterface $responsePropagator;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\Context\Propagation\TextMapPropagatorInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $propagator;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Metrics\MeterProviderInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $meterProvider;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Trace\TracerProviderInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $tracerProvider;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\SDK\Logs\LoggerProviderInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $loggerProvider;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\API\Logs\EventLoggerProviderInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $eventLoggerProvider;
+    /**
+     * @var \PHPUnit\Framework\MockObject\Stub&\OpenTelemetry\Context\Propagation\ResponsePropagatorInterface
+     */
+    private \PHPUnit\Framework\MockObject\Stub $responsePropagator;
 
     #[\Override]
     public function setUp(): void
     {
-        $this->propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $this->meterProvider = $this->createMock(MeterProviderInterface::class);
-        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
-        $this->responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        $this->propagator = $this->createStub(TextMapPropagatorInterface::class);
+        $this->meterProvider = $this->createStub(MeterProviderInterface::class);
+        $this->tracerProvider = $this->createStub(TracerProviderInterface::class);
+        $this->loggerProvider = $this->createStub(LoggerProviderInterface::class);
+        $this->eventLoggerProvider = $this->createStub(EventLoggerProviderInterface::class);
+        $this->responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
     }
 
     #[\Override]
