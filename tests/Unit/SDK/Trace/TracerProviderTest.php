@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use OpenTelemetry\API\Trace\NoopTracer;
+use OpenTelemetry\API\Trace\TraceFlags;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\TracerConfig;
@@ -53,7 +54,17 @@ class TracerProviderTest extends TestCase
         $this->assertNotEquals($t1, $t3);
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#random-trace-flag
+     */
     #[Group('trace-compliance')]
+    public function test_root_span_with_default_id_generator_sets_random_flag(): void
+    {
+        $span = (new TracerProvider())->getTracer('test')->spanBuilder('root')->startSpan();
+
+        $this->assertSame(TraceFlags::SAMPLED | TraceFlags::RANDOM, $span->getContext()->getTraceFlags());
+    }
+
     public function test_shutdown(): void
     {
         $provider = new TracerProvider(null);

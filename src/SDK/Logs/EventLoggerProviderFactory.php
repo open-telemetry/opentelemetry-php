@@ -11,6 +11,9 @@ use OpenTelemetry\SDK\Sdk;
  */
 class EventLoggerProviderFactory
 {
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public function create(LoggerProviderInterface $loggerProvider): EventLoggerProviderInterface
     {
         if (Sdk::isDisabled()) {

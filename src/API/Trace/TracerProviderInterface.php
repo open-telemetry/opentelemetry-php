@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Trace;
 
-/** @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/api.md#tracerprovider */
+/**
+ * Implementations MUST be safe for concurrent use, for example from multiple fibers.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.7.0/specification/trace/api.md#tracerprovider
+ */
 interface TracerProviderInterface
 {
     /**

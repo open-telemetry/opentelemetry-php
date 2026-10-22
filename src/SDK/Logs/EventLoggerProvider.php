@@ -8,6 +8,7 @@ use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Logs\EventLoggerInterface;
 
 /**
+ * @deprecated
  * @phan-suppress PhanDeprecatedInterface
  */
 class EventLoggerProvider implements EventLoggerProviderInterface

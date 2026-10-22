@@ -109,6 +109,9 @@ class SdkBuilder
         return $this;
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public function build(): Sdk
     {
         $tracerProvider = $this->tracerProvider ?? new NoopTracerProvider();

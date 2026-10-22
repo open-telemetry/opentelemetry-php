@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace;
 use OpenTelemetry\API\Trace\SpanContextValidator;
 use Throwable;
 
-class RandomIdGenerator implements IdGeneratorInterface
+class RandomIdGenerator implements RandomTraceIdGeneratorInterface
 {
     private const TRACE_ID_HEX_LENGTH = 32;
     private const SPAN_ID_HEX_LENGTH = 16;

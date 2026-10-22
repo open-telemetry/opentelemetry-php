@@ -1262,7 +1262,7 @@ final class ConfigurationTest extends TestCase
 
         $sampler = $this->getSampler($sdk->create(new Context())->build());
 
-        $this->assertSame('TraceIdRatioBasedSampler{0.001000}', $sampler->getDescription());
+        $this->assertSame('TraceIdRatioBased{0.001000}', $sampler->getDescription());
     }
 
     /**

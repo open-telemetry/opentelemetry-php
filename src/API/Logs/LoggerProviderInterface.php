@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\API\Logs;
 
 /**
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/logs/bridge-api.md#get-a-logger
+ * Implementations MUST be safe for concurrent use, for example from multiple fibers.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/api.md#get-a-logger
  */
 interface LoggerProviderInterface
 {

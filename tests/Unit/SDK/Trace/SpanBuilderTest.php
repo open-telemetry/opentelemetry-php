@@ -15,6 +15,7 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\IdGeneratorInterface;
+use OpenTelemetry\SDK\Trace\RandomTraceIdGeneratorInterface;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -101,5 +102,69 @@ class SpanBuilderTest extends TestCase
             ->startSpan();
 
         $this->assertSame(TraceFlags::RANDOM, $span->getContext()->getTraceFlags());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#idgenerator-randomness-1
+     */
+    public function test_root_span_without_random_trace_id_generator_does_not_set_random_flag(): void
+    {
+        $this->sampler->method('shouldSample')->willReturn(new SamplingResult(SamplingResult::RECORD_AND_SAMPLE));
+        $this->idGenerator->method('generateTraceId')->willReturn(self::TRACE_ID);
+        $this->idGenerator->method('generateSpanId')->willReturn(self::SPAN_ID);
+
+        $span = $this->builder->setParent(false)->startSpan();
+
+        $this->assertSame(TraceFlags::SAMPLED, $span->getContext()->getTraceFlags());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#random-trace-flag
+     */
+    public function test_root_span_with_random_trace_id_generator_sets_random_flag(): void
+    {
+        $this->sampler->method('shouldSample')->willReturn(new SamplingResult(SamplingResult::RECORD_AND_SAMPLE));
+        $idGenerator = $this->createMock(RandomTraceIdGeneratorInterface::class);
+        $idGenerator->method('generateTraceId')->willReturn(self::TRACE_ID);
+        $idGenerator->method('generateSpanId')->willReturn(self::SPAN_ID);
+
+        $span = $this->createBuilder($idGenerator)->setParent(false)->startSpan();
+
+        $this->assertSame(TraceFlags::SAMPLED | TraceFlags::RANDOM, $span->getContext()->getTraceFlags());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#random-trace-flag
+     */
+    public function test_child_span_with_random_trace_id_generator_keeps_parent_flags(): void
+    {
+        $this->sampler->method('shouldSample')->willReturn(new SamplingResult(SamplingResult::RECORD_AND_SAMPLE));
+        $idGenerator = $this->createMock(RandomTraceIdGeneratorInterface::class);
+        $idGenerator->method('generateSpanId')->willReturn(self::SPAN_ID);
+
+        $parent = SpanContext::create('4bf92f3577b34da6a3ce929d0e0e4736', '00f067aa0ba902b7', TraceFlags::SAMPLED);
+        $span = $this->createBuilder($idGenerator)
+            ->setParent(Span::wrap($parent)->storeInContext(Context::getCurrent()))
+            ->startSpan();
+
+        $this->assertSame(TraceFlags::SAMPLED, $span->getContext()->getTraceFlags());
+    }
+
+    private function createBuilder(IdGeneratorInterface $idGenerator): SpanBuilder
+    {
+        $attributesFactory = $this->createMock(AttributesFactoryInterface::class);
+        $sharedState = new TracerSharedState(
+            $idGenerator,
+            $this->createMock(ResourceInfo::class),
+            new SpanLimits($attributesFactory, $attributesFactory, $attributesFactory, 10, 10),
+            $this->sampler,
+            [$this->spanProcessor]
+        );
+
+        return new SpanBuilder(
+            'foo',
+            new InstrumentationScope('s', '1.0', null, $this->createMock(AttributesInterface::class)),
+            $sharedState,
+        );
     }
 }

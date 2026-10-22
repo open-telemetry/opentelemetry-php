@@ -10,6 +10,27 @@ defaults and environment variables. Settings the spec doesn't cover use the `OTE
 configuration follows the [opentelemetry-configuration](https://github.com/open-telemetry/opentelemetry-configuration)
 schema.
 
+### Link to the spec
+
+A link lets a reader check the code against the rule it implements. Add one when the spec decides the outcome and
+the code alone doesn't show why:
+
+- Code that implements a spec rule, such as a required format, default, name or precedence. Use an `@see` in the
+  docblock.
+- A test that confirms a spec rule. Put the `@see` on the test method, after any `@param` lines.
+- A deprecation or removal the spec requires, in the docblock, the deprecation message and the README.
+- A commit or PR that implements a spec change. Reference each section it addresses.
+
+Don't link when the spec doesn't cover the code, such as internal helpers, PHP-specific plumbing or settings with the
+`OTEL_PHP_` prefix. Don't link to show that a class merely exists in the spec.
+
+Link to the spec repository, pinned to the release you checked against, for example
+`https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#alwaysrecord`.
+Don't link to opentelemetry.io, `main` or blog posts, because their text changes after the code is written. Link the
+most specific heading, and check the anchor exists at that tag.
+
+Leave existing links pinned to older releases alone, unless the change brings that item up to a newer release.
+
 ## Development Setup
 
 This project uses the "3 Musketeers" pattern: Docker + Make + Compose. Most commands run inside Docker containers.

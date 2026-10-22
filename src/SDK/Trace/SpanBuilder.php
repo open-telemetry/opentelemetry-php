@@ -135,12 +135,15 @@ final class SpanBuilder implements API\SpanBuilderInterface
             return Span::wrap($parentSpanContext);
         }
 
-        $spanId = $this->tracerSharedState->getIdGenerator()->generateSpanId();
+        $idGenerator = $this->tracerSharedState->getIdGenerator();
+        $spanId = $idGenerator->generateSpanId();
 
         if (!$parentSpanContext->isValid()) {
-            $traceId = $this->tracerSharedState->getIdGenerator()->generateTraceId();
+            $traceId = $idGenerator->generateTraceId();
+            $flags = $idGenerator instanceof RandomTraceIdGeneratorInterface ? API\TraceFlags::RANDOM : API\TraceFlags::DEFAULT;
         } else {
             $traceId = $parentSpanContext->getTraceId();
+            $flags = $parentSpanContext->getTraceFlags() & API\TraceFlags::RANDOM;
         }
 
         $samplingResult = $this
@@ -157,7 +160,6 @@ final class SpanBuilder implements API\SpanBuilderInterface
         $samplingDecision = $samplingResult->getDecision();
         $samplingResultTraceState = $samplingResult->getTraceState();
 
-        $flags = $parentSpanContext->getTraceFlags() & 0x2;
         if ($samplingDecision === SamplingResult::RECORD_AND_SAMPLE) {
             $flags |= API\TraceFlags::SAMPLED;
         }

@@ -6,6 +6,9 @@ namespace OpenTelemetry\API\Logs;
 
 use OpenTelemetry\Context\ContextInterface;
 
+/**
+ * Implementations MUST be safe for concurrent use, for example from multiple fibers.
+ */
 interface LoggerInterface
 {
     /**
