@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-json": "*",
         "nyholm/psr7-server": "^1.1",
         "open-telemetry/api": "^1.8",
@@ -31,7 +31,6 @@
         "psr/log": "^1.1|^2.0|^3.0",
         "ramsey/uuid": "^3.0 || ^4.0",
         "symfony/polyfill-mbstring": "^1.23",
-        "symfony/polyfill-php82": "^1.26",
         "tbachert/spi": "^1.0.5"
     },
     "autoload": {
