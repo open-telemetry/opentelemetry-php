@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Configuration;
 
+/**
+ * @experimental
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/api.md#configprovider
+ */
 interface ConfigProviderInterface
 {
-    public function getInstrumentationConfig(): ConfigProperties;
+    public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties;
 }

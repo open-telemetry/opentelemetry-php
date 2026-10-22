@@ -68,8 +68,10 @@
                 <directory name="tests"/>
             </errorLevel>
         </MoreSpecificImplementedParamType>
+        <!-- @todo required for symfony/config < 7.4, can be removed when 8.1 support dropped? -->
         <UndefinedInterfaceMethod>
             <errorLevel type="suppress">
+                <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::append"/>
                 <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::end"/>
                 <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::scalarNode"/>
                 <referencedMethod name="Symfony\Component\Config\Definition\Builder\NodeParentInterface::integerNode"/>

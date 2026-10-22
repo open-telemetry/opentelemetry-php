@@ -35,6 +35,33 @@ class ListParserTest extends TestCase
         ],
     ];
 
+    /**
+     * An array input is already a list of values, so it is reindexed and its members cast rather
+     * than split — which is what lets {@see ListParser::parse()} promise `list<string>`.
+     */
+    private const ARRAY_VALUES = [
+        'empty array' => [
+            [],
+            [],
+        ],
+        'list of strings' => [
+            ['foo', 'bar'],
+            ['foo', 'bar'],
+        ],
+        'associative keys are dropped' => [
+            ['a' => 'foo', 'b' => 'bar'],
+            ['foo', 'bar'],
+        ],
+        'gaps in numeric keys are reindexed' => [
+            [3 => 'foo', 7 => 'bar'],
+            ['foo', 'bar'],
+        ],
+        'non-string scalars are cast' => [
+            [123, 4.5, true],
+            ['123', '4.5', '1'],
+        ],
+    ];
+
     #[DataProvider('listValueProvider')]
     public function test_comma_separated_list_returns_array(string $value, array $expected): void
     {
@@ -44,8 +71,22 @@ class ListParserTest extends TestCase
         );
     }
 
+    #[DataProvider('arrayValueProvider')]
+    public function test_array_returns_list_of_strings(array $value, array $expected): void
+    {
+        $this->assertSame(
+            $expected,
+            ListParser::parse($value),
+        );
+    }
+
     public static function listValueProvider(): array
     {
         return self::LIST_VALUES;
+    }
+
+    public static function arrayValueProvider(): array
+    {
+        return self::ARRAY_VALUES;
     }
 }

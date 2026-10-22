@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Globals;
+use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -18,12 +25,18 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
+use Override;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use TypeError;
 
 #[CoversClass(SdkAutoloader::class)]
 class SdkAutoloaderTest extends TestCase
@@ -187,5 +200,118 @@ class SdkAutoloaderTest extends TestCase
 
         $this->assertSame($propagator, Globals::propagator());
         $this->assertSame($responsePropagator, Globals::responsePropagator());
+    }
+
+    #[DataProvider('unusableConfigFileProvider')]
+    public function test_autoload_with_unusable_config_file(string $file): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())->method('write')->with(
+            $this->anything(),
+            $this->stringContains('Error during opentelemetry initialization'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, $file);
+
+        try {
+            $this->assertTrue(SdkAutoloader::autoload());
+            $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public static function unusableConfigFileProvider(): iterable
+    {
+        yield 'missing' => [__DIR__ . '/fixtures/does-not-exist.yaml'];
+        yield 'malformed' => [__DIR__ . '/fixtures/otel-sdk-malformed.yaml'];
+        yield 'schema-invalid' => [__DIR__ . '/fixtures/otel-sdk-invalid.yaml'];
+    }
+
+    /**
+     * The SDK and instrumentation roots are processed separately, so an `instrumentation/development`
+     * node that does not validate must not cost us the SDK configured by the same document.
+     */
+    public function test_autoload_with_unusable_instrumentation_config(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->atLeastOnce())->method('write')->with(
+            $this->anything(),
+            $this->stringContains('Error during opentelemetry initialization'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk-invalid-instrumentation.yaml');
+
+        try {
+            $this->assertTrue(SdkAutoloader::autoload());
+            $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    /**
+     * A plugin that throws an {@see \Error} from its own `createPlugin()` must be reported as the
+     * fault it is, not as a missing sdk-configuration API.
+     *
+     * Isolated because the SPI registration below has to happen before anything in this process has
+     * loaded the ComponentProvider service.
+     */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_autoload_reports_plugin_error_rather_than_version_mismatch(): void
+    {
+        ServiceLoader::register(ComponentProvider::class, ThrowingInstrumentationProvider::class);
+
+        $messages = [];
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->method('write')->willReturnCallback(
+            static function ($level, string $message) use (&$messages): void {
+                $messages[] = $message;
+            },
+        );
+        Logging::setLogWriter($logWriter);
+
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk-throwing-instrumentation.yaml');
+
+        try {
+            $this->assertTrue(SdkAutoloader::autoload());
+            Globals::tracerProvider();
+        } finally {
+            Logging::reset();
+        }
+
+        $logged = implode("\n", $messages);
+        $this->assertStringContainsString(ThrowingInstrumentationProvider::MESSAGE, $logged);
+        $this->assertStringNotContainsString('requires a newer open-telemetry/sdk-configuration', $logged);
+    }
+}
+
+/**
+ * Stands in for a third-party plugin whose own `createPlugin()` is buggy.
+ *
+ * @implements ComponentProvider<InstrumentationConfiguration>
+ */
+final class ThrowingInstrumentationProvider implements ComponentProvider
+{
+    public const MESSAGE = 'plugin raised an Error of its own';
+
+    #[Override]
+    public function createPlugin(array $properties, Context $context): InstrumentationConfiguration
+    {
+        throw new TypeError(self::MESSAGE);
+    }
+
+    #[Override]
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        return $builder->arrayNode('throwing_instrumentation');
     }
 }

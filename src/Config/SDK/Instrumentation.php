@@ -4,34 +4,34 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK;
 
-use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
-use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\ConfigurationRegistry;
-use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
-use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
-use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
-use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
-use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
-use WeakMap;
 
+/**
+ * @deprecated Use {@see Configuration::parseFile()} and
+ *             {@see Configuration::getInstrumentationConfig()} instead. Instrumentation
+ *             configuration is a node of the same document as the SDK configuration
+ *             ({@see https://github.com/open-telemetry/opentelemetry-configuration/pull/91}), so it
+ *             does not need a parse entry point of its own: one {@see Configuration} serves both
+ *             roots, and reaching them separately costs an extra read of the same file whenever the
+ *             SDK root came from the on-disk cache.
+ *
+ * @todo Remove before 1.0 of `open-telemetry/sdk-configuration`. Kept for now as a transition for
+ *       instrumentations still on this entry point — the package is 0.x, so this is a courtesy
+ *       rather than a compatibility guarantee.
+ */
 final class Instrumentation
 {
-    /**
-     * @param ComponentPlugin<ConfigurationRegistry> $plugin
-     */
     private function __construct(
-        private readonly ComponentPlugin $plugin,
+        private readonly Configuration $configuration,
     ) {
     }
 
     public function create(Context $context = new Context()): ConfigurationRegistry
     {
-        $plugin = $this->plugin;
-
-        return $plugin->create($context);
+        /** @var ConfigurationRegistry */
+        return $this->configuration->getInstrumentationConfig($context);
     }
 
     /**
@@ -43,34 +43,6 @@ final class Instrumentation
         bool $debug = true,
         ?EnvReader $envReader = null,
     ): Instrumentation {
-        return new self(self::factory($envReader)->parseFile($file, $cacheFile, $debug));
-    }
-
-    /**
-     * @return ConfigurationFactory<ConfigurationRegistry>
-     */
-    private static function factory(?EnvReader $envReader): ConfigurationFactory
-    {
-        static $defaultEnvReader;
-        static $factories = new WeakMap();
-
-        $envReader ??= $defaultEnvReader ??= new EnvSourceReader([
-            new ServerEnvSource(),
-            new PhpIniEnvSource(),
-        ]);
-
-        return $factories[$envReader] ??= new ConfigurationFactory(
-            self::loadComponentProviders(),
-            new InstrumentationConfigurationRegistry(),
-            $envReader,
-        );
-    }
-
-    private static function loadComponentProviders(): iterable
-    {
-        yield from ServiceLoader::load(ComponentProvider::class);
-
-        /** @phpstan-ignore-next-line */
-        yield from ServiceLoader::load(Configuration\ComponentProvider::class);
+        return new self(Configuration::parseFile($file, $cacheFile, $debug, $envReader));
     }
 }

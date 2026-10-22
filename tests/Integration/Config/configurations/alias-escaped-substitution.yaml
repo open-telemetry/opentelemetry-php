@@ -1,0 +1,19 @@
+# An escaped `$${FOO}` means the literal `${FOO}`. The two attributes below share one anchored
+# value node, which ext-yaml materialises as a PHP reference — the shape that used to get
+# substituted twice and so resolve the escape. The alias must stay direct (`*name`): a merge key
+# (`<<:`) deep-copies and would not reproduce it.
+
+file_format: "1.0"
+
+resource:
+  attributes:
+    - name: escaped
+      value: &escaped_value $${DO_NOT_REPLACE_ME}
+    - name: escaped_via_alias
+      value: *escaped_value
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
