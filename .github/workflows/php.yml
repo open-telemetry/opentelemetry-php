@@ -35,7 +35,7 @@ jobs:
       with:
         persist-credentials: false
 
-    - uses: gacts/run-and-post-run@598d7a875d5620e0457490555b5e18e46082aa47 # v1.4.4
+    - uses: gacts/run-and-post-run@fc6503862aba998e2f2123225ad63c09a92ed46e # v1.4.5
       id: post-run-command
       with:
         post: |
@@ -58,7 +58,7 @@ jobs:
 
     - name: Setup cache environment
       id: extcache
-      uses: shivammathur/cache-extensions@22e24453af1bf3851994136f122ce065ab828a74 # 1.15.2
+      uses: shivammathur/cache-extensions@d894929efeece5f8d386bd667369b321947064ad # 1.15.6
       with:
         php-version: ${{ matrix.php-version }}
         extensions: ${{ env.extensions }}
