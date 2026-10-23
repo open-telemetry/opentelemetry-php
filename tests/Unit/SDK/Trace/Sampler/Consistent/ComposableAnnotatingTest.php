@@ -98,6 +98,30 @@ final class ComposableAnnotatingTest extends TestCase
         $this->assertSame(['shared' => 'own', 'only.delegate' => 1, 'only.own' => 2], $result->getAttributes());
     }
 
+    public function test_numeric_attribute_names_are_not_renumbered(): void
+    {
+        $delegate = new class() implements ComposableSamplerInterface {
+            #[\Override]
+            public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
+            {
+                // numeric attribute names are integer keys in PHP, which the string key types do not express
+                /** @psalm-suppress InvalidArgument */
+                return new SamplingIntent(0, true, ['456' => 'delegate']); // @phpstan-ignore argument.type
+            }
+
+            #[\Override]
+            public function getDescription(): string
+            {
+                return 'D';
+            }
+        };
+
+        /** @psalm-suppress InvalidArgument */
+        $result = $this->sample(new ComposableAnnotating(['123' => 'own'], $delegate)); // @phpstan-ignore argument.type
+
+        $this->assertSame([456 => 'delegate', 123 => 'own'], $result->getAttributes());
+    }
+
     public function test_delegates_trace_state_updates(): void
     {
         $delegate = new class() implements ComposableSamplerInterface {

@@ -42,15 +42,17 @@ final class ComposableAnnotating implements ComposableSamplerInterface
     ): SamplingIntentInterface {
         $intent = $this->delegate->getSamplingIntent($parentContext, $spanName, $spanKind, $attributes, $links);
 
-        $merged = [];
-        foreach ($intent->getAttributes() as $key => $value) {
-            $merged[$key] = $value;
-        }
+        // The spread operator would renumber integer keys, which attribute names like "123" become
+        $delegateAttributes = $intent->getAttributes();
+        $merged = array_replace(
+            is_array($delegateAttributes) ? $delegateAttributes : iterator_to_array($delegateAttributes),
+            $this->attributes,
+        );
 
         return new SamplingIntent(
             threshold: $intent->getThreshold(),
             adjustedCountReliable: $intent->isAdjustedCountReliable(),
-            attributes: [...$merged, ...$this->attributes],
+            attributes: $merged,
             traceStateUpdater: $intent->updateTraceState(...),
         );
     }

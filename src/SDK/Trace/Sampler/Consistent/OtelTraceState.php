@@ -168,9 +168,9 @@ final class OtelTraceState
             $seenKeys[$key] = true;
 
             if ($key === self::SUBKEY_THRESHOLD) {
-                $threshold = self::parseThreshold($value, 0, strlen($value));
+                $threshold = self::parseThreshold($value);
             } elseif ($key === self::SUBKEY_RANDOM_VALUE) {
-                $randomValue = self::parseRandomValue($value, 0, strlen($value));
+                $randomValue = self::parseRandomValue($value);
             } else {
                 $otherKeyValuePairs[] = $member;
             }
@@ -186,44 +186,44 @@ final class OtelTraceState
         return new self($randomValue, $threshold, $otherKeyValuePairs);
     }
 
-    private static function parseThreshold(string $s, int $start, int $len): int
+    private static function parseThreshold(string $hex): int
     {
-        if ($len === 0 || $len > 14) {
+        $length = strlen($hex);
+        if ($length === 0 || $length > 14) {
             return ConsistentSamplingUtil::INVALID_THRESHOLD;
         }
 
-        // 1 to 14 hex digits, right-padded with zeros to 14 digits (56 bits)
-        return self::parseHex($s, $start, $len, ConsistentSamplingUtil::INVALID_THRESHOLD);
+        return self::parseHex($hex, ConsistentSamplingUtil::INVALID_THRESHOLD);
     }
 
-    private static function parseRandomValue(string $s, int $start, int $len): int
+    private static function parseRandomValue(string $hex): int
     {
-        if ($len !== 14) {
+        if (strlen($hex) !== 14) {
             return ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
         }
 
-        return self::parseHex($s, $start, $len, ConsistentSamplingUtil::INVALID_RANDOM_VALUE);
+        return self::parseHex($hex, ConsistentSamplingUtil::INVALID_RANDOM_VALUE);
     }
 
     /**
-     * Parses a variable-length lower-case hex substring, left-aligned in a 56-bit field (the first digit are the
-     * bits 52 to 55).
+     * Parses lower-case hex digits, left-aligned in a 56-bit field (the first digit is the bits 52 to 55), so that a
+     * threshold with fewer than 14 digits is implicitly right-padded with zeros.
      */
-    private static function parseHex(string $s, int $start, int $len, int $invalid): int
+    private static function parseHex(string $hex, int $invalid): int
     {
-        $r = 0;
-        for ($i = 0; $i < $len; $i++) {
-            $c = ord($s[$start + $i]);
-            if ($c >= 0x30 && $c <= 0x39) {       // '0'..'9'
-                $x = $c - 0x30;
-            } elseif ($c >= 0x61 && $c <= 0x66) { // 'a'..'f'
-                $x = $c - 0x61 + 10;
+        $result = 0;
+        for ($i = 0, $length = strlen($hex); $i < $length; $i++) {
+            $c = ord($hex[$i]);
+            if ($c >= 0x30 && $c <= 0x39) {
+                $digit = $c - 0x30;
+            } elseif ($c >= 0x61 && $c <= 0x66) {
+                $digit = $c - 0x61 + 10;
             } else {
                 return $invalid;
             }
-            $r |= $x << (52 - ($i << 2));
+            $result |= $digit << (52 - ($i << 2));
         }
 
-        return $r;
+        return $result;
     }
 }
