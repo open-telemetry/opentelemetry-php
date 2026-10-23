@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use function array_keys;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor;
@@ -48,7 +49,7 @@ final class StreamFactory implements MetricFactoryInterface
         $streams = [];
         $dedup = [];
         foreach ($views as [$view, $registration]) {
-            if ($view->aggregation === null) {
+            if ($view->aggregation === null || $view->aggregation instanceof DropAggregation) {
                 continue;
             }
 
@@ -92,7 +93,7 @@ final class StreamFactory implements MetricFactoryInterface
         $streams = [];
         $dedup = [];
         foreach ($views as [$view, $registration]) {
-            if ($view->aggregation === null) {
+            if ($view->aggregation === null || $view->aggregation instanceof DropAggregation) {
                 continue;
             }
 
