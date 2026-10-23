@@ -6,6 +6,9 @@ namespace OpenTelemetry\API\Instrumentation\AutoInstrumentation;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
 
+/**
+ * @experimental
+ */
 final class ConfigurationRegistry implements ConfigProperties
 {
     private array $configurations = [];
