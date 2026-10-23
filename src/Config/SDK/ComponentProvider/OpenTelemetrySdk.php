@@ -58,6 +58,7 @@ use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SDK\Trace\TracerConfig;
 use OpenTelemetry\SDK\Trace\TracerProvider;
+use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -130,7 +131,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         composite_list: ?string,
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
-     *     "response_propagator/development": array{
+     *     "response_propagator/development"?: array{
      *         composite_list: ?string,
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
@@ -238,17 +239,6 @@ final class OpenTelemetrySdk implements ComponentProvider
         $propagator = ($propagators === []) ? NoopTextMapPropagator::getInstance() : new MultiTextMapPropagator($propagators);
         $sdkBuilder->setPropagator($propagator);
 
-        $responsePropagators = [];
-        foreach ($properties['response_propagator/development']['composite'] as $plugin) {
-            $responsePropagators[] = $plugin->create($context);
-        }
-        $responsePropagator = ($responsePropagators === []) ? NoopResponsePropagator::getInstance() : new MultiResponsePropagator($responsePropagators);
-        $sdkBuilder->setResponsePropagator($responsePropagator);
-
-        if ($properties['disabled']) {
-            return $sdkBuilder;
-        }
-
         $distributionProperties = new DistributionRegistry();
         foreach ($properties['distribution'] as $distributionConfiguration) {
             if (($distribution = $distributionConfiguration->create($context)) !== null) {
@@ -257,6 +247,25 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
 
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
+
+        $responsePropagator = $distributionConfiguration->responsePropagator;
+        // TODO remove the deprecated top-level response_propagator/development before 1.0
+        if (isset($properties['response_propagator/development'])) {
+            $context->logger->log(LogLevel::WARNING, '"response_propagator/development" is deprecated, move it under "distribution.opentelemetry_php/development"');
+
+            $responsePropagators = [];
+            foreach ($properties['response_propagator/development']['composite'] as $plugin) {
+                $responsePropagators[] = $plugin->create($context);
+            }
+            if ($responsePropagator === null && $responsePropagators !== []) {
+                $responsePropagator = new MultiResponsePropagator($responsePropagators);
+            }
+        }
+        $sdkBuilder->setResponsePropagator($responsePropagator ?? NoopResponsePropagator::getInstance());
+
+        if ($properties['disabled']) {
+            return $sdkBuilder;
+        }
 
         //priorities: 1. attributes 2. attributes_list, 3. detected (after applying include/exclude)
         $schemaUrl = $properties['resource']['schema_url'];
@@ -861,6 +870,10 @@ final class OpenTelemetrySdk implements ComponentProvider
         return $node;
     }
 
+    /**
+     * Deprecated in favor of `distribution.opentelemetry_php/development.response_propagator/development`.
+     * It has no defaults, so it is absent unless the file sets it.
+     */
     private function getExperimentalResponsePropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('response_propagator/development');
@@ -887,7 +900,6 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->end();
 
         $node
-            ->addDefaultsIfNotSet()
             ->children()
             ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
             ->append($registry->componentList('composite', ResponsePropagatorInterface::class))

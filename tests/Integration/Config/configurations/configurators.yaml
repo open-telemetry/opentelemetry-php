@@ -5,9 +5,6 @@ propagator:
     - tracecontext:
     - baggage:
 
-response_propagator/development:
-  composite: []
-
 tracer_provider:
   sampler:
     parent_based:

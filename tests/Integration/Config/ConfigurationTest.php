@@ -26,6 +26,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
+use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -1144,6 +1145,62 @@ final class ConfigurationTest extends TestCase
         $this->assertIsArray($responsePropagators);
         $this->assertCount(1, $responsePropagators, 'duplicate was removed');
         $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
+    }
+
+    public function test_top_level_response_propagator_is_deprecated_but_applied(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->stringContains('"response_propagator/development" is deprecated'), $this->anything());
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $factory = new ConfigurationFactory(
+                self::spiComponentProviders(),
+                new OpenTelemetrySdk(),
+                new EnvSourceReader([]),
+            );
+            $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                response_propagator/development:
+                  composite_list: servertiming
+                YAML)])->create(new Context())->build()->getResponsePropagator();
+
+            $this->assertInstanceOf(MultiResponsePropagator::class, $responsePropagator);
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public function test_distribution_response_propagator_takes_precedence_over_top_level(): void
+    {
+        Logging::setLogWriter($this->createStub(LogWriterInterface::class));
+
+        try {
+            $factory = new ConfigurationFactory(
+                self::spiComponentProviders(),
+                new OpenTelemetrySdk(),
+                new EnvSourceReader([]),
+            );
+            $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                response_propagator/development:
+                  composite_list: servertiming,traceresponse
+                distribution:
+                  opentelemetry_php/development:
+                    response_propagator/development:
+                      composite_list: servertiming
+                YAML)])->create(new Context())->build()->getResponsePropagator();
+
+            $responsePropagators = (new \ReflectionClass($responsePropagator))
+                ->getProperty('responsePropagators')
+                ->getValue($responsePropagator);
+            $this->assertIsArray($responsePropagators);
+            $this->assertCount(1, $responsePropagators);
+        } finally {
+            Logging::reset();
+        }
     }
 
     #[DataProvider('unsupportedFileFormatProvider')]
