@@ -12,7 +12,7 @@ putenv('OTEL_TRACES_EXPORTER=console');
 putenv('OTEL_METRICS_EXPORTER=none');
 putenv('OTEL_LOGS_EXPORTER=console');
 putenv('OTEL_PROPAGATORS=tracecontext');
-putenv('OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN=true');
+putenv('OTEL_PHP_TRANSACTION_SPAN_ENABLED=true');
 
 //Usage: php -S localhost:8080 examples/traces/features/auto_root_span.php
 

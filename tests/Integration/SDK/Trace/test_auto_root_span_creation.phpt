@@ -22,7 +22,7 @@ require_once 'vendor/autoload.php';
 --EXPECTF--
 [
     {
-        "name": "GET",
+        "name": "GET \/foo",
         "context": {
             "trace_id": "ff000000000000000000000000000041",
             "span_id": "%s",
