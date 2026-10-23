@@ -77,7 +77,7 @@ final class ConfigurationFactory
      * @throws Throwable if a cache file is given and a non-serializable component provider is used
      * @return ComponentPlugin parsed component plugin
      *
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/file-configuration.md#parse
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
      * @psalm-suppress PossiblyNullReference
      */
     public function parseFile(
