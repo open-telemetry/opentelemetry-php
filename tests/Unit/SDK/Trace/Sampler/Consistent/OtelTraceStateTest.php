@@ -1,0 +1,253 @@
+<?php
+
+declare(strict_types=1);
+
+namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
+
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+use function str_repeat;
+
+#[CoversClass(OtelTraceState::class)]
+class OtelTraceStateTest extends TestCase
+{
+    /**
+     * Generate a repeated character string for length-boundary tests.
+     */
+    private static function xString(int $len): string
+    {
+        return str_repeat('X', $len);
+    }
+
+    public function test_empty_or_null_input(): void
+    {
+        $this->assertSame('', OtelTraceState::parse('')->serialize());
+        $this->assertSame('', OtelTraceState::parse(null)->serialize());
+    }
+
+    public function test_invalid_input_returns_empty(): void
+    {
+        // Single char that is not a valid key
+        $this->assertSame('', OtelTraceState::parse('a')->serialize());
+        // Starts with '#'
+        $this->assertSame('', OtelTraceState::parse('#')->serialize());
+        // Space
+        $this->assertSame('', OtelTraceState::parse(' ')->serialize());
+        // Garbage only
+        $this->assertSame('', OtelTraceState::parse('A:b;1:2;:;;x')->serialize());
+    }
+
+    public function test_invalid_members_are_discarded_but_valid_ones_are_kept(): void
+    {
+        // Upper-case key
+        $this->assertSame('th:8;x:1', OtelTraceState::parse('th:8;RV:1;x:1')->serialize());
+        // Invalid value character
+        $this->assertSame('th:8;y:1', OtelTraceState::parse('th:8;x:a b;y:1')->serialize());
+        // Missing colon / empty key
+        $this->assertSame('th:8;x:1', OtelTraceState::parse('th:8;novalue;:1;x:1')->serialize());
+        // Empty members (double and trailing semicolon) are skipped
+        $this->assertSame('th:8;x:1', OtelTraceState::parse('th:8;;x:1;')->serialize());
+        $this->assertSame('th:0', OtelTraceState::parse('th:0;')->serialize());
+        // Invalid th (upper-case digit) is treated as absent, valid rv is kept
+        $this->assertSame('rv:1234567890abcd;x:1', OtelTraceState::parse('th:8A;rv:1234567890abcd;x:1')->serialize());
+    }
+
+    public function test_duplicate_th_is_ambiguous_and_ignored(): void
+    {
+        // th:f;th:0 must neither be read as th:0 (sample everything) nor as th:f; the threshold is unknown
+        $this->assertSame('x:1', OtelTraceState::parse('th:f;th:0;x:1')->serialize());
+        $this->assertSame('', OtelTraceState::parse('th:8;th:8')->serialize());
+        $this->assertFalse(OtelTraceState::parse('th:f;th:0')->hasValidThreshold());
+        // three occurrences stay ambiguous
+        $this->assertFalse(OtelTraceState::parse('th:f;th:0;th:8')->hasValidThreshold());
+    }
+
+    public function test_duplicate_rv_is_ambiguous_and_ignored(): void
+    {
+        $state = OtelTraceState::parse('rv:1234567890abcd;rv:00000000000001;th:8');
+
+        $this->assertFalse($state->hasValidRandomValue());
+        $this->assertSame('th:8', $state->serialize());
+    }
+
+    public function test_duplicate_other_keys_keep_the_first_occurrence(): void
+    {
+        $this->assertSame('th:8;x:1;y:3', OtelTraceState::parse('x:1;th:8;x:2;y:3;x:1')->serialize());
+    }
+
+    public function test_duplicate_of_a_valid_key_with_an_invalid_first_value_is_still_ambiguous(): void
+    {
+        // first th has an invalid value, the repeated one must not "fix" it
+        $this->assertFalse(OtelTraceState::parse('th:zz;th:8')->hasValidThreshold());
+    }
+
+    public function test_serialize_stops_before_exceeding_the_size_limit(): void
+    {
+        // each pair is 'kN:' plus 70 value characters; only as many fit next to th as the 256 character limit allows
+        $pairs = array_map(static fn (int $i): string => sprintf('k%d:%s', $i, str_repeat('x', 70)), [1, 2, 3, 4]);
+        $state = OtelTraceState::parse('th:8;' . implode(';', $pairs));
+
+        $serialized = $state->serialize();
+
+        $this->assertLessThanOrEqual(256, strlen($serialized));
+        $this->assertStringStartsWith('th:8;k1:', $serialized);
+        $this->assertStringNotContainsString('k4:', $serialized);
+    }
+
+    public function test_rv_roundtrip(): void
+    {
+        $this->assertSame('rv:1234567890abcd', OtelTraceState::parse('rv:1234567890abcd')->serialize());
+        $this->assertSame('rv:01020304050607', OtelTraceState::parse('rv:01020304050607')->serialize());
+    }
+
+    public function test_rv_too_long_rejected(): void
+    {
+        // 15 hex chars are invalid
+        $this->assertSame('', OtelTraceState::parse('rv:1234567890abcde')->serialize());
+    }
+
+    public function test_rv_too_short_rejected(): void
+    {
+        // 13 chars are invalid (exactly 14 are required)
+        $this->assertSame('', OtelTraceState::parse('rv:1000000000000')->serialize());
+    }
+
+    public function test_rv_non_hex_rejected(): void
+    {
+        $this->assertSame('', OtelTraceState::parse('rv:x')->serialize());
+    }
+
+    public function test_rv_upper_boundary(): void
+    {
+        $this->assertSame('rv:10000000000000', OtelTraceState::parse('rv:10000000000000')->serialize());
+    }
+
+    public function test_th_roundtrip(): void
+    {
+        $this->assertSame('th:1234567890abcd', OtelTraceState::parse('th:1234567890abcd')->serialize());
+        $this->assertSame('th:01020304050607', OtelTraceState::parse('th:01020304050607')->serialize());
+    }
+
+    public function test_th_trailing_zeros_stripped_on_output(): void
+    {
+        // 14 chars with trailing zeros: the output drops the trailing zeros
+        $this->assertSame('th:1', OtelTraceState::parse('th:10000000000000')->serialize());
+        $this->assertSame('th:12345', OtelTraceState::parse('th:1234500000000')->serialize());
+        $this->assertSame('th:0', OtelTraceState::parse('th:0')->serialize());
+    }
+
+    public function test_th_too_long_rejected(): void
+    {
+        // 15 hex chars are invalid
+        $this->assertSame('', OtelTraceState::parse('th:100000000000000')->serialize());
+        $this->assertSame('', OtelTraceState::parse('th:1234567890abcde')->serialize());
+    }
+
+    public function test_th_non_hex_rejected(): void
+    {
+        $this->assertSame('', OtelTraceState::parse('th:x')->serialize());
+    }
+
+    public function test_th_various_lengths_with_trailing_zeros(): void
+    {
+        // Each of these has trailing zeros, so it is serialized as 'th:1'
+        $inputs = [
+            'th:10000000000000',
+            'th:1000000000000',
+            'th:100000000000',
+            'th:10000000000',
+            'th:1000000000',
+            'th:100000000',
+            'th:10000000',
+            'th:1000000',
+            'th:100000',
+            'th:10000',
+            'th:1000',
+            'th:100',
+            'th:10',
+            'th:1',
+        ];
+        foreach ($inputs as $input) {
+            $this->assertSame('th:1', OtelTraceState::parse($input)->serialize(), "Failed for input: $input");
+        }
+    }
+
+    public function test_th_with_non_trailing_significant_digits(): void
+    {
+        $this->assertSame('th:10000000000001', OtelTraceState::parse('th:10000000000001')->serialize());
+        $this->assertSame('th:1000000000001', OtelTraceState::parse('th:10000000000010')->serialize());
+    }
+
+    public function test_combined_th_and_rv_reordered(): void
+    {
+        // Input has 'a:...;rv:...;th:...;x:3', output normalizes to 'th:...;rv:...;a:...;x:3'
+        $xStr = self::xString(214);
+        $input = "a:{$xStr};rv:1234567890abcd;th:1234567890abcd;x:3";
+        $expected = "th:1234567890abcd;rv:1234567890abcd;a:{$xStr};x:3";
+        $this->assertSame($expected, OtelTraceState::parse($input)->serialize());
+    }
+
+    public function test_members_exceeding_the_256_char_limit_are_dropped(): void
+    {
+        // 'a:' + 215 'X' = 217 chars, th and rv bring it to 253; 'x:3' would exceed 256 and is dropped
+        $xStr = self::xString(215);
+        $input = "a:{$xStr};rv:1234567890abcd;th:1234567890abcd;x:3";
+        $expected = "th:1234567890abcd;rv:1234567890abcd;a:{$xStr}";
+        $this->assertSame($expected, OtelTraceState::parse($input)->serialize());
+    }
+
+    public function test_set_threshold(): void
+    {
+        $state = OtelTraceState::parse('');
+        $state->setThreshold(0x80000000000000);
+        $this->assertSame('th:8', $state->serialize());
+    }
+
+    public function test_set_invalid_threshold_is_noop(): void
+    {
+        $state = OtelTraceState::parse('th:8');
+        $state->setThreshold(SamplingIntent::INVALID_THRESHOLD);
+        $this->assertSame('', $state->serialize());
+    }
+
+    public function test_invalidate_threshold(): void
+    {
+        $state = OtelTraceState::parse('th:8');
+        $this->assertTrue($state->hasValidThreshold());
+        $state->invalidateThreshold();
+        $this->assertFalse($state->hasValidThreshold());
+        $this->assertSame('', $state->serialize());
+    }
+
+    public function test_other_key_value_pairs_preserved(): void
+    {
+        $state = OtelTraceState::parse('foo:bar;th:8;baz:qux');
+        $this->assertSame('th:8;foo:bar;baz:qux', $state->serialize());
+    }
+
+    public function test_max_threshold_not_serialized(): void
+    {
+        // th = MAX_THRESHOLD means "drop" and is not serialized
+        $state = OtelTraceState::parse('');
+        $state->setThreshold(ConsistentSamplingUtil::MAX_THRESHOLD);
+        $this->assertSame('', $state->serialize());
+    }
+
+    public function test_has_valid_threshold(): void
+    {
+        $state = OtelTraceState::parse('th:8');
+        $this->assertTrue($state->hasValidThreshold());
+        $this->assertSame(0x80000000000000, $state->getThreshold());
+    }
+
+    public function test_has_valid_random_value(): void
+    {
+        $state = OtelTraceState::parse('rv:1234567890abcd');
+        $this->assertTrue($state->hasValidRandomValue());
+        // 14 hex chars left-aligned into 56-bit: 0x1234567890abcd
+        $this->assertSame(0x1234567890abcd, $state->getRandomValue());
+    }
+}

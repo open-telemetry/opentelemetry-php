@@ -54,7 +54,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.15.x-dev"
+            "dev-main": "1.16.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [

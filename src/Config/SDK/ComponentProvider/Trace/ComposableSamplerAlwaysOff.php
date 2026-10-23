@@ -2,41 +2,34 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Trace;
+namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
-use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOff;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @experimental
  * @implements ComponentProvider<ComposableSamplerInterface>
  */
-final class ComposableSamplerParentThreshold implements ComponentProvider
+final class ComposableSamplerAlwaysOff implements ComponentProvider
 {
     /**
-     * @param array{
-     *     root: ComponentPlugin<ComposableSamplerInterface>,
-     * } $properties
+     * @param array{} $properties
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): ComposableSamplerInterface
     {
-        return new NoopComposableSampler();
+        return new ComposableAlwaysOff();
     }
 
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('parent_threshold');
-        $node
-            ->children()
-                ->append($registry->component('root', ComposableSamplerInterface::class)->isRequired())
-            ->end()
-        ;
-
-        return $node;
+        return $builder->arrayNode('always_off');
     }
 }
