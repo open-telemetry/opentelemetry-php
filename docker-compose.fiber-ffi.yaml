@@ -13,7 +13,7 @@ services:
       context: .
       dockerfile: docker/examples/Dockerfile
       args:
-        - PHP_VERSION=8.1-fpm
+        - PHP_VERSION=8.2-fpm
         - EXT_ENABLE=ffi
     environment:
       - OTEL_PHP_FIBERS_ENABLED=true
@@ -22,5 +22,5 @@ services:
       - -d
       - opcache.preload=/php/vendor/autoload.php
     volumes:
-      - ./tests/Context/Fiber/test_context_switching_ffi_observer.phpt:/var/www/public/index.php
+      - ./tests/Integration/Context/Fiber/test_context_switching_ffi_observer.phpt:/var/www/public/index.php
       - ./:/php

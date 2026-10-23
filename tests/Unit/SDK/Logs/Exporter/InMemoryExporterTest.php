@@ -23,8 +23,8 @@ class InMemoryExporterTest extends TestCase
         $exporter = new InMemoryExporter();
         $batch = [
             (new ReadableLogRecord(
-                $this->createMock(InstrumentationScopeInterface::class),
-                $this->createMock(LoggerSharedState::class),
+                $this->createStub(InstrumentationScopeInterface::class),
+                $this->createStub(LoggerSharedState::class),
                 (new LogRecord('foo')),
             )),
         ];

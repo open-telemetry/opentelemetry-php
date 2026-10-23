@@ -30,10 +30,8 @@ class MultiSpanProcessorTest extends TestCase
     public function test_add_span_processor(): void
     {
         $multiProcessor = $this->createMultiSpanProcessor();
-        $processor = $this->createMock(SpanProcessorInterface::class);
-        $multiProcessor->addSpanProcessor($processor);
-        $extendedProcessor = $this->createMock(ExtendedSpanProcessorInterface::class);
-        $multiProcessor->addSpanProcessor($extendedProcessor);
+        $multiProcessor->addSpanProcessor($this->createMock(SpanProcessorInterface::class));
+        $multiProcessor->addSpanProcessor($this->createMock(ExtendedSpanProcessorInterface::class));
         $processors = array_merge(
             $this->getSpanProcessors(),
             [$this->createMock(SpanProcessorInterface::class)],

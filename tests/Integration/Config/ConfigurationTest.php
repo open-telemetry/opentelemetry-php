@@ -20,6 +20,7 @@ use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
@@ -58,7 +59,7 @@ final class ConfigurationTest extends TestCase
 {
     use TestState;
 
-    #[\Override]
+    #[Override]
     public function setUp(): void
     {
         // set up mock file system with /var/log directory, for otlp_file exporter.
@@ -67,7 +68,7 @@ final class ConfigurationTest extends TestCase
         OutputStreamParser::setRoot($root);
     }
 
-    #[\Override]
+    #[Override]
     public function tearDown(): void
     {
         OutputStreamParser::reset();
@@ -359,7 +360,7 @@ final class ConfigurationTest extends TestCase
 
     /**
      * The `Context` passed to {@see Configuration::getInstrumentationConfig()} must reach
-     * {@see \OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin}, which is how
+     * {@see SkippedComponentPlugin}, which is how
      * a file-configured `log_level` will be honoured once the caller has one.
      */
     public function test_context_logger_receives_skipped_component_warning(): void
@@ -875,7 +876,7 @@ final class ConfigurationTest extends TestCase
      */
     public function test_known_distribution_is_applied_alongside_another_vendors(): void
     {
-        Logging::setLogWriter($this->createMock(LogWriterInterface::class));
+        Logging::setLogWriter($this->createStub(LogWriterInterface::class));
 
         try {
             $factory = new ConfigurationFactory(

@@ -84,7 +84,7 @@ final class ExportingReaderTest extends TestCase
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->once())->method('create')->with(Temporality::CUMULATIVE);
-        $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $metricMetadata = $this->createStub(MetricMetadataInterface::class);
         $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
         $stalenessHandler->expects($this->once())->method('onStale');
 
@@ -93,12 +93,12 @@ final class ExportingReaderTest extends TestCase
 
     public function test_add_does_not_create_metric_source_if_exporter_temporality_null(): void
     {
-        $exporter = $this->createMock(MetricExporterInterface::class);
+        $exporter = $this->createStub(MetricExporterInterface::class);
         $reader = new ExportingReader($exporter);
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->never())->method('create');
-        $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $metricMetadata = $this->createStub(MetricMetadataInterface::class);
         $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
         $stalenessHandler->expects($this->never())->method('onStale');
 
@@ -112,7 +112,7 @@ final class ExportingReaderTest extends TestCase
 
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->never())->method('create');
-        $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $metricMetadata = $this->createStub(MetricMetadataInterface::class);
         $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
         $stalenessHandler->expects($this->never())->method('onStale');
 
@@ -125,8 +125,8 @@ final class ExportingReaderTest extends TestCase
         $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
         $reader = new ExportingReader($exporter);
 
-        $provider = $this->createMock(MetricSourceProviderInterface::class);
-        $metricMetadata = $this->createMock(MetricMetadataInterface::class);
+        $provider = $this->createStub(MetricSourceProviderInterface::class);
+        $metricMetadata = $this->createStub(MetricMetadataInterface::class);
         $stalenessHandler = new ImmediateStalenessHandler();
         $stalenessHandler->acquire();
         $reader->add($provider, $metricMetadata, $stalenessHandler);
@@ -142,20 +142,20 @@ final class ExportingReaderTest extends TestCase
         $reader = new ExportingReader($exporter);
 
         $metric = new Metric(
-            $this->createMock(InstrumentationScopeInterface::class),
-            $this->createMock(ResourceInfo::class),
+            $this->createStub(InstrumentationScopeInterface::class),
+            $this->createStub(ResourceInfo::class),
             'test',
             null,
             null,
-            $this->createMock(DataInterface::class),
+            $this->createStub(DataInterface::class),
         );
 
         $source = $this->createMock(MetricSourceInterface::class);
         $source->expects($this->once())->method('collect')->willReturn($metric);
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $provider->expects($this->once())->method('create')->willReturn($source);
-        $metricMetadata = $this->createMock(MetricMetadataInterface::class);
-        $stalenessHandler = $this->createMock(StalenessHandlerInterface::class);
+        $metricMetadata = $this->createStub(MetricMetadataInterface::class);
+        $stalenessHandler = $this->createStub(StalenessHandlerInterface::class);
 
         $reader->add($provider, $metricMetadata, $stalenessHandler);
         $reader->collect();
@@ -186,7 +186,7 @@ final class ExportingReaderTest extends TestCase
         $exporter = $this->createMock(MetricExporterWithTemporalityInterface::class);
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $source = $this->createMock(MetricSourceInterface::class);
-        $source->method('collect')->willReturn($this->createMock(Metric::class));
+        $source->method('collect')->willReturn($this->createStub(Metric::class));
         $provider->method('create')->willReturn($source);
         $exporter->method('temporality')->willReturn('foo');
         $exporter->expects($this->once())->method('export')->willReturn(true);
@@ -195,8 +195,8 @@ final class ExportingReaderTest extends TestCase
         $reader = new ExportingReader($exporter);
         $reader->add(
             $provider,
-            $this->createMock(MetricMetadataInterface::class),
-            $this->createMock(StalenessHandlerInterface::class)
+            $this->createStub(MetricMetadataInterface::class),
+            $this->createStub(StalenessHandlerInterface::class)
         );
 
         $this->assertTrue($reader->shutdown());
@@ -213,7 +213,7 @@ final class ExportingReaderTest extends TestCase
 
     public function test_force_flush_with_non_push_exporter(): void
     {
-        $exporter = $this->createMock(MetricExporterInterface::class);
+        $exporter = $this->createStub(MetricExporterInterface::class);
         $reader = new ExportingReader($exporter);
 
         $this->assertTrue($reader->forceFlush());

@@ -189,20 +189,20 @@ final class MetricConverterTest extends TestCase
             2,
             (new MetricConverter())->convert([
                 new Metric(
-                    $this->createMock(InstrumentationScopeInterface::class),
+                    $this->createStub(InstrumentationScopeInterface::class),
                     $resourceA,
                     'test',
                     null,
                     null,
-                    $this->createMock(DataInterface::class),
+                    $this->createStub(DataInterface::class),
                 ),
                 new Metric(
-                    $this->createMock(InstrumentationScopeInterface::class),
+                    $this->createStub(InstrumentationScopeInterface::class),
                     $resourceB,
                     'test',
                     null,
                     null,
-                    $this->createMock(DataInterface::class),
+                    $this->createStub(DataInterface::class),
                 ),
             ])->getResourceMetrics(),
         );
@@ -226,7 +226,7 @@ final class MetricConverterTest extends TestCase
                     'name-1',
                     'unit-1',
                     'description-1',
-                    $this->createMock(DataInterface::class),
+                    $this->createStub(DataInterface::class),
                 ),
             ])->serializeToJsonString(),
         );

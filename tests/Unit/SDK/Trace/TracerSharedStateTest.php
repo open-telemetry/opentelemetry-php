@@ -66,7 +66,7 @@ class TracerSharedStateTest extends TestCase
 
     public function test_construct_one_span_processor(): void
     {
-        $processor = $this->createMock(SpanProcessorInterface::class);
+        $processor = $this->createStub(SpanProcessorInterface::class);
 
         $this->assertSame(
             $processor,
@@ -76,8 +76,8 @@ class TracerSharedStateTest extends TestCase
 
     public function test_construct_multiple_span_processors(): void
     {
-        $processor1 = $this->createMock(SpanProcessorInterface::class);
-        $processor2 = $this->createMock(SpanProcessorInterface::class);
+        $processor1 = $this->createStub(SpanProcessorInterface::class);
+        $processor2 = $this->createStub(SpanProcessorInterface::class);
 
         $this->assertInstanceOf(
             MultiSpanProcessor::class,

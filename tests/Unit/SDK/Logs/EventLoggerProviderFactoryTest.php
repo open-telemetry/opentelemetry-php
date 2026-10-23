@@ -26,7 +26,7 @@ class EventLoggerProviderFactoryTest extends TestCase
     public function test_create(string $disabled, string $expected): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $disabled);
-        $loggerProvider = $this->createMock(LoggerProviderInterface::class);
+        $loggerProvider = $this->createStub(LoggerProviderInterface::class);
         $factory = new EventLoggerProviderFactory();
         $eventLoggerProvider = $factory->create($loggerProvider);
         $this->assertInstanceOf($expected, $eventLoggerProvider);

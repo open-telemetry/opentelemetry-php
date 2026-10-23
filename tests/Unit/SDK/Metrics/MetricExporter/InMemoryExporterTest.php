@@ -70,12 +70,12 @@ final class InMemoryExporterTest extends TestCase
         $metrics = [];
         for ($i = 0; $i < $count; $i++) {
             $metrics[] = new Metric(
-                $this->createMock(InstrumentationScopeInterface::class),
-                $this->createMock(ResourceInfo::class),
+                $this->createStub(InstrumentationScopeInterface::class),
+                $this->createStub(ResourceInfo::class),
                 sprintf('test-%d', $i),
                 null,
                 null,
-                $this->createMock(DataInterface::class),
+                $this->createStub(DataInterface::class),
             );
         }
 

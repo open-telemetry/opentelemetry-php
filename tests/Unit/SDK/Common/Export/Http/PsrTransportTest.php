@@ -27,6 +27,9 @@ use Psr\Http\Message\ResponseInterface;
 #[CoversClass(PsrTransport::class)]
 final class PsrTransportTest extends TestCase
 {
+    /**
+     * @var MockObject&ClientInterface
+     */
     private MockObject $client;
     private PsrTransportFactory $factory;
 
@@ -157,7 +160,7 @@ final class PsrTransportTest extends TestCase
 
     public function test_send_retry_network_exception_returns_error(): void
     {
-        $e = new class('network error') extends \Exception implements NetworkExceptionInterface {
+        $e = new class('network error') extends Exception implements NetworkExceptionInterface {
             #[\Override]
             public function getRequest(): RequestInterface
             {

@@ -7,12 +7,6 @@ parameters:
 			path: src/API/Trace/functions.php
 
 		-
-			message: '#^Comparison operation "\<" between int\<80100, 80599\> and 80100 is always false\.$#'
-			identifier: smaller.alwaysFalse
-			count: 1
-			path: src/Context/DebugScope.php
-
-		-
 			message: '#^Call to function is_array\(\) with array\<string, string\> will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -23,12 +17,6 @@ parameters:
 			identifier: arrayValues.list
 			count: 1
 			path: src/Context/Propagation/SanitizeCombinedHeadersPropagationGetter.php
-
-		-
-			message: '#^Comparison operation "\<" between int\<80100, 80599\> and 80100 is always false\.$#'
-			identifier: smaller.alwaysFalse
-			count: 1
-			path: src/Context/ZendObserverFiber.php
 
 		-
 			message: '#^Method OpenTelemetry\\Contrib\\Otlp\\MetricExporter\:\:temporality\(\) never returns null so it can be removed from the return type\.$#'

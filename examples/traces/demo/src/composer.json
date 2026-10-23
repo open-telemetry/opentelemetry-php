@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "php": ">=8.1",
+    "php": ">=8.2",
     "open-telemetry/opentelemetry": "dev-main",
     "guzzlehttp/guzzle": "*",
     "php-http/guzzle7-adapter": "*",

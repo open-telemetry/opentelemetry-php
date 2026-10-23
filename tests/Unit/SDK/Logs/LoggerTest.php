@@ -61,7 +61,7 @@ class LoggerTest extends TestCase
     public function test_log_record(): void
     {
         $logger = new Logger($this->sharedState, $this->scope);
-        $record = (new LogRecord())->setContext($this->createMock(ContextInterface::class));
+        $record = (new LogRecord())->setContext($this->createStub(ContextInterface::class));
 
         $this->processor->expects($this->once())->method('onEmit')
             ->with(
@@ -84,7 +84,7 @@ class LoggerTest extends TestCase
 
         $logger
             ->logRecordBuilder()
-            ->setContext($this->createMock(ContextInterface::class))
+            ->setContext($this->createStub(ContextInterface::class))
             ->emit();
     }
 

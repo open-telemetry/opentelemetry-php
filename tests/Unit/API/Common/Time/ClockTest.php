@@ -26,7 +26,7 @@ class ClockTest extends TestCase
 
     public function test_default_is_settable(): void
     {
-        $clock = $this->createMock(ClockInterface::class);
+        $clock = $this->createStub(ClockInterface::class);
         Clock::setDefault($clock);
 
         $this->assertSame($clock, Clock::getDefault());
@@ -34,7 +34,7 @@ class ClockTest extends TestCase
 
     public function test_default_is_resettable(): void
     {
-        $clock = $this->createMock(ClockInterface::class);
+        $clock = $this->createStub(ClockInterface::class);
         Clock::setDefault(
             $clock
         );

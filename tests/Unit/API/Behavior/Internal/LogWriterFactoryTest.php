@@ -52,7 +52,7 @@ class LogWriterFactoryTest extends TestCase
 
     public function test_psr3_log_destination(): void
     {
-        LoggerHolder::set($this->createMock(LoggerInterface::class));
+        LoggerHolder::set($this->createStub(LoggerInterface::class));
         $this->assertInstanceOf(Psr3LogWriter::class, (new LogWriterFactory())->create());
     }
 }

@@ -28,7 +28,7 @@ class LogRecordProcessorFactoryTest extends TestCase
     #[DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
     {
-        $exporter = $this->createMock(LogRecordExporterInterface::class);
+        $exporter = $this->createStub(LogRecordExporterInterface::class);
         $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', $name);
         $processor = (new LogRecordProcessorFactory())->create($exporter);
 
@@ -50,13 +50,13 @@ class LogRecordProcessorFactoryTest extends TestCase
         $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'baz');
         $this->expectException(\InvalidArgumentException::class);
 
-        (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
+        (new LogRecordProcessorFactory())->create($this->createStub(LogRecordExporterInterface::class));
     }
 
     public function test_create_multiple(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_LOGS_PROCESSOR', 'batch,simple');
-        $processor = (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
+        $processor = (new LogRecordProcessorFactory())->create($this->createStub(LogRecordExporterInterface::class));
 
         $this->assertInstanceOf(MultiLogRecordProcessor::class, $processor);
     }
@@ -74,7 +74,7 @@ class LogRecordProcessorFactoryTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_BLRP_EXPORT_TIMEOUT, 3);
         $this->setEnvironmentVariable(Variables::OTEL_BLRP_MAX_EXPORT_BATCH_SIZE, 1);
 
-        $processor = (new LogRecordProcessorFactory())->create($this->createMock(LogRecordExporterInterface::class));
+        $processor = (new LogRecordProcessorFactory())->create($this->createStub(LogRecordExporterInterface::class));
         $this->assertInstanceOf(BatchLogRecordProcessor::class, $processor);
 
         $reflection = new ReflectionClass($processor);

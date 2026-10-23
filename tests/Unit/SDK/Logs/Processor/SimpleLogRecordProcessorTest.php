@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,13 +22,16 @@ class SimpleLogRecordProcessorTest extends TestCase
     private SimpleLogRecordProcessor $processor;
     /** @var LogRecordExporterInterface&MockObject $exporter */
     private LogRecordExporterInterface $exporter;
-    private ReadWriteLogRecord $readWriteLogRecord;
+    /**
+     * @var Stub&ReadWriteLogRecord
+     */
+    private Stub $readWriteLogRecord;
 
     #[\Override]
     public function setUp(): void
     {
         $this->exporter = $this->createMock(LogRecordExporterInterface::class);
-        $this->readWriteLogRecord = $this->createMock(ReadWriteLogRecord::class);
+        $this->readWriteLogRecord = $this->createStub(ReadWriteLogRecord::class);
         $this->processor = new SimpleLogRecordProcessor($this->exporter);
     }
 
