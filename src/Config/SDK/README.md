@@ -135,7 +135,8 @@ and sequences. Here it is a registry of instrumentation configuration objects ke
 $http = $configuration->getInstrumentationConfig()->get(HttpConfig::class);
 ```
 
-`ConfigProperties` is marked experimental, and will be reshaped to match the spec.
+`ConfigProperties` is marked experimental. The spec's accessors will be added alongside `get()`,
+which stays.
 
 ## Contributing
 
