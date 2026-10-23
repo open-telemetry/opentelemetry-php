@@ -1381,8 +1381,11 @@ final class ConfigurationTest extends TestCase
     public function test_empty_tracer_configurator_config(): void
     {
         $file = __DIR__ . '/configurations/empty-tracer-config.yaml';
-        $this->expectNotToPerformAssertions();
-        Configuration::parseFile($file)->create();
+        $sdk = Configuration::parseFile($file)->create()->build();
+
+        $this->assertTrue($sdk->getTracerProvider()->getTracer('test')->isEnabled());
+        $this->assertTrue($sdk->getMeterProvider()->getMeter('test')->createCounter('cnt')->isEnabled());
+        $this->assertTrue($sdk->getLoggerProvider()->getLogger('test')->isEnabled());
     }
 
     /**

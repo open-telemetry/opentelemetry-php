@@ -660,6 +660,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
+                                        ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                                         ->addDefaultsIfNotSet()
                                         ->children()
                                             ->booleanNode('enabled')->defaultTrue()->end()
@@ -759,6 +760,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
+                                        ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                                         ->addDefaultsIfNotSet()
                                         ->children()
                                             ->booleanNode('enabled')->defaultTrue()->end()
@@ -822,6 +824,7 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode($name);
         $node
+            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
