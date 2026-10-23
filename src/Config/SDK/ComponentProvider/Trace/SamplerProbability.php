@@ -2,24 +2,21 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Integration\Config\ComponentProvider\Trace;
+namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableProbability;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * Unlike the other providers here this one is not a no-op: `probability/development` describes
- * consistent probability sampling via a 56-bit threshold, which is what
- * {@see TraceIdRatioBasedSampler} already implements, so the ratio is honoured.
+ * Consistent probability sampler.
  *
- * It stays in the test suite rather than the SDK only because the schema key is still
- * `/development`; promoting it to `src/` would be a behavioural commitment to an unstable key.
- *
+ * @experimental
  * @implements ComponentProvider<SamplerInterface>
  */
 final class SamplerProbability implements ComponentProvider
@@ -32,9 +29,7 @@ final class SamplerProbability implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        return new TraceIdRatioBasedSampler(
-            probability: $properties['ratio'],
-        );
+        return new CompositeSampler(new ComposableProbability($properties['ratio']));
     }
 
     #[\Override]
