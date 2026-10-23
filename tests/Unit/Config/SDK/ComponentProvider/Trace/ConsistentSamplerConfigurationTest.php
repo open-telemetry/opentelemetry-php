@@ -16,6 +16,8 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\ComposableSamplerProbabilit
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\ComposableSamplerRuleBased;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SamplerComposite;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SamplerProbability;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterMemory;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
@@ -267,13 +269,15 @@ final class ConsistentSamplerConfigurationTest extends TestCase
                 new ComposableSamplerProbability(),
                 new ComposableSamplerParentThreshold(),
                 new ComposableSamplerRuleBased(),
+                new SpanProcessorSimple(),
+                new SpanExporterMemory(),
             ],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $indented = preg_replace('/^/m', '    ', $samplerYaml);
-        $sdk = $factory->process([Yaml::parse("file_format: \"1.0\"\ntracer_provider:\n  processors: []\n  sampler:\n" . $indented)])
+        $sdk = $factory->process([Yaml::parse("file_format: \"1.0\"\ntracer_provider:\n  processors:\n    - simple:\n        exporter:\n          memory/development:\n  sampler:\n" . $indented)])
             ->create(new Context())
             ->build();
 
