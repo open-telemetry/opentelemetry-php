@@ -43,8 +43,8 @@ final class SpanProcessorBatch implements ComponentProvider {
      * @param array{
      *     schedule_delay: int<0, max>,
      *     export_timeout: int<0, max>,
-     *     max_queue_size: int<0, max>,
-     *     max_export_batch_size: int<0, max>,
+     *     max_queue_size: int<1, max>,
+     *     max_export_batch_size: int<1, max>,
      *     exporter: ComponentPlugin<SpanExporter>,
      * } $properties
      */
@@ -58,8 +58,8 @@ final class SpanProcessorBatch implements ComponentProvider {
             ->children()
                 ->integerNode('schedule_delay')->min(0)->defaultValue(5000)->end()
                 ->integerNode('export_timeout')->min(0)->defaultValue(30000)->end()
-                ->integerNode('max_queue_size')->min(0)->defaultValue(2048)->end()
-                ->integerNode('max_export_batch_size')->min(0)->defaultValue(512)->end()
+                ->integerNode('max_queue_size')->min(1)->defaultValue(2048)->end()
+                ->integerNode('max_export_batch_size')->min(1)->defaultValue(512)->end()
                 ->append($registry->component('exporter', SpanExporter::class)->isRequired())
             ->end()
         ;

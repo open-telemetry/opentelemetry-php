@@ -1238,6 +1238,101 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * The schema has `exclusiveMinimum: 0` on these, so zero is invalid.
+     */
+    #[DataProvider('zeroExclusiveMinimumProvider')]
+    public function test_zero_is_rejected_where_schema_has_exclusive_minimum(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/value 0 is too small for path ".*%s"/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse($yaml)]);
+    }
+
+    public static function zeroExclusiveMinimumProvider(): iterable
+    {
+        foreach (['max_queue_size', 'max_export_batch_size'] as $key) {
+            yield "span batch $key" => [sprintf(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - batch:
+                      %s: 0
+                      exporter:
+                        console:
+                YAML, $key), "batch.$key"];
+            yield "log batch $key" => [sprintf(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                logger_provider:
+                  processors:
+                  - batch:
+                      %s: 0
+                      exporter:
+                        console:
+                YAML, $key), "batch.$key"];
+        }
+        yield 'view aggregation_cardinality_limit' => [/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  instrument_name: test
+                stream:
+                  aggregation_cardinality_limit: 0
+            YAML, 'stream.aggregation_cardinality_limit'];
+        foreach (['default', 'counter', 'gauge', 'histogram', 'observable_counter', 'observable_gauge', 'observable_up_down_counter', 'up_down_counter'] as $key) {
+            yield "reader cardinality_limits $key" => [sprintf(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                      cardinality_limits:
+                        %s: 0
+                YAML, $key), "cardinality_limits.$key"];
+        }
+    }
+
+    public function test_null_cardinality_limits_parse(): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+                  cardinality_limits:
+                    default: ~
+                    counter: ~
+              views:
+              - selector:
+                  instrument_name: test
+                stream:
+                  aggregation_cardinality_limit: ~
+            YAML)]);
+    }
+
+    /**
      * `probability/development` is the one composable-sampler provider that is not a no-op, so
      * the configured ratio should reach the sampler rather than being parsed and dropped.
      */

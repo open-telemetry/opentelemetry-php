@@ -161,7 +161,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             stream: array{
      *                 name: ?string,
      *                 description: ?string,
-     *                 aggregation_cardinality_limit: ?int<0, max>,
+     *                 aggregation_cardinality_limit: ?int<1, max>,
      *                 attribute_keys: array{
      *                     included: list<string>,
      *                     excluded: list<string>,
@@ -685,7 +685,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->children()
                                     ->scalarNode('name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                                    ->integerNode('aggregation_cardinality_limit')->defaultValue(2000)->end()
+                                    ->integerNode('aggregation_cardinality_limit')->defaultNull()->min(1)->end()
                                     ->arrayNode('attribute_keys')
                                         ->children()
                                             ->arrayNode('included')
