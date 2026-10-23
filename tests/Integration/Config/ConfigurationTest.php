@@ -760,6 +760,44 @@ final class ConfigurationTest extends TestCase
         yield 'up_down_counter' => ['up_down_counter', InstrumentType::UP_DOWN_COUNTER];
     }
 
+    public function test_view_selects_on_unit(): void
+    {
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  unit: ms
+                stream:
+                  name: renamed
+            YAML)]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+        $scope = new InstrumentationScope('test', null, null, Attributes::create([]));
+
+        $views = $viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', 'ms', null), $scope);
+        $this->assertNotNull($views);
+        $names = [];
+        foreach ($views as $view) {
+            $names[] = $view->name;
+        }
+        $this->assertSame(['renamed'], $names);
+
+        $this->assertNull($viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', 's', null), $scope));
+        $this->assertNull($viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', null, null), $scope));
+    }
+
     /**
      * `log_level` is named with an OTel severity but the internal logger is PSR-3, and it is global
      * state, so it must not be applied until the SDK is registered globally.

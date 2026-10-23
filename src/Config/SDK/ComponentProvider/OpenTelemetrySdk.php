@@ -45,6 +45,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeSchemaU
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersionCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentUnitCriteria;
 use OpenTelemetry\SDK\Metrics\View\ViewTemplate;
 use OpenTelemetry\SDK\Resource\Detectors;
 use OpenTelemetry\SDK\Resource\ResourceDetectorInterface;
@@ -320,7 +321,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 $criteria[] = new InstrumentNameCriteria($view['selector']['instrument_name']);
             }
             if (isset($view['selector']['unit'])) {
-                // TODO Add unit criteria
+                $criteria[] = new InstrumentUnitCriteria($view['selector']['unit']);
             }
             if (isset($view['selector']['meter_name'])) {
                 $criteria[] = new InstrumentationScopeNameCriteria($view['selector']['meter_name']);

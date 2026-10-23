@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeSchemaU
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentationScopeVersionCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentNameCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentTypeCriteria;
+use OpenTelemetry\SDK\Metrics\View\SelectionCriteria\InstrumentUnitCriteria;
 use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,6 +26,7 @@ use Prophecy\PhpUnit\ProphecyTrait;
 #[CoversClass(InstrumentationScopeSchemaUrlCriteria::class)]
 #[CoversClass(InstrumentNameCriteria::class)]
 #[CoversClass(InstrumentTypeCriteria::class)]
+#[CoversClass(InstrumentUnitCriteria::class)]
 #[CoversClass(AllCriteria::class)]
 final class SelectionCriteriaTest extends TestCase
 {
@@ -102,6 +104,24 @@ final class SelectionCriteriaTest extends TestCase
             new Instrument(InstrumentType::HISTOGRAM, 'name', null, null),
             new InstrumentationScope('scopeName', null, null, Attributes::create([])),
         ));
+    }
+
+    #[DataProvider('instrumentUnitProvider')]
+    public function test_instrument_unit_criteria(string $unit, ?string $instrumentUnit, bool $expected): void
+    {
+        $this->assertSame($expected, (new InstrumentUnitCriteria($unit))->accepts(
+            new Instrument(InstrumentType::COUNTER, 'name', $instrumentUnit, null),
+            new InstrumentationScope('scopeName', null, null, Attributes::create([])),
+        ));
+    }
+
+    public static function instrumentUnitProvider(): iterable
+    {
+        yield 'matching' => ['ms', 'ms', true];
+        yield 'not matching' => ['ms', 's', false];
+        yield 'case sensitive' => ['ms', 'MS', false];
+        yield 'instrument without unit' => ['ms', null, false];
+        yield 'no wildcards' => ['*', 'ms', false];
     }
 
     public function test_all_criteria_accepts_if_all_criteria_accept(): void
