@@ -10,6 +10,7 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableProbability;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -41,7 +42,7 @@ class ComposableProbabilityTest extends TestCase
     {
         $intent = $this->intent(new ComposableProbability($ratio));
 
-        $this->assertSame(ConsistentSamplingUtil::INVALID_THRESHOLD, $intent->getThreshold());
+        $this->assertSame(SamplingIntent::INVALID_THRESHOLD, $intent->getThreshold());
         $this->assertFalse($intent->isAdjustedCountReliable());
     }
 

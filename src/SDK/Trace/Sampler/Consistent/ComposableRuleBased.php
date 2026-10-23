@@ -51,7 +51,7 @@ final class ComposableRuleBased implements ComposableSamplerInterface
             }
         }
 
-        return new SamplingIntent(threshold: ConsistentSamplingUtil::INVALID_THRESHOLD, adjustedCountReliable: false);
+        return new SamplingIntent(threshold: SamplingIntent::INVALID_THRESHOLD, adjustedCountReliable: false);
     }
 
     #[\Override]

@@ -32,7 +32,7 @@ final class ComposableProbability implements ComposableSamplerInterface
 
         $threshold = ConsistentSamplingUtil::calculateThreshold($ratio);
         $this->intent = $threshold === ConsistentSamplingUtil::MAX_THRESHOLD
-            ? new SamplingIntent(threshold: ConsistentSamplingUtil::INVALID_THRESHOLD, adjustedCountReliable: false)
+            ? new SamplingIntent(threshold: SamplingIntent::INVALID_THRESHOLD, adjustedCountReliable: false)
             : new SamplingIntent(threshold: $threshold, adjustedCountReliable: true);
         $this->description = sprintf('ComposableProbability{ratio=%g}', $ratio);
     }

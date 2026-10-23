@@ -19,7 +19,7 @@ final class ComposableAlwaysOff implements ComposableSamplerInterface
     public function __construct()
     {
         $this->intent = new SamplingIntent(
-            threshold: ConsistentSamplingUtil::INVALID_THRESHOLD,
+            threshold: SamplingIntent::INVALID_THRESHOLD,
             adjustedCountReliable: false,
         );
     }

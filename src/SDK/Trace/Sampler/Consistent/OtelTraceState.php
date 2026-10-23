@@ -48,7 +48,7 @@ final class OtelTraceState
     {
         return new self(
             ConsistentSamplingUtil::INVALID_RANDOM_VALUE,
-            ConsistentSamplingUtil::INVALID_THRESHOLD,
+            SamplingIntent::INVALID_THRESHOLD,
             [],
         );
     }
@@ -75,7 +75,7 @@ final class OtelTraceState
 
     public function invalidateThreshold(): void
     {
-        $this->threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
+        $this->threshold = SamplingIntent::INVALID_THRESHOLD;
     }
 
     /**
@@ -134,7 +134,7 @@ final class OtelTraceState
             return self::empty();
         }
 
-        $threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
+        $threshold = SamplingIntent::INVALID_THRESHOLD;
         $randomValue = ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
         $otherKeyValuePairs = [];
         $seenKeys = [];
@@ -177,7 +177,7 @@ final class OtelTraceState
         }
 
         if (isset($ambiguousKeys[self::SUBKEY_THRESHOLD])) {
-            $threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
+            $threshold = SamplingIntent::INVALID_THRESHOLD;
         }
         if (isset($ambiguousKeys[self::SUBKEY_RANDOM_VALUE])) {
             $randomValue = ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
@@ -190,10 +190,10 @@ final class OtelTraceState
     {
         $length = strlen($hex);
         if ($length === 0 || $length > 14) {
-            return ConsistentSamplingUtil::INVALID_THRESHOLD;
+            return SamplingIntent::INVALID_THRESHOLD;
         }
 
-        return self::parseHex($hex, ConsistentSamplingUtil::INVALID_THRESHOLD);
+        return self::parseHex($hex, SamplingIntent::INVALID_THRESHOLD);
     }
 
     private static function parseRandomValue(string $hex): int

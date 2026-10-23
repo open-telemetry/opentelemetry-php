@@ -100,7 +100,7 @@ class CompositeSamplerTest extends TestCase
         $sampler = self::composable(0, attributes: ['custom' => true]);
 
         $sampled = SamplerTestContexts::sample($sampler, SamplerTestContexts::rootContext());
-        $dropped = SamplerTestContexts::sample(self::composable(ConsistentSamplingUtil::INVALID_THRESHOLD, attributes: ['custom' => true]), SamplerTestContexts::rootContext());
+        $dropped = SamplerTestContexts::sample(self::composable(SamplingIntent::INVALID_THRESHOLD, attributes: ['custom' => true]), SamplerTestContexts::rootContext());
 
         $this->assertSame(['custom' => true], $sampled->getAttributes());
         $this->assertSame([], $dropped->getAttributes());

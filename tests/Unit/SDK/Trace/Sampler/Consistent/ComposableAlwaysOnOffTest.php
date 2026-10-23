@@ -12,6 +12,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOn;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -36,7 +37,7 @@ class ComposableAlwaysOnOffTest extends TestCase
     {
         $intent = $this->intent(new ComposableAlwaysOff());
 
-        $this->assertSame(ConsistentSamplingUtil::INVALID_THRESHOLD, $intent->getThreshold());
+        $this->assertSame(SamplingIntent::INVALID_THRESHOLD, $intent->getThreshold());
         $this->assertFalse($intent->isAdjustedCountReliable());
         $this->assertSame([], $intent->getAttributes());
     }

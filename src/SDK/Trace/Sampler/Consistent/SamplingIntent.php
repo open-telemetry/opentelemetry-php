@@ -14,6 +14,9 @@ use OpenTelemetry\API\Trace\TraceStateInterface;
  */
 final class SamplingIntent implements SamplingIntentInterface
 {
+    /** The threshold of an intent that drops the span. */
+    public const INVALID_THRESHOLD = -1;
+
     /**
      * @param iterable<string, mixed> $attributes
      * @param (Closure(TraceStateInterface, bool): TraceStateInterface)|null $traceStateUpdater Must not modify the `ot` entry

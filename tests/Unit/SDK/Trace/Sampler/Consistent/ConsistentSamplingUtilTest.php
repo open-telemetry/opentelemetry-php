@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
 use InvalidArgumentException;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +16,7 @@ class ConsistentSamplingUtilTest extends TestCase
 {
     public function test_sentinels_are_outside_the_valid_ranges(): void
     {
-        $this->assertFalse(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::INVALID_THRESHOLD));
+        $this->assertFalse(ConsistentSamplingUtil::isValidThreshold(SamplingIntent::INVALID_THRESHOLD));
         $this->assertFalse(ConsistentSamplingUtil::isValidRandomValue(ConsistentSamplingUtil::INVALID_RANDOM_VALUE));
         $this->assertTrue(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::MIN_THRESHOLD));
         $this->assertTrue(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::MAX_THRESHOLD));
@@ -25,7 +26,7 @@ class ConsistentSamplingUtilTest extends TestCase
 
     public function test_invalid_threshold_is_invalid(): void
     {
-        $this->assertFalse(ConsistentSamplingUtil::isValidThreshold(ConsistentSamplingUtil::INVALID_THRESHOLD));
+        $this->assertFalse(ConsistentSamplingUtil::isValidThreshold(SamplingIntent::INVALID_THRESHOLD));
     }
 
     public function test_invalid_random_value_is_invalid(): void

@@ -11,7 +11,7 @@ use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOff;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOn;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableParentThreshold;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +25,7 @@ class ComposableParentThresholdTest extends TestCase
 
         $intent = $sampler->getSamplingIntent(SamplerTestContexts::rootContext(), 'span', SpanKind::KIND_SERVER, Attributes::create([]), []);
 
-        $this->assertSame(ConsistentSamplingUtil::INVALID_THRESHOLD, $intent->getThreshold());
+        $this->assertSame(SamplingIntent::INVALID_THRESHOLD, $intent->getThreshold());
     }
 
     public function test_consistent_parent_threshold_is_propagated(): void

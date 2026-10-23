@@ -58,7 +58,7 @@ final class ComposableParentThreshold implements ComposableSamplerInterface
         return new SamplingIntent(
             threshold: $parentSpanContext->isSampled()
                 ? ConsistentSamplingUtil::MIN_THRESHOLD
-                : ConsistentSamplingUtil::INVALID_THRESHOLD,
+                : SamplingIntent::INVALID_THRESHOLD,
             adjustedCountReliable: false,
         );
     }

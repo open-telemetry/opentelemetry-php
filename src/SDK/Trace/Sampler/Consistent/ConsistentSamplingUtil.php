@@ -31,8 +31,6 @@ final class ConsistentSamplingUtil
 
     public const MAX_RANDOM_VALUE = self::MAX_THRESHOLD - 1;
 
-    public const INVALID_THRESHOLD = -1;
-
     public const INVALID_RANDOM_VALUE = -1;
 
     private const HEX_DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];

@@ -15,7 +15,7 @@ interface SamplingIntentInterface
 {
     /**
      * The rejection threshold: the lower, the more likely the span is sampled (0 samples every span).
-     * {@see ConsistentSamplingUtil::INVALID_THRESHOLD} means that the span is dropped.
+     * {@see SamplingIntent::INVALID_THRESHOLD} means that the span is dropped.
      */
     public function getThreshold(): int;
 

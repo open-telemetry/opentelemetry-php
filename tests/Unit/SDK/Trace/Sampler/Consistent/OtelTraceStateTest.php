@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
 
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use function str_repeat;
@@ -208,7 +209,7 @@ class OtelTraceStateTest extends TestCase
     public function test_set_invalid_threshold_is_noop(): void
     {
         $state = OtelTraceState::parse('th:8');
-        $state->setThreshold(ConsistentSamplingUtil::INVALID_THRESHOLD);
+        $state->setThreshold(SamplingIntent::INVALID_THRESHOLD);
         $this->assertSame('', $state->serialize());
     }
 

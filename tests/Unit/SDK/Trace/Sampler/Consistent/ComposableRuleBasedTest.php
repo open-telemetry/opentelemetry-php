@@ -14,6 +14,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableRuleBased;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicatedSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -36,7 +37,7 @@ class ComposableRuleBasedTest extends TestCase
 
     public function test_empty_rule_set_drops(): void
     {
-        $this->assertSame(ConsistentSamplingUtil::INVALID_THRESHOLD, $this->threshold(new ComposableRuleBased(), 'span'));
+        $this->assertSame(SamplingIntent::INVALID_THRESHOLD, $this->threshold(new ComposableRuleBased(), 'span'));
     }
 
     public function test_no_match_drops(): void
@@ -45,7 +46,7 @@ class ComposableRuleBasedTest extends TestCase
 
         $intent = $sampler->getSamplingIntent(Context::getRoot(), 'B', SpanKind::KIND_SERVER, Attributes::create([]), []);
 
-        $this->assertSame(ConsistentSamplingUtil::INVALID_THRESHOLD, $intent->getThreshold());
+        $this->assertSame(SamplingIntent::INVALID_THRESHOLD, $intent->getThreshold());
         $this->assertFalse($intent->isAdjustedCountReliable());
     }
 
@@ -61,7 +62,7 @@ class ComposableRuleBasedTest extends TestCase
         $this->assertSame(0x80000000000000, $this->threshold($sampler, 'A', SpanKind::KIND_CLIENT));
         $this->assertSame(0x50000000000000, $this->threshold($sampler, 'B', SpanKind::KIND_PRODUCER));
         $this->assertSame(0x30000000000000, $this->threshold($sampler, 'C'));
-        $this->assertSame(ConsistentSamplingUtil::INVALID_THRESHOLD, $this->threshold($sampler, 'D', SpanKind::KIND_CONSUMER));
+        $this->assertSame(SamplingIntent::INVALID_THRESHOLD, $this->threshold($sampler, 'D', SpanKind::KIND_CONSUMER));
     }
 
     public function test_matching_rule_delegates_the_whole_intent(): void
