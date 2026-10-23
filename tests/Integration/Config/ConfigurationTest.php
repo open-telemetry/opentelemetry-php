@@ -14,8 +14,12 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
+use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricExporterConsole;
+use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricReaderPeriodic;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterConsole;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
@@ -701,10 +705,18 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('instrumentTypeSelectorProvider')]
     public function test_view_selects_on_instrument_type(string $instrumentType, string $expected): void
     {
-        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
         $sdk = $factory->process([Yaml::parse(sprintf(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
             meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
               views:
               - selector:
                   instrument_type: %s
@@ -1104,7 +1116,7 @@ final class ConfigurationTest extends TestCase
         };
 
         $factory = new ConfigurationFactory(
-            [$samplerProvider],
+            [$samplerProvider, new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
@@ -1115,6 +1127,10 @@ final class ConfigurationTest extends TestCase
               attributes:
               - { name: service.name, value: test-service }
             tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
               sampler:
                 remote_sampler:
             YAML)]);
@@ -1235,6 +1251,47 @@ final class ConfigurationTest extends TestCase
                   ratio: 1.5', '/value 1\.5 is too big for path "probability\/development\.ratio"/'];
         yield 'probability ratio below zero' => ['    probability/development:
                   ratio: -0.5', '/value -0\.5 is too small for path "probability\/development\.ratio"/'];
+    }
+
+    /**
+     * An omitted provider is a noop, but a present one needs at least one processor or reader.
+     */
+    #[DataProvider('providerWithoutProcessorsProvider')]
+    public function test_provider_without_processors_is_rejected(string $yaml, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse($yaml)]);
+    }
+
+    public static function providerWithoutProcessorsProvider(): iterable
+    {
+        foreach (['tracer_provider' => 'processors', 'logger_provider' => 'processors', 'meter_provider' => 'readers'] as $provider => $list) {
+            $message = sprintf('/path ".*%s".*at least one %s/', $provider, rtrim($list, 's'));
+            yield "$provider empty" => [sprintf("file_format: \"1.0\"\n%s: {}", $provider), $message];
+            yield "$provider null" => [sprintf("file_format: \"1.0\"\n%s: ~", $provider), $message];
+            yield "$provider empty $list" => [sprintf("file_format: \"1.0\"\n%s:\n  %s: []", $provider, $list), $message];
+        }
+    }
+
+    public function test_omitted_providers_parse(): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse('file_format: "1.0"')])->create(new Context());
     }
 
     /**

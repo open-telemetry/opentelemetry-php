@@ -617,6 +617,10 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node = $builder->arrayNode('tracer_provider');
         $node
             ->addDefaultsIfNotSet()
+            ->validate()
+                ->ifTrue(static fn (?array $v): bool => ($v['processors'] ?? []) === [])
+                ->thenInvalid('A tracer provider needs at least one processor. Omit tracer_provider for a noop.')
+            ->end()
             ->children()
                 ->arrayNode('limits')
                     ->addDefaultsIfNotSet()
@@ -667,6 +671,10 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node = $builder->arrayNode('meter_provider');
         $node
             ->addDefaultsIfNotSet()
+            ->validate()
+                ->ifTrue(static fn (?array $v): bool => ($v['readers'] ?? []) === [])
+                ->thenInvalid('A meter provider needs at least one reader. Omit meter_provider for a noop.')
+            ->end()
             ->children()
                 ->enumNode('exemplar_filter')
                     ->values([
@@ -762,6 +770,10 @@ final class OpenTelemetrySdk implements ComponentProvider
         $node = $builder->arrayNode('logger_provider');
         $node
             ->addDefaultsIfNotSet()
+            ->validate()
+                ->ifTrue(static fn (?array $v): bool => ($v['processors'] ?? []) === [])
+                ->thenInvalid('A logger provider needs at least one processor. Omit logger_provider for a noop.')
+            ->end()
             ->children()
                 ->arrayNode('limits')
                     ->addDefaultsIfNotSet()
