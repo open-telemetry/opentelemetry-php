@@ -7,7 +7,8 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableProbability;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -28,7 +29,7 @@ final class SamplerProbability implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        return ConsistentSampler::probabilityBased($properties['ratio']);
+        return new CompositeSampler(new ComposableProbability($properties['ratio']));
     }
 
     #[\Override]

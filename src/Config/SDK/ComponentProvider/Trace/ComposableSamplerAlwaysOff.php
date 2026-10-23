@@ -7,14 +7,14 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Trace;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOff;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @experimental
- * @implements ComponentProvider<ComposableInterface>
+ * @implements ComponentProvider<ComposableSamplerInterface>
  */
 final class ComposableSamplerAlwaysOff implements ComponentProvider
 {
@@ -22,9 +22,9 @@ final class ComposableSamplerAlwaysOff implements ComponentProvider
      * @param array{} $properties
      */
     #[\Override]
-    public function createPlugin(array $properties, Context $context): ComposableInterface
+    public function createPlugin(array $properties, Context $context): ComposableSamplerInterface
     {
-        return ConsistentSampler::alwaysOff();
+        return new ComposableAlwaysOff();
     }
 
     #[\Override]

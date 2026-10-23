@@ -8,7 +8,7 @@ namespace OpenTelemetry\SDK\Trace\Sampler\Consistent;
  * Parser and serializer for the `ot` sub-key of the W3C TraceState.
  *
  * Format: `th:<threshold>;rv:<randomvalue>[;other:value...]`
- * - `th`: 1–14 lower-case hex digits (right-padded with zeros to 56 bits), trailing zeros stripped on write
+ * - `th`: 1 to 14 lower-case hex digits (right-padded with zeros to 56 bits), trailing zeros stripped on write
  * - `rv`: exactly 14 lower-case hex digits
  *
  * @internal
@@ -26,7 +26,7 @@ final class OtelTraceState
     private const TRACE_STATE_SIZE_LIMIT = 256;
 
     /** @var int valid in [0, MAX_RANDOM_VALUE], or INVALID_RANDOM_VALUE */
-    private int $randomValue;
+    private readonly int $randomValue;
 
     /** @var int valid in [0, MAX_THRESHOLD], or INVALID_THRESHOLD */
     private int $threshold;
@@ -73,18 +73,13 @@ final class OtelTraceState
         return ConsistentSamplingUtil::isValidThreshold($this->threshold);
     }
 
-    public function invalidateRandomValue(): void
-    {
-        $this->randomValue = ConsistentSamplingUtil::INVALID_RANDOM_VALUE;
-    }
-
     public function invalidateThreshold(): void
     {
         $this->threshold = ConsistentSamplingUtil::INVALID_THRESHOLD;
     }
 
     /**
-     * Sets the threshold. If the given value is invalid, the threshold is invalidated.
+     * An invalid value invalidates the threshold.
      */
     public function setThreshold(int $threshold): void
     {
@@ -96,20 +91,7 @@ final class OtelTraceState
     }
 
     /**
-     * Sets the random value. If the given value is invalid, the random value is invalidated.
-     */
-    public function setRandomValue(int $randomValue): void
-    {
-        if (ConsistentSamplingUtil::isValidRandomValue($randomValue)) {
-            $this->randomValue = $randomValue;
-        } else {
-            $this->invalidateRandomValue();
-        }
-    }
-
-    /**
-     * Serializes the current state back to a string for the `ot` key.
-     * Returns empty string if there is nothing to encode.
+     * The value of the `ot` entry, or an empty string if there is nothing to encode.
      */
     public function serialize(): string
     {
@@ -123,7 +105,7 @@ final class OtelTraceState
             $parts[] = self::SUBKEY_RANDOM_VALUE . ':' . ConsistentSamplingUtil::encodeRandomValue($this->randomValue);
         }
 
-        // Append other k:v pairs, stopping if we would exceed the size limit
+        // Other sub-keys are kept as long as the size limit is not exceeded
         $currentLength = $parts !== [] ? strlen(implode(';', $parts)) : 0;
         foreach ($this->otherKeyValuePairs as $pair) {
             $pairLength = ($currentLength > 0 ? 1 : 0) + strlen((string) $pair);
@@ -210,7 +192,7 @@ final class OtelTraceState
             return ConsistentSamplingUtil::INVALID_THRESHOLD;
         }
 
-        // Parse the 1–14 hex digits (right-pad with zeros to 14 chars = 56 bits)
+        // 1 to 14 hex digits, right-padded with zeros to 14 digits (56 bits)
         return self::parseHex($s, $start, $len, ConsistentSamplingUtil::INVALID_THRESHOLD);
     }
 
@@ -224,10 +206,8 @@ final class OtelTraceState
     }
 
     /**
-     * Parses a variable-length lower-case hex substring into an integer,
-     * left-aligning within a 56-bit field (i.e. first digit = bits 52-55).
-     *
-     * This matches the Java parseHex() in consistent56: `r |= x << (52 - (i << 2))`
+     * Parses a variable-length lower-case hex substring, left-aligned in a 56-bit field (the first digit are the
+     * bits 52 to 55).
      */
     private static function parseHex(string $s, int $start, int $len, int $invalid): int
     {

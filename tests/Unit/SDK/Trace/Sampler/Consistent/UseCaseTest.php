@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler\Consistent;
 
+use function implode;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
 use OpenTelemetry\API\Trace\SpanKind;
@@ -13,7 +14,12 @@ use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOff;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableAlwaysOn;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableParentThreshold;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableProbability;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableRuleBased;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
@@ -23,12 +29,8 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration-style use case tests, ported from Java's UseCaseTest.
- *
- * Scenario: parent-based sampling with rule-based root sampler:
- * - health-check spans are NEVER sampled
- * - checkout spans are ALWAYS sampled
- * - everything else: 10% sampling
+ * Parent threshold sampling with a rule based root sampler: health-check spans are never sampled, checkout spans
+ * are always sampled and all other root spans are sampled with a probability of 10%.
  */
 #[CoversNothing]
 class UseCaseTest extends TestCase
@@ -36,7 +38,7 @@ class UseCaseTest extends TestCase
     private const TRACE_ID = '4bf92f3577b34da6a3ce929d0e0e4736';
     private const SPAN_ID = '00f067aa0ba902b7';
 
-    private static function buildSampler(): ConsistentSampler
+    private static function buildSampler(): CompositeSampler
     {
         $isHealthCheck = new class() implements \OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface {
             #[\Override]
@@ -54,35 +56,37 @@ class UseCaseTest extends TestCase
             }
         };
 
-        $rootSampler = ConsistentSampler::ruleBased(
-            null,
-            PredicatedSampler::onMatch($isHealthCheck, ConsistentSampler::alwaysOff()),
-            PredicatedSampler::onMatch($isCheckout, ConsistentSampler::alwaysOn()),
-            PredicatedSampler::onMatch(Predicate::anySpan(), ConsistentSampler::probabilityBased(0.1)),
+        $rootSampler = new ComposableRuleBased(
+            new PredicatedSampler($isHealthCheck, new ComposableAlwaysOff()),
+            new PredicatedSampler($isCheckout, new ComposableAlwaysOn()),
+            new PredicatedSampler(Predicate::anySpan(), new ComposableProbability(0.1)),
         );
 
-        return ConsistentSampler::parentBased($rootSampler);
+        return new CompositeSampler(new ComposableParentThreshold($rootSampler));
     }
 
-    private static function makeParentContext(bool $sampled, ?int $thresholdHex = null, ?int $rvHex = null): \OpenTelemetry\Context\ContextInterface
+    private static function makeParentContext(bool $sampled, ?int $threshold = null, ?int $randomValue = null): ContextInterface
     {
-        $state = OtelTraceState::parse('');
-        if ($thresholdHex !== null) {
-            $state->setThreshold($thresholdHex);
+        $members = [];
+        if ($threshold !== null) {
+            $members[] = 'th:' . ConsistentSamplingUtil::encodeThreshold($threshold);
         }
-        if ($rvHex !== null) {
-            $state->setRandomValue($rvHex);
+        if ($randomValue !== null) {
+            $members[] = 'rv:' . ConsistentSamplingUtil::encodeRandomValue($randomValue);
         }
 
-        $serialized = $state->serialize();
-        $traceState = $serialized !== '' ? (new TraceState())->with(OtelTraceState::TRACE_STATE_KEY, $serialized) : new TraceState();
-        $traceFlag = $sampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT;
-        $spanContext = SpanContext::createFromRemoteParent(self::TRACE_ID, self::SPAN_ID, $traceFlag, $traceState);
+        $traceState = $members !== []
+            ? (new TraceState())->with(OtelTraceState::TRACE_STATE_KEY, implode(';', $members))
+            : new TraceState();
+        $spanContext = SpanContext::createFromRemoteParent(
+            self::TRACE_ID,
+            self::SPAN_ID,
+            $sampled ? TraceFlags::SAMPLED : TraceFlags::DEFAULT,
+            $traceState,
+        );
 
         return Context::getRoot()->withContextValue(new NonRecordingSpan($spanContext));
     }
-
-    // ─── Root span tests ──────────────────────────────────────────────────────
 
     public function test_root_health_check_is_dropped(): void
     {
@@ -137,7 +141,7 @@ class UseCaseTest extends TestCase
         );
     }
 
-    private function sampleRootSpan(ConsistentSampler $sampler, string $traceId): SamplingResult
+    private function sampleRootSpan(CompositeSampler $sampler, string $traceId): SamplingResult
     {
         return $sampler->shouldSample(
             Context::getRoot(),
@@ -149,12 +153,10 @@ class UseCaseTest extends TestCase
         );
     }
 
-    // ─── Child span tests ─────────────────────────────────────────────────────
-
     public function test_child_with_sampled_parent_and_threshold_is_sampled(): void
     {
-        // Parent is sampled, has th=0 (always sample) → child should be sampled with th=0
-        $parentCtx = self::makeParentContext(sampled: true, thresholdHex: 0, rvHex: 0x7f99aa40c02744);
+        // A sampled parent with th=0 gives a sampled child with th=0
+        $parentCtx = self::makeParentContext(sampled: true, threshold: 0, randomValue: 0x7f99aa40c02744);
         $sampler = self::buildSampler();
         $result = $sampler->shouldSample(
             $parentCtx,
@@ -165,7 +167,6 @@ class UseCaseTest extends TestCase
             [],
         );
 
-        // Parent is sampled with th=0 → parent sampler propagates th=0 → child is sampled
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
         $ot = OtelTraceState::parse($result->getTraceState()?->get(OtelTraceState::TRACE_STATE_KEY));
         $this->assertSame(0, $ot->getThreshold());
@@ -189,8 +190,8 @@ class UseCaseTest extends TestCase
 
     public function test_child_with_sampled_parent_no_threshold_follows_sampled_flag(): void
     {
-        // Parent sampled but no th → reliable=false → th erased in output
-        $parentCtx = self::makeParentContext(sampled: true, thresholdHex: null);
+        // A sampled parent without th gives a sampled child; the adjusted count is not reliable, so th is not written
+        $parentCtx = self::makeParentContext(sampled: true, threshold: null);
         $sampler = self::buildSampler();
         $result = $sampler->shouldSample(
             $parentCtx,
@@ -201,10 +202,7 @@ class UseCaseTest extends TestCase
             [],
         );
 
-        // Should be sampled (parent.sampled=true → threshold=0, reliable=false → random R)
-        // Random R >= 0 is always true, so this should always be RECORD_AND_SAMPLE
         $this->assertSame(SamplingResult::RECORD_AND_SAMPLE, $result->getDecision());
-        // But th should NOT be set in output (reliable=false)
         $ot = OtelTraceState::parse($result->getTraceState()?->get(OtelTraceState::TRACE_STATE_KEY));
         $this->assertFalse($ot->hasValidThreshold());
     }

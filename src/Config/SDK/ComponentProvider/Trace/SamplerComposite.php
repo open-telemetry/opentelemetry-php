@@ -8,14 +8,14 @@ use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * Wraps a composable (consistent probability) sampler as a {@see SamplerInterface} (the spec's CompositeSampler).
+ * Wraps a composable sampler in a {@see CompositeSampler}.
  *
  * @experimental
  * @implements ComponentProvider<SamplerInterface>
@@ -23,21 +23,18 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class SamplerComposite implements ComponentProvider
 {
     /**
-     * @param list<ComponentPlugin<ComposableInterface>> $properties
+     * @param list<ComponentPlugin<ComposableSamplerInterface>> $properties
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
-        $sampler = $properties[0]->create($context);
-
-        // Built-in composable samplers already are samplers; any other composable sampler is wrapped
-        return $sampler instanceof SamplerInterface ? $sampler : ConsistentSampler::composite($sampler);
+        return new CompositeSampler($properties[0]->create($context));
     }
 
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $registry->componentMap('composite/development', ComposableInterface::class);
+        $node = $registry->componentMap('composite/development', ComposableSamplerInterface::class);
         $node->isRequired();
         // The schema requires exactly one composable sampler (minProperties: 1, maxProperties: 1)
         $node->validate()->always(static function (array $value): array {

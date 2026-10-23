@@ -21,7 +21,7 @@ use function sprintf;
 use function strtr;
 
 /**
- * Factory for common {@see PredicateInterface} implementations backed by closures.
+ * Closure based {@see PredicateInterface} with named constructors for the common conditions.
  *
  * @experimental
  */
@@ -52,10 +52,8 @@ final class Predicate implements PredicateInterface
         return $this->description;
     }
 
-    // ─── Static factories ──────────────────────────────────────────────────────
-
     /**
-     * Returns a predicate that matches root spans only (no valid parent span context).
+     * Matches spans without a valid parent span context.
      */
     public static function isRootSpan(): self
     {
@@ -65,24 +63,6 @@ final class Predicate implements PredicateInterface
         );
     }
 
-    /**
-     * Returns a predicate that matches spans with a local (non-remote) parent, including root spans.
-     */
-    public static function hasLocalParent(): self
-    {
-        return new self(
-            static function (ContextInterface $ctx): bool {
-                $sc = Span::fromContext($ctx)->getContext();
-
-                return !$sc->isValid() || !$sc->isRemote();
-            },
-            'hasLocalParent',
-        );
-    }
-
-    /**
-     * Returns a predicate that matches spans with a remote parent.
-     */
     public static function hasRemoteParent(): self
     {
         return new self(
@@ -96,7 +76,7 @@ final class Predicate implements PredicateInterface
     }
 
     /**
-     * Returns a predicate that matches spans with a valid, local (non-remote) parent. Root spans do not match.
+     * Matches spans with a valid, local parent. Root spans do not match.
      */
     public static function hasLocalSpanParent(): self
     {
@@ -110,9 +90,6 @@ final class Predicate implements PredicateInterface
         );
     }
 
-    /**
-     * Returns a predicate that matches spans of any of the given {@see \OpenTelemetry\API\Trace\SpanKind} values.
-     */
     public static function spanKindIn(int ...$spanKinds): self
     {
         return new self(
@@ -122,8 +99,8 @@ final class Predicate implements PredicateInterface
     }
 
     /**
-     * Returns a predicate that matches when the attribute $key is present and its string representation
-     * equals one of $values. For array attributes, a match on any item is a match.
+     * Matches when the attribute is present and its string representation equals one of the values.
+     * For array attributes, a match of any item is a match.
      *
      * @param list<string> $values
      */
@@ -144,10 +121,9 @@ final class Predicate implements PredicateInterface
     }
 
     /**
-     * Returns a predicate that matches when the attribute $key is present and its string representation
-     * matches one of the $included patterns (all values if empty) and none of the $excluded patterns.
-     * Patterns are case-sensitive; '?' matches any single character and '*' any sequence of characters.
-     * For array attributes, a match on any item is a match.
+     * Matches when the attribute is present, its string representation matches one of the included patterns
+     * (any value if there are none) and none of the excluded patterns. Patterns are case-sensitive, `?` matches a
+     * single character and `*` any sequence of characters. For array attributes, a match of any item is a match.
      *
      * @param list<string> $included
      * @param list<string> $excluded
@@ -171,9 +147,6 @@ final class Predicate implements PredicateInterface
         );
     }
 
-    /**
-     * Returns a predicate that matches all spans.
-     */
     public static function anySpan(): self
     {
         return new self(
@@ -182,9 +155,6 @@ final class Predicate implements PredicateInterface
         );
     }
 
-    /**
-     * Returns a predicate that is true when both $p1 and $p2 match.
-     */
     public static function and(PredicateInterface $p1, PredicateInterface $p2): self
     {
         return new self(
@@ -195,9 +165,6 @@ final class Predicate implements PredicateInterface
         );
     }
 
-    /**
-     * Returns a predicate that is true when either $p1 or $p2 matches.
-     */
     public static function or(PredicateInterface $p1, PredicateInterface $p2): self
     {
         return new self(
@@ -209,15 +176,11 @@ final class Predicate implements PredicateInterface
     }
 
     /**
-     * Returns a predicate that negates $p.
+     * Booleans are compared as "true" and "false", everything else by its string cast.
      */
-    public static function not(PredicateInterface $p): self
+    public static function attributeValueToString(mixed $value): string
     {
-        return new self(
-            static fn (ContextInterface $ctx, string $name, int $kind, AttributesInterface $attrs, array $links)
-                => !$p->spanMatches($ctx, $name, $kind, $attrs, $links),
-            sprintf('not(%s)', self::describe($p)),
-        );
+        return is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
     }
 
     /**
@@ -238,14 +201,6 @@ final class Predicate implements PredicateInterface
     }
 
     /**
-     * String representation used to compare attribute values: booleans as "true"/"false", everything else cast.
-     */
-    public static function attributeValueToString(mixed $value): string
-    {
-        return is_bool($value) ? ($value ? 'true' : 'false') : (string) $value;
-    }
-
-    /**
      * @return non-empty-string
      */
     private static function wildcardToRegex(string $pattern): string
@@ -262,8 +217,8 @@ final class Predicate implements PredicateInterface
             return $defaultIfEmpty;
         }
         foreach ($regexes as $regex) {
-            // Prefer unicode matching so that '?' matches one character; for candidates that are not valid UTF-8
-            // preg_match() fails, so fall back to byte-wise matching instead of silently not matching.
+            // Unicode matching lets `?` match one character; candidates that are not valid UTF-8 make it fail,
+            // so fall back to byte matching instead of silently not matching
             $result = preg_match($regex . 'u', $candidate);
             if ($result === false) {
                 $result = preg_match($regex, $candidate);
@@ -278,6 +233,6 @@ final class Predicate implements PredicateInterface
 
     private static function describe(PredicateInterface $p): string
     {
-        return $p instanceof self ? (string) $p : get_class($p);
+        return $p instanceof self ? (string) $p : $p::class;
     }
 }

@@ -46,11 +46,6 @@ final class PredicateTest extends TestCase
         $this->assertTrue($this->check(Predicate::hasLocalSpanParent(), $local));
         $this->assertFalse($this->check(Predicate::hasLocalSpanParent(), $remote));
 
-        // hasLocalParent() also matches root spans, unlike hasLocalSpanParent()
-        $this->assertTrue($this->check(Predicate::hasLocalParent(), $root));
-        $this->assertTrue($this->check(Predicate::hasLocalParent(), $local));
-        $this->assertFalse($this->check(Predicate::hasLocalParent(), $remote));
-
         $this->assertFalse($this->check(Predicate::hasRemoteParent(), $root));
         $this->assertFalse($this->check(Predicate::hasRemoteParent(), $local));
         $this->assertTrue($this->check(Predicate::hasRemoteParent(), $remote));
@@ -59,7 +54,7 @@ final class PredicateTest extends TestCase
     public function test_any_span_and_boolean_combinators(): void
     {
         $true = Predicate::anySpan();
-        $false = Predicate::not($true);
+        $false = new Predicate(static fn (): bool => false, 'never');
         $custom = new class() implements PredicateInterface {
             #[\Override]
             public function spanMatches(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): bool
@@ -70,19 +65,17 @@ final class PredicateTest extends TestCase
 
         $this->assertTrue($this->check($true));
         $this->assertFalse($this->check($false));
+        $this->assertTrue($this->check(Predicate::and($true, Predicate::or($false, $true))));
         $this->assertTrue($this->check(Predicate::and($true, $true)));
         $this->assertFalse($this->check(Predicate::and($true, $false)));
         $this->assertTrue($this->check(Predicate::or($false, $true)));
         $this->assertFalse($this->check(Predicate::or($false, $false)));
-        $this->assertTrue($this->check(Predicate::not($false)));
-        $this->assertTrue($this->check(Predicate::and($true, Predicate::or($false, Predicate::not($false)))));
 
         $this->assertSame('anySpan', (string) $true);
-        $this->assertSame('not(anySpan)', (string) $false);
-        $this->assertSame('and(anySpan,not(anySpan))', (string) Predicate::and($true, $false));
-        $this->assertSame('or(anySpan,not(anySpan))', (string) Predicate::or($true, $false));
+        $this->assertSame('and(anySpan,never)', (string) Predicate::and($true, $false));
+        $this->assertSame('or(anySpan,never)', (string) Predicate::or($true, $false));
         // predicates that are not created by the factories are described by their class name
-        $this->assertSame('not(' . $custom::class . ')', (string) Predicate::not($custom));
+        $this->assertSame('and(anySpan,' . $custom::class . ')', (string) Predicate::and($true, $custom));
     }
 
     public function test_attribute_values(): void

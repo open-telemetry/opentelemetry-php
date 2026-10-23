@@ -9,15 +9,13 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Trace\LinkInterface;
 
 /**
- * A predicate used by {@see ConsistentRuleBasedSampler} to match spans.
+ * A condition of a {@see ComposableRuleBased} rule.
  *
  * @experimental
  */
 interface PredicateInterface
 {
     /**
-     * Returns true if the span described by the given arguments matches this predicate.
-     *
      * @param list<LinkInterface> $links
      */
     public function spanMatches(

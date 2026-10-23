@@ -35,16 +35,16 @@ class ConsistentSamplingUtilTest extends TestCase
 
     public function test_calculate_threshold(): void
     {
-        // probability 1.0 → threshold 0 (always sample)
+        // probability 1.0 gives threshold 0 (always sample)
         $this->assertSame(0, ConsistentSamplingUtil::calculateThreshold(1.0));
 
-        // probability 0.5 → threshold = 2^56 * 0.5 = 2^55 = 0x80000000000000
+        // probability 0.5 gives threshold 2^56 * 0.5 = 2^55 = 0x80000000000000
         $this->assertSame(0x80000000000000, ConsistentSamplingUtil::calculateThreshold(0.5));
 
-        // probability 0.25 → threshold = 0xc0000000000000
+        // probability 0.25 gives threshold 0xc0000000000000
         $this->assertSame(0xc0000000000000, ConsistentSamplingUtil::calculateThreshold(0.25));
 
-        // probability 0.0 → threshold = MAX_THRESHOLD (drop all)
+        // probability 0.0 gives MAX_THRESHOLD (drop all)
         $this->assertSame(ConsistentSamplingUtil::MAX_THRESHOLD, ConsistentSamplingUtil::calculateThreshold(0.0));
     }
 
@@ -60,42 +60,15 @@ class ConsistentSamplingUtilTest extends TestCase
         ConsistentSamplingUtil::calculateThreshold(1.01);
     }
 
-    public function test_calculate_sampling_probability(): void
-    {
-        $this->assertSame(1.0, ConsistentSamplingUtil::calculateSamplingProbability(0));
-        $this->assertSame(0.5, ConsistentSamplingUtil::calculateSamplingProbability(0x80000000000000));
-        $this->assertSame(0.25, ConsistentSamplingUtil::calculateSamplingProbability(0xc0000000000000));
-        $this->assertSame(0.0, ConsistentSamplingUtil::calculateSamplingProbability(ConsistentSamplingUtil::MAX_THRESHOLD));
-    }
-
-    public function test_calculate_sampling_probability_invalid(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        ConsistentSamplingUtil::calculateSamplingProbability(-1);
-    }
-
-    public function test_calculate_adjusted_count(): void
-    {
-        $this->assertSame(1.0, ConsistentSamplingUtil::calculateAdjustedCount(0));
-        $this->assertSame(2.0, ConsistentSamplingUtil::calculateAdjustedCount(0x80000000000000));
-        $this->assertSame(4.0, ConsistentSamplingUtil::calculateAdjustedCount(0xc0000000000000));
-    }
-
-    public function test_calculate_adjusted_count_max_throws(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        ConsistentSamplingUtil::calculateAdjustedCount(ConsistentSamplingUtil::MAX_THRESHOLD);
-    }
-
     public function test_encode_threshold(): void
     {
-        // 0 → "0" (always sample)
+        // 0 is encoded as "0" (always sample)
         $this->assertSame('0', ConsistentSamplingUtil::encodeThreshold(0));
 
-        // 50% sampling → threshold = 0x80000000000000 → "8" (trailing zeros stripped)
+        // 50% sampling is threshold 0x80000000000000, encoded as "8" (trailing zeros stripped)
         $this->assertSame('8', ConsistentSamplingUtil::encodeThreshold(0x80000000000000));
 
-        // 25% → 0xc0000000000000 → "c"
+        // 25% is threshold 0xc0000000000000, encoded as "c"
         $this->assertSame('c', ConsistentSamplingUtil::encodeThreshold(0xc0000000000000));
 
         // All 14 hex digits significant

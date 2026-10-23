@@ -8,21 +8,20 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 
 /**
- * Consistent sampler that samples every span (threshold = 0).
+ * Drops every span (no threshold, adjusted count not reliable).
  *
  * @experimental
  */
-final class ConsistentAlwaysOnSampler extends ConsistentSampler
+final class ComposableAlwaysOff implements ComposableSamplerInterface
 {
-    private static ?self $instance = null;
+    private readonly SamplingIntentInterface $intent;
 
-    private function __construct()
+    public function __construct()
     {
-    }
-
-    public static function getInstance(): self
-    {
-        return self::$instance ??= new self();
+        $this->intent = new SamplingIntent(
+            threshold: ConsistentSamplingUtil::INVALID_THRESHOLD,
+            adjustedCountReliable: false,
+        );
     }
 
     #[\Override]
@@ -33,15 +32,12 @@ final class ConsistentAlwaysOnSampler extends ConsistentSampler
         AttributesInterface $attributes,
         array $links,
     ): SamplingIntentInterface {
-        return new SamplingIntent(
-            threshold: ConsistentSamplingUtil::MIN_THRESHOLD,
-            adjustedCountReliable: true,
-        );
+        return $this->intent;
     }
 
     #[\Override]
     public function getDescription(): string
     {
-        return 'ConsistentAlwaysOnSampler';
+        return 'ComposableAlwaysOff';
     }
 }

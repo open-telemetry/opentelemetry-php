@@ -28,7 +28,7 @@ use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
@@ -984,8 +984,8 @@ final class ConfigurationTest extends TestCase
 
         $sampler = $this->getSampler($sdk->create(new Context())->build());
 
-        $this->assertInstanceOf(ConsistentSampler::class, $sampler);
-        $this->assertStringContainsString('sampling probability=0.001', $sampler->getDescription());
+        $this->assertInstanceOf(CompositeSampler::class, $sampler);
+        $this->assertSame('ComposableProbability{ratio=0.001}', $sampler->getDescription());
     }
 
     /**

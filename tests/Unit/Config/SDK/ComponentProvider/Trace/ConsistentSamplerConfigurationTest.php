@@ -18,12 +18,13 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SamplerComposite;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SamplerProbability;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
 use OpenTelemetry\Context\Context as OtelContext;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntentInterface;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
@@ -43,6 +44,7 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(ComposableSamplerRuleBased::class)]
 #[CoversClass(SamplerComposite::class)]
 #[CoversClass(SamplerProbability::class)]
+#[CoversClass(NonEmptyList::class)]
 final class ConsistentSamplerConfigurationTest extends TestCase
 {
     private const TRACE_ID = '0af7651916cd43dd8448eb211c80319c';
@@ -171,11 +173,11 @@ final class ConsistentSamplerConfigurationTest extends TestCase
 
     public function test_composite_wraps_a_custom_composable_sampler(): void
     {
-        $custom = new /** @implements ComponentProvider<ComposableInterface> */ class() implements ComponentProvider {
+        $custom = new /** @implements ComponentProvider<ComposableSamplerInterface> */ class() implements ComponentProvider {
             #[\Override]
-            public function createPlugin(array $properties, Context $context): ComposableInterface
+            public function createPlugin(array $properties, Context $context): ComposableSamplerInterface
             {
-                return new class() implements ComposableInterface {
+                return new class() implements ComposableSamplerInterface {
                     #[\Override]
                     public function getSamplingIntent(ContextInterface $parentContext, string $spanName, int $spanKind, AttributesInterface $attributes, array $links): SamplingIntentInterface
                     {
@@ -296,6 +298,6 @@ final class ConsistentSamplerConfigurationTest extends TestCase
 
     public function test_composable_samplers_are_consistent_samplers(): void
     {
-        $this->assertInstanceOf(ConsistentSampler::class, $this->sampler("probability/development:\n  ratio: 0.5\n"));
+        $this->assertInstanceOf(CompositeSampler::class, $this->sampler("probability/development:\n  ratio: 0.5\n"));
     }
 }

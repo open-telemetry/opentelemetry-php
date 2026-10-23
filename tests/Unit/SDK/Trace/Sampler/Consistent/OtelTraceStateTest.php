@@ -83,16 +83,6 @@ class OtelTraceStateTest extends TestCase
         $this->assertFalse(OtelTraceState::parse('th:zz;th:8')->hasValidThreshold());
     }
 
-    public function test_set_invalid_random_value_invalidates_it(): void
-    {
-        $state = OtelTraceState::parse('rv:1234567890abcd');
-
-        $state->setRandomValue(-5);
-
-        $this->assertFalse($state->hasValidRandomValue());
-        $this->assertSame('', $state->serialize());
-    }
-
     public function test_serialize_stops_before_exceeding_the_size_limit(): void
     {
         // each pair is 'kN:' plus 70 value characters; only as many fit next to th as the 256 character limit allows
@@ -114,13 +104,13 @@ class OtelTraceStateTest extends TestCase
 
     public function test_rv_too_long_rejected(): void
     {
-        // 15 hex chars → invalid
+        // 15 hex chars are invalid
         $this->assertSame('', OtelTraceState::parse('rv:1234567890abcde')->serialize());
     }
 
     public function test_rv_too_short_rejected(): void
     {
-        // 13 chars → invalid (must be exactly 14)
+        // 13 chars are invalid (exactly 14 are required)
         $this->assertSame('', OtelTraceState::parse('rv:1000000000000')->serialize());
     }
 
@@ -142,7 +132,7 @@ class OtelTraceStateTest extends TestCase
 
     public function test_th_trailing_zeros_stripped_on_output(): void
     {
-        // Input with 14 chars but trailing zeros → output drops trailing zeros
+        // 14 chars with trailing zeros: the output drops the trailing zeros
         $this->assertSame('th:1', OtelTraceState::parse('th:10000000000000')->serialize());
         $this->assertSame('th:12345', OtelTraceState::parse('th:1234500000000')->serialize());
         $this->assertSame('th:0', OtelTraceState::parse('th:0')->serialize());
@@ -150,7 +140,7 @@ class OtelTraceStateTest extends TestCase
 
     public function test_th_too_long_rejected(): void
     {
-        // 15 hex chars → invalid
+        // 15 hex chars are invalid
         $this->assertSame('', OtelTraceState::parse('th:100000000000000')->serialize());
         $this->assertSame('', OtelTraceState::parse('th:1234567890abcde')->serialize());
     }
@@ -162,7 +152,7 @@ class OtelTraceStateTest extends TestCase
 
     public function test_th_various_lengths_with_trailing_zeros(): void
     {
-        // Each of these has trailing zeros → serialized as 'th:1'
+        // Each of these has trailing zeros, so it is serialized as 'th:1'
         $inputs = [
             'th:10000000000000',
             'th:1000000000000',
@@ -231,22 +221,6 @@ class OtelTraceStateTest extends TestCase
         $this->assertSame('', $state->serialize());
     }
 
-    public function test_invalidate_random_value(): void
-    {
-        $state = OtelTraceState::parse('rv:1234567890abcd');
-        $this->assertTrue($state->hasValidRandomValue());
-        $state->invalidateRandomValue();
-        $this->assertFalse($state->hasValidRandomValue());
-        $this->assertSame('', $state->serialize());
-    }
-
-    public function test_set_random_value(): void
-    {
-        $state = OtelTraceState::parse('');
-        $state->setRandomValue(0x1234567890abcd);
-        $this->assertSame('rv:1234567890abcd', $state->serialize());
-    }
-
     public function test_other_key_value_pairs_preserved(): void
     {
         $state = OtelTraceState::parse('foo:bar;th:8;baz:qux');
@@ -255,7 +229,7 @@ class OtelTraceStateTest extends TestCase
 
     public function test_max_threshold_not_serialized(): void
     {
-        // th = MAX_THRESHOLD means "drop" → not serialized
+        // th = MAX_THRESHOLD means "drop" and is not serialized
         $state = OtelTraceState::parse('');
         $state->setThreshold(ConsistentSamplingUtil::MAX_THRESHOLD);
         $this->assertSame('', $state->serialize());

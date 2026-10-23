@@ -8,17 +8,15 @@ use Closure;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 
 /**
- * Immutable value object implementing {@see SamplingIntentInterface}.
+ * Immutable {@see SamplingIntentInterface}.
  *
  * @experimental
  */
 final class SamplingIntent implements SamplingIntentInterface
 {
     /**
-     * @param int $threshold Rejection threshold; {@see ConsistentSamplingUtil::INVALID_THRESHOLD} = drop
-     * @param bool $adjustedCountReliable Whether the threshold can be used for adjusted count
-     * @param iterable<string, mixed> $attributes Attributes to add when sampled
-     * @param Closure(TraceStateInterface, bool): TraceStateInterface|null $traceStateUpdater Function to modify the parent TraceState, given the final sampling decision (must not touch the `ot` key)
+     * @param iterable<string, mixed> $attributes
+     * @param (Closure(TraceStateInterface, bool): TraceStateInterface)|null $traceStateUpdater Must not modify the `ot` entry
      */
     public function __construct(
         private readonly int $threshold,

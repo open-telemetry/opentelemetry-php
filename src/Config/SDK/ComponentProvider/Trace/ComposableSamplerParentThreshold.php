@@ -8,26 +8,26 @@ use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableParentThreshold;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * @experimental
- * @implements ComponentProvider<ComposableInterface>
+ * @implements ComponentProvider<ComposableSamplerInterface>
  */
 final class ComposableSamplerParentThreshold implements ComponentProvider
 {
     /**
      * @param array{
-     *     root: ComponentPlugin<ComposableInterface>,
+     *     root: ComponentPlugin<ComposableSamplerInterface>,
      * } $properties
      */
     #[\Override]
-    public function createPlugin(array $properties, Context $context): ComposableInterface
+    public function createPlugin(array $properties, Context $context): ComposableSamplerInterface
     {
-        return ConsistentSampler::parentBased($properties['root']->create($context));
+        return new ComposableParentThreshold($properties['root']->create($context));
     }
 
     #[\Override]
@@ -36,7 +36,7 @@ final class ComposableSamplerParentThreshold implements ComponentProvider
         $node = $builder->arrayNode('parent_threshold');
         $node
             ->children()
-                ->append($registry->component('root', ComposableInterface::class)->isRequired())
+                ->append($registry->component('root', ComposableSamplerInterface::class)->isRequired())
             ->end()
         ;
 

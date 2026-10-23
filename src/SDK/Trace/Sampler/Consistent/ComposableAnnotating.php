@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace\Sampler\Consistent;
 
-use function json_encode;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use function sprintf;
 
 /**
- * Delegates the sampling decision to another composable sampler and adds attributes to sampled spans.
- *
+ * Delegates the decision to another composable sampler and adds attributes to sampled spans.
  * Attributes of the delegate are kept; on a key conflict the attributes of this sampler win.
  *
  * @experimental
  */
-final class ConsistentAnnotatingSampler extends ConsistentSampler
+final class ComposableAnnotating implements ComposableSamplerInterface
 {
     private readonly string $description;
 
@@ -25,10 +23,10 @@ final class ConsistentAnnotatingSampler extends ConsistentSampler
      */
     public function __construct(
         private readonly array $attributes,
-        private readonly ComposableInterface $delegate,
+        private readonly ComposableSamplerInterface $delegate,
     ) {
         $this->description = sprintf(
-            'ConsistentAnnotatingSampler{%s,%s}',
+            'ComposableAnnotating{%s,%s}',
             $delegate->getDescription(),
             (string) json_encode($attributes, JSON_PARTIAL_OUTPUT_ON_ERROR),
         );

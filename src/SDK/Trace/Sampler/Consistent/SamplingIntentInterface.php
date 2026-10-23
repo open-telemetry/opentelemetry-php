@@ -7,41 +7,36 @@ namespace OpenTelemetry\SDK\Trace\Sampler\Consistent;
 use OpenTelemetry\API\Trace\TraceStateInterface;
 
 /**
- * Represents a sampling decision intent returned by a {@see ComposableInterface}.
+ * The sampling preference returned by a {@see ComposableSamplerInterface}.
  *
  * @experimental
  */
 interface SamplingIntentInterface
 {
     /**
-     * Returns the suggested rejection threshold.
-     *
-     * A lower value increases the likelihood of sampling (0 = always sample).
-     * {@see ConsistentSamplingUtil::INVALID_THRESHOLD} means "drop".
+     * The rejection threshold: the lower, the more likely the span is sampled (0 samples every span).
+     * {@see ConsistentSamplingUtil::INVALID_THRESHOLD} means that the span is dropped.
      */
     public function getThreshold(): int;
 
     /**
-     * Returns true if the threshold value can be reliably used to compute the adjusted count
-     * (the reciprocal of the sampling probability, used for Span-to-Metrics estimation).
+     * Whether the threshold can be used to compute the adjusted count (the reciprocal of the sampling probability,
+     * used for span to metrics estimation).
      */
     public function isAdjustedCountReliable(): bool;
 
     /**
-     * Returns the attributes to add to the span when the sampling decision is positive.
+     * Attributes to add to the span when it is sampled.
      *
      * @return iterable<string, mixed>
      */
     public function getAttributes(): iterable;
 
     /**
-     * Given the parent TraceState and the final sampling decision, returns the (possibly updated)
-     * TraceState to attach to the span. Called for every span, sampled or not.
+     * Returns the TraceState of the span, given the one of the parent and the final decision. Called for every span.
+     * Implementations must not modify the `ot` entry, which is owned by the {@see CompositeSampler}.
      *
-     * Note: implementations MUST NOT modify the OpenTelemetry `ot` sub-key; that is the sole
-     * responsibility of {@see ConsistentSampler}.
-     *
-     * @param bool $sampled true if the final decision is RECORD_AND_SAMPLE, false if it is DROP
+     * @param bool $sampled whether the final decision is RECORD_AND_SAMPLE
      */
     public function updateTraceState(TraceStateInterface $parentState, bool $sampled): TraceStateInterface;
 }

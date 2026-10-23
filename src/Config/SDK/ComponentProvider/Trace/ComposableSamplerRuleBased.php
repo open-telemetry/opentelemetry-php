@@ -10,18 +10,18 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableInterface;
-use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSampler;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableRuleBased;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicatedSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\PredicateInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * @experimental
- * @implements ComponentProvider<ComposableInterface>
+ * @implements ComponentProvider<ComposableSamplerInterface>
  */
 final class ComposableSamplerRuleBased implements ComponentProvider
 {
@@ -37,7 +37,7 @@ final class ComposableSamplerRuleBased implements ComponentProvider
     /**
      * @param array{
      *     rules: list<array{
-     *         sampler: ComponentPlugin<ComposableInterface>,
+     *         sampler: ComponentPlugin<ComposableSamplerInterface>,
      *         span_kinds: list<string>,
      *         parent: list<string>,
      *         attribute_values: ?array{key: string, values: list<string>},
@@ -46,30 +46,30 @@ final class ComposableSamplerRuleBased implements ComponentProvider
      * } $properties
      */
     #[\Override]
-    public function createPlugin(array $properties, Context $context): ComposableInterface
+    public function createPlugin(array $properties, Context $context): ComposableSamplerInterface
     {
         $samplers = [];
         foreach ($properties['rules'] as $rule) {
-            $samplers[] = PredicatedSampler::onMatch(
+            $samplers[] = new PredicatedSampler(
                 self::createPredicate($rule),
                 $rule['sampler']->create($context),
             );
         }
 
-        return ConsistentSampler::ruleBased(null, ...$samplers);
+        return new ComposableRuleBased(...$samplers);
     }
 
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('rule_based');
-        self::rejectExplicitlyEmpty($node, 'rules');
+        NonEmptyList::require($node, 'rules');
 
         $rule = $node->children()->arrayNode('rules')->defaultValue([])->arrayPrototype();
-        self::rejectExplicitlyEmpty($rule, 'span_kinds', 'parent');
+        NonEmptyList::require($rule, 'span_kinds', 'parent');
 
         $ruleChildren = $rule->children();
-        $ruleChildren->append($registry->component('sampler', ComposableInterface::class)->isRequired());
+        $ruleChildren->append($registry->component('sampler', ComposableSamplerInterface::class)->isRequired());
         $ruleChildren->arrayNode('span_kinds')
             ->defaultValue([])
             ->enumPrototype()->values(array_keys(self::SPAN_KINDS))->end()
@@ -86,7 +86,7 @@ final class ComposableSamplerRuleBased implements ComponentProvider
         ->end();
 
         $patterns = $ruleChildren->arrayNode('attribute_patterns');
-        self::rejectExplicitlyEmpty($patterns, 'included', 'excluded');
+        NonEmptyList::require($patterns, 'included', 'excluded');
         $patterns
             ->children()
                 ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
@@ -96,25 +96,6 @@ final class ComposableSamplerRuleBased implements ComponentProvider
         ;
 
         return $node;
-    }
-
-    /**
-     * The schema requires at least one item (minItems: 1) when one of these lists is set; omitting it is fine.
-     * An explicit empty list must not silently widen a rule (no filter) or drop every span (no rules).
-     */
-    private static function rejectExplicitlyEmpty(ArrayNodeDefinition $node, string ...$keys): void
-    {
-        $node->beforeNormalization()->always(static function (mixed $value) use ($keys): mixed {
-            if (is_array($value)) {
-                foreach ($keys as $key) {
-                    if (array_key_exists($key, $value) && ($value[$key] === [] || $value[$key] === null)) {
-                        throw new InvalidConfigurationException(sprintf('"%s" must contain at least one item when set.', $key));
-                    }
-                }
-            }
-
-            return $value;
-        })->end();
     }
 
     /**

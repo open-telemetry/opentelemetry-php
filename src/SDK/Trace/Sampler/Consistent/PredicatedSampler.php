@@ -5,22 +5,16 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\Sampler\Consistent;
 
 /**
- * Associates a {@see PredicateInterface} with a {@see ComposableInterface} for use in
- * {@see ConsistentRuleBasedSampler}.
+ * A rule of {@see ComposableRuleBased}: the sampler is used for spans that match the predicate.
  *
  * @experimental
  */
 final class PredicatedSampler
 {
-    private function __construct(
+    public function __construct(
         private readonly PredicateInterface $predicate,
-        private readonly ComposableInterface $sampler,
+        private readonly ComposableSamplerInterface $sampler,
     ) {
-    }
-
-    public static function onMatch(PredicateInterface $predicate, ComposableInterface $sampler): self
-    {
-        return new self($predicate, $sampler);
     }
 
     public function getPredicate(): PredicateInterface
@@ -28,7 +22,7 @@ final class PredicatedSampler
         return $this->predicate;
     }
 
-    public function getSampler(): ComposableInterface
+    public function getSampler(): ComposableSamplerInterface
     {
         return $this->sampler;
     }
