@@ -7,8 +7,8 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
-use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -18,14 +18,19 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 final class AggregationResolverDefault implements ComponentProvider
 {
     /**
+     * Resolves to null, so the metric reader's default aggregation applies.
+     *
      * @param array{} $properties
      */
     #[\Override]
     public function createPlugin(array $properties, Context $context): DefaultAggregationProviderInterface
     {
-        // TODO Implement proper aggregation providers (default, drop, explicit_bucket_histogram, last_value, sum) to handle advisory
         return new class() implements DefaultAggregationProviderInterface {
-            use DefaultAggregationProviderTrait;
+            #[\Override]
+            public function defaultAggregation($instrumentType, array $advisory = []): ?AggregationInterface
+            {
+                return null;
+            }
         };
     }
 

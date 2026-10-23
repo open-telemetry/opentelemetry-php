@@ -345,7 +345,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']['included']);
             }
             if (isset($view['stream']['aggregation'])) {
-                // TODO Add support for aggregation providers in views to allow usage of advisory
+                $viewTemplate = $viewTemplate->withAggregationResolver($view['stream']['aggregation']->create($context));
             }
             // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
 

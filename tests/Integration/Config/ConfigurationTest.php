@@ -30,6 +30,11 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
@@ -796,6 +801,129 @@ final class ConfigurationTest extends TestCase
 
         $this->assertNull($viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', 's', null), $scope));
         $this->assertNull($viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', null, null), $scope));
+    }
+
+    /**
+     * A null projection means the reader's default aggregation applies.
+     */
+    #[DataProvider('viewAggregationProvider')]
+    public function test_view_aggregation_resolves_per_instrument(array $aggregation, Instrument $instrument, ?AggregationInterface $expected): void
+    {
+        $this->assertEquals($expected, $this->projectedAggregation($aggregation, $instrument));
+    }
+
+    public static function viewAggregationProvider(): iterable
+    {
+        $counter = new Instrument(InstrumentType::COUNTER, 'i', null, null);
+        $upDownCounter = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'i', null, null);
+        $histogram = new Instrument(InstrumentType::HISTOGRAM, 'i', null, null);
+        $advised = new Instrument(InstrumentType::HISTOGRAM, 'i', null, null, ['ExplicitBucketBoundaries' => [1, 2, 3]]);
+        $asyncCounter = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'i', null, null);
+        $gauge = new Instrument(InstrumentType::GAUGE, 'i', null, null);
+
+        yield 'default on counter' => [['default' => null], $counter, null];
+        yield 'default on histogram' => [['default' => null], $histogram, null];
+        yield 'drop on counter' => [['drop' => null], $counter, new DropAggregation()];
+        yield 'drop on histogram' => [['drop' => null], $histogram, new DropAggregation()];
+        yield 'sum on counter' => [['sum' => null], $counter, new SumAggregation(true)];
+        yield 'sum on histogram' => [['sum' => null], $histogram, new SumAggregation(true)];
+        yield 'sum on observable counter' => [['sum' => null], $asyncCounter, new SumAggregation(true)];
+        yield 'sum on up down counter' => [['sum' => null], $upDownCounter, new SumAggregation(false)];
+        yield 'sum on gauge' => [['sum' => null], $gauge, new SumAggregation(false)];
+        yield 'last_value on counter' => [['last_value' => null], $counter, new LastValueAggregation()];
+        yield 'last_value on histogram' => [['last_value' => null], $histogram, new LastValueAggregation()];
+        yield 'explicit_bucket_histogram on counter' => [
+            ['explicit_bucket_histogram' => ['boundaries' => [1, 2]]],
+            $counter,
+            new ExplicitBucketHistogramAggregation([1, 2]),
+        ];
+        yield 'explicit_bucket_histogram boundaries beat advisory' => [
+            ['explicit_bucket_histogram' => ['boundaries' => [1.5, 2.5]]],
+            $advised,
+            new ExplicitBucketHistogramAggregation([1.5, 2.5]),
+        ];
+        yield 'explicit_bucket_histogram empty boundaries is one bucket' => [
+            ['explicit_bucket_histogram' => ['boundaries' => []]],
+            $advised,
+            new ExplicitBucketHistogramAggregation([]),
+        ];
+        yield 'explicit_bucket_histogram advisory beats SDK default' => [
+            ['explicit_bucket_histogram' => null],
+            $advised,
+            new ExplicitBucketHistogramAggregation([1, 2, 3]),
+        ];
+        yield 'explicit_bucket_histogram SDK default' => [
+            ['explicit_bucket_histogram' => null],
+            $histogram,
+            new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
+        ];
+        yield 'explicit_bucket_histogram without min and max' => [
+            ['explicit_bucket_histogram' => ['record_min_max' => false]],
+            $histogram,
+            new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000], false),
+        ];
+    }
+
+    public function test_base2_exponential_bucket_histogram_aggregation_warns_and_uses_reader_default(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('base2_exponential_bucket_histogram'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $this->assertNull($this->projectedAggregation(
+                ['base2_exponential_bucket_histogram' => ['max_scale' => -10, 'max_size' => 2, 'record_min_max' => false]],
+                new Instrument(InstrumentType::HISTOGRAM, 'i', null, null),
+            ));
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    #[DataProvider('invalidViewAggregationProvider')]
+    public function test_invalid_view_aggregation_is_rejected(array $aggregation): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->projectedAggregation($aggregation, new Instrument(InstrumentType::HISTOGRAM, 'i', null, null));
+    }
+
+    public static function invalidViewAggregationProvider(): iterable
+    {
+        yield 'non-numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['one']]]];
+        yield 'max_scale below -10' => [['base2_exponential_bucket_histogram' => ['max_scale' => -11]]];
+        yield 'max_scale above 20' => [['base2_exponential_bucket_histogram' => ['max_scale' => 21]]];
+        yield 'max_size below 2' => [['base2_exponential_bucket_histogram' => ['max_size' => 1]]];
+        yield 'two aggregations' => [['drop' => null, 'sum' => null]];
+    }
+
+    private function projectedAggregation(array $aggregation, Instrument $instrument): ?AggregationInterface
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([[
+            'file_format' => '1.0',
+            'meter_provider' => [
+                'readers' => [['periodic' => ['exporter' => ['console' => null]]]],
+                'views' => [['selector' => ['instrument_name' => 'i'], 'stream' => ['aggregation' => $aggregation]]],
+            ],
+        ]]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+
+        $views = $viewRegistry->find($instrument, new InstrumentationScope('test', null, null, Attributes::create([])));
+        $this->assertNotNull($views);
+        $aggregations = [];
+        foreach ($views as $view) {
+            $aggregations[] = $view->aggregation;
+        }
+        $this->assertCount(1, $aggregations);
+
+        return $aggregations[0];
     }
 
     /**
