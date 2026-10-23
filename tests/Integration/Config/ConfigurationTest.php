@@ -14,18 +14,28 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
+use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricExporterConsole;
+use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricReaderPeriodic;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterConsole;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
+use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation;
+use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
+use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
@@ -702,10 +712,18 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('instrumentTypeSelectorProvider')]
     public function test_view_selects_on_instrument_type(string $instrumentType, string $expected): void
     {
-        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
         $sdk = $factory->process([Yaml::parse(sprintf(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
             meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
               views:
               - selector:
                   instrument_type: %s
@@ -747,6 +765,167 @@ final class ConfigurationTest extends TestCase
         yield 'observable_gauge' => ['observable_gauge', InstrumentType::ASYNCHRONOUS_GAUGE];
         yield 'observable_up_down_counter' => ['observable_up_down_counter', InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER];
         yield 'up_down_counter' => ['up_down_counter', InstrumentType::UP_DOWN_COUNTER];
+    }
+
+    public function test_view_selects_on_unit(): void
+    {
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  unit: ms
+                stream:
+                  name: renamed
+            YAML)]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+        $scope = new InstrumentationScope('test', null, null, Attributes::create([]));
+
+        $views = $viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', 'ms', null), $scope);
+        $this->assertNotNull($views);
+        $names = [];
+        foreach ($views as $view) {
+            $names[] = $view->name;
+        }
+        $this->assertSame(['renamed'], $names);
+
+        $this->assertNull($viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', 's', null), $scope));
+        $this->assertNull($viewRegistry->find(new Instrument(InstrumentType::HISTOGRAM, 'original', null, null), $scope));
+    }
+
+    /**
+     * A null projection means the reader's default aggregation applies.
+     */
+    #[DataProvider('viewAggregationProvider')]
+    public function test_view_aggregation_resolves_per_instrument(array $aggregation, Instrument $instrument, ?AggregationInterface $expected): void
+    {
+        $this->assertEquals($expected, $this->projectedAggregation($aggregation, $instrument));
+    }
+
+    public static function viewAggregationProvider(): iterable
+    {
+        $counter = new Instrument(InstrumentType::COUNTER, 'i', null, null);
+        $upDownCounter = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'i', null, null);
+        $histogram = new Instrument(InstrumentType::HISTOGRAM, 'i', null, null);
+        $advised = new Instrument(InstrumentType::HISTOGRAM, 'i', null, null, ['ExplicitBucketBoundaries' => [1, 2, 3]]);
+        $asyncCounter = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'i', null, null);
+        $gauge = new Instrument(InstrumentType::GAUGE, 'i', null, null);
+
+        yield 'default on counter' => [['default' => null], $counter, null];
+        yield 'default on histogram' => [['default' => null], $histogram, null];
+        yield 'drop on counter' => [['drop' => null], $counter, new DropAggregation()];
+        yield 'drop on histogram' => [['drop' => null], $histogram, new DropAggregation()];
+        yield 'sum on counter' => [['sum' => null], $counter, new SumAggregation(true)];
+        yield 'sum on histogram' => [['sum' => null], $histogram, new SumAggregation(true)];
+        yield 'sum on observable counter' => [['sum' => null], $asyncCounter, new SumAggregation(true)];
+        yield 'sum on up down counter' => [['sum' => null], $upDownCounter, new SumAggregation(false)];
+        yield 'sum on gauge' => [['sum' => null], $gauge, new SumAggregation(false)];
+        yield 'last_value on counter' => [['last_value' => null], $counter, new LastValueAggregation()];
+        yield 'last_value on histogram' => [['last_value' => null], $histogram, new LastValueAggregation()];
+        yield 'explicit_bucket_histogram on counter' => [
+            ['explicit_bucket_histogram' => ['boundaries' => [1, 2]]],
+            $counter,
+            new ExplicitBucketHistogramAggregation([1, 2]),
+        ];
+        yield 'explicit_bucket_histogram boundaries beat advisory' => [
+            ['explicit_bucket_histogram' => ['boundaries' => [1.5, 2.5]]],
+            $advised,
+            new ExplicitBucketHistogramAggregation([1.5, 2.5]),
+        ];
+        yield 'explicit_bucket_histogram empty boundaries is one bucket' => [
+            ['explicit_bucket_histogram' => ['boundaries' => []]],
+            $advised,
+            new ExplicitBucketHistogramAggregation([]),
+        ];
+        yield 'explicit_bucket_histogram advisory beats SDK default' => [
+            ['explicit_bucket_histogram' => null],
+            $advised,
+            new ExplicitBucketHistogramAggregation([1, 2, 3]),
+        ];
+        yield 'explicit_bucket_histogram SDK default' => [
+            ['explicit_bucket_histogram' => null],
+            $histogram,
+            new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
+        ];
+        yield 'explicit_bucket_histogram without min and max' => [
+            ['explicit_bucket_histogram' => ['record_min_max' => false]],
+            $histogram,
+            new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000], false),
+        ];
+    }
+
+    public function test_base2_exponential_bucket_histogram_aggregation_warns_and_uses_reader_default(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('base2_exponential_bucket_histogram'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $this->assertNull($this->projectedAggregation(
+                ['base2_exponential_bucket_histogram' => ['max_scale' => -10, 'max_size' => 2, 'record_min_max' => false]],
+                new Instrument(InstrumentType::HISTOGRAM, 'i', null, null),
+            ));
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    #[DataProvider('invalidViewAggregationProvider')]
+    public function test_invalid_view_aggregation_is_rejected(array $aggregation): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->projectedAggregation($aggregation, new Instrument(InstrumentType::HISTOGRAM, 'i', null, null));
+    }
+
+    public static function invalidViewAggregationProvider(): iterable
+    {
+        yield 'non-numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['one']]]];
+        yield 'max_scale below -10' => [['base2_exponential_bucket_histogram' => ['max_scale' => -11]]];
+        yield 'max_scale above 20' => [['base2_exponential_bucket_histogram' => ['max_scale' => 21]]];
+        yield 'max_size below 2' => [['base2_exponential_bucket_histogram' => ['max_size' => 1]]];
+        yield 'two aggregations' => [['drop' => null, 'sum' => null]];
+    }
+
+    private function projectedAggregation(array $aggregation, Instrument $instrument): ?AggregationInterface
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([[
+            'file_format' => '1.0',
+            'meter_provider' => [
+                'readers' => [['periodic' => ['exporter' => ['console' => null]]]],
+                'views' => [['selector' => ['instrument_name' => 'i'], 'stream' => ['aggregation' => $aggregation]]],
+            ],
+        ]]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+
+        $views = $viewRegistry->find($instrument, new InstrumentationScope('test', null, null, Attributes::create([])));
+        $this->assertNotNull($views);
+        $aggregations = [];
+        foreach ($views as $view) {
+            $aggregations[] = $view->aggregation;
+        }
+        $this->assertCount(1, $aggregations);
+
+        return $aggregations[0];
     }
 
     /**
@@ -969,6 +1148,62 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
     }
 
+    public function test_top_level_response_propagator_is_deprecated_but_applied(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->stringContains('"response_propagator/development" is deprecated'), $this->anything());
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $factory = new ConfigurationFactory(
+                self::spiComponentProviders(),
+                new OpenTelemetrySdk(),
+                new EnvSourceReader([]),
+            );
+            $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                response_propagator/development:
+                  composite_list: servertiming
+                YAML)])->create(new Context())->build()->getResponsePropagator();
+
+            $this->assertInstanceOf(MultiResponsePropagator::class, $responsePropagator);
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public function test_distribution_response_propagator_takes_precedence_over_top_level(): void
+    {
+        Logging::setLogWriter($this->createStub(LogWriterInterface::class));
+
+        try {
+            $factory = new ConfigurationFactory(
+                self::spiComponentProviders(),
+                new OpenTelemetrySdk(),
+                new EnvSourceReader([]),
+            );
+            $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                response_propagator/development:
+                  composite_list: servertiming,traceresponse
+                distribution:
+                  opentelemetry_php/development:
+                    response_propagator/development:
+                      composite_list: servertiming
+                YAML)])->create(new Context())->build()->getResponsePropagator();
+
+            $responsePropagators = (new \ReflectionClass($responsePropagator))
+                ->getProperty('responsePropagators')
+                ->getValue($responsePropagator);
+            $this->assertIsArray($responsePropagators);
+            $this->assertCount(1, $responsePropagators);
+        } finally {
+            Logging::reset();
+        }
+    }
+
     #[DataProvider('unsupportedFileFormatProvider')]
     public function test_unsupported_file_format_is_rejected(string $fileFormat, string $expectedMessage): void
     {
@@ -1105,7 +1340,7 @@ final class ConfigurationTest extends TestCase
         };
 
         $factory = new ConfigurationFactory(
-            [$samplerProvider],
+            [$samplerProvider, new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
@@ -1116,6 +1351,10 @@ final class ConfigurationTest extends TestCase
               attributes:
               - { name: service.name, value: test-service }
             tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
               sampler:
                 remote_sampler:
             YAML)]);
@@ -1142,8 +1381,11 @@ final class ConfigurationTest extends TestCase
     public function test_empty_tracer_configurator_config(): void
     {
         $file = __DIR__ . '/configurations/empty-tracer-config.yaml';
-        $this->expectNotToPerformAssertions();
-        Configuration::parseFile($file)->create();
+        $sdk = Configuration::parseFile($file)->create()->build();
+
+        $this->assertTrue($sdk->getTracerProvider()->getTracer('test')->isEnabled());
+        $this->assertTrue($sdk->getMeterProvider()->getMeter('test')->createCounter('cnt')->isEnabled());
+        $this->assertTrue($sdk->getLoggerProvider()->getLogger('test')->isEnabled());
     }
 
     /**
@@ -1236,6 +1478,142 @@ final class ConfigurationTest extends TestCase
                   ratio: 1.5', '/value 1\.5 is too big for path "probability\/development\.ratio"/'];
         yield 'probability ratio below zero' => ['    probability/development:
                   ratio: -0.5', '/value -0\.5 is too small for path "probability\/development\.ratio"/'];
+    }
+
+    /**
+     * An omitted provider is a noop, but a present one needs at least one processor or reader.
+     */
+    #[DataProvider('providerWithoutProcessorsProvider')]
+    public function test_provider_without_processors_is_rejected(string $yaml, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse($yaml)]);
+    }
+
+    public static function providerWithoutProcessorsProvider(): iterable
+    {
+        foreach (['tracer_provider' => 'processors', 'logger_provider' => 'processors', 'meter_provider' => 'readers'] as $provider => $list) {
+            $message = sprintf('/path ".*%s".*at least one %s/', $provider, rtrim($list, 's'));
+            yield "$provider empty" => [sprintf("file_format: \"1.0\"\n%s: {}", $provider), $message];
+            yield "$provider null" => [sprintf("file_format: \"1.0\"\n%s: ~", $provider), $message];
+            yield "$provider empty $list" => [sprintf("file_format: \"1.0\"\n%s:\n  %s: []", $provider, $list), $message];
+        }
+    }
+
+    public function test_omitted_providers_parse(): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse('file_format: "1.0"')])->create(new Context());
+    }
+
+    /**
+     * The schema has `exclusiveMinimum: 0` on these, so zero is invalid.
+     */
+    #[DataProvider('zeroExclusiveMinimumProvider')]
+    public function test_zero_is_rejected_where_schema_has_exclusive_minimum(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/value 0 is too small for path ".*%s"/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse($yaml)]);
+    }
+
+    public static function zeroExclusiveMinimumProvider(): iterable
+    {
+        foreach (['max_queue_size', 'max_export_batch_size'] as $key) {
+            yield "span batch $key" => [sprintf(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - batch:
+                      %s: 0
+                      exporter:
+                        console:
+                YAML, $key), "batch.$key"];
+            yield "log batch $key" => [sprintf(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                logger_provider:
+                  processors:
+                  - batch:
+                      %s: 0
+                      exporter:
+                        console:
+                YAML, $key), "batch.$key"];
+        }
+        yield 'view aggregation_cardinality_limit' => [/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  instrument_name: test
+                stream:
+                  aggregation_cardinality_limit: 0
+            YAML, 'stream.aggregation_cardinality_limit'];
+        foreach (['default', 'counter', 'gauge', 'histogram', 'observable_counter', 'observable_gauge', 'observable_up_down_counter', 'up_down_counter'] as $key) {
+            yield "reader cardinality_limits $key" => [sprintf(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                      cardinality_limits:
+                        %s: 0
+                YAML, $key), "cardinality_limits.$key"];
+        }
+    }
+
+    public function test_null_cardinality_limits_parse(): void
+    {
+        $factory = new ConfigurationFactory(
+            self::spiComponentProviders(),
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+                  cardinality_limits:
+                    default: ~
+                    counter: ~
+              views:
+              - selector:
+                  instrument_name: test
+                stream:
+                  aggregation_cardinality_limit: ~
+            YAML)]);
     }
 
     /**

@@ -58,7 +58,17 @@ final class MetricReaderPeriodic implements ComponentProvider
                     ->variablePrototype()->end()
                 ->end()
                 ->arrayNode('cardinality_limits') //TODO not implemented in metrics SDK
-                    ->variablePrototype()->end()
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('default')->defaultNull()->min(1)->end()
+                        ->integerNode('counter')->defaultNull()->min(1)->end()
+                        ->integerNode('gauge')->defaultNull()->min(1)->end()
+                        ->integerNode('histogram')->defaultNull()->min(1)->end()
+                        ->integerNode('observable_counter')->defaultNull()->min(1)->end()
+                        ->integerNode('observable_gauge')->defaultNull()->min(1)->end()
+                        ->integerNode('observable_up_down_counter')->defaultNull()->min(1)->end()
+                        ->integerNode('up_down_counter')->defaultNull()->min(1)->end()
+                    ->end()
                 ->end()
             ->end()
         ;

@@ -10,7 +10,7 @@ each one is for. Two are parsed without assertions, as a check that they remain 
 | File | Covers |
 |------|--------|
 | `anchors.yaml` | YAML anchors and merge keys (`<<:`), which no upstream file uses |
-| `php-specific.yaml` | `response_propagator/development`, a PHP extension absent from the schema |
+| `php-specific.yaml` | `response_propagator/development` under `distribution`, a PHP extension absent from the schema |
 | `distribution.yaml` | `distribution`, which no upstream file uses |
 
 When adding a fixture, prefer asserting on the built SDK over parse-only coverage: an upstream file

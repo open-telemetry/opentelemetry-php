@@ -127,4 +127,24 @@ final class ExplicitBucketHistogramAggregationTest extends TestCase
             ),
         );
     }
+
+    public function test_without_min_max_records_neither(): void
+    {
+        $aggregation = new ExplicitBucketHistogramAggregation([0, 5], recordMinMax: false);
+        $summary = $aggregation->initialize();
+        $aggregation->record($summary, 3, Attributes::create([]), Context::getRoot(), 1);
+        $aggregation->record($summary, 6, Attributes::create([]), Context::getRoot(), 1);
+
+        $dataPoints = [];
+        foreach ($aggregation->toData([Attributes::create([])], [$summary], [], 0, 1, Temporality::DELTA)->dataPoints as $dataPoint) {
+            $dataPoints[] = $dataPoint;
+        }
+
+        $this->assertCount(1, $dataPoints);
+        $this->assertSame(2, $dataPoints[0]->count);
+        $this->assertSame(9, $dataPoints[0]->sum);
+        $this->assertSame([0, 1, 1], $dataPoints[0]->bucketCounts);
+        $this->assertNan($dataPoints[0]->min);
+        $this->assertNan($dataPoints[0]->max);
+    }
 }

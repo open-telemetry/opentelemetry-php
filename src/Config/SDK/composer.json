@@ -36,7 +36,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.1.x-dev"
+            "dev-main": "1.0.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
@@ -68,7 +68,12 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySemConv",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySpanKind",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverBase2ExponentialBucketHistogram",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDrop",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverLastValue",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverSum",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterMemory",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpFile",

@@ -147,6 +147,27 @@ final class MetricConverterTest extends TestCase
         );
     }
 
+    public function test_histogram_nan_min_max_are_omitted(): void
+    {
+        $request = (new MetricConverter())->convert([
+            new Metric(
+                new InstrumentationScope('test', null, null, Attributes::create([])),
+                ResourceInfoFactory::emptyResource(),
+                'test-1',
+                null,
+                null,
+                new Histogram([
+                    new HistogramDataPoint(2, 7, NAN, NAN, [2, 0], [5], Attributes::create([]), 17, 42),
+                ], Temporality::DELTA),
+            ),
+        ]);
+
+        /** @var \Opentelemetry\Proto\Metrics\V1\HistogramDataPoint $dataPoint */
+        $dataPoint = $request->getResourceMetrics()[0]->getScopeMetrics()[0]->getMetrics()[0]->getHistogram()->getDataPoints()[0];
+        $this->assertFalse($dataPoint->hasMin());
+        $this->assertFalse($dataPoint->hasMax());
+    }
+
     public function test_gauge_exemplars_are_converted(): void
     {
         $this->assertJsonStringEqualsJsonString(

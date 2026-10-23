@@ -7,7 +7,7 @@ namespace OpenTelemetry\API\Configuration;
 /**
  * @experimental
  *
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/api.md#configprovider
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider
  */
 interface ConfigProviderInterface
 {
