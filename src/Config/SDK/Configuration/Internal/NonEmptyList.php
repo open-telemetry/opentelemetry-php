@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\Configuration\Internal;
 
 use function array_key_exists;
+use Closure;
 use function is_array;
 use function sprintf;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
@@ -22,9 +22,14 @@ final class NonEmptyList
     {
     }
 
-    public static function require(ArrayNodeDefinition $node, string ...$keys): void
+    /**
+     * A normalization for `ArrayNodeDefinition::beforeNormalization()->always()`.
+     *
+     * @return Closure(mixed): mixed
+     */
+    public static function normalizer(string ...$keys): Closure
     {
-        $node->beforeNormalization()->always(static function (mixed $value) use ($keys): mixed {
+        return static function (mixed $value) use ($keys): mixed {
             if (is_array($value)) {
                 foreach ($keys as $key) {
                     if (array_key_exists($key, $value) && ($value[$key] === [] || $value[$key] === null)) {
@@ -34,6 +39,6 @@ final class NonEmptyList
             }
 
             return $value;
-        })->end();
+        };
     }
 }

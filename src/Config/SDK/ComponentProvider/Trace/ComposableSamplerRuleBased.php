@@ -63,10 +63,10 @@ final class ComposableSamplerRuleBased implements ComponentProvider
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('rule_based');
-        NonEmptyList::require($node, 'rules');
+        $node->beforeNormalization()->always(NonEmptyList::normalizer('rules'))->end();
 
         $rule = $node->children()->arrayNode('rules')->defaultValue([])->arrayPrototype();
-        NonEmptyList::require($rule, 'span_kinds', 'parent');
+        $rule->beforeNormalization()->always(NonEmptyList::normalizer('span_kinds', 'parent'))->end();
 
         $ruleChildren = $rule->children();
         $ruleChildren->append($registry->component('sampler', ComposableSamplerInterface::class)->isRequired());
@@ -86,7 +86,7 @@ final class ComposableSamplerRuleBased implements ComponentProvider
         ->end();
 
         $patterns = $ruleChildren->arrayNode('attribute_patterns');
-        NonEmptyList::require($patterns, 'included', 'excluded');
+        $patterns->beforeNormalization()->always(NonEmptyList::normalizer('included', 'excluded'))->end();
         $patterns
             ->children()
                 ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
