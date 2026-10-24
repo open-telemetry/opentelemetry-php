@@ -25,7 +25,6 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ScalarNodeDef
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\StringNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\VariableNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NormalizationsAware;
-use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
 use function serialize;
 use function sprintf;
@@ -99,7 +98,7 @@ final class ConfigurationFactory
             && (!$debug || $cache->isFresh())) {
             return $configuration;
         }
-        $resources = new ResourceCollection();
+        $resources = new Internal\ResourceCollection();
         $resources->addClassResource(ComponentPlugin::class);
         $resources->addClassResource(VarExporter::class);
 
@@ -123,7 +122,7 @@ final class ConfigurationFactory
         }
     }
 
-    private static function writeCache(ResourceCheckerConfigCache $cache, ComponentPlugin $configuration, ResourceCollection $resources): void
+    private static function writeCache(ResourceCheckerConfigCache $cache, ComponentPlugin $configuration, Internal\ResourceCollection $resources): void
     {
         // The cache holds substituted values, which may be secrets. umask is process-wide, so this
         // can race with file creation in other threads of a ZTS build.

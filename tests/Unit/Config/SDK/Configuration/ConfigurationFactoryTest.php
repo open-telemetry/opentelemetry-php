@@ -19,6 +19,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Internal;
 use OpenTelemetry\Config\SDK\Configuration\Loader;
+use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,6 +33,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Yaml\Yaml;
 
 #[CoversClass(ConfigurationFactory::class)]
@@ -566,6 +568,28 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->assertEquals(self::factory()->parseFile($file), self::factory()->parseFile($file, $cacheFile));
         $this->assertNotSame('<?php return ', file_get_contents($cacheFile), 'cache was rewritten');
+    }
+
+    public function test_process_accepts_any_resource_collection(): void
+    {
+        $resources = new class() implements ResourceCollection {
+            public array $classes = [];
+
+            #[\Override]
+            public function addClassResource(object|string $class): void
+            {
+                $this->classes[] = is_object($class) ? $class::class : $class;
+            }
+
+            #[\Override]
+            public function addResource(ResourceInterface $resource): void
+            {
+            }
+        };
+
+        self::factory()->process([Yaml::parseFile($this->cacheDir . '/kitchen-sink.yaml')], $resources);
+
+        $this->assertContains(ComponentProvider\OpenTelemetryConfiguration::class, $resources->classes);
     }
 
     private static function mode(string $file): int
