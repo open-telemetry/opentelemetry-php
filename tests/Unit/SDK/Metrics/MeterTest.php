@@ -28,6 +28,7 @@ use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
@@ -224,6 +225,28 @@ final class MeterTest extends TestCase
         $counter = $meter->createCounter('name', 'unit', 'description');
     }
 
+    /**
+     * @noinspection PhpUnusedLocalVariableInspection
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#instrument-unit
+     */
+    #[DataProvider('nullOrEmptyUnitAndDescriptionProvider')]
+    public function test_null_unit_and_description_are_same_instrument_as_empty(?string $unit, ?string $description): void
+    {
+        $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory);
+        $meter = $meterProvider->getMeter('test');
+        $metricFactory->expects($this->once())->method('createSynchronousWriter')->willReturn([]);
+
+        $counter = $meter->createCounter('name');
+        $counter = $meter->createCounter('name', $unit, $description);
+    }
+
+    public static function nullOrEmptyUnitAndDescriptionProvider(): iterable
+    {
+        yield 'empty unit' => ['', null];
+        yield 'empty description' => [null, ''];
+    }
+
     public function test_releases_writer_on_stale(): void
     {
         $metricFactory = $this->createMock(MetricFactoryInterface::class);
@@ -340,6 +363,37 @@ final class MeterTest extends TestCase
                 [[$v1]] = [...func_get_arg(5)];
 
                 $this->assertEquals(new ViewProjection('view-1', null, null, null, $aggregation), $v1);
+
+                return [];
+            });
+
+        $meterProvider = $this->createMeterProviderForMetricFactory($metricFactory, $viewRegistry, [$metricReader]);
+        $meter = $meterProvider->getMeter('test');
+        $meter->createCounter('name');
+    }
+
+    /**
+     * @psalm-suppress InvalidOperand
+     * @psalm-suppress PossiblyUndefinedArrayOffset
+     */
+    public function test_default_aggregation_keeps_attribute_key_filter(): void
+    {
+        $aggregation = $this->createStub(AggregationInterface::class);
+
+        $metricReader = $this->createMock(MeterMetricReaderInterface::class);
+        $metricReader->method('defaultAggregation')->willReturn($aggregation);
+
+        $viewRegistry = $this->createMock(ViewRegistryInterface::class);
+        $viewRegistry->method('find')->willReturn([
+            new ViewProjection('view-1', null, null, null, null, ['foo*'], ['bar']),
+        ]);
+
+        $metricFactory = $this->createMock(MetricFactoryInterface::class);
+        $metricFactory->expects($this->exactly(1))->method('createSynchronousWriter')
+            ->willReturnCallback(function () use ($aggregation): array {
+                [[$v1]] = [...func_get_arg(5)];
+
+                $this->assertEquals(new ViewProjection('view-1', null, null, null, $aggregation, ['foo*'], ['bar']), $v1);
 
                 return [];
             });

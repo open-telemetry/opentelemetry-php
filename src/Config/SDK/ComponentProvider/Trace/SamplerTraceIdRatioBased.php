@@ -36,7 +36,7 @@ final class SamplerTraceIdRatioBased implements ComponentProvider
         $node = $builder->arrayNode('trace_id_ratio_based');
         $node
             ->children()
-                ->floatNode('ratio')->min(0)->max(1)->isRequired()->end()
+                ->floatNode('ratio')->min(0)->max(1)->defaultValue(1.0)->end()
             ->end()
         ;
 

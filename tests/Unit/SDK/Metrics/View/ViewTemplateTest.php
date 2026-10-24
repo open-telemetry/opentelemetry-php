@@ -53,6 +53,48 @@ final class ViewTemplateTest extends TestCase
         );
     }
 
+    public function test_template_returns_attribute_key_filter(): void
+    {
+        $this->assertEquals(
+            new ViewProjection(
+                'name',
+                'unit',
+                'description',
+                null,
+                null,
+                ['foo*'],
+                ['foobar'],
+            ),
+            ViewTemplate::create()
+                ->withAttributeKeyFilter(['foo*'], ['foobar'])
+                ->project(new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description')),
+        );
+    }
+
+    public function test_attribute_keys_replace_attribute_key_filter(): void
+    {
+        $projection = ViewTemplate::create()
+            ->withAttributeKeyFilter(['foo*'], ['foobar'])
+            ->withAttributeKeys(['foo'])
+            ->project(new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'));
+
+        $this->assertSame(['foo'], $projection->attributeKeys);
+        $this->assertNull($projection->includedAttributeKeys);
+        $this->assertNull($projection->excludedAttributeKeys);
+    }
+
+    public function test_attribute_key_filter_replaces_attribute_keys(): void
+    {
+        $projection = ViewTemplate::create()
+            ->withAttributeKeys(['foo'])
+            ->withAttributeKeyFilter(null, ['bar'])
+            ->project(new Instrument(InstrumentType::COUNTER, 'name', 'unit', 'description'));
+
+        $this->assertNull($projection->attributeKeys);
+        $this->assertNull($projection->includedAttributeKeys);
+        $this->assertSame(['bar'], $projection->excludedAttributeKeys);
+    }
+
     public function test_resolver_receives_instrument_type_and_advisory(): void
     {
         $resolver = new class() implements DefaultAggregationProviderInterface {

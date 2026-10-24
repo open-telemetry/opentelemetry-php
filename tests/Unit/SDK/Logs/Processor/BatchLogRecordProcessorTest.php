@@ -25,6 +25,7 @@ use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LogLevel;
 
@@ -113,6 +114,7 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
             'clock advance less than threshold' => [1000, 999 * ClockInterface::NANOS_PER_MILLISECOND, false],
             'clock advance equals threshold' => [1000, 1000 * ClockInterface::NANOS_PER_MILLISECOND, false],
             'clock advance exceeds threshold' => [1000, 1001 * ClockInterface::NANOS_PER_MILLISECOND, true],
+            'zero delay, clock advance' => [0, 1, true],
         ];
     }
 
@@ -447,6 +449,16 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         $this->expectException(InvalidArgumentException::class);
         $exporter = $this->createStub(LogRecordExporterInterface::class);
         new BatchLogRecordProcessor($exporter, $this->testClock, 2048, 5000, -1);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/common.md#timeout
+     */
+    #[DoesNotPerformAssertions]
+    public function test_logs_processor_accepts_zero_export_timeout(): void
+    {
+        $exporter = $this->createStub(LogRecordExporterInterface::class);
+        new BatchLogRecordProcessor($exporter, $this->testClock, 2048, 5000, 0);
     }
 
     public function test_logs_processor_throws_on_invalid_max_export_batch_size(): void

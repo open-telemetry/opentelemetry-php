@@ -9,9 +9,9 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\TemporalityPreference;
 use OpenTelemetry\SDK\Registry;
 
 class MetricExporterFactory implements MetricExporterFactoryInterface
@@ -70,17 +70,14 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
         );
     }
 
-    /**
-     * @phpstan-ignore-next-line
-     */
-    private function getTemporality(): string|Temporality|null
+    private function getTemporality(): TemporalityPreference
     {
         $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
 
         return match (strtolower($value)) {
-            'cumulative' => Temporality::CUMULATIVE,
-            'delta' => Temporality::DELTA,
-            'lowmemory' => null,
+            'cumulative' => TemporalityPreference::cumulative(),
+            'delta' => TemporalityPreference::delta(),
+            'lowmemory' => TemporalityPreference::lowMemory(),
             default => throw new \UnexpectedValueException('Unknown temporality: ' . $value),
         };
     }

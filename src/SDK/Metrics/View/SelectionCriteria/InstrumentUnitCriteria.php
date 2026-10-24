@@ -17,6 +17,6 @@ final class InstrumentUnitCriteria implements SelectionCriteriaInterface
     #[\Override]
     public function accepts(Instrument $instrument, InstrumentationScopeInterface $instrumentationScope): bool
     {
-        return $this->unit === $instrument->unit;
+        return $this->unit === ($instrument->unit ?? '');
     }
 }

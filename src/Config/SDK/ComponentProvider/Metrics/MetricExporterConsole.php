@@ -7,9 +7,9 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\TemporalityPreference;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -28,9 +28,9 @@ final class MetricExporterConsole implements ComponentProvider
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
         $temporality = match ($properties['temporality_preference']) {
-            'cumulative' => Temporality::CUMULATIVE,
-            'delta' => Temporality::DELTA,
-            'low_memory' => null,
+            'cumulative' => TemporalityPreference::cumulative(),
+            'delta' => TemporalityPreference::delta(),
+            'low_memory' => TemporalityPreference::lowMemory(),
         };
 
         return new ConsoleMetricExporter($temporality);

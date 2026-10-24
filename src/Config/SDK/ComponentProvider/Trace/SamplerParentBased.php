@@ -22,7 +22,7 @@ final class SamplerParentBased implements ComponentProvider
 {
     /**
      * @param array{
-     *     root: ComponentPlugin<SamplerInterface>,
+     *     root: ?ComponentPlugin<SamplerInterface>,
      *     remote_parent_sampled: ?ComponentPlugin<SamplerInterface>,
      *     remote_parent_not_sampled: ?ComponentPlugin<SamplerInterface>,
      *     local_parent_sampled: ?ComponentPlugin<SamplerInterface>,
@@ -33,7 +33,7 @@ final class SamplerParentBased implements ComponentProvider
     public function createPlugin(array $properties, Context $context): SamplerInterface
     {
         return new ParentBased(
-            root: $properties['root']->create($context),
+            root: ($properties['root'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
             remoteParentSampler: ($properties['remote_parent_sampled'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
             remoteParentNotSampler: ($properties['remote_parent_not_sampled'] ?? null)?->create($context) ?? new AlwaysOffSampler(),
             localParentSampler: ($properties['local_parent_sampled'] ?? null)?->create($context) ?? new AlwaysOnSampler(),
@@ -47,7 +47,7 @@ final class SamplerParentBased implements ComponentProvider
         $node = $builder->arrayNode('parent_based');
         $node
             ->children()
-                ->append($registry->component('root', SamplerInterface::class)->isRequired())
+                ->append($registry->component('root', SamplerInterface::class))
                 ->append($registry->component('remote_parent_sampled', SamplerInterface::class))
                 ->append($registry->component('remote_parent_not_sampled', SamplerInterface::class))
                 ->append($registry->component('local_parent_sampled', SamplerInterface::class))
