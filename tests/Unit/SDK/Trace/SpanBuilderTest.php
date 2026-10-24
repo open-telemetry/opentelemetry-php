@@ -156,7 +156,7 @@ class SpanBuilderTest extends TestCase
         $attributesFactory = $this->createMock(AttributesFactoryInterface::class);
         $sharedState = new TracerSharedState(
             $idGenerator,
-            $this->createMock(ResourceInfo::class),
+            $this->createStub(ResourceInfo::class),
             new SpanLimits($attributesFactory, $attributesFactory, $attributesFactory, 10, 10),
             $this->sampler,
             [$this->spanProcessor]
@@ -164,7 +164,7 @@ class SpanBuilderTest extends TestCase
 
         return new SpanBuilder(
             'foo',
-            new InstrumentationScope('s', '1.0', null, $this->createMock(AttributesInterface::class)),
+            new InstrumentationScope('s', '1.0', null, $this->createStub(AttributesInterface::class)),
             $sharedState,
         );
     }
