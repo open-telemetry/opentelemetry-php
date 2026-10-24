@@ -1,0 +1,13 @@
+file_format: '1.0'
+
+# `processors` must be a list. The instrumentation root below is valid, so instrumentation config
+# must still be readable from this file.
+tracer_provider:
+  processors: not-a-list
+
+instrumentation/development:
+  general:
+    http:
+      client:
+        request_captured_headers:
+          - Content-Type

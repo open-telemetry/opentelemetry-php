@@ -14,6 +14,9 @@ use OpenTelemetry\SDK\Metrics\Data\Metric;
 use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\TemporalityPreference;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -88,5 +91,17 @@ final class MetricExporterTest extends TestCase
             {"resourceMetrics":[{"resource":{},"scopeMetrics":[{"scope":{"name":"test"},"metrics":[{"name":"test","sum":{"dataPoints":[{"startTimeUnixNano":"42","timeUnixNano":"57","asInt":"7"}],"aggregationTemporality":1}}]}]}]}
 
             METRICS, stream_get_contents($this->stream));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration
+     */
+    public function test_temporality_preference_selects_by_instrument_type(): void
+    {
+        $exporter = new MetricExporter(new StreamTransport($this->stream, 'application/x-ndjson'), TemporalityPreference::delta());
+        $metric = $this->createStub(MetricMetadataInterface::class);
+        $metric->method('instrumentType')->willReturn(InstrumentType::UP_DOWN_COUNTER);
+
+        $this->assertSame(Temporality::CUMULATIVE, $exporter->temporality($metric));
     }
 }

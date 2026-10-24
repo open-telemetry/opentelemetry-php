@@ -431,6 +431,8 @@ final class Meter implements MeterInterface, Configurable
                             $view->attributeKeys,
                             /** @phan-suppress-next-line PhanParamTooMany @phpstan-ignore-next-line */
                             $metricRegistry->defaultAggregation($instrument->type, $instrument->advisory),
+                            $view->includedAttributeKeys,
+                            $view->excludedAttributeKeys,
                         ),
                         new RegistryRegistration($metricRegistry, $stalenessHandler),
                     ];
@@ -449,8 +451,8 @@ final class Meter implements MeterInterface, Configurable
         return serialize([
             $instrument->type,
             $instrument->name,
-            $instrument->unit,
-            $instrument->description,
+            $instrument->unit ?? '',
+            $instrument->description ?? '',
         ]);
     }
 }

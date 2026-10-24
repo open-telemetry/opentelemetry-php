@@ -50,7 +50,7 @@ final class Validation
                 throw new InvalidArgumentException('must be of type numeric');
             }
 
-            return $value;
+            return $value + 0;
         };
     }
 

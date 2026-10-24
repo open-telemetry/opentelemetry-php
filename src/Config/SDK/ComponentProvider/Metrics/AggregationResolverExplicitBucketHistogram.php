@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
+use function array_is_list;
+use function count;
+use InvalidArgumentException;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
@@ -63,9 +65,19 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
             ->children()
                 ->arrayNode('boundaries')
                     ->defaultNull()
-                    ->prototype('scalar')
-                        ->validate()->always(Validation::ensureNumber())->end()
-                    ->end()
+                    ->floatPrototype()->end()
+                    ->validate()->always(static function (array $boundaries): array {
+                        if (!array_is_list($boundaries)) {
+                            throw new InvalidArgumentException('must be a list');
+                        }
+                        for ($i = 1, $n = count($boundaries); $i < $n; $i++) {
+                            if ($boundaries[$i] <= $boundaries[$i - 1]) {
+                                throw new InvalidArgumentException('must be strictly ascending');
+                            }
+                        }
+
+                        return $boundaries;
+                    })->end()
                 ->end()
                 ->booleanNode('record_min_max')->defaultTrue()->end()
             ->end();

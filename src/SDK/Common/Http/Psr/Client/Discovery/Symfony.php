@@ -25,8 +25,16 @@ class Symfony implements DiscoveryInterface
     #[\Override]
     public function create(mixed $options): ClientInterface
     {
+        if (is_array($options)) {
+            // Symfony rejects these Guzzle names. Their stream context equivalents are also passed.
+            unset($options['verify'], $options['cert'], $options['ssl_key']);
+        }
         if (is_array($options) && array_key_exists('timeout', $options)) {
             $options['max_duration'] = $options['timeout'];
+            // Symfony applies a zero idle timeout literally. A negative one means no limit.
+            if (is_numeric($options['timeout']) && $options['timeout'] <= 0) {
+                $options['timeout'] = -1;
+            }
         }
 
         return new Psr18Client(HttpClient::create($options));

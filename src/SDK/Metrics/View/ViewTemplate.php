@@ -15,6 +15,10 @@ final class ViewTemplate
     private ?string $description = null;
     /** @var list<string> */
     private ?array $attributeKeys = null;
+    /** @var list<string>|null */
+    private ?array $includedAttributeKeys = null;
+    /** @var list<string>|null */
+    private ?array $excludedAttributeKeys = null;
     private ?AggregationInterface $aggregation = null;
     private ?DefaultAggregationProviderInterface $aggregationResolver = null;
 
@@ -52,6 +56,25 @@ final class ViewTemplate
     {
         $self = clone $this;
         $self->attributeKeys = $attributeKeys;
+        $self->includedAttributeKeys = null;
+        $self->excludedAttributeKeys = null;
+
+        return $self;
+    }
+
+    /**
+     * Keeps attributes whose key matches an included pattern (any key if `$included` is null) and
+     * no excluded pattern. `?` matches one character and `*` any sequence.
+     *
+     * @param list<string>|null $included
+     * @param list<string>|null $excluded
+     */
+    public function withAttributeKeyFilter(?array $included, ?array $excluded): self
+    {
+        $self = clone $this;
+        $self->attributeKeys = null;
+        $self->includedAttributeKeys = $included;
+        $self->excludedAttributeKeys = $excluded;
 
         return $self;
     }
@@ -95,6 +118,8 @@ final class ViewTemplate
             $this->description ?? $instrument->description,
             $this->attributeKeys,
             $aggregation,
+            $this->includedAttributeKeys,
+            $this->excludedAttributeKeys,
         );
     }
 }

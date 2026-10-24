@@ -6,6 +6,7 @@ namespace OpenTelemetry\Contrib\Otlp;
 
 use function array_column;
 use function array_filter;
+use function array_map;
 use const E_USER_DEPRECATED;
 use function explode;
 use OpenTelemetry\API\Signals;
@@ -15,7 +16,9 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Resource\Detectors\Sdk;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use function parse_url;
+use function rtrim;
 use function sprintf;
+use function strtolower;
 use function trigger_error;
 use UnexpectedValueException;
 
@@ -66,9 +69,8 @@ class OtlpUtil
         $headers = Configuration::has(self::HEADER_VARS[$signal]) ?
             Configuration::getMap(self::HEADER_VARS[$signal]) :
             Configuration::getMap(Variables::OTEL_EXPORTER_OTLP_HEADERS);
-        $headers += self::getUserAgentHeader();
 
-        return array_map(rawurldecode(...), $headers);
+        return self::mergeHeaders(array_map(rawurldecode(...), $headers), self::getUserAgentHeader());
     }
 
     /**
@@ -105,20 +107,50 @@ class OtlpUtil
      */
     public static function headers(array $headers, ?string $headersList): array
     {
-        return array_filter(
-            array_column($headers, 'value', 'name'),
-            static fn (?string $value): bool => $value !== null,
-        ) + MapParser::parse($headersList);
+        return self::mergeHeaders(
+            array_filter(
+                array_column($headers, 'value', 'name'),
+                static fn (?string $value): bool => $value !== null,
+            ),
+            array_map(rawurldecode(...), MapParser::parse($headersList)),
+            self::getUserAgentHeader(),
+        );
+    }
+
+    /**
+     * Header names are case-insensitive, so an earlier set wins over any spelling of the same name.
+     *
+     * @param array<string, string> ...$sets
+     * @return array<string, string>
+     */
+    private static function mergeHeaders(array ...$sets): array
+    {
+        $merged = [];
+        $names = [];
+        foreach ($sets as $set) {
+            foreach ($set as $name => $value) {
+                $lower = strtolower((string) $name);
+                if (isset($names[$lower])) {
+                    continue;
+                }
+                $names[$lower] = true;
+                $merged[$name] = $value;
+            }
+        }
+
+        return $merged;
     }
 
     /**
      * Prepends a scheme to a scheme-less endpoint, since transports infer TLS from it.
-     * An endpoint that carries its own scheme is returned unchanged.
+     * An endpoint that carries its own scheme keeps it. A trailing slash is dropped, so that
+     * `http://host:4317/` is not mistaken for an endpoint with a path.
      *
      * @internal
      */
     public static function applyScheme(string $endpoint, ?bool $insecure): string
     {
+        $endpoint = rtrim($endpoint, '/');
         if (parse_url($endpoint, PHP_URL_SCHEME) !== null) {
             return $endpoint;
         }

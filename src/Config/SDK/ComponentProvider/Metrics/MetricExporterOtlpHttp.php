@@ -13,8 +13,8 @@ use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
-use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
+use OpenTelemetry\SDK\Metrics\TemporalityPreference;
 use OpenTelemetry\SDK\Registry;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -48,9 +48,9 @@ final class MetricExporterOtlpHttp implements ComponentProvider
         $headers = OtlpUtil::headers($properties['headers'], $properties['headers_list']);
 
         $temporality = match ($properties['temporality_preference']) {
-            'cumulative' => Temporality::CUMULATIVE,
-            'delta' => Temporality::DELTA,
-            'low_memory' => null,
+            'cumulative' => TemporalityPreference::cumulative(),
+            'delta' => TemporalityPreference::delta(),
+            'low_memory' => TemporalityPreference::lowMemory(),
         };
 
         return new MetricExporter(Registry::transportFactory('http')->create(
@@ -86,6 +86,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
                 ->end()
             ->end()
             ->arrayNode('headers')
+                ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                 ->arrayPrototype()
                     ->children()
                         ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()

@@ -14,7 +14,11 @@ use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegis
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
+use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSource;
+use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceProvider;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Configuration\Environment\GetenvEnvSource;
+use OpenTelemetry\Config\SDK\Configuration\Environment\LazyEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationFileLoader;
@@ -58,6 +62,24 @@ final class Configuration
 
         return self::instrumentationFactory($this->envReader)
             ->process($this->configs)
+            ->create($context);
+    }
+
+    /**
+     * Instrumentation configuration from the file, without processing the SDK root, so an invalid
+     * SDK root costs nothing here.
+     *
+     * @internal
+     * @param string|list<string> $file
+     * @return ConfigurationRegistry
+     */
+    public static function parseInstrumentationConfig(
+        string|array $file,
+        Context $context = new Context(),
+        ?EnvReader $envReader = null,
+    ): ConfigProperties {
+        return self::instrumentationFactory($envReader)
+            ->process(ConfigurationFileLoader::load($file))
             ->create($context);
     }
 
@@ -111,14 +133,33 @@ final class Configuration
         );
     }
 
+    /**
+     * Reads the same sources, in the same order, as the SDK resolver that finds `OTEL_CONFIG_FILE`.
+     */
     private static function envReader(?EnvReader $envReader): EnvReader
     {
         static $defaultEnvReader;
 
         return $envReader ?? $defaultEnvReader ??= new EnvSourceReader([
+            ...self::envSourceProviders(),
             new ServerEnvSource(),
             new PhpIniEnvSource(),
+            new GetenvEnvSource(),
         ]);
+    }
+
+    /**
+     * @return list<EnvSource>
+     */
+    private static function envSourceProviders(): array
+    {
+        $envSources = [];
+        /** @var EnvSourceProvider $envSourceProvider */
+        foreach (ServiceLoader::load(EnvSourceProvider::class) as $envSourceProvider) {
+            $envSources[] = new LazyEnvSource($envSourceProvider->getEnvSource(...));
+        }
+
+        return $envSources;
     }
 
     private static function loadComponentProviders(): iterable

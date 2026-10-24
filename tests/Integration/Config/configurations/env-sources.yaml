@@ -1,0 +1,8 @@
+file_format: '1.0'
+
+resource:
+  attributes:
+    - name: from_provider
+      value: ${CONFIG_SOURCE_TEST_ONLY}
+    - name: from_getenv
+      value: ${OTEL_PHP_TEST_GETENV_ONLY}

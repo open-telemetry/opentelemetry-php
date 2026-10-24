@@ -115,6 +115,8 @@ final class OtlpExporterTlsTest extends TestCase
 
     /**
      * @param ComponentProvider<object> $provider
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/protocol/exporter.md#configuration-options
      */
     #[DataProvider('grpcInsecureProvider')]
     public function test_insecure_is_applied_as_endpoint_scheme(
@@ -156,6 +158,7 @@ final class OtlpExporterTlsTest extends TestCase
             yield sprintf('%s insecure omitted defaults to secure', $signal) => [$provider, 'localhost:4317', null, 'https://localhost:4317' . $method];
             yield sprintf('%s explicit https kept', $signal) => [$provider, 'https://localhost:4317', true, 'https://localhost:4317' . $method];
             yield sprintf('%s explicit http kept', $signal) => [$provider, 'http://localhost:4317', false, 'http://localhost:4317' . $method];
+            yield sprintf('%s trailing slash dropped', $signal) => [$provider, 'http://localhost:4317/', false, 'http://localhost:4317' . $method];
         }
     }
 

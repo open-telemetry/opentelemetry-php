@@ -10,6 +10,7 @@ use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AttributeProcessor\FilteredAttributeProcessor;
+use OpenTelemetry\SDK\Metrics\AttributeProcessor\IncludeExcludeAttributeProcessor;
 use OpenTelemetry\SDK\Metrics\AttributeProcessorInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarReservoirInterface;
@@ -53,11 +54,11 @@ final class StreamFactory implements MetricFactoryInterface
                 continue;
             }
 
-            $dedupId = $this->streamId($view->aggregation, $view->attributeKeys);
+            $dedupId = $this->streamId($view->aggregation, $view);
             if (($streamId = $dedup[$dedupId] ?? null) === null) {
                 $stream = new AsynchronousMetricStream($view->aggregation, $timestamp);
                 $streamId = $registry->registerAsynchronousStream($instrument, $stream, new MetricAggregatorFactory(
-                    $this->attributeProcessor($view->attributeKeys),
+                    $this->attributeProcessor($view),
                     $view->aggregation,
                 ));
 
@@ -97,11 +98,11 @@ final class StreamFactory implements MetricFactoryInterface
                 continue;
             }
 
-            $dedupId = $this->streamId($view->aggregation, $view->attributeKeys);
+            $dedupId = $this->streamId($view->aggregation, $view);
             if (($streamId = $dedup[$dedupId] ?? null) === null) {
                 $stream = new SynchronousMetricStream($view->aggregation, $timestamp);
                 $streamId = $registry->registerSynchronousStream($instrument, $stream, new MetricAggregator(
-                    $this->attributeProcessor($view->attributeKeys),
+                    $this->attributeProcessor($view),
                     $view->aggregation,
                     $this->createExemplarReservoir($view->aggregation, $exemplarFilter),
                 ));
@@ -125,12 +126,16 @@ final class StreamFactory implements MetricFactoryInterface
         return array_keys($streams);
     }
 
-    private function attributeProcessor(
-        ?array $attributeKeys,
-    ): ?AttributeProcessorInterface {
-        return $attributeKeys !== null
-            ? new FilteredAttributeProcessor($attributeKeys)
-            : null;
+    private function attributeProcessor(ViewProjection $view): ?AttributeProcessorInterface
+    {
+        if ($view->attributeKeys !== null) {
+            return new FilteredAttributeProcessor($view->attributeKeys);
+        }
+        if ($view->includedAttributeKeys !== null || $view->excludedAttributeKeys !== null) {
+            return new IncludeExcludeAttributeProcessor($view->includedAttributeKeys, $view->excludedAttributeKeys);
+        }
+
+        return null;
     }
 
     private function createExemplarReservoir(
@@ -173,9 +178,10 @@ final class StreamFactory implements MetricFactoryInterface
         $metricRegistration->register($provider, $provider);
     }
 
-    private function streamId(AggregationInterface $aggregation, ?array $attributeKeys): string
+    private function streamId(AggregationInterface $aggregation, ViewProjection $view): string
     {
-        return $this->trySerialize($aggregation) . serialize($attributeKeys);
+        return $this->trySerialize($aggregation)
+            . serialize([$view->attributeKeys, $view->includedAttributeKeys, $view->excludedAttributeKeys]);
     }
 
     private function trySerialize(object $object)

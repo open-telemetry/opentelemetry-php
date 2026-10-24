@@ -39,7 +39,7 @@ final class GrpcTransport implements TransportInterface
     private readonly array $metadata;
     private readonly Channel $channel;
     private bool $closed = false;
-    private readonly Timeval $exportTimeout;
+    private readonly ?Timeval $exportTimeout;
 
     public function __construct(
         string $endpoint,
@@ -50,7 +50,7 @@ final class GrpcTransport implements TransportInterface
     ) {
         $this->channel = new Channel($endpoint, $opts);
         $this->metadata = $this->formatMetadata(array_change_key_case($headers));
-        $this->exportTimeout = new Timeval($timeoutMillis * self::MICROS_PER_MILLISECOND);
+        $this->exportTimeout = $timeoutMillis > 0 ? new Timeval($timeoutMillis * self::MICROS_PER_MILLISECOND) : null;
     }
 
     #[\Override]
@@ -66,7 +66,7 @@ final class GrpcTransport implements TransportInterface
             return new ErrorFuture(new BadMethodCallException('Transport closed'));
         }
 
-        $call = new Call($this->channel, $this->method, $this->exportTimeout);
+        $call = new Call($this->channel, $this->method, $this->exportTimeout ?? Timeval::infFuture());
 
         $cancellation ??= new NullCancellation();
         $cancellationId = $cancellation->subscribe(static fn (Throwable $e) => $call->cancel());
