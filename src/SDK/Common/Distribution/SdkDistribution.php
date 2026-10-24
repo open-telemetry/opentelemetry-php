@@ -8,6 +8,9 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
 
+/**
+ * @internal
+ */
 final class SdkDistribution implements DistributionConfiguration
 {
     public function __construct(

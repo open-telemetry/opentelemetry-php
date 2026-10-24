@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 /**
  * Wraps a composable sampler in a {@see CompositeSampler}.
  *
+ * @internal
  * @experimental
  * @implements ComponentProvider<SamplerInterface>
  */

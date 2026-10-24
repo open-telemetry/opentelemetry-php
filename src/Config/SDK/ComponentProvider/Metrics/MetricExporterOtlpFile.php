@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<MetricExporterInterface>
  */
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]

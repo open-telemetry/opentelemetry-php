@@ -6,6 +6,9 @@ namespace OpenTelemetry\Config\SDK\Configuration\Loader;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 
+/**
+ * @internal
+ */
 interface ConfigurationLoader
 {
     public function loadConfiguration(mixed $configuration): void;

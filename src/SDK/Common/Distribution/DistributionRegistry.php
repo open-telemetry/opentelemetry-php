@@ -6,6 +6,9 @@ namespace OpenTelemetry\SDK\Common\Distribution;
 
 use Override;
 
+/**
+ * @internal
+ */
 final class DistributionRegistry implements DistributionProperties
 {
     private array $distributionConfigurations = [];

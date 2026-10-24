@@ -15,6 +15,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<LogRecordProcessorInterface>
  */
 final class LogRecordProcessorSimple implements ComponentProvider

@@ -14,6 +14,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<MetricExporterInterface>
  */
 final class MetricExporterConsole implements ComponentProvider

@@ -8,9 +8,10 @@ use function is_string;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 /**
+ * @internal
  * @todo When symfony/config 7.2+ is required, extend StringNode and remove validateType method
  */
-class StringNode extends \Symfony\Component\Config\Definition\ScalarNode
+final class StringNode extends \Symfony\Component\Config\Definition\ScalarNode
 {
     use NodeTrait;
 

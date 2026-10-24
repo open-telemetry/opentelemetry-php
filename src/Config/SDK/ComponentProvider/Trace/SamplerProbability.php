@@ -16,6 +16,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 /**
  * Consistent probability sampler.
  *
+ * @internal
  * @experimental
  * @implements ComponentProvider<SamplerInterface>
  */

@@ -17,6 +17,9 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * @internal
+ */
 final class YamlSymfonyFileLoader extends FileLoader
 {
     public function __construct(private readonly ConfigurationLoader $configuration, FileLocatorInterface $locator, ?string $env = null)

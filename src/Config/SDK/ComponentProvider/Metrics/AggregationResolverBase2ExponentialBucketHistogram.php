@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * The SDK has no exponential histogram. The settings are validated so a schema-valid file still
  * parses, and the view falls back to the metric reader's default aggregation.
  *
+ * @internal
  * @implements ComponentProvider<DefaultAggregationProviderInterface>
  */
 final class AggregationResolverBase2ExponentialBucketHistogram implements ComponentProvider
