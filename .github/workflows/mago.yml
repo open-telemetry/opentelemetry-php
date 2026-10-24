@@ -33,7 +33,7 @@ jobs:
       - name: Setup Mago
         uses: nhedger/setup-mago@db907a61008831176aa6d71499a8479868edb141 # v1.0.1
         with:
-          version: "latest"
+          version: "1.58.2"
           token: ${{ github.token }}
 
       - name: Formatting

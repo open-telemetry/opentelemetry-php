@@ -84,10 +84,10 @@ The top-level `response_propagator/development` key is deprecated. It still work
 warning, and the `distribution` one wins when both are set.
 
 Any distribution may claim a key there, so one file can carry the settings of several. Keys this SDK
-has no provider for — another distribution's, or one whose package is not installed — are ignored
-and logged at warning level, rather than failing the parse. Note that this makes a typo in the key
-above silently fall back to the default instead of raising an error; the warning is where it shows
-up. It is emitted when the SDK is created, so a configured `log_level` applies to it.
+has no provider for are logged at warning level and ignored, rather than failing the parse. That
+covers another distribution's keys, and ours when the package providing them is not installed. A
+typo in a key above therefore falls back to the default, and the warning is the only sign of it.
+The warning is emitted when the SDK is created, so a configured `log_level` applies to it.
 
 #### Performance considerations
 

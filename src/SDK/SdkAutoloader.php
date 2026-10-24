@@ -189,7 +189,7 @@ class SdkAutoloader
                 $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
             } catch (Throwable $t) {
                 // Reported verbatim, including the Error raised when an older sdk-configuration
-                // lacks getInstrumentationConfig() — PHP's own message names the missing method, and
+                // lacks getInstrumentationConfig(). PHP's own message names the missing method, and
                 // `sdk` can only suggest that package, so its version cannot be constrained from
                 // here. Singling Error out to blame the version instead would also catch faults
                 // raised *by* the configuration, such as a TypeError from a plugin's create().

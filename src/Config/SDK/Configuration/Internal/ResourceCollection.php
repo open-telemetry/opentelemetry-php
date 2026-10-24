@@ -38,9 +38,6 @@ final class ResourceCollection implements \OpenTelemetry\Config\SDK\Configuratio
         $this->vendors = $this->composerResource->getVendors();
     }
 
-    /**
-     * @psalm-suppress PossiblyInvalidArgument
-     */
     #[\Override]
     public function addClassResource(object|string $class): void
     {
@@ -52,7 +49,8 @@ final class ResourceCollection implements \OpenTelemetry\Config\SDK\Configuratio
 
             $this->addResource(new ReflectionClassResource($reflection, $this->vendors));
         } catch (ReflectionException) {
-            //@todo $class could be an object here?
+            // ReflectionClass only throws for a class name that does not exist.
+            \assert(\is_string($class));
             $this->addResource(new ClassExistenceResource($class, false));
         }
     }

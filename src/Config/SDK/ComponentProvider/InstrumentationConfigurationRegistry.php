@@ -22,28 +22,24 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * Root for the `instrumentation/development` node, processed separately from {@see OpenTelemetrySdk}
  * even though both describe the same document.
  *
- * The separation buys independent failure: a node that does not validate costs us the
- * instrumentation config and nothing else, leaving the SDK configured. That matters because
- * `/development` is exempt from the file format's versioning guarantees, so this node is the part
- * of the document most likely to disagree with what we can parse. Appending it to the SDK root
- * instead would make one bad header list fatal to tracing — `ignoreExtraKeys()` and
- * {@see IgnoresUnknownProviders} only tolerate unknown keys and unregistered providers, not a known
- * node that fails type validation.
+ * The separation means a node that does not validate costs the instrumentation config and
+ * nothing else, leaving the SDK configured. `/development` is exempt from the file format's
+ * versioning guarantees, so this node is the part of the document most likely to disagree with
+ * what we can parse. Appended to the SDK root, one bad header list would be fatal to tracing.
+ * `ignoreExtraKeys()` and {@see IgnoresUnknownProviders} tolerate unknown keys and unregistered
+ * providers, not a known node that fails type validation.
  *
  * The reverse holds only for {@see \OpenTelemetry\Config\SDK\ConfigProvider}.
  * {@see \OpenTelemetry\Config\SDK\Configuration::parseFile()} processes the SDK root first, so an
  * invalid SDK root costs its callers both.
  *
  * @internal
- * @todo Append `instrumentation/development` to {@see OpenTelemetrySdk} and remove this provider,
- *       once that node graduates into the versioned schema — losing its `/development` suffix — and
- *       so no longer needs to fail on its own. Merging is already possible without losing the
- *       independence (declare the node as a variable node and run this schema through a nested
- *       processor inside its validation closure, as
+ * @todo Append `instrumentation/development` to {@see OpenTelemetrySdk} and remove this provider
+ *       once the node drops its `/development` suffix and joins the versioned schema. Merging
+ *       sooner without losing the independent failure needs a variable node that runs this schema
+ *       through a nested processor in its validation closure, as
  *       {@see \OpenTelemetry\Config\SDK\Configuration\Internal\ComponentProviderRegistry::process()}
- *       already does), but until the versioning caveat lifts it trades a statically declared schema
- *       for a hand-rolled closure to save one tree walk, now that
- *       {@see \OpenTelemetry\Config\SDK\Configuration} reads the file once.
+ *       does. That trades a declared schema for a hand-rolled closure to save one tree walk.
  * @implements ComponentProvider<ConfigurationRegistry>
  */
 class InstrumentationConfigurationRegistry implements ComponentProvider
@@ -109,7 +105,7 @@ class InstrumentationConfigurationRegistry implements ComponentProvider
     }
 
     /**
-     * `ExperimentalGeneralInstrumentation`: fixed properties, not a component map — a scalar
+     * `ExperimentalGeneralInstrumentation`: fixed properties, not a component map, because a scalar
      * sibling such as `stability_opt_in_list` cannot resolve to a provider. Everything but `http`
      * is validated and discarded, since nothing in this SDK reads it yet.
      */

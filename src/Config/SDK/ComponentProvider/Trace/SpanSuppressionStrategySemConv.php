@@ -11,7 +11,6 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -24,13 +23,13 @@ final class SpanSuppressionStrategySemConv implements ComponentProvider
     /**
      * @param array{} $properties
      */
-    #[Override]
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanSuppressionStrategy
     {
         return new SemanticConventionSuppressionStrategy(ServiceLoader::load(SemanticConventionResolver::class));
     }
 
-    #[Override]
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('semconv');

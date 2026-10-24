@@ -49,7 +49,6 @@ final class ConfigurationFactory
     /**
      * @param iterable<ComponentProvider> $componentProviders
      * @param ComponentProvider<T> $rootComponent
-     * @param EnvReader $envReader
      */
     public function __construct(
         private readonly iterable $componentProviders,

@@ -54,7 +54,6 @@ final class Configuration
      * document, or an empty {@see ConfigProperties} if the node is absent.
      *
      * @experimental
-     * @return ConfigurationRegistry
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#get-instrumentation-config
      */
@@ -75,7 +74,6 @@ final class Configuration
      *
      * @internal
      * @param string|list<string> $file
-     * @return ConfigurationRegistry
      */
     public static function parseInstrumentationConfig(
         string|array $file,

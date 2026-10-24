@@ -517,8 +517,8 @@ final class OpenTelemetrySdk implements ComponentProvider
 
     /**
      * Applies the `file_format` compatibility rules from upstream's versioning policy: a matching
-     * `MAJOR` is required, a newer `MINOR` only warns, and anything else — including the `1.0-rc.*`
-     * release candidates and the superseded `0.x` formats — is rejected.
+     * `MAJOR` is required and a newer `MINOR` only warns. Anything else is rejected, including the
+     * `1.0-rc.*` release candidates and the superseded `0.x` formats.
      *
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/VERSIONING.md#file-format
      */

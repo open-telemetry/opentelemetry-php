@@ -9,7 +9,6 @@ use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanKindSuppressionStrategy\SpanKindSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -22,13 +21,13 @@ final class SpanSuppressionStrategySpanKind implements ComponentProvider
     /**
      * @param array{} $properties
      */
-    #[Override]
+    #[\Override]
     public function createPlugin(array $properties, Context $context): SpanSuppressionStrategy
     {
         return new SpanKindSuppressionStrategy();
     }
 
-    #[Override]
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         return $builder->arrayNode('spankind');

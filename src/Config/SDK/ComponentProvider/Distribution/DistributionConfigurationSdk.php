@@ -15,7 +15,6 @@ use OpenTelemetry\SDK\Common\Distribution\DistributionConfiguration;
 use OpenTelemetry\SDK\Common\Distribution\SdkDistribution;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -38,10 +37,8 @@ final class DistributionConfigurationSdk implements ComponentProvider
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
      * } $properties
-     * @param Context $context
-     * @return DistributionConfiguration
      */
-    #[Override]
+    #[\Override]
     public function createPlugin(array $properties, Context $context): DistributionConfiguration
     {
         $responsePropagators = [];
@@ -56,7 +53,7 @@ final class DistributionConfigurationSdk implements ComponentProvider
         );
     }
 
-    #[Override]
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('opentelemetry_php/development');

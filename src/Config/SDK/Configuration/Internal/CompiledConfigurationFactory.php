@@ -19,7 +19,6 @@ final class CompiledConfigurationFactory
 {
     /**
      * @param ComponentProvider<T> $rootComponent
-     * @param NodeInterface $node
      * @param iterable<ResourceTrackable> $resourceTrackable
      */
     public function __construct(
