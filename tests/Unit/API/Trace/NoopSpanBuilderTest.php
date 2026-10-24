@@ -20,7 +20,7 @@ class NoopSpanBuilderTest extends TestCase
 {
     public function test_set_parent(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
@@ -33,14 +33,14 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_noop_created_span_uses_provided_context(): void
     {
-        $spanContext = $this->createMock(SpanContextInterface::class);
+        $spanContext = $this->createStub(SpanContextInterface::class);
 
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
 
         $context = Context::getRoot()->with(ContextKeys::span(), $span);
 
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $span = (new NoopSpanBuilder($contextStorage))
             ->setParent($context)
@@ -52,7 +52,7 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_noop_created_span_uses_current_context(): void
     {
-        $spanContext = $this->createMock(SpanContextInterface::class);
+        $spanContext = $this->createStub(SpanContextInterface::class);
 
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
@@ -71,7 +71,7 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_noop_created_span_doesnt_use_current_context_if_no_parent(): void
     {
-        $spanContext = $this->createMock(SpanContextInterface::class);
+        $spanContext = $this->createStub(SpanContextInterface::class);
 
         $span = $this->createMock(SpanInterface::class);
         $span->method('getContext')->willReturn($spanContext);
@@ -97,7 +97,7 @@ class NoopSpanBuilderTest extends TestCase
 
         $context = Context::getRoot()->with(ContextKeys::span(), $span);
 
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $span = (new NoopSpanBuilder($contextStorage))
             ->setParent($context)
@@ -109,7 +109,7 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_set_no_parent(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
@@ -119,19 +119,19 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_add_link(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
             (new NoopSpanBuilder($contextStorage))->addLink(
-                $this->createMock(SpanContextInterface::class)
+                $this->createStub(SpanContextInterface::class)
             )
         );
     }
 
     public function test_set_attribute(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
@@ -141,7 +141,7 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_set_attributes(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
@@ -151,7 +151,7 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_set_start_timestamp(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,
@@ -163,7 +163,7 @@ class NoopSpanBuilderTest extends TestCase
 
     public function test_set_span_kind(): void
     {
-        $contextStorage = $this->createMock(ContextStorageInterface::class);
+        $contextStorage = $this->createStub(ContextStorageInterface::class);
 
         $this->assertInstanceOf(
             NoopSpanBuilder::class,

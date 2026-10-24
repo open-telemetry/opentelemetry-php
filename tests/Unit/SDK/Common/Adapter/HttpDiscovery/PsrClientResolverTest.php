@@ -22,7 +22,7 @@ class PsrClientResolverTest extends TestCase
 
     public function test_resolve_psr_client(): void
     {
-        $dependency = $this->createMock(ClientInterface::class);
+        $dependency = $this->createStub(ClientInterface::class);
         $instance = PsrClientResolver::create($dependency);
 
         $this->assertSame(

@@ -21,7 +21,7 @@ class LoggerHolderTest extends TestCase
 
     public function test_constructor(): void
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         new LoggerHolder($logger);
 
@@ -30,7 +30,7 @@ class LoggerHolderTest extends TestCase
 
     public function test_set_and_get(): void
     {
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
 
         $this->assertFalse(LoggerHolder::isSet());
         LoggerHolder::set($logger);

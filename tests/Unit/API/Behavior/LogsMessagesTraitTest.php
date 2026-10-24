@@ -20,6 +20,9 @@ class LogsMessagesTraitTest extends TestCase
 {
     use TestState;
 
+    /**
+     * @var MockObject&LogWriterInterface
+     */
     protected MockObject $writer;
 
     #[\Override]

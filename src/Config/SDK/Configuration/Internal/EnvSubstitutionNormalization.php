@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\Configuration\Internal;
 
 use const FILTER_DEFAULT;
+use const FILTER_FLAG_ALLOW_HEX;
 use const FILTER_NULL_ON_FAILURE;
 use const FILTER_VALIDATE_BOOLEAN;
 use const FILTER_VALIDATE_FLOAT;
@@ -59,14 +60,14 @@ final class EnvSubstitutionNormalization implements Normalization
             return $value;
         }
         if ($node instanceof ScalarNode && is_string($value)) {
-            $filter = match (true) {
-                $node instanceof BooleanNode => FILTER_VALIDATE_BOOLEAN,
-                $node instanceof IntegerNode => FILTER_VALIDATE_INT,
-                $node instanceof FloatNode => FILTER_VALIDATE_FLOAT,
-                default => FILTER_DEFAULT,
+            [$filter, $flags] = match (true) {
+                $node instanceof BooleanNode => [FILTER_VALIDATE_BOOLEAN, 0],
+                $node instanceof IntegerNode => [FILTER_VALIDATE_INT, FILTER_FLAG_ALLOW_HEX],
+                $node instanceof FloatNode => [FILTER_VALIDATE_FLOAT, 0],
+                default => [FILTER_DEFAULT, 0],
             };
 
-            return $this->replaceEnvVariables($value, $filter);
+            return $this->replaceEnvVariables($value, $filter, $flags);
         }
         if ($node instanceof VariableNode) {
             return $this->replaceEnvVariablesRecursive($value);
@@ -75,7 +76,7 @@ final class EnvSubstitutionNormalization implements Normalization
         return $value;
     }
 
-    private function replaceEnvVariables(string $value, int $filter = FILTER_DEFAULT): mixed
+    private function replaceEnvVariables(string $value, int $filter = FILTER_DEFAULT, int $flags = 0): mixed
     {
         $replaced = Substitution::process($value, $this->envReader);
 
@@ -86,7 +87,7 @@ final class EnvSubstitutionNormalization implements Normalization
             return null;
         }
 
-        return filter_var($replaced, $filter, FILTER_NULL_ON_FAILURE) ?? $replaced;
+        return filter_var($replaced, $filter, $flags | FILTER_NULL_ON_FAILURE) ?? $replaced;
     }
 
     private function replaceEnvVariablesRecursive(mixed $value): mixed

@@ -33,7 +33,7 @@ class ConfiguratorTest extends TestCase
                 return $this->disabled === false;
             }
         };
-        $this->scope = new InstrumentationScope('test', '1.0', 'https://example.org/schema', $this->createMock(AttributesInterface::class));
+        $this->scope = new InstrumentationScope('test', '1.0', 'https://example.org/schema', $this->createStub(AttributesInterface::class));
         $this->configurator = (new Configurator(static fn () => $config));
     }
 

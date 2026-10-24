@@ -205,8 +205,8 @@ final class InstrumentTest extends TestCase
 
     public function test_observable_callback_removes_callback_destructor_token_on_detach(): void
     {
-        $writer = $this->createMock(MetricWriterInterface::class);
-        $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
+        $writer = $this->createStub(MetricWriterInterface::class);
+        $referenceCounter = $this->createStub(ReferenceCounterInterface::class);
 
         $callbackDestructor = new ObservableCallbackDestructor(new WeakMap(), $writer);
         $callbackDestructor->callbackIds[1] = $referenceCounter;
@@ -219,7 +219,7 @@ final class InstrumentTest extends TestCase
 
     public function test_observable_callback_acquires_persistent_on_destruct(): void
     {
-        $writer = $this->createMock(MetricWriterInterface::class);
+        $writer = $this->createStub(MetricWriterInterface::class);
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
         $referenceCounter->expects($this->once())->method('acquire')->with(true);
         $referenceCounter->expects($this->once())->method('release');
@@ -230,7 +230,7 @@ final class InstrumentTest extends TestCase
 
     public function test_observable_callback_does_not_acquire_persistent_on_destruct_if_callback_destructor_set(): void
     {
-        $writer = $this->createMock(MetricWriterInterface::class);
+        $writer = $this->createStub(MetricWriterInterface::class);
         $referenceCounter = $this->createMock(ReferenceCounterInterface::class);
         $referenceCounter->expects($this->never())->method('acquire')->with(true);
 
@@ -244,7 +244,7 @@ final class InstrumentTest extends TestCase
     public function test_synchronous_disabled_if_meter_disabled(): void
     {
         $w = $this->createMock(MetricWriterInterface::class);
-        $c = $this->createMock(ReferenceCounterInterface::class);
+        $c = $this->createStub(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
         $w->expects($this->once())->method('enabled')->with($i)->willReturn(false);
         $counter = new Counter($w, $i, $c);
@@ -255,7 +255,7 @@ final class InstrumentTest extends TestCase
     public function test_asynchronous_disabled_if_meter_disabled(): void
     {
         $w = $this->createMock(MetricWriterInterface::class);
-        $c = $this->createMock(ReferenceCounterInterface::class);
+        $c = $this->createStub(ReferenceCounterInterface::class);
         $i = new Instrument(InstrumentType::UP_DOWN_COUNTER, 'test', null, null);
         $w->expects($this->once())->method('enabled')->with($i)->willReturn(false);
         $counter = new ObservableCounter($w, $i, $c, new WeakMap());

@@ -43,6 +43,37 @@ If autoloading was not successful (or partially successful), no-op implementatio
 
 See https://github.com/open-telemetry/opentelemetry-php/blob/main/examples/autoload_sdk.php for a more detailed example.
 
+### Consistent probability samplers (experimental)
+
+`OpenTelemetry\SDK\Trace\Sampler\Consistent` contains the composable samplers of the
+[SDK specification](https://opentelemetry.io/docs/specs/otel/trace/sdk/#compositesampler), which implement
+[TraceState probability sampling](https://opentelemetry.io/docs/specs/otel/trace/tracestate-probability-sampling/):
+the sampling threshold is propagated in the `ot` entry of the W3C `tracestate`, so that services sampling with different
+probabilities still make consistent decisions about a trace and the adjusted count of sampled spans is known.
+
+A `CompositeSampler` wraps a composable sampler and makes the final decision. The composable samplers are
+`ComposableAlwaysOn`, `ComposableAlwaysOff`, `ComposableProbability`, `ComposableParentThreshold`, `ComposableRuleBased`
+(with `PredicatedSampler` and `Predicate`) and `ComposableAnnotating`. Custom samplers implement `ComposableSamplerInterface`.
+
+```php
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableParentThreshold;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableProbability;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
+
+// 10% of the root spans, children follow the parent
+$sampler = new CompositeSampler(new ComposableParentThreshold(new ComposableProbability(0.1)));
+```
+
+The same samplers are available in declarative configuration (`probability/development` and `composite/development` with
+`always_on`, `always_off`, `probability`, `parent_threshold` and `rule_based`, in `open-telemetry/sdk-configuration`).
+They are not available through `OTEL_TRACES_SAMPLER`.
+
+Limitations:
+- The thresholds are 56-bit values held in native integers, so 64-bit PHP is required.
+- The specification recommends a compatibility warning when the randomness of a span with a parent is taken from the
+  trace ID but the `Random` trace flag is not set. This is not implemented yet.
+- Everything here is experimental and may change.
+
 ## Contributing
 
 This repository is a read-only git subtree split.

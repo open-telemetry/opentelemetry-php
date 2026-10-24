@@ -21,6 +21,9 @@ use function stream_get_contents;
 #[CoversClass(SpanExporter::class)]
 class SpanExporterTest extends TestCase
 {
+    /**
+     * @var MockObject&TransportInterface
+     */
     private MockObject $transport;
     private SpanExporter $exporter;
 

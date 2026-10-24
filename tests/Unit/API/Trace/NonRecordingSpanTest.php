@@ -46,7 +46,7 @@ class NonRecordingSpanTest extends TestCase
         $this->assertInstanceOf(
             NonRecordingSpan::class,
             $this->createNonRecordingSpan()->setAttributes(
-                $this->createMock(AttributesInterface::class)
+                $this->createStub(AttributesInterface::class)
             )
         );
     }

@@ -41,8 +41,6 @@ resource:
 
 tracer_provider:
   processors:
-
-meter_provider:
-  readers:
-logger_provider:
-  processors:
+    - simple:
+        exporter:
+          console:

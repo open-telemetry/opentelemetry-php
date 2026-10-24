@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "open-telemetry/api": "^1.11",
         "open-telemetry/context": "^1.4",
         "open-telemetry/sdk": "^1.16",
@@ -36,7 +36,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.1.x-dev"
+            "dev-main": "1.0.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
@@ -47,9 +47,16 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOff",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOn",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerParentThreshold",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerProbability",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerRuleBased",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOff",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerAlwaysOn",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerParentBased",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerProbability",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SamplerTraceIdRatioBased",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanExporterMemory",
@@ -61,7 +68,12 @@
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySemConv",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\SpanSuppressionStrategySpanKind",
 
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverBase2ExponentialBucketHistogram",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDefault",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverDrop",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverExplicitBucketHistogram",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverLastValue",
+                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\AggregationResolverSum",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterConsole",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterMemory",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Metrics\\MetricExporterOtlpFile",

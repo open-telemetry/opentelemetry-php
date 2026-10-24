@@ -14,22 +14,32 @@ use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ReadableLogRecord::class)]
 class ReadableLogRecordTest extends TestCase
 {
-    private InstrumentationScopeInterface $scope;
-    private ContextInterface $context;
+    /**
+     * @var Stub&InstrumentationScopeInterface
+     */
+    private Stub $scope;
+    /**
+     * @var Stub&ContextInterface
+     */
+    private Stub $context;
     private LoggerSharedState $sharedState;
-    private ResourceInfo $resource;
+    /**
+     * @var Stub&ResourceInfo
+     */
+    private Stub $resource;
     #[\Override]
     public function setUp(): void
     {
-        $this->scope = $this->createMock(InstrumentationScopeInterface::class);
+        $this->scope = $this->createStub(InstrumentationScopeInterface::class);
         $this->sharedState = $this->createMock(LoggerSharedState::class);
-        $this->context = $this->createMock(ContextInterface::class);
-        $this->resource = $this->createMock(ResourceInfo::class);
+        $this->context = $this->createStub(ContextInterface::class);
+        $this->resource = $this->createStub(ResourceInfo::class);
         $limits = $this->createMock(LogRecordLimits::class);
         $attributeFactory = new AttributesFactory();
         $limits->method('getAttributeFactory')->willReturn($attributeFactory); //final

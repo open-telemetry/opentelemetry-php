@@ -7,6 +7,7 @@ namespace OpenTelemetry\Contrib\Otlp;
 use function hex2bin;
 use function is_float;
 use function is_int;
+use function is_nan;
 use function method_exists;
 use Opentelemetry\Proto\Collector\Metrics\V1\ExportMetricsServiceRequest;
 use Opentelemetry\Proto\Common\V1\InstrumentationScope;
@@ -204,8 +205,12 @@ final class MetricConverter
         $pHistogramDataPoint->setTimeUnixNano($dataPoint->timestamp);
         $pHistogramDataPoint->setCount($dataPoint->count);
         $pHistogramDataPoint->setSum($dataPoint->sum);
-        $pHistogramDataPoint->setMin($dataPoint->min);
-        $pHistogramDataPoint->setMax($dataPoint->max);
+        if (!is_nan($dataPoint->min)) {
+            $pHistogramDataPoint->setMin($dataPoint->min);
+        }
+        if (!is_nan($dataPoint->max)) {
+            $pHistogramDataPoint->setMax($dataPoint->max);
+        }
         $pHistogramDataPoint->setBucketCounts($dataPoint->bucketCounts);
         $pHistogramDataPoint->setExplicitBounds($dataPoint->explicitBounds);
         foreach ($dataPoint->exemplars as $exemplar) {

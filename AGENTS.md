@@ -40,10 +40,10 @@ cp .env.dist .env   # Required before first use
 make install        # Install dependencies
 ```
 
-Set `PHP_VERSION` (8.1, 8.2, 8.3, 8.4, 8.5) to test against specific PHP versions: `PHP_VERSION=8.1 make all`
+Set `PHP_VERSION` (8.2, 8.3, 8.4, 8.5) to test against specific PHP versions: `PHP_VERSION=8.2 make all`
 
-PHP 8.1 is the minimum supported version and the Makefile default, so code must not use newer syntax or functions.
-Polyfills for 8.2 to 8.4 are available.
+PHP 8.2 is the minimum supported version and the Makefile default, so code must not use newer syntax or functions.
+Polyfills for 8.3 and 8.4 are available.
 
 Most contributors use the Makefile with Docker Compose. Alternatively, `.devcontainer/` provides a devcontainer per
 PHP version. Inside one, `MAKEFLAGS=DC_RUN_PHP=` makes the
@@ -150,7 +150,7 @@ Files marked "DO NOT EDIT" are generated. Don't edit them by hand:
 
 ## CI Requirements
 
-The blocking checks in `.github/workflows/php.yml` run on PHP 8.1 to 8.5:
+The blocking checks in `.github/workflows/php.yml` run on PHP 8.2 to 8.5:
 1. `composer validate` and `make packages-composer`
 2. `make style`: CI runs it with `--dry-run`, so run it locally to apply fixes
 3. `make deptrac`: no architectural layer violations

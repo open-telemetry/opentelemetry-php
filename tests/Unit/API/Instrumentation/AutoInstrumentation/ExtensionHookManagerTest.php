@@ -42,8 +42,8 @@ class ExtensionHookManagerTest extends TestCase
         $this->hookManager = new ExtensionHookManager();
         $this->context = new InstrumentationContext(
             $tracerProvider,
-            $this->createMock(MeterProviderInterface::class),
-            $this->createMock(LoggerProviderInterface::class)
+            $this->createStub(MeterProviderInterface::class),
+            $this->createStub(LoggerProviderInterface::class)
         );
     }
 

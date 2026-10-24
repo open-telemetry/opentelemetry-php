@@ -37,12 +37,11 @@ class LoggerProviderTest extends TestCase
     {
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
         $instrumentationScopeFactory = $this->createMock(InstrumentationScopeFactoryInterface::class);
-        $instrumentationScopeFactory->method('create')->willReturn($this->createMock(InstrumentationScope::class));
-        $resource = $this->createMock(ResourceInfo::class);
+        $instrumentationScopeFactory->method('create')->willReturn($this->createStub(InstrumentationScope::class));
         $this->config = $this->createMock(LoggerConfig::class);
         $configurator = $this->createMock(Configurator::class);
         $configurator->method('resolve')->willReturn($this->config);
-        $this->provider = new LoggerProvider($this->processor, $instrumentationScopeFactory, $resource, $configurator);
+        $this->provider = new LoggerProvider($this->processor, $instrumentationScopeFactory, $this->createStub(ResourceInfo::class), $configurator);
     }
 
     public function test_get_logger(): void

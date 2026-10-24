@@ -10,7 +10,7 @@ x-otel-common:
 version: '3.7'
 services:
   service-one:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.1
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.2
     command: [ 'php', '-S', '0.0.0.0:8000' ]
     volumes:
       - './src:/usr/src/myapp'
@@ -22,7 +22,7 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.1'
 
   service-two:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.1
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.2
     command: [ 'php', '-S', '0.0.0.0:8000' ]
     volumes:
       - './src:/usr/src/myapp'
@@ -32,7 +32,7 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: 'service.version=0.2'
 
   service-three:
-    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.1
+    image: ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:8.2
     command: [ 'php', '-S', '0.0.0.0:8000' ]
     volumes:
       - './src:/usr/src/myapp'

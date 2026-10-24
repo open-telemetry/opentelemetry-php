@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,17 +18,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LoggerSharedState::class)]
 class LoggerSharedStateTest extends TestCase
 {
-    private ResourceInfo $resource;
+    /**
+     * @var Stub&ResourceInfo
+     */
+    private Stub $resource;
     private LogRecordProcessorInterface $processor;
-    private LogRecordLimits $limits;
+    /**
+     * @var Stub&LogRecordLimits
+     */
+    private Stub $limits;
     private LoggerSharedState $loggerSharedState;
 
     #[\Override]
     public function setUp(): void
     {
-        $this->resource = $this->createMock(ResourceInfo::class);
+        $this->resource = $this->createStub(ResourceInfo::class);
         $this->processor = $this->createMock(LogRecordProcessorInterface::class);
-        $this->limits = $this->createMock(LogRecordLimits::class);
+        $this->limits = $this->createStub(LogRecordLimits::class);
         $this->loggerSharedState = new LoggerSharedState(
             $this->resource,
             $this->limits,

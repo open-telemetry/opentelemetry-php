@@ -86,7 +86,7 @@ class TracerProviderTest extends TestCase
 
     public function test_get_sampler(): void
     {
-        $sampler = $this->createMock(SamplerInterface::class);
+        $sampler = $this->createStub(SamplerInterface::class);
         $provider = new TracerProvider([], $sampler);
 
         $this->assertSame(

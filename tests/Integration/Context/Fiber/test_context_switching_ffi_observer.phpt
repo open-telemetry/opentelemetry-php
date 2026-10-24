@@ -1,7 +1,7 @@
 --TEST--
 Context switches on execution context switch.
 --SKIPIF--
-<?php if (PHP_VERSION_ID < 80100 || !extension_loaded('ffi')) die('skip requires PHP8.1 and FFI'); ?>
+<?php if (!extension_loaded('ffi')) die('skip requires FFI'); ?>
 --ENV--
 OTEL_PHP_FIBERS_ENABLED=1
 --FILE--

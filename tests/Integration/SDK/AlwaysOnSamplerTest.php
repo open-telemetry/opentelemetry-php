@@ -20,7 +20,7 @@ class AlwaysOnSamplerTest extends TestCase
 {
     public function test_always_on_sampler_decision(): void
     {
-        $parentTraceState = $this->createMock(API\TraceStateInterface::class);
+        $parentTraceState = $this->createStub(API\TraceStateInterface::class);
         $sampler = new AlwaysOnSampler();
         $decision = $sampler->shouldSample(
             $this->createParentContext(true, false, $parentTraceState),

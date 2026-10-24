@@ -66,12 +66,12 @@ final class InstrumentationTest extends TestCase
 
     public function test_globals_returns_configured_instances(): void
     {
-        $tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $meterProvider = $this->createMock(MeterProviderInterface::class);
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
-        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        $tracerProvider = $this->createStub(TracerProviderInterface::class);
+        $meterProvider = $this->createStub(MeterProviderInterface::class);
+        $propagator = $this->createStub(TextMapPropagatorInterface::class);
+        $loggerProvider = $this->createStub(LoggerProviderInterface::class);
+        $eventLoggerProvider = $this->createStub(EventLoggerProviderInterface::class);
+        $responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
@@ -106,20 +106,20 @@ final class InstrumentationTest extends TestCase
     {
         $instrumentation = new CachedInstrumentation('', null, null, []);
 
-        $tracer = $this->createMock(TracerInterface::class);
+        $tracer = $this->createStub(TracerInterface::class);
         $tracerProvider = $this->createMock(TracerProviderInterface::class);
         $tracerProvider->method('getTracer')->willReturn($tracer);
-        $meter = $this->createMock(MeterInterface::class);
+        $meter = $this->createStub(MeterInterface::class);
         $meterProvider = $this->createMock(MeterProviderInterface::class);
         $meterProvider->method('getMeter')->willReturn($meter);
-        $logger = $this->createMock(LoggerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
         $loggerProvider = $this->createMock(LoggerProviderInterface::class);
         $loggerProvider->method('getLogger')->willReturn($logger);
-        $eventLogger = $this->createMock(EventLoggerInterface::class);
+        $eventLogger = $this->createStub(EventLoggerInterface::class);
         $eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
         $eventLoggerProvider->method('getEventLogger')->willReturn($eventLogger);
-        $propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        $propagator = $this->createStub(TextMapPropagatorInterface::class);
+        $responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)

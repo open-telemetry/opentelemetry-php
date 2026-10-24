@@ -76,7 +76,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
 
     public function test_ignore_parent_sampled_flag(): void
     {
-        $parentTraceState = $this->createMock(API\TraceStateInterface::class);
+        $parentTraceState = $this->createStub(API\TraceStateInterface::class);
         $sampler = new TraceIdRatioBasedSampler(0.0);
         $samplingResult = $sampler->shouldSample(
             $this->createParentContext(true, true, $parentTraceState),

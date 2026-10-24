@@ -1,7 +1,28 @@
 file_format: "1.0"
-
 tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
   tracer_configurator/development:
     tracers:
+      - name: test
+        config:
+meter_provider:
+  readers:
+    - periodic:
+        exporter:
+          console:
+  meter_configurator/development:
+    meters:
+      - name: test
+        config:
+logger_provider:
+  processors:
+    - simple:
+        exporter:
+          console:
+  logger_configurator/development:
+    loggers:
       - name: test
         config:

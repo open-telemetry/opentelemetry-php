@@ -292,9 +292,9 @@ final class MeterTest extends TestCase
      */
     public function test_uses_view_registry_to_create_views(): void
     {
-        $aggregation = $this->createMock(AggregationInterface::class);
+        $aggregation = $this->createStub(AggregationInterface::class);
 
-        $metricReader = $this->createMock(MeterMetricReaderInterface::class);
+        $metricReader = $this->createStub(MeterMetricReaderInterface::class);
 
         $viewRegistry = $this->createMock(ViewRegistryInterface::class);
         $viewRegistry->method('find')->willReturn([
@@ -324,7 +324,7 @@ final class MeterTest extends TestCase
      */
     public function test_uses_default_aggregation_if_view_aggregation_null(): void
     {
-        $aggregation = $this->createMock(AggregationInterface::class);
+        $aggregation = $this->createStub(AggregationInterface::class);
 
         $metricReader = $this->createMock(MeterMetricReaderInterface::class);
         $metricReader->method('defaultAggregation')->willReturn($aggregation);
@@ -355,7 +355,7 @@ final class MeterTest extends TestCase
      */
     public function test_uses_default_view_if_null_views_returned(): void
     {
-        $aggregation = $this->createMock(AggregationInterface::class);
+        $aggregation = $this->createStub(AggregationInterface::class);
 
         $metricReader = $this->createMock(MeterMetricReaderInterface::class);
         $metricReader->method('defaultAggregation')->willReturn($aggregation);

@@ -23,9 +23,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -108,7 +110,6 @@ final class ConfigurationFactoryTest extends TestCase
             ]),
         );
 
-        /** @todo  int_key_with_unquoted_hex_value is being interpreted as string */
         $parsed = $factory->process([
             Yaml::parse(<<<'YAML'
                 string_key: ${STRING_VALUE}                           # Valid reference to STRING_VALUE
@@ -119,7 +120,7 @@ final class ConfigurationFactoryTest extends TestCase
                 yet_another_string_key: ${INVALID_MAP_VALUE}          # Valid reference to INVALID_MAP_VALUE, but YAML structure from INVALID_MAP_VALUE MUST NOT be injected
                 bool_key: ${BOOl_VALUE}                               # Valid reference to BOOl_VALUE
                 int_key: ${INT_VALUE}                                 # Valid reference to INT_VALUE
-                #int_key_with_unquoted_hex_value: ${HEX_VALUE}         # Valid reference to HEX_VALUE without quotes
+                int_key_with_unquoted_hex_value: ${HEX_VALUE}          # Valid reference to HEX_VALUE without quotes
                 float_key: ${FLOAT_VALUE}                             # Valid reference to FLOAT_VALUE
                 combo_string_key: foo ${STRING_VALUE} ${FLOAT_VALUE}  # Valid reference to STRING_VALUE and FLOAT_VALUE
                 string_key_with_default: ${UNDEFINED_KEY:-fallback}   # UNDEFINED_KEY is not defined but a default value is included
@@ -139,7 +140,7 @@ final class ConfigurationFactoryTest extends TestCase
                 yet_another_string_key: "value\nkey:value"     # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 bool_key: true                                 # Interpreted as type bool, tag URI tag:yaml.org,2002:bool
                 int_key: 1                                     # Interpreted as type int, tag URI tag:yaml.org,2002:int
-                #int_key_with_unquoted_hex_value: 3735928559    # Interpreted as type int, tag URI tag:yaml.org,2002:int
+                int_key_with_unquoted_hex_value: 3735928559     # Interpreted as type int, tag URI tag:yaml.org,2002:int
                 float_key: 1.1                                 # Interpreted as type float, tag URI tag:yaml.org,2002:float
                 combo_string_key: foo value 1.1                # Interpreted as type string, tag URI tag:yaml.org,2002:str
                 string_key_with_default: fallback              # Interpreted as type string, tag URI tag:yaml.org,2002:str
@@ -201,6 +202,23 @@ final class ConfigurationFactoryTest extends TestCase
 
         $this->assertInstanceOf(ComponentPlugin::class, $parsed);
         $this->assertSame(2048, self::getPropertiesFromPlugin($parsed)['attribute_limits']['attribute_value_length_limit']);
+    }
+
+    #[BackupGlobals(true)]
+    #[TestWith(['0x'])]
+    #[TestWith(['0xZZ'])]
+    public function test_env_substitution_rejects_malformed_hex_integer(string $value): void
+    {
+        $_SERVER['OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT'] = $value;
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        self::factory()->process([[
+            'file_format' => '0.1',
+            'attribute_limits' => [
+                'attribute_value_length_limit' => '${OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT}',
+            ],
+        ]]);
     }
 
     /**

@@ -20,9 +20,11 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
 {
     /**
      * @param list<float|int> $boundaries strictly ascending histogram bucket boundaries
+     * @param bool $recordMinMax when false, data points have NAN min and max, and exporters omit them
      */
     public function __construct(
         public readonly array $boundaries,
+        public readonly bool $recordMinMax = true,
     ) {
     }
 
@@ -50,8 +52,10 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
         }
         $summary->count++;
         $summary->sum += $value;
-        $summary->min = self::min($value, $summary->min);
-        $summary->max = self::max($value, $summary->max);
+        if ($this->recordMinMax) {
+            $summary->min = self::min($value, $summary->min);
+            $summary->max = self::max($value, $summary->max);
+        }
         $summary->buckets[$i]++;
     }
 
@@ -126,8 +130,8 @@ final class ExplicitBucketHistogramAggregation implements AggregationInterface
             $dataPoints[] = new Data\HistogramDataPoint(
                 $summaries[$key]->count,
                 $summaries[$key]->sum,
-                $summaries[$key]->min,
-                $summaries[$key]->max,
+                $this->recordMinMax ? $summaries[$key]->min : NAN,
+                $this->recordMinMax ? $summaries[$key]->max : NAN,
                 $summaries[$key]->buckets,
                 $this->boundaries,
                 $dataPointAttributes,

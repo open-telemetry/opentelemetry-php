@@ -14,7 +14,7 @@ class HttpPlugClientResolverTest extends TestCase
 {
     public function test_resolve_http_plug_async_client(): void
     {
-        $dependency = $this->createMock(HttpAsyncClient::class);
+        $dependency = $this->createStub(HttpAsyncClient::class);
         $instance = HttpPlugClientResolver::create($dependency);
 
         $this->assertSame(

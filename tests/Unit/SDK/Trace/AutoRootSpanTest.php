@@ -148,7 +148,7 @@ class AutoRootSpanTest extends TestCase
             ['REQUEST_TIME_FLOAT' => $requestTimeFloat],
         );
 
-        $span = $this->createMock(SpanInterface::class);
+        $span = $this->createStub(SpanInterface::class);
         $spanBuilder = $this->createMock(SpanBuilderInterface::class);
         $spanBuilder->method('setSpanKind')->willReturnSelf();
         $spanBuilder->method('setParent')->willReturnSelf();
@@ -172,7 +172,7 @@ class AutoRootSpanTest extends TestCase
         $request = new ServerRequest('GET', 'https://example.com/');
 
         $capturedTimestamp = null;
-        $span = $this->createMock(SpanInterface::class);
+        $span = $this->createStub(SpanInterface::class);
         $spanBuilder = $this->createMock(SpanBuilderInterface::class);
         $spanBuilder->method('setSpanKind')->willReturnSelf();
         $spanBuilder->method('setParent')->willReturnSelf();

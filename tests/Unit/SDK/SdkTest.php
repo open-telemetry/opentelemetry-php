@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Sdk::class)]
@@ -23,22 +24,40 @@ class SdkTest extends TestCase
 {
     use TestState;
 
-    private TextMapPropagatorInterface $propagator;
-    private MeterProviderInterface $meterProvider;
-    private TracerProviderInterface $tracerProvider;
-    private LoggerProviderInterface $loggerProvider;
-    private EventLoggerProviderInterface $eventLoggerProvider;
-    private ResponsePropagatorInterface $responsePropagator;
+    /**
+     * @var Stub&TextMapPropagatorInterface
+     */
+    private Stub $propagator;
+    /**
+     * @var Stub&MeterProviderInterface
+     */
+    private Stub $meterProvider;
+    /**
+     * @var Stub&TracerProviderInterface
+     */
+    private Stub $tracerProvider;
+    /**
+     * @var Stub&LoggerProviderInterface
+     */
+    private Stub $loggerProvider;
+    /**
+     * @var Stub&EventLoggerProviderInterface
+     */
+    private Stub $eventLoggerProvider;
+    /**
+     * @var Stub&ResponsePropagatorInterface
+     */
+    private Stub $responsePropagator;
 
     #[\Override]
     public function setUp(): void
     {
-        $this->propagator = $this->createMock(TextMapPropagatorInterface::class);
-        $this->meterProvider = $this->createMock(MeterProviderInterface::class);
-        $this->tracerProvider = $this->createMock(TracerProviderInterface::class);
-        $this->loggerProvider = $this->createMock(LoggerProviderInterface::class);
-        $this->eventLoggerProvider = $this->createMock(EventLoggerProviderInterface::class);
-        $this->responsePropagator = $this->createMock(ResponsePropagatorInterface::class);
+        $this->propagator = $this->createStub(TextMapPropagatorInterface::class);
+        $this->meterProvider = $this->createStub(MeterProviderInterface::class);
+        $this->tracerProvider = $this->createStub(TracerProviderInterface::class);
+        $this->loggerProvider = $this->createStub(LoggerProviderInterface::class);
+        $this->eventLoggerProvider = $this->createStub(EventLoggerProviderInterface::class);
+        $this->responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
     }
 
     #[\Override]

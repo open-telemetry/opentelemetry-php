@@ -147,6 +147,27 @@ final class MetricConverterTest extends TestCase
         );
     }
 
+    public function test_histogram_nan_min_max_are_omitted(): void
+    {
+        $request = (new MetricConverter())->convert([
+            new Metric(
+                new InstrumentationScope('test', null, null, Attributes::create([])),
+                ResourceInfoFactory::emptyResource(),
+                'test-1',
+                null,
+                null,
+                new Histogram([
+                    new HistogramDataPoint(2, 7, NAN, NAN, [2, 0], [5], Attributes::create([]), 17, 42),
+                ], Temporality::DELTA),
+            ),
+        ]);
+
+        /** @var \Opentelemetry\Proto\Metrics\V1\HistogramDataPoint $dataPoint */
+        $dataPoint = $request->getResourceMetrics()[0]->getScopeMetrics()[0]->getMetrics()[0]->getHistogram()->getDataPoints()[0];
+        $this->assertFalse($dataPoint->hasMin());
+        $this->assertFalse($dataPoint->hasMax());
+    }
+
     public function test_gauge_exemplars_are_converted(): void
     {
         $this->assertJsonStringEqualsJsonString(
@@ -189,20 +210,20 @@ final class MetricConverterTest extends TestCase
             2,
             (new MetricConverter())->convert([
                 new Metric(
-                    $this->createMock(InstrumentationScopeInterface::class),
+                    $this->createStub(InstrumentationScopeInterface::class),
                     $resourceA,
                     'test',
                     null,
                     null,
-                    $this->createMock(DataInterface::class),
+                    $this->createStub(DataInterface::class),
                 ),
                 new Metric(
-                    $this->createMock(InstrumentationScopeInterface::class),
+                    $this->createStub(InstrumentationScopeInterface::class),
                     $resourceB,
                     'test',
                     null,
                     null,
-                    $this->createMock(DataInterface::class),
+                    $this->createStub(DataInterface::class),
                 ),
             ])->getResourceMetrics(),
         );
@@ -226,7 +247,7 @@ final class MetricConverterTest extends TestCase
                     'name-1',
                     'unit-1',
                     'description-1',
-                    $this->createMock(DataInterface::class),
+                    $this->createStub(DataInterface::class),
                 ),
             ])->serializeToJsonString(),
         );
