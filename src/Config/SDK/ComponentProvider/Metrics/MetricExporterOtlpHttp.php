@@ -9,7 +9,7 @@ use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Config\SDK\ComponentProvider\OtlpExporterNodes;
 use OpenTelemetry\Contrib\Otlp\ContentTypes;
 use OpenTelemetry\Contrib\Otlp\MetricExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
@@ -72,42 +72,19 @@ final class MetricExporterOtlpHttp implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('otlp_http');
+        $node = OtlpExporterNodes::http($builder, 'http://localhost:4318/v1/metrics');
         $node
             ->children()
-            ->enumNode('encoding')->defaultValue('protobuf')->values(['protobuf', 'json'])->end()
-            ->scalarNode('endpoint')->defaultValue('http://localhost:4318/v1/metrics')->validate()->always(Validation::ensureString())->end()->end()
-            ->arrayNode('tls')
-                ->addDefaultsIfNotSet()
-                ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
-                ->children()
-                    ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                    ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                    ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->enumNode('temporality_preference')
+                    ->values(['cumulative', 'delta', 'low_memory'])
+                    ->defaultValue('cumulative')
+                ->end()
+                // TODO honour default_histogram_aggregation
+                ->enumNode('default_histogram_aggregation')
+                    ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
+                    ->defaultValue('explicit_bucket_histogram')
                 ->end()
             ->end()
-            ->arrayNode('headers')
-                ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
-                ->arrayPrototype()
-                    ->children()
-                        ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                        ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                    ->end()
-                ->end()
-            ->end()
-            ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-            ->enumNode('compression')->values(['gzip', 'none', null])->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-            ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
-            ->enumNode('temporality_preference')
-                ->values(['cumulative', 'delta', 'low_memory'])
-                ->defaultValue('cumulative')
-            ->end()
-            // TODO honour default_histogram_aggregation
-            ->enumNode('default_histogram_aggregation')
-                ->values(['explicit_bucket_histogram', 'base2_exponential_bucket_histogram'])
-                ->defaultValue('explicit_bucket_histogram')
-            ->end()
-        ->end()
         ;
 
         return $node;
