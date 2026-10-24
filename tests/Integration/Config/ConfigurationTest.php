@@ -28,7 +28,9 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -61,7 +63,9 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -136,6 +140,36 @@ final class ConfigurationTest extends TestCase
         $registry = Instrumentation::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml')->create();
 
         $this->assertInstanceOf(HttpConfig::class, $registry->get(HttpConfig::class));
+    }
+
+    /**
+     * Isolated because SPI registration is global, and {@see Configuration} caches its factories.
+     */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_legacy_spi_key_logs_deprecation(): void
+    {
+        /** @phpstan-ignore-next-line */
+        ServiceLoader::register(Configuration\ComponentProvider::class, LegacySpiKeyProvider::class);
+
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())
+            ->method('write')
+            ->with(
+                LogLevel::WARNING,
+                $this->logicalAnd(
+                    $this->stringContains(LegacySpiKeyProvider::class),
+                    $this->stringContains(ComponentProvider::class),
+                ),
+                $this->anything(),
+            );
+        Logging::setLogWriter($logWriter);
+
+        try {
+            Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml');
+        } finally {
+            Logging::reset();
+        }
     }
 
     /**
@@ -2079,5 +2113,23 @@ final class ConfigurationTest extends TestCase
         $samplerProperty = $stateReflection->getProperty('sampler');
 
         return $samplerProperty->getValue($sharedState);
+    }
+}
+
+/**
+ * @implements ComponentProvider<TextMapPropagatorInterface>
+ */
+final class LegacySpiKeyProvider implements ComponentProvider
+{
+    #[Override]
+    public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
+    {
+        return NoopTextMapPropagator::getInstance();
+    }
+
+    #[Override]
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        return $builder->arrayNode('legacy_spi_key');
     }
 }
