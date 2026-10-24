@@ -1439,6 +1439,21 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(NoopResponsePropagator::class, $responsePropagator);
     }
 
+    public function test_composite_is_not_a_response_propagator(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            distribution:
+              opentelemetry_php/development:
+                response_propagator/development:
+                  composite:
+                    - composite: [servertiming]
+            YAML)]);
+    }
+
     public function test_distribution_response_propagator_takes_precedence_over_top_level(): void
     {
         Logging::setLogWriter($this->createStub(LogWriterInterface::class));
