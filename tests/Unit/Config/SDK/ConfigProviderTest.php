@@ -40,6 +40,16 @@ class ConfigProviderTest extends TestCase
         );
     }
 
+    public function test_invalid_sdk_config_does_not_affect_instrumentation_config(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/../../SDK/fixtures/otel-sdk-invalid-sdk.yaml');
+
+        $http = (new ConfigProvider())->getInstrumentationConfig()->get(HttpConfig::class);
+
+        $this->assertInstanceOf(HttpConfig::class, $http);
+        $this->assertSame(['Content-Type'], $http->config['client']['request_captured_headers']);
+    }
+
     public function test_unusable_config_file_logs_and_returns_noop(): void
     {
         $logWriter = $this->createMock(LogWriterInterface::class);

@@ -11,6 +11,7 @@ use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,8 +44,11 @@ class MetricExporterFactoryTest extends TestCase
         $factory->create();
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration
+     */
     #[DataProvider('temporalityProvider')]
-    public function test_create_with_temporality(array $env, ?string $expected): void
+    public function test_create_with_temporality(array $env, string $instrumentType, string $expected): void
     {
         // @phpstan-ignore-next-line
         $this->transportFactory->method('create')->willReturn($this->transport);
@@ -56,9 +60,11 @@ class MetricExporterFactoryTest extends TestCase
         }
         $factory = new MetricExporterFactory($this->transportFactory);
         $exporter = $factory->create();
+        $metric = $this->createStub(MetricMetadataInterface::class);
+        $metric->method('instrumentType')->willReturn($instrumentType);
 
         $this->assertInstanceOf(AggregationTemporalitySelectorInterface::class, $exporter);
-        $this->assertSame($expected, $exporter->temporality($this->createMock(MetricMetadataInterface::class)));
+        $this->assertSame($expected, $exporter->temporality($metric));
     }
 
     public static function temporalityProvider(): array
@@ -66,35 +72,57 @@ class MetricExporterFactoryTest extends TestCase
         return [
             'default' => [
                 [],
+                InstrumentType::COUNTER,
                 Temporality::CUMULATIVE,
             ],
             'cumulative' => [
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
                 ],
+                InstrumentType::COUNTER,
                 Temporality::CUMULATIVE,
             ],
-            'delta' => [
+            'delta counter' => [
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'delta',
                 ],
+                InstrumentType::COUNTER,
                 Temporality::DELTA,
             ],
-            'low memory' => [
+            'delta up-down counter' => [
+                [
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'delta',
+                ],
+                InstrumentType::UP_DOWN_COUNTER,
+                Temporality::CUMULATIVE,
+            ],
+            'low memory counter' => [
                 [
                     'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'lowmemory',
                 ],
-                null,
+                InstrumentType::COUNTER,
+                Temporality::DELTA,
+            ],
+            'low memory asynchronous counter' => [
+                [
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'lowmemory',
+                ],
+                InstrumentType::ASYNCHRONOUS_COUNTER,
+                Temporality::CUMULATIVE,
             ],
             'CuMuLaTiVe (mixed case)' => [
                 [
-                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'cumulative',
+                    'OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE' => 'CuMuLaTiVe',
                 ],
+                InstrumentType::COUNTER,
                 Temporality::CUMULATIVE,
             ],
         ];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/protocol/exporter.md#configuration-options
+     */
     #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
@@ -135,6 +163,16 @@ class MetricExporterFactoryTest extends TestCase
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL => KnownValues::VALUE_GRPC,
                     Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT => 'http://collector:4317',
+                ],
+                'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
+                'protocol' => 'application/x-protobuf',
+                'compression' => 'none',
+                'headerKeys' => $defaultHeaderKeys,
+            ],
+            'signal-specific endpoint (gRPC) with trailing slash has path appended' => [
+                'env' => [
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_PROTOCOL => KnownValues::VALUE_GRPC,
+                    Variables::OTEL_EXPORTER_OTLP_METRICS_ENDPOINT => 'http://collector:4317/',
                 ],
                 'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.metrics.v1.MetricsService/Export',
                 'protocol' => 'application/x-protobuf',

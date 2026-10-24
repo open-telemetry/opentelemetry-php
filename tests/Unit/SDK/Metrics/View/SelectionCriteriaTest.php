@@ -106,6 +106,9 @@ final class SelectionCriteriaTest extends TestCase
         ));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#instrument-unit
+     */
     #[DataProvider('instrumentUnitProvider')]
     public function test_instrument_unit_criteria(string $unit, ?string $instrumentUnit, bool $expected): void
     {
@@ -121,6 +124,8 @@ final class SelectionCriteriaTest extends TestCase
         yield 'not matching' => ['ms', 's', false];
         yield 'case sensitive' => ['ms', 'MS', false];
         yield 'instrument without unit' => ['ms', null, false];
+        yield 'empty matches instrument without unit' => ['', null, true];
+        yield 'empty matches empty' => ['', '', true];
         yield 'no wildcards' => ['*', 'ms', false];
     }
 

@@ -9,6 +9,7 @@ use function filter_var;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use InvalidArgumentException;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Http\Psr\Client\Discovery;
@@ -18,6 +19,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class PsrTransportFactory implements TransportFactoryInterface
 {
+    use LogsMessagesTrait;
+
     public function __construct(
         private ?ClientInterface $client = null,
         private ?RequestFactoryInterface $requestFactory = null,
@@ -88,7 +91,8 @@ final class PsrTransportFactory implements TransportFactoryInterface
 
         try {
             return Discovery::find($options);
-        } catch (InvalidArgumentException) {
+        } catch (InvalidArgumentException $e) {
+            self::logWarning('HTTP client rejected TLS options, they will be ignored: ' . $e->getMessage());
         }
 
         return Discovery::find([
