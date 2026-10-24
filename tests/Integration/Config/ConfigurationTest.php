@@ -841,7 +841,7 @@ final class ConfigurationTest extends TestCase
 
         $views = $viewRegistry->find(new Instrument(InstrumentType::COUNTER, 'i', null, null), new InstrumentationScope('test', null, null, Attributes::create([])));
         $this->assertNotNull($views);
-        $projections = [...$views];
+        $projections = iterator_to_array($views, false);
         $this->assertCount(1, $projections);
         $this->assertNull($projections[0]->attributeKeys);
         $this->assertSame($included, $projections[0]->includedAttributeKeys);

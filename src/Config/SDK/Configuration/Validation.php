@@ -37,7 +37,7 @@ final class Validation
     }
 
     /**
-     * @psalm-suppress InvalidReturnType,InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType,InvalidReturnStatement,InvalidOperand
      */
     public static function ensureNumber(): Closure
     {
