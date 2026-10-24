@@ -7,6 +7,8 @@ namespace OpenTelemetry\Tests\Unit\Config\SDK\Configuration;
 use BadMethodCallException;
 use ExampleSDK\ComponentProvider;
 use InvalidArgumentException;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
@@ -25,6 +27,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -514,5 +517,62 @@ final class ConfigurationFactoryTest extends TestCase
         $this->assertTrue(file_exists($cacheFile));
         $fromCache = self::factory()->parseFile($file, $cacheFile);
         $this->assertEquals($fromCache, $plugin);
+    }
+
+    /**
+     * The cache holds substituted values, which may be secrets.
+     */
+    public function test_cache_is_readable_by_owner_only(): void
+    {
+        $cacheFile = $this->cacheDir . '/kitchen-sink.cache';
+        $umask = umask(0o022);
+
+        try {
+            self::factory()->parseFile($this->cacheDir . '/kitchen-sink.yaml', $cacheFile);
+        } finally {
+            umask($umask);
+        }
+
+        clearstatcache();
+        $this->assertSame(0o600, self::mode($cacheFile));
+        $this->assertSame(0o600, self::mode($cacheFile . '.meta'));
+        $this->assertSame(0o600, self::mode($cacheFile . '.meta.json'));
+    }
+
+    public function test_unwritable_cache_is_ignored(): void
+    {
+        $file = $this->cacheDir . '/kitchen-sink.yaml';
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->stringContains('Failed to write configuration cache'), $this->anything());
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $this->assertEquals(
+                self::factory()->parseFile($file),
+                self::factory()->parseFile($file, $file . '/not-a-directory/kitchen-sink.cache'),
+            );
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public function test_truncated_cache_is_a_miss(): void
+    {
+        $file = $this->cacheDir . '/kitchen-sink.yaml';
+        $cacheFile = $this->cacheDir . '/kitchen-sink.cache';
+        file_put_contents($cacheFile, '<?php return ');
+
+        $this->assertEquals(self::factory()->parseFile($file), self::factory()->parseFile($file, $cacheFile));
+        $this->assertNotSame('<?php return ', file_get_contents($cacheFile), 'cache was rewritten');
+    }
+
+    private static function mode(string $file): int
+    {
+        $perms = fileperms($file);
+        self::assertIsInt($perms);
+
+        return $perms & 0o777;
     }
 }
