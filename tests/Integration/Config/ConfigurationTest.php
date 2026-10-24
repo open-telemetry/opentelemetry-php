@@ -12,6 +12,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
+use OpenTelemetry\API\Metrics\Noop\NoopCounter;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricExporterConsole;
@@ -31,6 +32,9 @@ use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
+use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation;
@@ -44,6 +48,7 @@ use OpenTelemetry\SDK\Sdk;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\TracerProvider;
@@ -806,6 +811,52 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#stream-configuration
+     */
+    #[DataProvider('viewAttributeKeysProvider')]
+    public function test_view_attribute_keys(string $attributeKeys, ?array $included, ?array $excluded): void
+    {
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+        $sdk = $factory->process([Yaml::parse(<<<YAML
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  instrument_name: i
+                stream:
+                  $attributeKeys
+            YAML)]);
+
+        $meterProvider = $sdk->create(new Context())->build()->getMeterProvider();
+        $viewRegistry = (new \ReflectionProperty($meterProvider::class, 'viewRegistry'))->getValue($meterProvider);
+        $this->assertInstanceOf(ViewRegistryInterface::class, $viewRegistry);
+
+        $views = $viewRegistry->find(new Instrument(InstrumentType::COUNTER, 'i', null, null), new InstrumentationScope('test', null, null, Attributes::create([])));
+        $this->assertNotNull($views);
+        $projections = [...$views];
+        $this->assertCount(1, $projections);
+        $this->assertNull($projections[0]->attributeKeys);
+        $this->assertSame($included, $projections[0]->includedAttributeKeys);
+        $this->assertSame($excluded, $projections[0]->excludedAttributeKeys);
+    }
+
+    public static function viewAttributeKeysProvider(): iterable
+    {
+        yield 'omitted' => ['name: renamed', null, null];
+        yield 'included patterns' => ['attribute_keys: {included: ["http.*", "a?c"]}', ['http.*', 'a?c'], null];
+        yield 'excluded patterns' => ['attribute_keys: {excluded: ["http.*"]}', null, ['http.*']];
+        yield 'both' => ['attribute_keys: {included: ["http.*"], excluded: ["http.url"]}', ['http.*'], ['http.url']];
+    }
+
+    /**
      * A null projection means the reader's default aggregation applies.
      */
     #[DataProvider('viewAggregationProvider')]
@@ -886,6 +937,9 @@ final class ConfigurationTest extends TestCase
         }
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#explicit-bucket-histogram-aggregation
+     */
     #[DataProvider('invalidViewAggregationProvider')]
     public function test_invalid_view_aggregation_is_rejected(array $aggregation): void
     {
@@ -896,15 +950,34 @@ final class ConfigurationTest extends TestCase
     public static function invalidViewAggregationProvider(): iterable
     {
         yield 'non-numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['one']]]];
+        yield 'quoted numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['1']]]];
+        yield 'unordered boundaries' => [['explicit_bucket_histogram' => ['boundaries' => [10, 1]]]];
+        yield 'duplicate boundaries' => [['explicit_bucket_histogram' => ['boundaries' => [1, 1]]]];
+        yield 'boundaries map' => [['explicit_bucket_histogram' => ['boundaries' => ['a' => 1, 'b' => 2]]]];
         yield 'max_scale below -10' => [['base2_exponential_bucket_histogram' => ['max_scale' => -11]]];
         yield 'max_scale above 20' => [['base2_exponential_bucket_histogram' => ['max_scale' => 21]]];
         yield 'max_size below 2' => [['base2_exponential_bucket_histogram' => ['max_size' => 1]]];
         yield 'two aggregations' => [['drop' => null, 'sum' => null]];
     }
 
-    private function projectedAggregation(array $aggregation, Instrument $instrument): ?AggregationInterface
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/data-model.md#environment-variable-substitution
+     */
+    public function test_explicit_bucket_histogram_boundaries_accept_substituted_values(): void
     {
-        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $this->assertEquals(
+            new ExplicitBucketHistogramAggregation([1.5, 10]),
+            $this->projectedAggregation(
+                ['explicit_bucket_histogram' => ['boundaries' => ['${LOW}', '${HIGH}']]],
+                new Instrument(InstrumentType::HISTOGRAM, 'i', null, null),
+                new EnvSourceReader([new ArrayEnvSource(['LOW' => '1.5', 'HIGH' => '10'])]),
+            ),
+        );
+    }
+
+    private function projectedAggregation(array $aggregation, Instrument $instrument, EnvSourceReader $envReader = new EnvSourceReader([])): ?AggregationInterface
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), $envReader);
         $sdk = $factory->process([[
             'file_format' => '1.0',
             'meter_provider' => [
@@ -1023,6 +1096,106 @@ final class ConfigurationTest extends TestCase
         $counter = (new \ReflectionProperty($sharedState::class, 'spanStartedCounter'))->getValue($sharedState);
 
         $this->assertSame($expected, $counter !== null);
+    }
+
+    #[DataProvider('internalMetricsDataProvider')]
+    public function test_batch_processor_self_observability_is_opt_in(string $yaml, bool $expected): void
+    {
+        $yaml .= "\n" . /** @lang yaml */ <<<'YAML'
+            tracer_provider:
+              processors:
+              - batch:
+                  exporter:
+                    console:
+            logger_provider:
+              processors:
+              - batch:
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse($yaml)])->create(new Context())->build();
+
+        $tracerSharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($sdk->getTracerProvider());
+        $spanProcessor = $tracerSharedState->getSpanProcessor();
+        $loggerSharedState = (new \ReflectionProperty(LoggerProvider::class, 'loggerSharedState'))->getValue($sdk->getLoggerProvider());
+        $logProcessor = (new \ReflectionProperty(MultiLogRecordProcessor::class, 'processors'))->getValue($loggerSharedState->getProcessor())[0];
+
+        $this->assertInstanceOf(BatchSpanProcessor::class, $spanProcessor);
+        $this->assertInstanceOf(BatchLogRecordProcessor::class, $logProcessor);
+        $spanCounter = (new \ReflectionProperty(BatchSpanProcessor::class, 'spanProcessedCounter'))->getValue($spanProcessor);
+        $logCounter = (new \ReflectionProperty(BatchLogRecordProcessor::class, 'logProcessedCounter'))->getValue($logProcessor);
+        $this->assertSame($expected, $spanCounter !== null && !$spanCounter instanceof NoopCounter);
+        $this->assertSame($expected, $logCounter !== null && !$logCounter instanceof NoopCounter);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#batchspanprocessor
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#batchlogrecordprocessor
+     */
+    public function test_batch_processor_schedule_delay_defaults_match_sdk(): void
+    {
+        $yaml = /** @lang yaml */ <<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - batch:
+                  exporter:
+                    console:
+            logger_provider:
+              processors:
+              - batch:
+                  schedule_delay:
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse($yaml)])->create(new Context())->build();
+
+        $tracerSharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($sdk->getTracerProvider());
+        $spanProcessor = $tracerSharedState->getSpanProcessor();
+        $loggerSharedState = (new \ReflectionProperty(LoggerProvider::class, 'loggerSharedState'))->getValue($sdk->getLoggerProvider());
+        $logProcessor = (new \ReflectionProperty(MultiLogRecordProcessor::class, 'processors'))->getValue($loggerSharedState->getProcessor())[0];
+
+        $this->assertSame(
+            BatchSpanProcessor::DEFAULT_SCHEDULE_DELAY * 1_000_000,
+            (new \ReflectionProperty(BatchSpanProcessor::class, 'scheduledDelayNanos'))->getValue($spanProcessor),
+        );
+        $this->assertSame(
+            BatchLogRecordProcessor::DEFAULT_SCHEDULE_DELAY * 1_000_000,
+            (new \ReflectionProperty(BatchLogRecordProcessor::class, 'scheduledDelayNanos'))->getValue($logProcessor),
+        );
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#spanlimits
+     */
+    #[DataProvider('attributeCountLimitProvider')]
+    public function test_event_and_link_attribute_count_limits_default_to_128(array $limits): void
+    {
+        $yaml = /** @lang yaml */ <<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse($yaml), $limits])->create(new Context())->build();
+        $tracerSharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($sdk->getTracerProvider());
+        $spanLimits = $tracerSharedState->getSpanLimits();
+        $attributes = array_fill_keys(array_map(static fn (int $i): string => "a$i", range(1, 128)), 'v');
+
+        $this->assertCount(1, $spanLimits->getAttributesFactory()->builder($attributes)->build());
+        $this->assertCount(128, $spanLimits->getEventAttributesFactory()->builder($attributes)->build());
+        $this->assertCount(128, $spanLimits->getLinkAttributesFactory()->builder($attributes)->build());
+    }
+
+    public static function attributeCountLimitProvider(): iterable
+    {
+        yield 'attribute_limits' => [['attribute_limits' => ['attribute_count_limit' => 1]]];
+        yield 'tracer_provider.limits' => [['tracer_provider' => ['limits' => ['attribute_count_limit' => 1]]]];
     }
 
     public static function internalMetricsDataProvider(): iterable
@@ -1319,6 +1492,150 @@ final class ConfigurationTest extends TestCase
         $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#declarative-configuration
+     */
+    public function test_resource_ignores_service_name_environment_variable(): void
+    {
+        $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-env');
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            resource:
+              detection/development:
+                attributes:
+                  excluded: [service.name]
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertNotSame('from-env', $resource->getAttributes()->get('service.name'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#resource
+     */
+    public function test_resource_keeps_configured_schema_url(): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            resource:
+              schema_url: https://opentelemetry.io/schemas/1.16.0
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('https://opentelemetry.io/schemas/1.16.0', $resource->getSchemaUrl());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/data-model.md#environment-variable-substitution
+     */
+    #[DataProvider('typedResourceAttributeProvider')]
+    public function test_resource_attribute_type_is_applied_after_substitution(string $type, string $value, mixed $expected): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([new ArrayEnvSource([
+                'STRING_VALUE' => 'value',
+                'BOOL_VALUE' => 'true',
+                'INT_VALUE' => '1',
+                'FLOAT_VALUE' => '1.1',
+                'HEX_VALUE' => '0xdeadbeef',
+            ])]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(sprintf(<<<'YAML'
+            file_format: "1.0"
+            resource:
+              attributes:
+                - name: key
+                  value: %s
+                  type: %s
+            YAML, $value, $type))]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame($expected, $resource->getAttributes()->get('key'));
+    }
+
+    public static function typedResourceAttributeProvider(): iterable
+    {
+        yield 'string' => ['string', '${STRING_VALUE}', 'value'];
+        yield 'numeric string' => ['string', '${INT_VALUE}', '1'];
+        yield 'bool' => ['bool', '${BOOL_VALUE}', true];
+        yield 'int' => ['int', '${INT_VALUE}', 1];
+        yield 'hex int' => ['int', '${HEX_VALUE}', 0xdeadbeef];
+        yield 'double' => ['double', '${FLOAT_VALUE}', 1.1];
+        yield 'int literal as double' => ['double', '1', 1.0];
+        yield 'string_array' => ['string_array', '[${STRING_VALUE}, other]', ['value', 'other']];
+        yield 'bool_array' => ['bool_array', '[${BOOL_VALUE}, false]', [true, false]];
+        yield 'int_array' => ['int_array', '[${INT_VALUE}, 2]', [1, 2]];
+        yield 'double_array' => ['double_array', '[${FLOAT_VALUE}, 2]', [1.1, 2.0]];
+        yield 'undefined array item' => ['int_array', '[${UNDEFINED}, 2]', [2]];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/data-model.md#environment-variable-substitution
+     */
+    #[DataProvider('mismatchedResourceAttributeProvider')]
+    public function test_resource_attribute_value_must_match_type(string $type, string $value): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([new ArrayEnvSource(['STRING_VALUE' => 'value'])]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(sprintf(<<<'YAML'
+            file_format: "1.0"
+            resource:
+              attributes:
+                - name: key
+                  value: %s
+                  type: %s
+            YAML, $value, $type))]);
+    }
+
+    public static function mismatchedResourceAttributeProvider(): iterable
+    {
+        yield 'int as string' => ['string', '1'];
+        yield 'string as int' => ['int', '${STRING_VALUE}'];
+        yield 'double as int' => ['int', '1.5'];
+        yield 'string as bool' => ['bool', 'value'];
+        yield 'array as string' => ['string', '[a, b]'];
+        yield 'scalar as array' => ['string_array', 'value'];
+        yield 'mixed array' => ['int_array', '[1, value]'];
+        yield 'empty array' => ['int_array', '[]'];
+    }
+
+    public function test_substitution_reads_env_source_providers(): void
+    {
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/env-sources.yaml')->create()->build();
+
+        $this->assertSame('from-test', $this->getResource($sdk)->getAttributes()->get('from_provider'));
+    }
+
+    public function test_substitution_reads_getenv(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_TEST_GETENV_ONLY', 'from-getenv');
+        unset($_SERVER['OTEL_PHP_TEST_GETENV_ONLY']);
+
+        $sdk = Configuration::parseFile(__DIR__ . '/configurations/env-sources.yaml')->create()->build();
+
+        $this->assertSame('from-getenv', $this->getResource($sdk)->getAttributes()->get('from_getenv'));
+    }
+
     public function test_samplers_have_access_to_resource_info_extension(): void
     {
         $samplerProvider = new /** @implements ComponentProvider<SamplerInterface> */ class() implements ComponentProvider {
@@ -1386,6 +1703,67 @@ final class ConfigurationTest extends TestCase
         $this->assertTrue($sdk->getTracerProvider()->getTracer('test')->isEnabled());
         $this->assertTrue($sdk->getMeterProvider()->getMeter('test')->createCounter('cnt')->isEnabled());
         $this->assertTrue($sdk->getLoggerProvider()->getLogger('test')->isEnabled());
+    }
+
+    #[DataProvider('nullObjectProvider')]
+    #[DoesNotPerformAssertions]
+    public function test_null_object_takes_defaults(string $yaml): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $config = $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+
+        set_error_handler(static function (int $errno, string $errstr): never {
+            throw new \ErrorException($errstr, 0, $errno);
+        });
+
+        try {
+            $config->create(new Context())->build();
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    public static function nullObjectProvider(): iterable
+    {
+        $tracerProvider = /** @lang yaml */ <<<'YAML'
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+
+            YAML;
+
+        yield 'tracer_provider.limits' => [$tracerProvider . '  limits:'];
+        yield 'resource' => ['resource:'];
+        yield 'attribute_limits' => ['attribute_limits:'];
+        yield 'propagator' => ['propagator:'];
+        yield 'propagator.composite' => ["propagator:\n  composite:"];
+        yield 'resource.attributes' => ["resource:\n  attributes:"];
+        yield 'meter_provider.views' => [
+            /** @lang yaml */
+            <<<'YAML'
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                  views:
+                YAML,
+        ];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter headers" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:",
+                ];
+            }
+        }
     }
 
     /**
@@ -1644,6 +2022,37 @@ final class ConfigurationTest extends TestCase
 
         $this->assertInstanceOf(CompositeSampler::class, $sampler);
         $this->assertSame('ComposableProbability{ratio=0.001}', $sampler->getDescription());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#traceidratiobasedsampler
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#parentbasedsampler
+     */
+    #[DataProvider('samplerDefaultsProvider')]
+    public function test_sampler_properties_take_schema_defaults(string $sampler, string $expected): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<YAML
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+              sampler:
+                $sampler
+            YAML)]);
+
+        $this->assertSame($expected, $this->getSampler($sdk->create(new Context())->build())->getDescription());
+    }
+
+    public static function samplerDefaultsProvider(): iterable
+    {
+        yield 'trace_id_ratio_based omitted ratio' => ['trace_id_ratio_based: {}', 'TraceIdRatioBasedSampler{1.000000}'];
+        yield 'trace_id_ratio_based null ratio' => ['trace_id_ratio_based: {ratio: ~}', 'TraceIdRatioBasedSampler{1.000000}'];
+        yield 'trace_id_ratio_based null' => ['trace_id_ratio_based:', 'TraceIdRatioBasedSampler{1.000000}'];
+        yield 'parent_based omitted root' => ['parent_based: {}', 'ParentBased+AlwaysOnSampler'];
+        yield 'parent_based null' => ['parent_based:', 'ParentBased+AlwaysOnSampler'];
     }
 
     /**

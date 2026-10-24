@@ -40,6 +40,9 @@ class SpanExporterFactoryTest extends TestCase
         $factory->create();
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/protocol/exporter.md#configuration-options
+     */
     #[DataProvider('configProvider')]
     public function test_create(array $env, string $endpoint, string $protocol, string $compression, array $headerKeys = [], array $expectedValues = []): void
     {
@@ -80,6 +83,16 @@ class SpanExporterFactoryTest extends TestCase
                 'env' => [
                     Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => KnownValues::VALUE_GRPC,
                     Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://collector:4317',
+                ],
+                'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.trace.v1.TraceService/Export',
+                'protocol' => 'application/x-protobuf',
+                'compression' => 'none',
+                'headerKeys' => $defaultHeaderKeys,
+            ],
+            'signal-specific endpoint (gRPC) with trailing slash has path appended' => [
+                'env' => [
+                    Variables::OTEL_EXPORTER_OTLP_TRACES_PROTOCOL => KnownValues::VALUE_GRPC,
+                    Variables::OTEL_EXPORTER_OTLP_TRACES_ENDPOINT => 'http://collector:4317/',
                 ],
                 'endpoint' => 'http://collector:4317/opentelemetry.proto.collector.trace.v1.TraceService/Export',
                 'protocol' => 'application/x-protobuf',

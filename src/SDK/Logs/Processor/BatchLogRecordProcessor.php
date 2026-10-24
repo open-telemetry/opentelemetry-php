@@ -72,11 +72,11 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         if ($maxQueueSize <= 0) {
             throw new InvalidArgumentException(sprintf('Maximum queue size (%d) must be greater than zero', $maxQueueSize));
         }
-        if ($scheduledDelayMillis <= 0) {
-            throw new InvalidArgumentException(sprintf('Scheduled delay (%d) must be greater than zero', $scheduledDelayMillis));
+        if ($scheduledDelayMillis < 0) {
+            throw new InvalidArgumentException(sprintf('Scheduled delay (%d) must not be negative', $scheduledDelayMillis));
         }
-        if ($exportTimeoutMillis <= 0) {
-            throw new InvalidArgumentException(sprintf('Export timeout (%d) must be greater than zero', $exportTimeoutMillis));
+        if ($exportTimeoutMillis < 0) {
+            throw new InvalidArgumentException(sprintf('Export timeout (%d) must not be negative', $exportTimeoutMillis));
         }
         if ($maxExportBatchSize <= 0) {
             throw new InvalidArgumentException(sprintf('Maximum export batch size (%d) must be greater than zero', $maxExportBatchSize));

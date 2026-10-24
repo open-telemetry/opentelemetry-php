@@ -28,7 +28,7 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
      */
     public function __construct(
         private readonly TransportInterface $transport,
-        private readonly string|Temporality|null $temporality = null,
+        private readonly string|Temporality|AggregationTemporalitySelectorInterface|null $temporality = null,
     ) {
         if (!class_exists('\Google\Protobuf\Api')) {
             throw new RuntimeException('No protobuf implementation found (ext-protobuf or google/protobuf)');
@@ -39,6 +39,10 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
     #[\Override]
     public function temporality(MetricMetadataInterface $metric): Temporality|string|null
     {
+        if ($this->temporality instanceof AggregationTemporalitySelectorInterface) {
+            return $this->temporality->temporality($metric);
+        }
+
         return $this->temporality ?? $metric->temporality();
     }
 

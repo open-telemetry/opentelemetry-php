@@ -49,7 +49,7 @@ final class LogRecordProcessorBatch implements ComponentProvider
         $node = $builder->arrayNode('batch');
         $node
             ->children()
-                ->integerNode('schedule_delay')->min(0)->defaultValue(5000)->end()
+                ->integerNode('schedule_delay')->min(0)->defaultValue(1000)->end()
                 ->integerNode('export_timeout')->min(0)->defaultValue(30000)->end()
                 ->integerNode('max_queue_size')->min(1)->defaultValue(2048)->end()
                 ->integerNode('max_export_batch_size')->min(1)->defaultValue(512)->end()

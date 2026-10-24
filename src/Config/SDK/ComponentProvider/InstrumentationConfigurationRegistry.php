@@ -30,6 +30,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * {@see IgnoresUnknownProviders} only tolerate unknown keys and unregistered providers, not a known
  * node that fails type validation.
  *
+ * The reverse holds only for {@see \OpenTelemetry\Config\SDK\ConfigProvider}.
+ * {@see \OpenTelemetry\Config\SDK\Configuration::parseFile()} processes the SDK root first, so an
+ * invalid SDK root costs its callers both.
+ *
  * @internal
  * @todo Append `instrumentation/development` to {@see OpenTelemetrySdk} and remove this provider,
  *       once that node graduates into the versioned schema — losing its `/development` suffix — and

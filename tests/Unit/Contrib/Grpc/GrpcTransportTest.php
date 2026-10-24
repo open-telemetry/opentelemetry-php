@@ -58,6 +58,16 @@ final class GrpcTransportTest extends TestCase
         $this->assertFalse($this->transport->shutdown());
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/common.md#timeout
+     */
+    public function test_zero_timeout_means_no_deadline(): void
+    {
+        $transport = new GrpcTransport('http://localhost:4317', [], '/method', [], 0);
+
+        $this->assertNull((new \ReflectionProperty(GrpcTransport::class, 'exportTimeout'))->getValue($transport));
+    }
+
     public function test_force_flush_closed_returns_false(): void
     {
         $this->transport->shutdown();

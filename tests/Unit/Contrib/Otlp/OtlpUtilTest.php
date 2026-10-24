@@ -54,11 +54,33 @@ class OtlpUtilTest extends TestCase
      * @param list<array{name: non-empty-string, value: ?string}> $headers
      *
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/protocol/exporter.md#configuration-options
      */
     #[DataProvider('declarativeHeadersProvider')]
     public function test_headers(array $headers, ?string $headersList, array $expected): void
     {
-        $this->assertSame($expected, OtlpUtil::headers($headers, $headersList));
+        $this->assertSame($expected + OtlpUtil::getUserAgentHeader(), OtlpUtil::headers($headers, $headersList));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/protocol/exporter.md#user-agent
+     */
+    public function test_configured_user_agent_replaces_default(): void
+    {
+        $this->assertSame(
+            ['user-agent' => 'my-app'],
+            OtlpUtil::headers([['name' => 'user-agent', 'value' => 'my-app']], null),
+        );
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/protocol/exporter.md#user-agent
+     */
+    public function test_get_headers_configured_user_agent_replaces_default(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_EXPORTER_OTLP_HEADERS, 'user-agent=my-app');
+
+        $this->assertSame(['user-agent' => 'my-app'], OtlpUtil::getHeaders(Signals::TRACE));
     }
 
     public static function declarativeHeadersProvider(): array
@@ -94,6 +116,16 @@ class OtlpUtilTest extends TestCase
                 [['name' => 'foo', 'value' => null]],
                 'foo=from-list',
                 ['foo' => 'from-list'],
+            ],
+            'headers take precedence over headers_list regardless of case' => [
+                [['name' => 'Authorization', 'value' => 'from-headers']],
+                'authorization=from-list',
+                ['Authorization' => 'from-headers'],
+            ],
+            'headers_list values are percent-decoded' => [
+                [],
+                'Authorization=Bearer%20secret',
+                ['Authorization' => 'Bearer secret'],
             ],
         ];
     }

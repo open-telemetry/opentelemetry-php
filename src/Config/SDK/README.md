@@ -103,7 +103,6 @@ These are validated, so a file that sets them still parses, but the SDK doesn't 
 - `logger_provider.limits`. Log record limits come from the `OTEL_LOGRECORD_*` and
   `OTEL_ATTRIBUTE_*` environment variables only.
 - `meter_provider.exemplar_filter`.
-- A view's `stream.attribute_keys.excluded`. `included` works.
 - A view's `stream.aggregation_cardinality_limit`, and a reader's `cardinality_limits`. The metrics
   SDK has no cardinality limits.
 - A reader's `producers`.

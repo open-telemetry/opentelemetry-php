@@ -12,6 +12,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Logs\Severity;
+use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
@@ -141,8 +142,8 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             attribute_count_limit: ?int<0, max>,
      *             event_count_limit: int<0, max>,
      *             link_count_limit: int<0, max>,
-     *             event_attribute_count_limit: ?int<0, max>,
-     *             link_attribute_count_limit: ?int<0, max>,
+     *             event_attribute_count_limit: int<0, max>,
+     *             link_attribute_count_limit: int<0, max>,
      *         },
      *         sampler: ?ComponentPlugin<SamplerInterface>,
      *         processors: list<ComponentPlugin<SpanProcessorInterface>>,
@@ -164,7 +165,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *                 name: ?string,
      *                 description: ?string,
      *                 aggregation_cardinality_limit: ?int<1, max>,
-     *                 attribute_keys: array{
+     *                 attribute_keys?: array{
      *                     included: list<string>,
      *                     excluded: list<string>,
      *                 },
@@ -281,7 +282,6 @@ final class OpenTelemetrySdk implements ComponentProvider
         }
         $mandatory = (new Detectors\Composite([
             new Detectors\Sdk(),
-            new Detectors\Service(),
         ]))->getResource();
 
         /** @psalm-suppress PossiblyInvalidArgument */
@@ -298,10 +298,11 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $resource = $mandatory
             ->merge($resource)
-            ->merge(ResourceInfo::create(
-                attributes: Attributes::create($attributes),
-                schemaUrl: $schemaUrl,
-            ));
+            ->merge(ResourceInfo::create(Attributes::create($attributes)));
+        if ($schemaUrl !== null) {
+            // a merge would drop the configured URL when it differs from the detectors' one
+            $resource = ResourceInfo::create($resource->getAttributes(), $schemaUrl);
+        }
 
         $context = $context->withExtension($resource, ResourceInfo::class);
 
@@ -349,9 +350,10 @@ final class OpenTelemetrySdk implements ComponentProvider
             if (isset($view['stream']['description'])) {
                 $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
             }
-            // TODO Add support for excluded keys to view template
-            if (!empty($view['stream']['attribute_keys']['included'])) {
-                $viewTemplate = $viewTemplate->withAttributeKeys($view['stream']['attribute_keys']['included']);
+            $included = ($view['stream']['attribute_keys']['included'] ?? []) ?: null;
+            $excluded = ($view['stream']['attribute_keys']['excluded'] ?? []) ?: null;
+            if ($included !== null || $excluded !== null) {
+                $viewTemplate = $viewTemplate->withAttributeKeyFilter($included, $excluded);
             }
             if (isset($view['stream']['aggregation'])) {
                 $viewTemplate = $viewTemplate->withAggregationResolver($view['stream']['aggregation']->create($context));
@@ -388,11 +390,10 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         // </editor-fold>
 
-        $context = $context->withMeterProvider($meterProvider);
-
         // Self-observability is opt-in, as it is for environment-based configuration. Passing the
-        // meter provider to the tracer/logger providers is what turns it on.
+        // meter provider to the tracer/logger providers and to components is what turns it on.
         $selfObservabilityMeterProvider = $distributionConfiguration->internalMetricsEnabled ? $meterProvider : null;
+        $context = $context->withMeterProvider($selfObservabilityMeterProvider ?? new NoopMeterProvider());
 
         $spanProcessors = [];
         foreach ($properties['tracer_provider']['processors'] as $processor) {
@@ -424,16 +425,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
                 eventAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit']
-                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit'],
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
                 linkAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit']
-                        ?? $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
+                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit'],
                     attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
                         ?? $properties['attribute_limits']['attribute_value_length_limit'],
                 ),
@@ -566,9 +563,11 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('resource');
         $node
+            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('attributes')
+                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
@@ -577,6 +576,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                                 ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
                             ->end()
                         ->end()
+                        ->validate()->always(static function (array $attribute): array {
+                            $attribute['value'] = AttributesParser::applyType($attribute['value'], $attribute['type']);
+
+                            return $attribute;
+                        })->end()
                     ->end()
                 ->end()
                 ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
@@ -613,6 +617,7 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('attribute_limits');
         $node
+            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
@@ -633,14 +638,15 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->end()
             ->children()
                 ->arrayNode('limits')
+                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
                         ->integerNode('attribute_count_limit')->min(0)->defaultNull()->end()
                         ->integerNode('event_count_limit')->min(0)->defaultValue(128)->end()
                         ->integerNode('link_count_limit')->min(0)->defaultValue(128)->end()
-                        ->integerNode('event_attribute_count_limit')->min(0)->defaultNull()->end()
-                        ->integerNode('link_attribute_count_limit')->min(0)->defaultNull()->end()
+                        ->integerNode('event_attribute_count_limit')->min(0)->defaultValue(128)->end()
+                        ->integerNode('link_attribute_count_limit')->min(0)->defaultValue(128)->end()
                     ->end()
                 ->end()
                 ->append($registry->component('sampler', SamplerInterface::class))
@@ -696,6 +702,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->defaultValue('trace_based')
                 ->end()
                 ->arrayNode('views')
+                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->arrayPrototype()
                         ->children()
                             ->arrayNode('stream')
@@ -841,6 +848,7 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('propagator');
         $node
+            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function (array $value): array {

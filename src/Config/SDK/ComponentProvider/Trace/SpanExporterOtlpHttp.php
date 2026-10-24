@@ -77,6 +77,7 @@ final class SpanExporterOtlpHttp implements ComponentProvider
                     ->end()
                 ->end()
                 ->arrayNode('headers')
+                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()

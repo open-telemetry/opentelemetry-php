@@ -159,6 +159,50 @@ final class StreamFactoryTest extends TestCase
         );
         $this->assertSame(3, $source->collectionTimestamp());
     }
+
+    public function test_synchronous_writer_applies_attribute_key_filter(): void
+    {
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
+        $instrument = new Instrument(InstrumentType::COUNTER, 'name', null, null);
+        $sourceRegistry = new CollectingSourceRegistry();
+        $registration = new RegistryRegistration($sourceRegistry, new NoopStalenessHandler());
+        $streamIds = (new StreamFactory())->createSynchronousWriter(
+            $registry,
+            ResourceInfoFactory::emptyResource(),
+            new InstrumentationScope('test', null, null, Attributes::create([])),
+            $instrument,
+            1,
+            [
+                [new ViewProjection('a', null, null, null, new SumAggregation(true), ['foo*'], ['foobar']), $registration],
+                [new ViewProjection('b', null, null, null, new SumAggregation(true), null, ['foo*']), $registration],
+            ],
+            new NoneExemplarFilter(),
+        );
+
+        $this->assertCount(2, $streamIds);
+        $this->assertCount(2, $sourceRegistry->sources);
+
+        $sources = [];
+        foreach ($sourceRegistry->sources as [$provider]) {
+            $sources[] = $provider->create(Temporality::CUMULATIVE);
+        }
+        $registry->record($instrument, 5, ['foo' => 1, 'food' => 2, 'foobar' => 3, 'bar' => 4]);
+        $registry->collectAndPush($streamIds);
+
+        $this->assertSame([['foo' => 1, 'food' => 2]], $this->dataPointAttributes($sources[0]->collect()));
+        $this->assertSame([['bar' => 4]], $this->dataPointAttributes($sources[1]->collect()));
+    }
+
+    private function dataPointAttributes(Metric $metric): array
+    {
+        $this->assertInstanceOf(Sum::class, $metric->data);
+        $attributes = [];
+        foreach ($metric->data->dataPoints as $dataPoint) {
+            $attributes[] = $dataPoint->attributes->toArray();
+        }
+
+        return $attributes;
+    }
 }
 
 final class CollectingSourceRegistry implements MetricSourceRegistryInterface
