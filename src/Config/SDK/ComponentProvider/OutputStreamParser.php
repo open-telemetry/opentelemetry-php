@@ -7,7 +7,7 @@ namespace OpenTelemetry\Config\SDK\ComponentProvider;
 /**
  * @internal
  */
-class OutputStreamParser
+final class OutputStreamParser
 {
     private static ?string $root = null;
 
@@ -21,20 +21,34 @@ class OutputStreamParser
         self::$root = null;
     }
 
+    /**
+     * @see https://www.rfc-editor.org/rfc/rfc8089
+     */
     public static function parse(string $outputStream): string
     {
         if ($outputStream === 'stdout') {
             return 'php://stdout';
         }
 
-        $pattern = '/^(?P<scheme>[a-zA-Z][a-zA-Z0-9]*):\/\/(?P<path>.+)$/';
+        $pattern = '~^(?P<scheme>[a-zA-Z][a-zA-Z0-9+.-]*):(?://(?P<host>[^/?#]*))?(?P<path>[^?#]*)$~D';
         if (preg_match($pattern, $outputStream, $matches) !== 1) {
             throw new \InvalidArgumentException('Invalid output_stream format: ' . $outputStream);
         }
+        if (strtolower($matches['scheme']) !== 'file') {
+            throw new \InvalidArgumentException('Invalid endpoint scheme: ' . $matches['scheme']);
+        }
+        if ($matches['host'] !== '' && strtolower($matches['host']) !== 'localhost') {
+            throw new \InvalidArgumentException('Invalid output_stream host, only localhost is supported: ' . $outputStream);
+        }
+        if (!str_starts_with($matches['path'], '/')) {
+            throw new \InvalidArgumentException('Invalid output_stream path, it must be absolute: ' . $outputStream);
+        }
 
-        return match ($matches['scheme']) {
-            'file' => self::$root . $matches['path'],
-            default => throw new \InvalidArgumentException('Invalid endpoint scheme: ' . $matches['scheme']),
-        };
+        $path = rawurldecode($matches['path']);
+        if (str_contains($path, "\0")) {
+            throw new \InvalidArgumentException('Invalid output_stream path: ' . $outputStream);
+        }
+
+        return self::$root . $path;
     }
 }
