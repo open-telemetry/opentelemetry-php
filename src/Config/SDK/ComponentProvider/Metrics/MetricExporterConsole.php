@@ -22,7 +22,7 @@ final class MetricExporterConsole implements ComponentProvider
     /**
      * @param array{
      *     temporality_preference: 'cumulative'|'delta'|'low_memory',
-     *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
+     *     default_histogram_aggregation: 'explicit_bucket_histogram'|'base2_exponential_bucket_histogram',
      * } $properties
      */
     #[\Override]

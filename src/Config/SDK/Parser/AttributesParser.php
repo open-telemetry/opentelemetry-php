@@ -33,13 +33,11 @@ class AttributesParser
     }
 
     /**
-     * @param array{
-     *     array{
-     *         name: string,
-     *         value: mixed,
-     *         type: ?string,
-     *     }
-     * } $input
+     * @param list<array{
+     *     name: string,
+     *     value: mixed,
+     *     type: ?string,
+     * }> $input
      */
     public static function parseAttributes(array $input): array
     {
