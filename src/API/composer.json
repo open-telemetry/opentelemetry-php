@@ -24,6 +24,9 @@
     "conflict": {
         "open-telemetry/sdk": "<=1.11"
     },
+    "suggest": {
+        "symfony/config": "To implement a ComponentProvider for declarative configuration"
+    },
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\API\\": "."

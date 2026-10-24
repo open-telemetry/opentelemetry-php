@@ -13,6 +13,9 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * A component provider is responsible for interpreting configuration and returning an
  * implementation of a particular type.
  *
+ * Only open-telemetry/sdk-configuration calls these methods. It requires symfony/config, which
+ * this package does not, so the symfony/config types here are available whenever it runs.
+ *
  * @template T
  */
 interface ComponentProvider
