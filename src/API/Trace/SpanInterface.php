@@ -9,6 +9,8 @@ use OpenTelemetry\Context\ImplicitContextKeyedInterface;
 use Throwable;
 
 /**
+ * Implementations MUST be safe for concurrent use, for example from multiple fibers.
+ *
  * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.1/specification/trace/api.md#span-operations
  */
 interface SpanInterface extends ImplicitContextKeyedInterface

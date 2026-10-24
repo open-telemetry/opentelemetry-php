@@ -34,7 +34,7 @@ function trace(SpanInterface $span, Closure $closure, iterable $args = [])
         return $c(...$a, ...($a = []));
     } catch (Throwable $e) {
         $s->setStatus(StatusCode::STATUS_ERROR, $e->getMessage());
-        $s->recordException($e, ['exception.escaped' => true]);
+        $s->recordException($e);
 
         throw $e;
     } finally {

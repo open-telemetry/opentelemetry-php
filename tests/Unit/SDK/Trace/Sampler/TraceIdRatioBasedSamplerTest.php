@@ -97,9 +97,12 @@ class TraceIdRatioBasedSamplerTest extends TestCase
         ];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#traceidratiobased
+     */
     public function test_get_description(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0001);
-        $this->assertEquals('TraceIdRatioBasedSampler{0.000100}', $sampler->getDescription());
+        $this->assertEquals('TraceIdRatioBased{0.000100}', $sampler->getDescription());
     }
 }

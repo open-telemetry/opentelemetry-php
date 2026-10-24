@@ -7,10 +7,14 @@ namespace OpenTelemetry\API\Logs;
 use OpenTelemetry\Context\ContextInterface;
 
 /**
+ * @deprecated
  * @phan-suppress PhanDeprecatedInterface
  */
 class NoopEventLogger implements EventLoggerInterface
 {
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public static function instance(): self
     {
         static $instance;

@@ -24,6 +24,17 @@ class OtlpUtilTest extends TestCase
         $this->assertNotNull($header['User-Agent']);
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/protocol/exporter.md#user-agent
+     */
+    public function test_user_agent_header_format(): void
+    {
+        $this->assertMatchesRegularExpression(
+            '~^OTel-OTLP-Exporter-PHP/\S+$~',
+            OtlpUtil::getUserAgentHeader()['User-Agent'],
+        );
+    }
+
     public function test_method_not_defined(): void
     {
         $this->expectException(\UnexpectedValueException::class);

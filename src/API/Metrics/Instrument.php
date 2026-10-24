@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
+/**
+ * Implementations MUST be safe for concurrent use, for example from multiple fibers.
+ */
 interface Instrument
 {
     /**
@@ -12,7 +15,6 @@ interface Instrument
      * MUST return false if:
      *  - The MeterConfig of the Meter used to create the instrument has parameter disabled=true
      *  - All resolved views for the instrument are configured with the Drop Aggregation
-     * @experimental
      * @see https://opentelemetry.io/docs/specs/otel/metrics/sdk/#instrument-enabled
      */
     public function isEnabled(): bool;

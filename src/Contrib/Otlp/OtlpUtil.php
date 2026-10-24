@@ -72,7 +72,7 @@ class OtlpUtil
     }
 
     /**
-     * @link https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#user-agent
+     * @link https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/protocol/exporter.md#user-agent
      */
     public static function getUserAgentHeader(): array
     {
@@ -81,7 +81,7 @@ class OtlpUtil
             $resource = (new Sdk())->getResource();
 
             $header = ['User-Agent' => sprintf(
-                'OTel OTLP Exporter PHP/%s',
+                'OTel-OTLP-Exporter-PHP/%s',
                 $resource->getAttributes()->get(ResourceAttributes::TELEMETRY_SDK_VERSION) ?: 'unknown'
             )];
         }

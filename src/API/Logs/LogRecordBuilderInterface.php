@@ -62,7 +62,8 @@ interface LogRecordBuilderInterface
     public function setAttributes(iterable $attributes): LogRecordBuilderInterface;
 
     /**
-     * Sets the `exception.message` `exception.type`, and `exception.stacktrace` attributes.
+     * Sets the `exception.message`, `exception.type` and `exception.stacktrace` attributes.
+     * Attributes set explicitly with the same keys take precedence.
      *
      * @see https://opentelemetry.io/docs/specs/semconv/exceptions/exceptions-logs/#attributes
      */
