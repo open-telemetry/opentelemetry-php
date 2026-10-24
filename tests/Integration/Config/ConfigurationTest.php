@@ -28,6 +28,7 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -1324,6 +1325,49 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(BaggagePropagator::class, $propagators[1]);
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
+     */
+    public function test_propagator_composite_list_none(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $propagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            propagator:
+              composite_list: none
+            YAML)])->create(new Context())->build()->getPropagator();
+
+        $this->assertInstanceOf(NoopTextMapPropagator::class, $propagator);
+    }
+
+    public function test_propagator_composite_list_none_beside_other_propagators_is_ignored(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $propagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            propagator:
+              composite_list: none,tracecontext
+            YAML)])->create(new Context())->build()->getPropagator();
+
+        $propagators = (new \ReflectionClass($propagator))->getProperty('propagators')->getValue($propagator);
+        $this->assertIsArray($propagators);
+        $this->assertCount(1, $propagators);
+        $this->assertInstanceOf(TraceContextPropagator::class, $propagators[0]);
+    }
+
+    public function test_composite_is_not_a_propagator(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            propagator:
+              composite:
+                - composite: [tracecontext]
+            YAML)]);
+    }
+
     public function test_propagators_env_substitution_falls_back_to_default(): void
     {
         $this->setEnvironmentVariable('OTEL_PROPAGATORS', null);
@@ -1379,6 +1423,20 @@ final class ConfigurationTest extends TestCase
         } finally {
             Logging::reset();
         }
+    }
+
+    public function test_distribution_response_propagator_composite_list_none(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            distribution:
+              opentelemetry_php/development:
+                response_propagator/development:
+                  composite_list: none
+            YAML)])->create(new Context())->build()->getResponsePropagator();
+
+        $this->assertInstanceOf(NoopResponsePropagator::class, $responsePropagator);
     }
 
     public function test_distribution_response_propagator_takes_precedence_over_top_level(): void

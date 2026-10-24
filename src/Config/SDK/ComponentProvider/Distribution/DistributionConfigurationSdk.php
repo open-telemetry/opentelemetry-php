@@ -91,7 +91,7 @@ final class DistributionConfigurationSdk implements ComponentProvider
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);
-                        if ($name !== '' && !in_array($name, $existing)) {
+                        if ($name !== '' && $name !== 'none' && !in_array($name, $existing)) {
                             $value['composite'][][$name] = null;
                             $existing[] = $name;
                         }
