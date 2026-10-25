@@ -85,13 +85,7 @@ class SdkAutoloader
         }
         self::registerInstrumentations($config);
 
-        if (AutoRootSpan::isEnabled()) {
-            $request = AutoRootSpan::createRequest();
-            if ($request) {
-                AutoRootSpan::create($request);
-                AutoRootSpan::registerShutdownHandler();
-            }
-        }
+        AutoRootSpan::start();
 
         return true;
     }
@@ -318,7 +312,10 @@ class SdkAutoloader
         });
     }
 
-    private static function getHookManager(): HookManagerInterface
+    /**
+     * @internal
+     */
+    public static function getHookManager(): HookManagerInterface
     {
         /** @var HookManagerInterface $hookManager */
         foreach (ServiceLoader::load(HookManagerInterface::class) as $hookManager) {

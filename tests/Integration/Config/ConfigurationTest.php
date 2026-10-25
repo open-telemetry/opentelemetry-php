@@ -70,6 +70,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -106,7 +107,8 @@ final class ConfigurationTest extends TestCase
     public function test_instrumentation_configuration(string $file): void
     {
         $this->expectNotToPerformAssertions();
-        Configuration::parseFile($file)->getInstrumentationConfig();
+        // The upstream kitchen sink has a "php: example" entry with no provider, so it warns.
+        Configuration::parseFile($file)->getInstrumentationConfig((new Context())->withLogger(new NullLogger()));
     }
 
     public function test_one_load_serves_both_roots(): void
@@ -2155,9 +2157,9 @@ final class ConfigurationTest extends TestCase
 
     public static function samplerDefaultsProvider(): iterable
     {
-        yield 'trace_id_ratio_based omitted ratio' => ['trace_id_ratio_based: {}', 'TraceIdRatioBasedSampler{1.000000}'];
-        yield 'trace_id_ratio_based null ratio' => ['trace_id_ratio_based: {ratio: ~}', 'TraceIdRatioBasedSampler{1.000000}'];
-        yield 'trace_id_ratio_based null' => ['trace_id_ratio_based:', 'TraceIdRatioBasedSampler{1.000000}'];
+        yield 'trace_id_ratio_based omitted ratio' => ['trace_id_ratio_based: {}', 'TraceIdRatioBased{1.000000}'];
+        yield 'trace_id_ratio_based null ratio' => ['trace_id_ratio_based: {ratio: ~}', 'TraceIdRatioBased{1.000000}'];
+        yield 'trace_id_ratio_based null' => ['trace_id_ratio_based:', 'TraceIdRatioBased{1.000000}'];
         yield 'parent_based omitted root' => ['parent_based: {}', 'ParentBased+AlwaysOnSampler'];
         yield 'parent_based null' => ['parent_based:', 'ParentBased+AlwaysOnSampler'];
     }

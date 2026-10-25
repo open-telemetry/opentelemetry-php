@@ -20,6 +20,9 @@ final class LogRecordBuilder implements LogRecordBuilderInterface
 {
     private readonly LoggerInterface $logger;
     private readonly LogRecord $logRecord;
+    /** @var array<string, true> */
+    private array $attributeKeys = [];
+    private ?Throwable $exception = null;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -87,6 +90,7 @@ final class LogRecordBuilder implements LogRecordBuilderInterface
     public function setAttribute(string $key, mixed $value): LogRecordBuilderInterface
     {
         $this->logRecord->setAttribute($key, $value);
+        $this->attributeKeys[$key] = true;
 
         return $this;
     }
@@ -94,7 +98,9 @@ final class LogRecordBuilder implements LogRecordBuilderInterface
     #[\Override]
     public function setAttributes(iterable $attributes): LogRecordBuilderInterface
     {
-        $this->logRecord->setAttributes($attributes);
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
+        }
 
         return $this;
     }
@@ -102,9 +108,7 @@ final class LogRecordBuilder implements LogRecordBuilderInterface
     #[\Override]
     public function setException(Throwable $exception): LogRecordBuilderInterface
     {
-        $this->logRecord->setAttribute('exception.message', $exception->getMessage());
-        $this->logRecord->setAttribute('exception.type', $exception::class);
-        $this->logRecord->setAttribute('exception.stacktrace', StackTraceFormatter::format($exception));
+        $this->exception = $exception;
 
         return $this;
     }
@@ -120,6 +124,23 @@ final class LogRecordBuilder implements LogRecordBuilderInterface
     #[\Override]
     public function emit(): void
     {
+        if ($this->exception !== null) {
+            $this->setExceptionAttributes($this->exception);
+        }
         $this->logger->emit($this->logRecord);
+    }
+
+    private function setExceptionAttributes(Throwable $exception): void
+    {
+        $attributes = [
+            'exception.message' => $exception->getMessage(),
+            'exception.type' => $exception::class,
+            'exception.stacktrace' => StackTraceFormatter::format($exception),
+        ];
+        foreach ($attributes as $key => $value) {
+            if (!isset($this->attributeKeys[$key])) {
+                $this->logRecord->setAttribute($key, $value);
+            }
+        }
     }
 }

@@ -23,9 +23,7 @@ use OpenTelemetry\SDK\Trace\SamplingResult;
  * $sampler = new AlwaysRecordSampler($rootSampler);
  * ```
  *
- * @see https://opentelemetry.io/docs/specs/otel/trace/sdk/#alwaysrecord
- *
- * @experimental
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#alwaysrecord
  */
 class AlwaysRecordSampler implements SamplerInterface
 {

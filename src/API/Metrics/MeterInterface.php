@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Metrics;
 
+/**
+ * Implementations MUST be safe for concurrent use, for example from multiple fibers.
+ */
 interface MeterInterface
 {
     /**

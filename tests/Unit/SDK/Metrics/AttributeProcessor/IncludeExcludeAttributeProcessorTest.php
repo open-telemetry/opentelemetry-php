@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
 final class IncludeExcludeAttributeProcessorTest extends TestCase
 {
     /**
+     * @param list<string>|null $included
+     * @param list<string>|null $excluded
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#stream-configuration
      *
      * @param list<string>|null $included

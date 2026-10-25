@@ -8,6 +8,7 @@ use ArrayObject;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\WithSpanHandler;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\API\Trace\StatusCode;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Trace\ImmutableSpan;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
@@ -16,6 +17,7 @@ use OpenTelemetry\SDK\Trace\TracerProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 #[CoversClass(WithSpanHandler::class)]
 class WithSpanHandlerTest extends TestCase
@@ -75,6 +77,24 @@ class WithSpanHandlerTest extends TestCase
             'code.lineno' => 99,
             'foo' => 'bar',
         ], $span->getAttributes()->toArray());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/exceptions.md#attributes
+     */
+    public function test_records_exception(): void
+    {
+        WithSpanHandler::pre(null, [], 'My\\Class', 'foo', null, null, [], []);
+        WithSpanHandler::post(null, [], null, new RuntimeException('boom'));
+
+        /** @var ImmutableSpan $span */
+        $span = $this->storage->offsetGet(0);
+        $this->assertSame(StatusCode::STATUS_ERROR, $span->getStatus()->getCode());
+        $this->assertCount(1, $span->getEvents());
+        $event = $span->getEvents()[0];
+        $this->assertSame('exception', $event->getName());
+        $this->assertSame('boom', $event->getAttributes()->get('exception.message'));
+        $this->assertFalse($event->getAttributes()->has('exception.escaped'));
     }
 
     #[DataProvider('defaultsProvider')]

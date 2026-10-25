@@ -51,7 +51,7 @@ string(8) "foo::end"
             "trace_id": "%s",
             "span_id": "%s",
             "trace_state": "",
-            "trace_flags": 1
+            "trace_flags": 3
         },
         "resource": [],
         "parent_span_id": "%s",
@@ -80,7 +80,7 @@ string(8) "foo::end"
             "trace_id": "%s",
             "span_id": "%s",
             "trace_state": "",
-            "trace_flags": 1
+            "trace_flags": 3
         },
         "resource": [],
         "parent_span_id": "%s",
@@ -109,7 +109,7 @@ string(8) "foo::end"
             "trace_id": "%s",
             "span_id": "%s",
             "trace_state": "",
-            "trace_flags": 1
+            "trace_flags": 3
         },
         "resource": [],
         "parent_span_id": "",

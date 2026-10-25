@@ -115,6 +115,6 @@ class TraceIdRatioBasedSampler implements SamplerInterface
     #[\Override]
     public function getDescription(): string
     {
-        return sprintf('%s{%.6F}', 'TraceIdRatioBasedSampler', $this->probability);
+        return sprintf('TraceIdRatioBased{%.6F}', $this->probability);
     }
 }

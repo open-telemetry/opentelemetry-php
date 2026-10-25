@@ -50,6 +50,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     /**
      * Creates a configurator that uses noop instances for not configured values.
      * @phan-suppress PhanDeprecatedFunction
+     * @phan-suppress PhanDeprecatedClass
      */
     public static function createNoop(): Configurator
     {
