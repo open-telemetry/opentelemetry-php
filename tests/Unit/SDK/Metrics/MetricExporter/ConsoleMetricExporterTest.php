@@ -25,7 +25,6 @@ use function stream_get_contents;
 #[CoversClass(ConsoleMetricExporter::class)]
 final class ConsoleMetricExporterTest extends TestCase
 {
-    /** @var resource */
     private $stream;
     private ConsoleMetricExporter $exporter;
 

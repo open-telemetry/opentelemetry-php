@@ -8,6 +8,11 @@
 
 Zipkin exporter for OpenTelemetry.
 
+## Deprecated
+
+This exporter is deprecated, following the [OpenTelemetry specification](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk_exporters/zipkin.md).
+It will be removed in a future release. Zipkin accepts OTLP, so use the OTLP exporter instead.
+
 ## Documentation
 
 https://opentelemetry.io/docs/instrumentation/php/exporters/#zipkin

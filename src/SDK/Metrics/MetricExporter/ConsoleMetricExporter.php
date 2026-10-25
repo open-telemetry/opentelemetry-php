@@ -26,8 +26,12 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
 use Traversable;
 
 /**
- * Console metrics exporter.
- * Note that the output is human-readable JSON, not compatible with OTLP.
+ * Writes metrics as human-readable JSON.
+ *
+ * The output format is unspecified, is not OTLP and may change between releases. Use it for
+ * debugging and learning, not for parsing or as input to other tools.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk_exporters/stdout.md
  */
 class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationTemporalitySelectorInterface
 {

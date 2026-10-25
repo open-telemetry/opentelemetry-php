@@ -82,6 +82,25 @@ final class TraceTest extends TestCase
         }
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/exceptions.md#attributes
+     */
+    public function test_does_not_record_deprecated_exception_escaped(): void
+    {
+        $span = $this->createMock(SpanInterface::class);
+        $span->expects($this->once())->method('recordException')->with(
+            $this->isInstanceOf(RuntimeException::class),
+            $this->logicalNot($this->arrayHasKey('exception.escaped')),
+        );
+
+        try {
+            trace($span, function (): never {
+                throw new RuntimeException();
+            });
+        } catch (RuntimeException $e) {
+        }
+    }
+
     public function test_ends_span_on_exception(): void
     {
         $span = $this->createMock(SpanInterface::class);

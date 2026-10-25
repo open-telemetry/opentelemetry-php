@@ -15,14 +15,17 @@ use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use Throwable;
 
 /**
- * Class ZipkinExporter - implements the export interface for data transfer via Zipkin protocol
- * @package OpenTelemetry\Exporter
+ * @deprecated The Zipkin exporter is deprecated. Use OTLP instead.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk_exporters/zipkin.md
  */
 class Exporter implements SpanExporterInterface
 {
     use LogsMessagesTrait;
     use UsesSpanConverterTrait;
 
+    /**
+     * @phan-suppress PhanDeprecatedClass
+     */
     public function __construct(
         private readonly TransportInterface $transport,
         ?SpanConverterInterface $spanConverter = null,

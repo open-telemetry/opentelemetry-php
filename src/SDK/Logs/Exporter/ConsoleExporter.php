@@ -15,8 +15,12 @@ use OpenTelemetry\SDK\Logs\ReadableLogRecord;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 
 /**
- * A JSON console exporter for LogRecords. This is only useful for testing; the
- * output is human-readable, and is not compatible with the OTLP format.
+ * Writes log records as human-readable JSON.
+ *
+ * The output format is unspecified, is not OTLP and may change between releases. Use it for
+ * debugging and learning, not for parsing or as input to other tools.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/sdk_exporters/stdout.md
  */
 class ConsoleExporter implements LogRecordExporterInterface
 {

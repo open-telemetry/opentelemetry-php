@@ -13,6 +13,14 @@ use OpenTelemetry\SDK\Trace\Behavior\UsesSpanConverterTrait;
 use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 
+/**
+ * Writes spans as human-readable JSON.
+ *
+ * The output format is unspecified, is not OTLP and may change between releases. Use it for
+ * debugging and learning, not for parsing or as input to other tools.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk_exporters/stdout.md
+ */
 class ConsoleSpanExporter implements SpanExporterInterface
 {
     use UsesSpanConverterTrait;

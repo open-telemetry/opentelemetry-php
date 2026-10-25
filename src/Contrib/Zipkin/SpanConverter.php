@@ -15,6 +15,10 @@ use OpenTelemetry\SDK\Trace\SpanConverterInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
 
+/**
+ * @deprecated The Zipkin exporter is deprecated. Use OTLP instead.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk_exporters/zipkin.md
+ */
 class SpanConverter implements SpanConverterInterface
 {
     const STATUS_CODE_TAG_KEY = 'otel.status_code';

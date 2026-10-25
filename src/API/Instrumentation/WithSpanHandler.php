@@ -57,7 +57,7 @@ class WithSpanHandler
 
         $span = Span::fromContext($scope->context());
         if ($exception) {
-            $span->recordException($exception, ['exception.escaped' => true]);
+            $span->recordException($exception);
             $span->setStatus(StatusCode::STATUS_ERROR, $exception->getMessage());
         }
 

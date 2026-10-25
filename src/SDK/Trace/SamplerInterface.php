@@ -40,7 +40,7 @@ interface SamplerInterface
     /**
      * Returns the sampler name or short description with the configuration.
      * This may be displayed on debug pages or in the logs.
-     * Example: "TraceIdRatioBasedSampler{0.000100}"
+     * Example: "TraceIdRatioBased{0.000100}"
      */
     public function getDescription(): string;
 }
