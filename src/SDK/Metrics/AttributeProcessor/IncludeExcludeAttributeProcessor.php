@@ -22,9 +22,9 @@ use function strtr;
  */
 final class IncludeExcludeAttributeProcessor implements AttributeProcessorInterface
 {
-    /** @var list<string>|null */
+    /** @var list<non-empty-string>|null */
     private readonly ?array $included;
-    /** @var list<string> */
+    /** @var list<non-empty-string> */
     private readonly array $excluded;
 
     /**
@@ -54,13 +54,14 @@ final class IncludeExcludeAttributeProcessor implements AttributeProcessorInterf
         return new Attributes($filtered, 0);
     }
 
+    /** @return non-empty-string */
     private static function regex(string $pattern): string
     {
         return sprintf('/^%s$/s', strtr(preg_quote($pattern, '/'), ['\\?' => '.', '\\*' => '.*']));
     }
 
     /**
-     * @param list<string> $regexes
+     * @param list<non-empty-string> $regexes
      */
     private static function matchesAny(array $regexes, string $key): bool
     {

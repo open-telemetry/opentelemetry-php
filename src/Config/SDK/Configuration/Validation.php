@@ -44,7 +44,7 @@ final class Validation
                 throw new InvalidArgumentException('must be of type numeric');
             }
 
-            return $value + 0;
+            return +$value;
         };
     }
 }

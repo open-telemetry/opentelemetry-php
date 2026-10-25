@@ -16,6 +16,9 @@ final class IncludeExcludeAttributeProcessorTest extends TestCase
 {
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#stream-configuration
+     *
+     * @param list<string>|null $included
+     * @param list<string>|null $excluded
      */
     #[DataProvider('filterProvider')]
     public function test_filters_attribute_keys(?array $included, ?array $excluded, array $expected): void

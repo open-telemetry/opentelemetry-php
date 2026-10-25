@@ -32,7 +32,9 @@ final class ConsoleMetricExporterTest extends TestCase
     #[\Override]
     public function setUp(): void
     {
-        $this->stream = fopen('php://memory', 'a+b');
+        $stream = fopen('php://memory', 'a+b');
+        $this->assertIsResource($stream);
+        $this->stream = $stream;
         $this->exporter = new ConsoleMetricExporter(null, new StreamTransport($this->stream, 'application/json'));
     }
 

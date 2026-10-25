@@ -99,7 +99,7 @@ class OtlpUtil
      * strings`.
      *
      * @param list<array{name: non-empty-string, value: ?string}> $headers
-     * @return array<non-empty-string, string>
+     * @return array<string, string>
      *
      * @internal
      *
