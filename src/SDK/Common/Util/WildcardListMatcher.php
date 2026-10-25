@@ -14,14 +14,13 @@ use function implode;
 final class WildcardListMatcher
 {
     /** @var WildcardMatcher[] */
-    private array $matchers;
+    private array $matchers = [];
 
     /**
      * @param iterable<string> $wildcardExprs
      */
     public function __construct(iterable $wildcardExprs)
     {
-        $this->matchers = [];
         foreach ($wildcardExprs as $wildcardExpr) {
             $this->matchers[] = new WildcardMatcher($wildcardExpr);
         }

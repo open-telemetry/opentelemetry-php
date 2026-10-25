@@ -204,7 +204,7 @@ class AutoRootSpan
             return;
         }
         self::$responseHeaderHookRegistered = true;
-        $namesLower = array_map('strtolower', $headerNames);
+        $namesLower = array_map(strtolower(...), $headerNames);
         self::$hookManager ??= SdkAutoloader::getHookManager();
         self::$hookManager->hook(
             null,

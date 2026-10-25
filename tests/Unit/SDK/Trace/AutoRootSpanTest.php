@@ -223,7 +223,7 @@ class AutoRootSpanTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_URL_GROUPS, '/users/*,/orders/*');
         $request = new ServerRequest('GET', 'https://example.com/users/42');
 
-        $span = $this->createMock(SpanInterface::class);
+        $span = $this->createStub(SpanInterface::class);
         $spanBuilder = $this->createMock(SpanBuilderInterface::class);
         $spanBuilder->method('setSpanKind')->willReturnSelf();
         $spanBuilder->method('setStartTimestamp')->willReturnSelf();
@@ -342,7 +342,7 @@ class AutoRootSpanTest extends TestCase
     public function test_start_creates_root_span_in_cli(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
-        $span = $this->createMock(SpanInterface::class);
+        $span = $this->createStub(SpanInterface::class);
         $spanBuilder = $this->createMock(SpanBuilderInterface::class);
         $spanBuilder->method('setSpanKind')->willReturnSelf();
         $spanBuilder->method('setStartTimestamp')->willReturnSelf();
@@ -374,7 +374,7 @@ class AutoRootSpanTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, '/health');
         $_SERVER['REQUEST_URI'] = '/orders';
-        $span = $this->createMock(SpanInterface::class);
+        $span = $this->createStub(SpanInterface::class);
         $spanBuilder = $this->createMock(SpanBuilderInterface::class);
         $spanBuilder->method('setSpanKind')->willReturnSelf();
         $spanBuilder->method('setStartTimestamp')->willReturnSelf();
@@ -400,7 +400,7 @@ class AutoRootSpanTest extends TestCase
     public function test_start_does_nothing_when_root_span_already_started(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
-        $span = $this->createMock(SpanInterface::class);
+        $span = $this->createStub(SpanInterface::class);
         $spanBuilder = $this->createMock(SpanBuilderInterface::class);
         $spanBuilder->method('setSpanKind')->willReturnSelf();
         $spanBuilder->method('setStartTimestamp')->willReturnSelf();
@@ -514,13 +514,11 @@ class AutoRootSpanTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, 'true');
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_SERVER['REQUEST_URI'] = '/foo?bar=baz';
-
-        $span = $this->createMock(SpanInterface::class);
         $this->tracer
             ->expects($this->once())
             ->method('spanBuilder')
             ->with($this->equalTo('GET /foo'))
-            ->willReturn($this->spanBuilderReturning($span));
+            ->willReturn($this->spanBuilderReturning($this->createMock(SpanInterface::class)));
 
         AutoRootSpan::start();
 

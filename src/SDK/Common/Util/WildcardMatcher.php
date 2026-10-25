@@ -24,19 +24,17 @@ final class WildcardMatcher
     private const CASE_SENSITIVE_PREFIX = '(?-i)';
     private const WILDCARD = '*';
 
-    private bool $isCaseSensitive;
-    private bool $startsWithWildcard;
-    private bool $endsWithWildcard;
+    private readonly bool $isCaseSensitive;
+    private bool $startsWithWildcard = false;
+    private readonly bool $endsWithWildcard;
     /** @var string[] */
-    private array $literalParts;
+    private array $literalParts = [];
 
     public function __construct(string $expr)
     {
         $this->isCaseSensitive = str_starts_with($expr, self::CASE_SENSITIVE_PREFIX);
         $exprPos = $this->isCaseSensitive ? strlen(self::CASE_SENSITIVE_PREFIX) : 0;
         $exprLen = strlen($expr);
-        $this->literalParts = [];
-        $this->startsWithWildcard = false;
         $lastPartWasWildcard = false;
         while ($exprPos < $exprLen) {
             $nextWildcardPos = strpos($expr, self::WILDCARD, $exprPos);
