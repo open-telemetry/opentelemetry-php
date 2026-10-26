@@ -1968,6 +1968,72 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * The schema allows an empty string here, but an attribute key must not be empty, and
+     * neither may an HTTP header name.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/common/README.md#attribute
+     */
+    #[DataProvider('emptyKeyProvider')]
+    public function test_empty_key_is_rejected(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path ".*%s" cannot contain an empty value/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function emptyKeyProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $sampler = "tracer_provider:\n$processors  sampler:\n    composite/development:\n      rule_based:\n        rules:\n        - sampler:\n            always_on:\n";
+
+        yield 'resource attribute name' => ["resource:\n  attributes:\n  - name: ''\n    value: v", 'resource.attributes..name'];
+        yield 'rule_based attribute_values key' => ["$sampler          attribute_values:\n            key: ''\n            values: [v]", 'attribute_values.key'];
+        yield 'rule_based attribute_patterns key' => ["$sampler          attribute_patterns:\n            key: ''\n            included: [v]", 'attribute_patterns.key'];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter header name" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:\n          - name: ''\n            value: v",
+                    "$exporter.headers..name",
+                ];
+            }
+        }
+    }
+
+    /**
+     * An empty scope or instrument name is schema-valid, and only fails to match.
+     */
+    #[DataProvider('emptyMatcherNameProvider')]
+    public function test_empty_matcher_name_is_accepted(string $yaml): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function emptyMatcherNameProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+
+        yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: ''\n      config: {}"];
+        yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: ''\n      config: {}"];
+        yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: ''\n      config: {}"];
+        yield 'view instrument_name' => ["meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: ''\n    stream:\n      name: n"];
+    }
+
+    /**
      * The SDK lists with `minItems: 1`, as YAML with `%s` for the list value and the node path.
      * `processors` and `readers` have their own check, in
      * {@see self::test_provider_without_processors_is_rejected()}.

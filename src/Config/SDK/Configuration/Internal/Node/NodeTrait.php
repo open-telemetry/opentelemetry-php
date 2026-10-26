@@ -64,6 +64,6 @@ trait NodeTrait
 
     protected function isValueEmpty(mixed $value): bool
     {
-        return $value === null;
+        return $value === null || $value === '';
     }
 }
