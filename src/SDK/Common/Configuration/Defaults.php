@@ -125,6 +125,8 @@ interface Defaults
     public const OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN = 'false';
     public const OTEL_PHP_TRANSACTION_SPAN_ENABLED = 'false';
     public const OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI = 'false';
+    public const OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY = 'false';
+    public const OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY_MAX_SIZE = 1024;
     public const OTEL_CONFIG_FILE = 'sdk-config.yaml';
     public const OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS = 'none';
 }
