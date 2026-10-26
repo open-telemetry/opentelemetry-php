@@ -9,7 +9,7 @@ tracer_provider:
     always_off:
 
 propagator:
-  composite: []
+  composite: ~
 
 instrumentation/development:
   php:

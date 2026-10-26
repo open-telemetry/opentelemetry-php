@@ -9,7 +9,10 @@ namespace OpenTelemetry\Config\SDK\Configuration\Internal\Node;
  */
 final class PrototypedArrayNode extends \Symfony\Component\Config\Definition\PrototypedArrayNode
 {
-    use NodeTrait;
+    use NodeTrait {
+        preNormalize as private preNormalizeNode;
+        finalizeValue as private finalizeNode;
+    }
 
     private bool $defaultValueSet = false;
     private mixed $defaultValue_ = null;
@@ -49,5 +52,25 @@ final class PrototypedArrayNode extends \Symfony\Component\Config\Definition\Pro
     public function setAllowEmptyValue(bool $boolean): void
     {
         $this->allowEmptyValue = $boolean;
+    }
+
+    /**
+     * Null takes the default in {@see self::finalizeValue()}, past the minimum count check, so
+     * that `requiresAtLeastOneElement()` rejects `[]` but not null.
+     */
+    #[\Override]
+    protected function preNormalize(mixed $value): mixed
+    {
+        return $value === null ? null : $this->preNormalizeNode($value);
+    }
+
+    #[\Override]
+    public function finalizeValue(mixed $value): mixed
+    {
+        if ($value === null && $this->allowEmptyValue) {
+            return $this->getDefaultValue();
+        }
+
+        return $this->finalizeNode($value);
     }
 }

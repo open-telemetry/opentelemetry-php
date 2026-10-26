@@ -10,7 +10,6 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableRuleBased;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
@@ -64,19 +63,19 @@ final class ComposableSamplerRuleBased implements ComponentProvider
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('rule_based');
-        $node->beforeNormalization()->always(NonEmptyList::normalizer('rules'))->end();
 
-        $rule = $node->children()->arrayNode('rules')->defaultValue([])->arrayPrototype();
-        $rule->beforeNormalization()->always(NonEmptyList::normalizer('span_kinds', 'parent'))->end();
+        $rule = $node->children()->arrayNode('rules')->defaultValue([])->requiresAtLeastOneElement()->arrayPrototype();
 
         $ruleChildren = $rule->children();
         $ruleChildren->append($registry->component('sampler', ComposableSamplerInterface::class)->isRequired());
         $ruleChildren->arrayNode('span_kinds')
             ->defaultValue([])
+            ->requiresAtLeastOneElement()
             ->enumPrototype()->values(array_keys(self::SPAN_KINDS))->end()
         ->end();
         $ruleChildren->arrayNode('parent')
             ->defaultValue([])
+            ->requiresAtLeastOneElement()
             ->enumPrototype()->values(self::PARENTS)->end()
         ->end();
         $ruleChildren->arrayNode('attribute_values')
@@ -86,13 +85,11 @@ final class ComposableSamplerRuleBased implements ComponentProvider
             ->end()
         ->end();
 
-        $patterns = $ruleChildren->arrayNode('attribute_patterns');
-        $patterns->beforeNormalization()->always(NonEmptyList::normalizer('included', 'excluded'))->end();
-        $patterns
+        $ruleChildren->arrayNode('attribute_patterns')
             ->children()
                 ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
-                ->arrayNode('included')->defaultValue([])->scalarPrototype()->end()->end()
-                ->arrayNode('excluded')->defaultValue([])->scalarPrototype()->end()->end()
+                ->arrayNode('included')->defaultValue([])->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
+                ->arrayNode('excluded')->defaultValue([])->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
             ->end()
         ;
 

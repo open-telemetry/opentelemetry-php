@@ -382,6 +382,35 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('capturedHeadersProvider')]
+    public function test_captured_headers_reject_empty_list(string $side, string $key): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path ".*%s\.%s" should have at least 1 element/', $side, $key));
+
+        self::instrumentationFactory()->process([Yaml::parse(sprintf("instrumentation/development:\n  general:\n    http:\n      %s:\n        %s: []", $side, $key))]);
+    }
+
+    #[DataProvider('capturedHeadersProvider')]
+    public function test_captured_headers_accept_null(string $side, string $key): void
+    {
+        $registry = self::instrumentationFactory()->process([Yaml::parse(sprintf("instrumentation/development:\n  general:\n    http:\n      %s:\n        %s: ~", $side, $key))])->create(new Context());
+
+        $this->assertSame([], $registry->get(HttpConfig::class)?->config[$side][$key]);
+    }
+
+    public static function capturedHeadersProvider(): iterable
+    {
+        foreach (['client', 'server'] as $side) {
+            foreach (['request_captured_headers', 'response_captured_headers'] as $key) {
+                yield "$side $key" => [$side, $key];
+            }
+        }
+    }
+
+    /**
      * The counterpart to the above: an environment placeholder resolves to a string, so a variable
      * whose value merely looks numeric must still pass.
      */
@@ -1910,18 +1939,59 @@ final class ConfigurationTest extends TestCase
         yield 'attribute_limits' => ['attribute_limits:'];
         yield 'propagator' => ['propagator:'];
         yield 'propagator.composite' => ["propagator:\n  composite:"];
-        yield 'resource.attributes' => ["resource:\n  attributes:"];
-        yield 'meter_provider.views' => [
-            /** @lang yaml */
-            <<<'YAML'
-                meter_provider:
-                  readers:
-                  - periodic:
-                      exporter:
-                        console:
-                  views:
-                YAML,
-        ];
+        foreach (self::minItemsLists() as $name => [$yaml]) {
+            yield $name => [sprintf($yaml, '~')];
+        }
+    }
+
+    /**
+     * A present null takes the default, so only an explicitly empty list breaks `minItems: 1`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('emptyMinItemsListProvider')]
+    public function test_empty_list_is_rejected_where_schema_has_min_items(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path ".*%s" should have at least 1 element/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function emptyMinItemsListProvider(): iterable
+    {
+        foreach (self::minItemsLists() as $name => [$yaml, $path]) {
+            yield $name => [sprintf($yaml, '[]'), $path];
+        }
+    }
+
+    /**
+     * The SDK lists with `minItems: 1`, as YAML with `%s` for the list value and the node path.
+     * `processors` and `readers` have their own check, in
+     * {@see self::test_provider_without_processors_is_rejected()}.
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    private static function minItemsLists(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $view = "meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: i\n    stream:\n      attribute_keys:\n";
+
+        yield 'views' => ["meter_provider:\n$readers  views: %s", 'meter_provider.views'];
+        yield 'view attribute_keys.included' => ["$view        included: %s", 'attribute_keys.included'];
+        yield 'view attribute_keys.excluded' => ["$view        excluded: %s", 'attribute_keys.excluded'];
+        yield 'producers' => ["meter_provider:\n$readers      producers: %s", 'periodic.producers'];
+        yield 'tracers' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers: %s", 'tracer_configurator/development.tracers'];
+        yield 'meters' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters: %s", 'meter_configurator/development.meters'];
+        yield 'loggers' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers: %s", 'logger_configurator/development.loggers'];
+        yield 'resource attributes' => ["resource:\n  attributes: %s", 'resource.attributes'];
+        yield 'detection attributes.included' => ["resource:\n  detection/development:\n    attributes:\n      included: %s", 'detection/development.attributes.included'];
+        yield 'detection attributes.excluded' => ["resource:\n  detection/development:\n    attributes:\n      excluded: %s", 'detection/development.attributes.excluded'];
+        yield 'detectors' => ["resource:\n  detection/development:\n    detectors: %s", 'detection/development.detectors'];
+        yield 'propagator composite' => ["propagator:\n  composite: %s", 'propagator.composite'];
 
         $exporters = [
             'tracer_provider' => ['processors', 'simple'],
@@ -1931,7 +2001,8 @@ final class ConfigurationTest extends TestCase
         foreach ($exporters as $provider => [$list, $component]) {
             foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
                 yield "$provider $exporter headers" => [
-                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:",
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers: %s",
+                    "$exporter.headers",
                 ];
             }
         }

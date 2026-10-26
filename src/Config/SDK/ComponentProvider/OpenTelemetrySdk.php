@@ -14,7 +14,6 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
-use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
@@ -564,6 +563,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('attributes')
+                    ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
@@ -588,9 +588,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->children()
                                 ->arrayNode('included')
                                     ->defaultNull()
+                                    ->requiresAtLeastOneElement()
                                     ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                 ->end()
                                 ->arrayNode('excluded')
+                                    ->requiresAtLeastOneElement()
                                     ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                 ->end()
                             ->end()
@@ -599,6 +601,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         // that a portable config may name detectors another SDK provides.
                         ->append(
                             $registry->componentList('detectors', ResourceDetectorInterface::class)
+                                ->requiresAtLeastOneElement()
                                 ->attribute(IgnoresUnknownProviders::ATTRIBUTE, true)
                         )
                     ->end()
@@ -655,6 +658,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->end()
                         ->end()
                         ->arrayNode('tracers')
+                            ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
@@ -695,6 +699,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->defaultValue('trace_based')
                 ->end()
                 ->arrayNode('views')
+                    ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
                             ->arrayNode('stream')
@@ -705,12 +710,13 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->integerNode('aggregation_cardinality_limit')->defaultNull()->min(1)->end()
                                     ->arrayNode('attribute_keys')
-                                        ->beforeNormalization()->always(NonEmptyList::normalizer('included', 'excluded'))->end()
                                         ->children()
                                             ->arrayNode('included')
+                                                ->requiresAtLeastOneElement()
                                                 ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                             ->end()
                                             ->arrayNode('excluded')
+                                                ->requiresAtLeastOneElement()
                                                 ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                             ->end()
                                         ->end()
@@ -755,6 +761,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->end()
                         ->end()
                         ->arrayNode('meters')
+                            ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
@@ -799,6 +806,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->children()
                         ->append($this->getLoggerConfig($builder, 'default_config'))
                         ->arrayNode('loggers')
+                            ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
@@ -864,7 +872,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
+                ->append($registry->componentList('composite', TextMapPropagatorInterface::class)->requiresAtLeastOneElement())
             ->end()
         ;
 

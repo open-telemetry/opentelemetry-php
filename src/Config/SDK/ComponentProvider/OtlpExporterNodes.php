@@ -37,7 +37,7 @@ final class OtlpExporterNodes
                 ->scalarNode('endpoint')->defaultValue($endpoint)->validate()->always(Validation::ensureString())->end()->end()
                 ->append(self::tls($builder, insecure: $grpc))
                 ->arrayNode('headers')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
+                    ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
