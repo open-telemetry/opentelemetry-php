@@ -11,8 +11,8 @@ trait NodeTrait
 {
     protected function preNormalize(mixed $value): mixed
     {
-        if ($value === null && $this->allowEmptyValue && $this->defaultValueSet) {
-            $value = $this->defaultValue;
+        if ($value === null && $this->allowEmptyValue && $this->hasDefaultValue()) {
+            $value = $this->getDefaultValue();
         }
 
         /** @noinspection PhpMultipleClassDeclarationsInspection */

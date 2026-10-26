@@ -40,6 +40,19 @@ class DiscoveryTest extends TestCase
         Discovery::find(['timeout' => 31415]);
     }
 
+    public function test_zero_timeout_is_passed_to_client(): void
+    {
+        $discoverer = $this->createMock(DiscoveryInterface::class);
+        $discoverer->method('available')->willReturn(true);
+        $discoverer->expects($this->once())
+            ->method('create')
+            ->with($this->identicalTo(['timeout' => 0.0]))
+            ->willReturn($this->createStub(ClientInterface::class));
+
+        Discovery::setDiscoverers([$discoverer]);
+        Discovery::find(['timeout' => 0.0, 'cafile' => null]);
+    }
+
     public function test_fallback(): void
     {
         Discovery::setDiscoverers([]);

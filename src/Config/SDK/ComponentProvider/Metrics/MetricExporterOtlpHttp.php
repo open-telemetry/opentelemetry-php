@@ -48,11 +48,7 @@ final class MetricExporterOtlpHttp implements ComponentProvider
     {
         $headers = OtlpUtil::headers($properties['headers'], $properties['headers_list']);
 
-        $temporality = match ($properties['temporality_preference']) {
-            'cumulative' => TemporalityPreference::cumulative(),
-            'delta' => TemporalityPreference::delta(),
-            'low_memory' => TemporalityPreference::lowMemory(),
-        };
+        $temporality = TemporalityPreference::fromName($properties['temporality_preference']);
 
         return new MetricExporter(Registry::transportFactory('http')->create(
             endpoint: $properties['endpoint'],

@@ -14,6 +14,7 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Logs\Severity;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
@@ -560,11 +561,9 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('resource');
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('attributes')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->arrayPrototype()
                         ->children()
                             ->scalarNode('name')->isRequired()->end()
@@ -614,7 +613,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('attribute_limits');
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
@@ -635,7 +633,6 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->end()
             ->children()
                 ->arrayNode('limits')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
@@ -663,7 +660,6 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
-                                        ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                                         ->addDefaultsIfNotSet()
                                         ->children()
                                             ->booleanNode('enabled')->defaultTrue()->end()
@@ -699,7 +695,6 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->defaultValue('trace_based')
                 ->end()
                 ->arrayNode('views')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->arrayPrototype()
                         ->children()
                             ->arrayNode('stream')
@@ -710,6 +705,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('description')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->integerNode('aggregation_cardinality_limit')->defaultNull()->min(1)->end()
                                     ->arrayNode('attribute_keys')
+                                        ->beforeNormalization()->always(NonEmptyList::normalizer('included', 'excluded'))->end()
                                         ->children()
                                             ->arrayNode('included')
                                                 ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
@@ -764,7 +760,6 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
-                                        ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                                         ->addDefaultsIfNotSet()
                                         ->children()
                                             ->booleanNode('enabled')->defaultTrue()->end()
@@ -828,7 +823,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode($name);
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
@@ -845,7 +839,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('propagator');
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function (array $value): array {

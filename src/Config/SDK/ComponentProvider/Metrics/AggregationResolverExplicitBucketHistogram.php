@@ -67,7 +67,10 @@ final class AggregationResolverExplicitBucketHistogram implements ComponentProvi
                 ->arrayNode('boundaries')
                     ->defaultNull()
                     ->floatPrototype()->end()
-                    ->validate()->always(static function (array $boundaries): array {
+                    ->validate()->always(static function (?array $boundaries): ?array {
+                        if ($boundaries === null) {
+                            return null;
+                        }
                         if (!array_is_list($boundaries)) {
                             throw new InvalidArgumentException('must be a list');
                         }

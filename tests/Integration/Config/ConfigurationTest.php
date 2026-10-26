@@ -894,6 +894,40 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml
+     */
+    #[DataProvider('emptyViewAttributeKeysProvider')]
+    public function test_view_attribute_keys_rejects_empty_list(string $attributeKeys): void
+    {
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(<<<YAML
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  instrument_name: i
+                stream:
+                  $attributeKeys
+            YAML)]);
+    }
+
+    public static function emptyViewAttributeKeysProvider(): iterable
+    {
+        yield 'empty included' => ['attribute_keys: {included: []}'];
+        yield 'empty excluded' => ['attribute_keys: {excluded: []}'];
+    }
+
+    /**
      * A null projection means the reader's default aggregation applies.
      */
     #[DataProvider('viewAggregationProvider')]
@@ -944,6 +978,11 @@ final class ConfigurationTest extends TestCase
         ];
         yield 'explicit_bucket_histogram SDK default' => [
             ['explicit_bucket_histogram' => null],
+            $histogram,
+            new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
+        ];
+        yield 'explicit_bucket_histogram null boundaries is SDK default' => [
+            ['explicit_bucket_histogram' => ['boundaries' => null]],
             $histogram,
             new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
         ];
@@ -1623,6 +1662,29 @@ final class ConfigurationTest extends TestCase
         $resource = $this->getResource($sdk->create(new Context())->build());
 
         $this->assertNotSame('from-env', $resource->getAttributes()->get('service.name'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/resource/sdk.md#sdk-provided-resource-attributes
+     */
+    public function test_resource_falls_back_to_unknown_service_when_service_name_is_excluded(): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            resource:
+              detection/development:
+                attributes:
+                  excluded: [service.name]
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('unknown_service:php', $resource->getAttributes()->get('service.name'));
     }
 
     /**

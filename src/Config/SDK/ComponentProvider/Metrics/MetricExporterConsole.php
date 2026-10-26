@@ -28,11 +28,7 @@ final class MetricExporterConsole implements ComponentProvider
     #[\Override]
     public function createPlugin(array $properties, Context $context): MetricExporterInterface
     {
-        $temporality = match ($properties['temporality_preference']) {
-            'cumulative' => TemporalityPreference::cumulative(),
-            'delta' => TemporalityPreference::delta(),
-            'low_memory' => TemporalityPreference::lowMemory(),
-        };
+        $temporality = TemporalityPreference::fromName($properties['temporality_preference']);
 
         return new ConsoleMetricExporter($temporality);
     }

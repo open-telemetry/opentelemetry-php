@@ -49,4 +49,25 @@ final class TemporalityPreferenceTest extends TestCase
         yield 'low memory async counter' => [$lowMemory, InstrumentType::ASYNCHRONOUS_COUNTER, Temporality::CUMULATIVE];
         yield 'low memory async up-down counter' => [$lowMemory, InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER, Temporality::CUMULATIVE];
     }
+
+    #[DataProvider('nameProvider')]
+    public function test_from_name(string $name, TemporalityPreference $expected): void
+    {
+        $this->assertEquals($expected, TemporalityPreference::fromName($name));
+    }
+
+    public static function nameProvider(): iterable
+    {
+        yield 'cumulative' => ['cumulative', TemporalityPreference::cumulative()];
+        yield 'delta' => ['delta', TemporalityPreference::delta()];
+        yield 'environment variable low memory' => ['lowmemory', TemporalityPreference::lowMemory()];
+        yield 'declarative config low memory' => ['low_memory', TemporalityPreference::lowMemory()];
+        yield 'case insensitive' => ['Delta', TemporalityPreference::delta()];
+    }
+
+    public function test_from_name_rejects_unknown_name(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        TemporalityPreference::fromName('sometimes');
+    }
 }
