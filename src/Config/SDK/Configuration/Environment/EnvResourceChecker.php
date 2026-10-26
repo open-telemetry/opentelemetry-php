@@ -8,6 +8,9 @@ use function assert;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Config\ResourceCheckerInterface;
 
+/**
+ * @internal
+ */
 final class EnvResourceChecker implements ResourceCheckerInterface
 {
     public function __construct(

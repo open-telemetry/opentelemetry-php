@@ -24,6 +24,9 @@
     "conflict": {
         "open-telemetry/sdk": "<=1.11"
     },
+    "suggest": {
+        "symfony/config": "To implement a ComponentProvider for declarative configuration"
+    },
     "autoload": {
         "psr-4": {
             "OpenTelemetry\\API\\": "."
@@ -34,7 +37,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.10.x-dev"
+            "dev-main": "1.11.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [

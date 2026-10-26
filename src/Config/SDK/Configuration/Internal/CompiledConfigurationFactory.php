@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\Configuration\Internal;
 
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\Config\SDK\Configuration\ResourceCollection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -18,7 +19,6 @@ final class CompiledConfigurationFactory
 {
     /**
      * @param ComponentProvider<T> $rootComponent
-     * @param NodeInterface $node
      * @param iterable<ResourceTrackable> $resourceTrackable
      */
     public function __construct(

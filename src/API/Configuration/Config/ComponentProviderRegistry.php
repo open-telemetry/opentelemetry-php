@@ -10,6 +10,9 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 /**
  * A registry of component providers.
+ *
+ * Implemented by open-telemetry/sdk-configuration, which requires the symfony/config types these
+ * methods return.
  */
 interface ComponentProviderRegistry
 {

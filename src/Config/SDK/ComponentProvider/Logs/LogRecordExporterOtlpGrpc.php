@@ -10,7 +10,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Signals;
-use OpenTelemetry\Config\SDK\Configuration\Validation;
+use OpenTelemetry\Config\SDK\ComponentProvider\OtlpExporterNodes;
 use OpenTelemetry\Contrib\Otlp\LogsExporter;
 use OpenTelemetry\Contrib\Otlp\OtlpUtil;
 use OpenTelemetry\Contrib\Otlp\Protocols;
@@ -20,6 +20,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<LogRecordExporterInterface>
  */
 #[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
@@ -63,35 +64,6 @@ final class LogRecordExporterOtlpGrpc implements ComponentProvider
     #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
-        $node = $builder->arrayNode('otlp_grpc');
-        $node
-            ->children()
-                ->scalarNode('endpoint')->defaultValue('http://localhost:4317')->validate()->always(Validation::ensureString())->end()->end()
-                ->arrayNode('tls')
-                    ->addDefaultsIfNotSet()
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
-                    ->children()
-                        ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        ->booleanNode('insecure')->defaultNull()->end()
-                    ->end()
-                ->end()
-                ->arrayNode('headers')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
-                    ->arrayPrototype()
-                        ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                            ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                        ->end()
-                    ->end()
-                ->end()
-                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->enumNode('compression')->values(['gzip', 'none', null])->defaultNull()->end()
-                ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
-            ->end()
-        ;
-
-        return $node;
+        return OtlpExporterNodes::grpc($builder);
     }
 }

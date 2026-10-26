@@ -12,14 +12,13 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
  * @deprecated Use {@see Configuration::parseFile()} and
  *             {@see Configuration::getInstrumentationConfig()} instead. Instrumentation
  *             configuration is a node of the same document as the SDK configuration
- *             ({@see https://github.com/open-telemetry/opentelemetry-configuration/pull/91}), so it
- *             does not need a parse entry point of its own: one {@see Configuration} serves both
- *             roots, and reaching them separately costs an extra read of the same file whenever the
- *             SDK root came from the on-disk cache.
+ *             ({@see https://github.com/open-telemetry/opentelemetry-configuration/pull/91}), so one
+ *             {@see Configuration} serves both roots. Parsing them separately reads the file twice
+ *             when the SDK root comes from the on-disk cache.
  *
- * @todo Remove before 1.0 of `open-telemetry/sdk-configuration`. Kept for now as a transition for
- *       instrumentations still on this entry point — the package is 0.x, so this is a courtesy
- *       rather than a compatibility guarantee.
+ * @todo Remove before 1.0 of `open-telemetry/sdk-configuration`. It stays for now so instrumentations
+ *       still on this entry point can move. The package is 0.x, so this is a courtesy rather than a
+ *       compatibility guarantee.
  */
 final class Instrumentation
 {

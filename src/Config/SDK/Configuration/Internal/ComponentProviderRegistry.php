@@ -33,7 +33,7 @@ use Symfony\Component\Config\Definition\Processor;
  */
 final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry, ResourceTrackable
 {
-    /** @var iterable iterable<Normalization> */
+    /** @var iterable<Normalization> */
     private readonly iterable $normalizations;
     private readonly NodeBuilder $builder;
     /** @var array<string, array<string, ComponentProviderRegistryEntry>> */

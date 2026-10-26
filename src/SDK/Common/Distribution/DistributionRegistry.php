@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Common\Distribution;
 
-use Override;
-
+/**
+ * @internal
+ */
 final class DistributionRegistry implements DistributionProperties
 {
     private array $distributionConfigurations = [];
@@ -17,7 +18,7 @@ final class DistributionRegistry implements DistributionProperties
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function getDistributionConfiguration(string $distribution): ?DistributionConfiguration
     {
         return $this->distributionConfigurations[$distribution] ?? null;

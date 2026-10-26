@@ -12,20 +12,19 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanSuppression\SemanticConventionResolver;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 
 /**
  * @implements EnvComponentLoader<SpanSuppressionStrategy>
  */
 final class SpanSuppressionStrategySemConv implements EnvComponentLoader
 {
-    #[Override]
+    #[\Override]
     public function load(EnvResolver $env, EnvComponentLoaderRegistry $registry, Context $context): SpanSuppressionStrategy
     {
         return new SemanticConventionSuppressionStrategy(ServiceLoader::load(SemanticConventionResolver::class));
     }
 
-    #[Override]
+    #[\Override]
     public function name(): string
     {
         return 'semconv';

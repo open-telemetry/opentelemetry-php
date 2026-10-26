@@ -10,20 +10,19 @@ use OpenTelemetry\API\Configuration\ConfigEnv\EnvResolver;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanKindSuppressionStrategy\SpanKindSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 
 /**
  * @implements EnvComponentLoader<SpanSuppressionStrategy>
  */
 final class SpanSuppressionStrategySpanKind implements EnvComponentLoader
 {
-    #[Override]
+    #[\Override]
     public function load(EnvResolver $env, EnvComponentLoaderRegistry $registry, Context $context): SpanSuppressionStrategy
     {
         return new SpanKindSuppressionStrategy();
     }
 
-    #[Override]
+    #[\Override]
     public function name(): string
     {
         return 'spankind';

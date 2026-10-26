@@ -18,9 +18,11 @@
     ],
     "require": {
         "php": "^8.2",
+        "composer-runtime-api": "^2.0",
         "open-telemetry/api": "^1.11",
         "open-telemetry/context": "^1.4",
         "open-telemetry/sdk": "^1.16",
+        "psr/log": "^1.1|^2.0|^3.0",
         "symfony/config": "^5.4 || ^6.4 || ^7.0 || ^8.0",
         "tbachert/spi": "^1.0.5"
     },
@@ -31,8 +33,7 @@
     },
     "suggest": {
         "ext-yaml": "Allows loading config from yaml files",
-        "symfony/yaml": "Allows loading config from yaml files",
-        "tbachert/spi": "Allows defining and loading component providers from composer.json extra.spi"
+        "symfony/yaml": "Allows loading config from yaml files"
     },
     "extra": {
         "branch-alias": {
@@ -40,11 +41,9 @@
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\ResponsePropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorComposite",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOff",

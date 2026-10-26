@@ -6,6 +6,9 @@ namespace OpenTelemetry\API\Instrumentation\Configuration\General;
 
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\GeneralInstrumentationConfiguration;
 
+/**
+ * @experimental
+ */
 class HttpConfig implements GeneralInstrumentationConfiguration
 {
     public function __construct(public readonly array $config)

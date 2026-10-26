@@ -26,7 +26,11 @@ class OutputStreamParserTest extends TestCase
         return [
             'stdout' => ['stdout', 'php://stdout'],
             'absolute' => ['file:///tmp/file.jsonl', '/tmp/file.jsonl'],
-            'relative' => ['file://file.jsonl', 'file.jsonl'],
+            'localhost' => ['file://localhost/tmp/file.jsonl', '/tmp/file.jsonl'],
+            'localhost is case-insensitive' => ['file://LocalHost/tmp/file.jsonl', '/tmp/file.jsonl'],
+            'no authority' => ['file:/tmp/file.jsonl', '/tmp/file.jsonl'],
+            'scheme is case-insensitive' => ['FILE:///tmp/file.jsonl', '/tmp/file.jsonl'],
+            'percent-encoded' => ['file:///tmp/my%20file%23.jsonl', '/tmp/my file#.jsonl'],
         ];
     }
 
@@ -43,6 +47,12 @@ class OutputStreamParserTest extends TestCase
             'invalid' => ['invalid'],
             'no scheme' => ['/var/log/file.jsonl'],
             'unknown scheme' => ['unknown://file.jsonl'],
+            'relative' => ['file://file.jsonl'],
+            'remote host' => ['file://example.com/tmp/file.jsonl'],
+            'no path' => ['file://'],
+            'query' => ['file:///tmp/file.jsonl?mode=append'],
+            'fragment' => ['file:///tmp/file.jsonl#end'],
+            'encoded null byte' => ['file:///tmp/file%00.jsonl'],
         ];
     }
 }

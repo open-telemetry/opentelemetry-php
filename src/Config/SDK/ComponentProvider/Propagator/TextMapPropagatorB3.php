@@ -14,6 +14,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<TextMapPropagatorInterface>
  */
 #[PackageDependency('open-telemetry/extension-propagator-b3', '^1.0.1')]

@@ -14,6 +14,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<MetricExporterInterface>
  */
 final class MetricExporterConsole implements ComponentProvider
@@ -21,7 +22,7 @@ final class MetricExporterConsole implements ComponentProvider
     /**
      * @param array{
      *     temporality_preference: 'cumulative'|'delta'|'low_memory',
-     *     default_histogram_aggregation: 'explicit_bucket_histogram|base2_exponential_bucket_histogram',
+     *     default_histogram_aggregation: 'explicit_bucket_histogram'|'base2_exponential_bucket_histogram',
      * } $properties
      */
     #[\Override]

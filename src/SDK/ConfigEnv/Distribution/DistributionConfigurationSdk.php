@@ -13,14 +13,13 @@ use OpenTelemetry\SDK\Common\Distribution\DistributionConfiguration;
 use OpenTelemetry\SDK\Common\Distribution\SdkDistribution;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 
 /**
  * @implements EnvComponentLoader<DistributionConfiguration>
  */
 final class DistributionConfigurationSdk implements EnvComponentLoader
 {
-    #[Override]
+    #[\Override]
     public function load(EnvResolver $env, EnvComponentLoaderRegistry $registry, Context $context): DistributionConfiguration
     {
         $spanSuppressionStrategyName = $env->string(Variables::OTEL_EXPERIMENTAL_SPAN_SUPPRESSION_STRATEGY) ?? 'none';
@@ -34,7 +33,7 @@ final class DistributionConfigurationSdk implements EnvComponentLoader
         );
     }
 
-    #[Override]
+    #[\Override]
     public function name(): string
     {
         return self::class;

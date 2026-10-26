@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 /**
  * `ExperimentalSemconvConfig`: the per-domain semantic convention version and migration settings.
  *
- * Validated so that portable configuration parses, but not yet exposed — nothing in this SDK
+ * Validated so that portable configuration parses, but not yet exposed. Nothing in this SDK
  * consumes it.
  *
  * @internal

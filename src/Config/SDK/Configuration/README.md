@@ -1,66 +1,81 @@
-# Configuration
+# Component providers
 
-Allows creation of an extensible configuration model according to the
-[OTel file configuration specification](https://opentelemetry.io/docs/specs/otel/configuration/file-configuration/).
+Each component in a configuration file, such as a sampler or a span exporter, is created by a
+component provider. This follows the spec's
+[SDK extension components](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#sdk-extension-components).
+A package can add its own components by shipping providers for them.
 
-## Installation
+To parse a file, see the [package README](../README.md#usage).
 
-```shell
-composer require tbachert/otel-sdk-configuration
-```
+## Write a component provider
 
-Additionally, you will need either `ext-yaml` or `symfony/yaml` to load configuration from yaml config files.
+A provider implements `OpenTelemetry\API\Configuration\Config\ComponentProvider`:
 
-## Usage
+- `getConfig()` returns the node for the component. The node's name is the key used in the file.
+- `createPlugin()` receives the processed properties and returns the component.
 
-### Parsing config
+Nested components come from the registry passed to `getConfig()`:
 
-```php
-$factory = new ConfigurationFactory(
-    [
-        // all available providers ...
-    ],
-    new OpenTelemetryConfiguration(),
-    new EnvSourceReader([
-        new ArrayEnvSource($_SERVER),
-        new PhpIniEnvSource(),
-    ]),
-);
-$configuration = $factory->parseFile(__DIR__ . '/config.yaml');
-$openTelemetry = $configuration->create(new Context());
-```
+- `component()` for a single component, such as `exporter`.
+- `componentList()` for a list of components, such as `processors`.
+- `componentMap()` for a map of components keyed by provider name.
+- `componentNames()` for a list of provider names with no properties.
 
-### Defining component providers
+### Example: the batch span processor
 
-See [examples](./examples) for component provider examples.
-
-###### Example: BatchSpanProcessor
+This is the SDK's own `batch` provider. A name can have only one provider per component type, so
+registering a second `batch` span processor fails at startup.
 
 ```php
-final class SpanProcessorBatch implements ComponentProvider {
+use OpenTelemetry\API\Common\Time\Clock;
+use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
+use OpenTelemetry\API\Configuration\Config\ComponentProvider;
+use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
+use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\SDK\Trace\SpanExporterInterface;
+use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
+use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * @implements ComponentProvider<SpanProcessorInterface>
+ */
+final class SpanProcessorBatch implements ComponentProvider
+{
     /**
      * @param array{
      *     schedule_delay: int<0, max>,
      *     export_timeout: int<0, max>,
      *     max_queue_size: int<1, max>,
      *     max_export_batch_size: int<1, max>,
-     *     exporter: ComponentPlugin<SpanExporter>,
+     *     exporter: ComponentPlugin<SpanExporterInterface>,
      * } $properties
      */
-    public function createPlugin(array $properties, Context $context): SpanProcessor {
-        // ...
+    #[\Override]
+    public function createPlugin(array $properties, Context $context): SpanProcessorInterface
+    {
+        return new BatchSpanProcessor(
+            exporter: $properties['exporter']->create($context),
+            clock: Clock::getDefault(),
+            maxQueueSize: $properties['max_queue_size'],
+            scheduledDelayMillis: $properties['schedule_delay'],
+            exportTimeoutMillis: $properties['export_timeout'],
+            maxExportBatchSize: $properties['max_export_batch_size'],
+        );
     }
 
-    public function getConfig(ComponentProviderRegistry $registry): ArrayNodeDefinition {
-        $node = new ArrayNodeDefinition('batch');
+    #[\Override]
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        $node = $builder->arrayNode('batch');
         $node
             ->children()
                 ->integerNode('schedule_delay')->min(0)->defaultValue(5000)->end()
                 ->integerNode('export_timeout')->min(0)->defaultValue(30000)->end()
                 ->integerNode('max_queue_size')->min(1)->defaultValue(2048)->end()
                 ->integerNode('max_export_batch_size')->min(1)->defaultValue(512)->end()
-                ->append($registry->component('exporter', SpanExporter::class)->isRequired())
+                ->append($registry->component('exporter', SpanExporterInterface::class)->isRequired())
             ->end()
         ;
 
@@ -68,3 +83,29 @@ final class SpanProcessorBatch implements ComponentProvider {
     }
 }
 ```
+
+## Register a component provider
+
+Providers are found with [`tbachert/spi`](https://github.com/Nevay/spi). List them in the package's
+`composer.json` under the `ComponentProvider` interface:
+
+```json
+{
+    "extra": {
+        "spi": {
+            "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "Example\\SpanExporterExample"
+            ]
+        }
+    }
+}
+```
+
+The application must allow the plugin:
+
+```shell
+composer config allow-plugins.tbachert/spi true
+```
+
+Providers registered under the old `OpenTelemetry\Config\SDK\Configuration\ComponentProvider` key
+still load, and log a deprecation warning.

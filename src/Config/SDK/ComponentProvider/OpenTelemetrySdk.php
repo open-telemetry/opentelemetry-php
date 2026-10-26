@@ -106,17 +106,14 @@ final class OpenTelemetrySdk implements ComponentProvider
      *     disabled: bool,
      *     log_level: ?string,
      *     resource: array{
-     *         attributes: array{
-     *             array{
-     *                 name: string,
-     *                 value: mixed,
-     *                 type: ?string,
-     *             },
-     *         },
+     *         attributes: list<array{
+     *             name: string,
+     *             value: mixed,
+     *             type: ?string,
+     *         }>,
      *         attributes_list: ?string,
-     *         detectors: array,
      *         schema_url: ?string,
-     *         "detection/development"?: array{
+     *         "detection/development": array{
      *             attributes: array{
      *                 included: ?list<string>,
      *                 excluded: list<string>,
@@ -145,9 +142,9 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             event_attribute_count_limit: int<0, max>,
      *             link_attribute_count_limit: int<0, max>,
      *         },
-     *         sampler: ?ComponentPlugin<SamplerInterface>,
+     *         sampler?: ComponentPlugin<SamplerInterface>,
      *         processors: list<ComponentPlugin<SpanProcessorInterface>>,
-     *         "tracer_configurator/development": ?array{
+     *         "tracer_configurator/development": array{
      *              default_config: array{
      *                  enabled: bool,
      *              },
@@ -169,7 +166,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *                     included: list<string>,
      *                     excluded: list<string>,
      *                 },
-     *                 aggregation: ?ComponentPlugin<DefaultAggregationProviderInterface>,
+     *                 aggregation?: ComponentPlugin<DefaultAggregationProviderInterface>,
      *             },
      *             selector: array{
      *                 instrument_type: 'counter'|'gauge'|'histogram'|'observable_counter'|'observable_gauge'|'observable_up_down_counter'|'up_down_counter'|null,
@@ -182,7 +179,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         }>,
      *         readers: list<ComponentPlugin<MetricReaderInterface>>,
      *         exemplar_filter: 'trace_based'|'always_on'|'always_off',
-     *         "meter_configurator/development": ?array{
+     *         "meter_configurator/development": array{
      *             default_config: array{
      *                 enabled: bool,
      *             },
@@ -200,7 +197,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             attribute_count_limit: ?int<0, max>,
      *         },
      *         processors: list<ComponentPlugin<LogRecordProcessorInterface>>,
-     *         "logger_configurator/development": ?array{
+     *         "logger_configurator/development": array{
      *            default_config: array{
      *                enabled: bool,
      *                minimum_severity: ?string,
@@ -272,7 +269,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $schemaUrl = $properties['resource']['schema_url'];
         /** @var ResourceDetectorInterface[] $detectors */
         $detectors = [];
-        foreach ($properties['resource']['detection/development']['detectors'] ?? [] as $plugin) {
+        foreach ($properties['resource']['detection/development']['detectors'] as $plugin) {
             /**
              * @psalm-suppress InvalidMethodCall
              **/
@@ -286,8 +283,8 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         /** @psalm-suppress PossiblyInvalidArgument */
         $composite = new Detectors\Composite($detectors);
-        $included = $properties['resource']['detection/development']['attributes']['included'] ?? null;
-        $excluded = $properties['resource']['detection/development']['attributes']['excluded'] ?? [];
+        $included = $properties['resource']['detection/development']['attributes']['included'];
+        $excluded = $properties['resource']['detection/development']['attributes']['excluded'];
 
         $resource = $composite->getResource();
         $attrs = AttributesParser::applyIncludeExclude($resource->getAttributes()->toArray(), $included, $excluded);
@@ -363,9 +360,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
         }
 
-        $disabled = !($properties['meter_provider']['meter_configurator/development']['default_config']['enabled'] ?? true);
+        $disabled = !$properties['meter_provider']['meter_configurator/development']['default_config']['enabled'];
         $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
-        foreach ($properties['meter_provider']['meter_configurator/development']['meters'] ?? [] as $meter) {
+        foreach ($properties['meter_provider']['meter_configurator/development']['meters'] as $meter) {
             $disabled = !$meter['config']['enabled'];
             $configurator = $configurator->with(
                 static fn (MeterConfig $config) => $config->setDisabled($disabled),
@@ -400,10 +397,10 @@ final class OpenTelemetrySdk implements ComponentProvider
             $spanProcessors[] = $processor->create($context);
         }
 
-        $disabled = !($properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'] ?? true);
+        $disabled = !$properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'];
         $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
-        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] ?? [] as $tracer) {
+        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] as $tracer) {
             $disabled = !$tracer['config']['enabled'];
             $configurator = $configurator->with(
                 static fn (TracerConfig $config) => $config->setDisabled($disabled),
@@ -451,9 +448,9 @@ final class OpenTelemetrySdk implements ComponentProvider
             $logRecordProcessors[] = $processor->create($context);
         }
 
-        $disabled = !($properties['logger_provider']['logger_configurator/development']['default_config']['enabled'] ?? true);
+        $disabled = !$properties['logger_provider']['logger_configurator/development']['default_config']['enabled'];
         $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
-        foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] ?? [] as $logger) {
+        foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] as $logger) {
             $disabled = !$logger['config']['enabled'];
             $configurator = $configurator->with(
                 static fn (LoggerConfig $config) => $config->setDisabled($disabled),
@@ -520,8 +517,8 @@ final class OpenTelemetrySdk implements ComponentProvider
 
     /**
      * Applies the `file_format` compatibility rules from upstream's versioning policy: a matching
-     * `MAJOR` is required, a newer `MINOR` only warns, and anything else — including the `1.0-rc.*`
-     * release candidates and the superseded `0.x` formats — is rejected.
+     * `MAJOR` is required and a newer `MINOR` only warns. Anything else is rejected, including the
+     * `1.0-rc.*` release candidates and the superseded `0.x` formats.
      *
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/VERSIONING.md#file-format
      */
@@ -858,7 +855,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);
-                        if ($name !== '' && !in_array($name, $existing)) {
+                        if ($name !== '' && $name !== 'none' && !in_array($name, $existing)) {
                             $value['composite'][][$name] = null;
                             $existing[] = $name;
                         }
@@ -898,7 +895,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 }
                 foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                     $name = trim($name);
-                    if ($name !== '' && !in_array($name, $existing)) {
+                    if ($name !== '' && $name !== 'none' && !in_array($name, $existing)) {
                         $value['composite'][][$name] = null;
                         $existing[] = $name;
                     }

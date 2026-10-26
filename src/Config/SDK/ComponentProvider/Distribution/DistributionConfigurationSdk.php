@@ -15,11 +15,11 @@ use OpenTelemetry\SDK\Common\Distribution\DistributionConfiguration;
 use OpenTelemetry\SDK\Common\Distribution\SdkDistribution;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppressionStrategy;
-use Override;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @implements ComponentProvider<DistributionConfiguration>
  */
 final class DistributionConfigurationSdk implements ComponentProvider
@@ -37,10 +37,8 @@ final class DistributionConfigurationSdk implements ComponentProvider
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
      * } $properties
-     * @param Context $context
-     * @return DistributionConfiguration
      */
-    #[Override]
+    #[\Override]
     public function createPlugin(array $properties, Context $context): DistributionConfiguration
     {
         $responsePropagators = [];
@@ -55,7 +53,7 @@ final class DistributionConfigurationSdk implements ComponentProvider
         );
     }
 
-    #[Override]
+    #[\Override]
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('opentelemetry_php/development');
@@ -90,7 +88,7 @@ final class DistributionConfigurationSdk implements ComponentProvider
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);
-                        if ($name !== '' && !in_array($name, $existing)) {
+                        if ($name !== '' && $name !== 'none' && !in_array($name, $existing)) {
                             $value['composite'][][$name] = null;
                             $existing[] = $name;
                         }

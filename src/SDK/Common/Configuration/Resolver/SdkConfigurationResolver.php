@@ -16,6 +16,7 @@ use OpenTelemetry\SDK\Common\Configuration\Configuration;
 /**
  * @internal
  */
+// TODO raise to ^1.0 once sdk-configuration 1.0 is tagged; LazyEnvSource and EnvSourceProvider need >=0.2
 #[PackageDependency('open-telemetry/sdk-configuration', '*')]
 class SdkConfigurationResolver implements ResolverInterface
 {

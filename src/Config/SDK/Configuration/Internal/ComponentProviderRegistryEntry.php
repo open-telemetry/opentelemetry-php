@@ -8,6 +8,9 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\NodeInterface;
 
+/**
+ * @internal
+ */
 final class ComponentProviderRegistryEntry
 {
     public function __construct(

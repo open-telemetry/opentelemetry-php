@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal\Node;
 
+/**
+ * @internal
+ */
 final class PrototypedArrayNode extends \Symfony\Component\Config\Definition\PrototypedArrayNode
 {
     use NodeTrait;

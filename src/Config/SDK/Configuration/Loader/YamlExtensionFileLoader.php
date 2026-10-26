@@ -16,6 +16,9 @@ use Symfony\Component\Config\FileLocatorInterface;
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
 
+/**
+ * @internal
+ */
 final class YamlExtensionFileLoader extends FileLoader
 {
     /**
@@ -56,7 +59,7 @@ final class YamlExtensionFileLoader extends FileLoader
      * Copying by value here keeps aliases as the independent values the format describes.
      *
      * An alias may also be recursive (`a: &x [*x]`), which ext-yaml resolves into a genuinely
-     * self-referential array — symfony/yaml rejects those outright. Such a document has no finite
+     * self-referential array. symfony/yaml rejects those outright. Such a document has no finite
      * by-value copy, so depth is bounded and anything past the limit is reported as invalid:
      * recursing freely would exhaust memory, and that fatal is not catchable by the callers that
      * otherwise degrade to a noop configuration. Identity cannot be used to spot the cycle

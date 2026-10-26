@@ -6,7 +6,10 @@ namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 
-class EnvResource implements ResourceInterface
+/**
+ * @internal
+ */
+final class EnvResource implements ResourceInterface
 {
     public function __construct(
         public readonly string $name,

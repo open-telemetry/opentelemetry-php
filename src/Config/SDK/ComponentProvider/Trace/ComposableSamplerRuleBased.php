@@ -20,6 +20,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
+ * @internal
  * @experimental
  * @implements ComponentProvider<ComposableSamplerInterface>
  */

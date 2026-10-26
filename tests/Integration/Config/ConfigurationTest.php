@@ -28,7 +28,10 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
+use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
+use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
@@ -61,7 +64,9 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -138,6 +143,36 @@ final class ConfigurationTest extends TestCase
         $registry = Instrumentation::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml')->create();
 
         $this->assertInstanceOf(HttpConfig::class, $registry->get(HttpConfig::class));
+    }
+
+    /**
+     * Isolated because SPI registration is global, and {@see Configuration} caches its factories.
+     */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function test_legacy_spi_key_logs_deprecation(): void
+    {
+        /** @phpstan-ignore-next-line */
+        ServiceLoader::register(Configuration\ComponentProvider::class, LegacySpiKeyProvider::class);
+
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())
+            ->method('write')
+            ->with(
+                LogLevel::WARNING,
+                $this->logicalAnd(
+                    $this->stringContains(LegacySpiKeyProvider::class),
+                    $this->stringContains(ComponentProvider::class),
+                ),
+                $this->anything(),
+            );
+        Logging::setLogWriter($logWriter);
+
+        try {
+            Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml');
+        } finally {
+            Logging::reset();
+        }
     }
 
     /**
@@ -1292,6 +1327,49 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(BaggagePropagator::class, $propagators[1]);
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
+     */
+    public function test_propagator_composite_list_none(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $propagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            propagator:
+              composite_list: none
+            YAML)])->create(new Context())->build()->getPropagator();
+
+        $this->assertInstanceOf(NoopTextMapPropagator::class, $propagator);
+    }
+
+    public function test_propagator_composite_list_none_beside_other_propagators_is_ignored(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $propagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            propagator:
+              composite_list: none,tracecontext
+            YAML)])->create(new Context())->build()->getPropagator();
+
+        $propagators = (new \ReflectionClass($propagator))->getProperty('propagators')->getValue($propagator);
+        $this->assertIsArray($propagators);
+        $this->assertCount(1, $propagators);
+        $this->assertInstanceOf(TraceContextPropagator::class, $propagators[0]);
+    }
+
+    public function test_composite_is_not_a_propagator(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            propagator:
+              composite:
+                - composite: [tracecontext]
+            YAML)]);
+    }
+
     public function test_propagators_env_substitution_falls_back_to_default(): void
     {
         $this->setEnvironmentVariable('OTEL_PROPAGATORS', null);
@@ -1347,6 +1425,35 @@ final class ConfigurationTest extends TestCase
         } finally {
             Logging::reset();
         }
+    }
+
+    public function test_distribution_response_propagator_composite_list_none(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            distribution:
+              opentelemetry_php/development:
+                response_propagator/development:
+                  composite_list: none
+            YAML)])->create(new Context())->build()->getResponsePropagator();
+
+        $this->assertInstanceOf(NoopResponsePropagator::class, $responsePropagator);
+    }
+
+    public function test_composite_is_not_a_response_propagator(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            distribution:
+              opentelemetry_php/development:
+                response_propagator/development:
+                  composite:
+                    - composite: [servertiming]
+            YAML)]);
     }
 
     public function test_distribution_response_propagator_takes_precedence_over_top_level(): void
@@ -2081,5 +2188,23 @@ final class ConfigurationTest extends TestCase
         $samplerProperty = $stateReflection->getProperty('sampler');
 
         return $samplerProperty->getValue($sharedState);
+    }
+}
+
+/**
+ * @implements ComponentProvider<TextMapPropagatorInterface>
+ */
+final class LegacySpiKeyProvider implements ComponentProvider
+{
+    #[Override]
+    public function createPlugin(array $properties, Context $context): TextMapPropagatorInterface
+    {
+        return NoopTextMapPropagator::getInstance();
+    }
+
+    #[Override]
+    public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
+    {
+        return $builder->arrayNode('legacy_spi_key');
     }
 }

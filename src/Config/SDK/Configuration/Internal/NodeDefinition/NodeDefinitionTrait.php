@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition;
 
+/**
+ * @internal
+ */
 trait NodeDefinitionTrait
 {
     public function cannotBeEmpty(): static

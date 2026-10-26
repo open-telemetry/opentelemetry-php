@@ -8,7 +8,6 @@ use OpenTelemetry\API\Trace\SpanContextInterface;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
-use Override;
 use Throwable;
 
 /**
@@ -22,67 +21,67 @@ final class NonRecordingSpan extends \OpenTelemetry\API\Trace\Span
     ) {
     }
 
-    #[Override]
+    #[\Override]
     public function storeInContext(ContextInterface $context): ContextInterface
     {
         return $this->spanSuppression->suppress(parent::storeInContext($context));
     }
 
-    #[Override]
+    #[\Override]
     public function getContext(): SpanContextInterface
     {
         return $this->spanContext;
     }
 
-    #[Override]
+    #[\Override]
     public function isRecording(): bool
     {
         return false;
     }
 
-    #[Override]
+    #[\Override]
     public function setAttribute(string $key, float|array|bool|int|string|null $value): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function setAttributes(iterable $attributes): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function addLink(SpanContextInterface $context, iterable $attributes = []): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function addEvent(string $name, iterable $attributes = [], ?int $timestamp = null): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function recordException(Throwable $exception, iterable $attributes = []): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function updateName(string $name): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function setStatus(string $code, ?string $description = null): SpanInterface
     {
         return $this;
     }
 
-    #[Override]
+    #[\Override]
     public function end(?int $endEpochNanos = null): void
     {
         // no-op

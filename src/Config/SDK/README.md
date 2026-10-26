@@ -23,12 +23,16 @@ When both are installed, `symfony/yaml` is used.
 
 ## Usage
 
-### Initialization from [configuration file](https://opentelemetry.io/docs/specs/otel/configuration/file-configuration/)
+### Create the SDK from a [configuration file](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#file-based-configuration-model)
 
 ```php
+use OpenTelemetry\Config\SDK\Configuration;
+
 $configuration = Configuration::parseFile(__DIR__ . '/otel-sdk-config.yaml');
 $sdkBuilder = $configuration->create();
 ```
+
+To add components of your own, see [component providers](Configuration/README.md).
 
 #### Supported file format
 
@@ -67,19 +71,23 @@ distribution:
     span_suppression_strategy/development:
       semconv:         # or `spankind:`; omit the block for no suppression
     response_propagator/development:
-      composite_list: servertiming,traceresponse
+      composite_list: my_response_propagator
 ```
 
 `response_propagator/development` takes `composite` and `composite_list`, like the schema's
-`propagator`. Response propagators aren't in the specification. The top-level
-`response_propagator/development` key is deprecated. It still works and logs a warning, and the
-`distribution` one wins when both are set.
+`propagator`. Response propagators aren't in the specification. None ship with a component
+provider, so each name needs one registered by another package. The contrib `servertiming` and
+`traceresponse` propagators register for `OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS` only, and can't
+be named here yet.
+
+The top-level `response_propagator/development` key is deprecated. It still works and logs a
+warning, and the `distribution` one wins when both are set.
 
 Any distribution may claim a key there, so one file can carry the settings of several. Keys this SDK
-has no provider for — another distribution's, or one whose package is not installed — are ignored
-and logged at warning level, rather than failing the parse. Note that this makes a typo in the key
-above silently fall back to the default instead of raising an error; the warning is where it shows
-up. It is emitted when the SDK is created, so a configured `log_level` applies to it.
+has no provider for are logged at warning level and ignored, rather than failing the parse. That
+covers another distribution's keys, and ours when the package providing them is not installed. A
+typo in a key above therefore falls back to the default, and the warning is the only sign of it.
+The warning is emitted when the SDK is created, so a configured `log_level` applies to it.
 
 #### Performance considerations
 
@@ -95,6 +103,21 @@ $sdkBuilder = $configuration->create();
 ```
 
 ## Deviations from the specification
+
+### Components that are not provided
+
+A file that names one of these fails to parse, unless another package registers a provider for it:
+
+- The `pull` metric reader, and with it `prometheus/development`.
+- The `always_record` and `jaeger_remote/development` samplers.
+- The `event_to_span_event_bridge/development` log record processor.
+
+The `container` resource detector is ignored with a warning, as are other unknown detectors.
+
+### Components outside the schema
+
+`memory/development` is a span, metric and log record exporter that keeps exported data in memory.
+It is meant for tests.
 
 ### Settings that parse but have no effect
 

@@ -7,6 +7,7 @@ namespace OpenTelemetry\Config\SDK\Configuration;
 use function class_exists;
 use Exception;
 use function is_file;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
@@ -24,7 +25,6 @@ use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ScalarNodeDef
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\StringNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\VariableNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NormalizationsAware;
-use OpenTelemetry\Config\SDK\Configuration\Internal\ResourceCollection;
 use OpenTelemetry\Config\SDK\Configuration\Internal\TrackingEnvReader;
 use function serialize;
 use function sprintf;
@@ -34,6 +34,7 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 use Symfony\Component\VarExporter\VarExporter;
 use Throwable;
+use function umask;
 use function var_export;
 
 /**
@@ -41,12 +42,13 @@ use function var_export;
  */
 final class ConfigurationFactory
 {
+    use LogsMessagesTrait;
+
     private readonly CompiledConfigurationFactory $compiledFactory;
 
     /**
      * @param iterable<ComponentProvider> $componentProviders
      * @param ComponentProvider<T> $rootComponent
-     * @param EnvReader $envReader
      */
     public function __construct(
         private readonly iterable $componentProviders,
@@ -74,45 +76,69 @@ final class ConfigurationFactory
      * @param bool $debug will check for cache freshness if debug mode enabled
      * @throws Exception if loading of a configuration file fails for any reason
      * @throws InvalidConfigurationException if the configuration is invalid
-     * @throws Throwable if a cache file is given and a non-serializable component provider is used
      * @return ComponentPlugin parsed component plugin
      *
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
-     * @psalm-suppress PossiblyNullReference
      */
     public function parseFile(
         string|array $file,
         ?string $cacheFile = null,
         bool $debug = true,
     ): ComponentPlugin {
-        $cache = null;
-        $resources = null;
-        if ($cacheFile !== null) {
-            $cache = new ResourceCheckerConfigCache($cacheFile, [
-                new SelfCheckingResourceChecker(),
-                new EnvResourceChecker($this->envReader),
-            ]);
-            if (is_file($cache->getPath())
-                && ($configuration = @include $cache->getPath()) instanceof ComponentPlugin
-                && (!$debug || $cache->isFresh())) {
-                return $configuration;
-            }
-            $resources = new ResourceCollection();
-            $resources->addClassResource(ComponentPlugin::class);
-            $resources->addClassResource(VarExporter::class);
+        if ($cacheFile === null) {
+            return $this->compiledFactory->process(ConfigurationFileLoader::load($file));
         }
+
+        $cache = new ResourceCheckerConfigCache($cacheFile, [
+            new SelfCheckingResourceChecker(),
+            new EnvResourceChecker($this->envReader),
+        ]);
+        if (($configuration = self::includeCache($cache->getPath())) instanceof ComponentPlugin
+            && (!$debug || $cache->isFresh())) {
+            return $configuration;
+        }
+        $resources = new Internal\ResourceCollection();
+        $resources->addClassResource(ComponentPlugin::class);
+        $resources->addClassResource(VarExporter::class);
 
         $configuration = $this->compiledFactory
             ->process(ConfigurationFileLoader::load($file, $resources), $resources);
-
-        $cache?->write(
-            class_exists(VarExporter::class)
-                ? sprintf('<?php return %s;', VarExporter::export($configuration))
-                : sprintf('<?php return unserialize(%s);', var_export(serialize($configuration), true)),
-            $resources->toArray()
-        );
+        self::writeCache($cache, $configuration, $resources);
 
         return $configuration;
+    }
+
+    private static function includeCache(string $path): mixed
+    {
+        if (!is_file($path)) {
+            return null;
+        }
+
+        try {
+            return @include $path;
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    private static function writeCache(ResourceCheckerConfigCache $cache, ComponentPlugin $configuration, Internal\ResourceCollection $resources): void
+    {
+        // The cache holds substituted values, which may be secrets. umask is process-wide, so this
+        // can race with file creation in other threads of a ZTS build.
+        $umask = umask(0o077);
+
+        try {
+            $cache->write(
+                class_exists(VarExporter::class)
+                    ? sprintf('<?php return %s;', VarExporter::export($configuration))
+                    : sprintf('<?php return unserialize(%s);', var_export(serialize($configuration), true)),
+                $resources->toArray()
+            );
+        } catch (Throwable $e) {
+            self::logWarning(sprintf('Failed to write configuration cache "%s"', $cache->getPath()), ['exception' => $e]);
+        } finally {
+            umask($umask);
+        }
     }
 
     private function compileFactory(): CompiledConfigurationFactory
