@@ -12,6 +12,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
+use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopCounter;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
@@ -35,7 +36,9 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
@@ -45,9 +48,12 @@ use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
+use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
@@ -634,8 +640,8 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('emptyDistributionProvider')]
     public function test_empty_distribution_falls_back_to_the_default_strategy(string $distribution): void
     {
-        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
-        $sdk = $factory->process([Yaml::parse(sprintf("file_format: \"1.0\"\n%s", $distribution))]);
+        $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(sprintf("file_format: \"1.0\"\ntracer_provider:\n  processors:\n  - simple:\n      exporter:\n        console:\n%s", $distribution))]);
         $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
 
         $strategy = (new \ReflectionClass($tracerProvider))
@@ -667,9 +673,14 @@ final class ConfigurationTest extends TestCase
         Logging::setLogWriter($logWriter);
 
         try {
-            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
             $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - simple:
+                      exporter:
+                        console:
                 distribution:
                   some_vendor:
                     profiler:
@@ -707,6 +718,11 @@ final class ConfigurationTest extends TestCase
             $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
             $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - simple:
+                      exporter:
+                        console:
                 resource:
                   detection/development:
                     detectors:
@@ -1194,6 +1210,13 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('internalMetricsDataProvider')]
     public function test_self_observability_is_opt_in(string $yaml, bool $expected): void
     {
+        $yaml .= "\n" . /** @lang yaml */ <<<'YAML'
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            YAML;
         $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
         $tracerProvider = $factory->process([Yaml::parse($yaml)])->create(new Context())->build()->getTracerProvider();
 
@@ -1305,11 +1328,27 @@ final class ConfigurationTest extends TestCase
 
     public static function internalMetricsDataProvider(): iterable
     {
-        yield 'omitted' => ['file_format: "1.0"', false];
+        yield 'omitted' => [
+            /** @lang yaml */
+            <<<'YAML'
+                file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                YAML,
+            false,
+        ];
         yield 'disabled' => [
             /** @lang yaml */
             <<<'YAML'
                 file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
                 distribution:
                   opentelemetry_php/development:
                     internal_metrics_enabled: false
@@ -1320,6 +1359,11 @@ final class ConfigurationTest extends TestCase
             /** @lang yaml */
             <<<'YAML'
                 file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
                 distribution:
                   opentelemetry_php/development:
                     internal_metrics_enabled: true
@@ -1344,6 +1388,11 @@ final class ConfigurationTest extends TestCase
             );
             $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - simple:
+                      exporter:
+                        console:
                 distribution:
                   some_vendor:
                     profiler:
@@ -1596,8 +1645,8 @@ final class ConfigurationTest extends TestCase
         Logging::setLogWriter($logWriter);
 
         try {
-            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
-            $sdk = $factory->process([Yaml::parse('file_format: "1.999"')]);
+            $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse("file_format: \"1.999\"\ntracer_provider:\n  processors:\n  - simple:\n      exporter:\n        console:")]);
 
             $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
 
@@ -1610,13 +1659,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_attributes_take_precedence_over_default_attributes(): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -1629,13 +1683,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_detectors_take_precedence_over_default_attributes(): void
     {
         $factory = new ConfigurationFactory(
-            [new ServiceName('test-service')],
+            [new ServiceName('test-service'), new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               detection/development:
                 detectors:
@@ -1649,13 +1708,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_keeps_numeric_attribute_names(): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
               - { name: '123', value: from_attributes }
@@ -1674,13 +1738,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_attributes_take_precedence_over_resource_detectors(): void
     {
         $factory = new ConfigurationFactory(
-            [new ServiceName('should-be-overridden')],
+            [new ServiceName('should-be-overridden'), new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -1700,13 +1769,18 @@ final class ConfigurationTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-env');
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               detection/development:
                 attributes:
@@ -1723,13 +1797,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_falls_back_to_unknown_service_when_service_name_is_excluded(): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               detection/development:
                 attributes:
@@ -1746,13 +1825,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_keeps_configured_schema_url(): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               schema_url: https://opentelemetry.io/schemas/1.16.0
             YAML)]);
@@ -1768,7 +1852,7 @@ final class ConfigurationTest extends TestCase
     public function test_resource_attribute_type_is_applied_after_substitution(string $type, string $value, mixed $expected): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([new ArrayEnvSource([
                 'STRING_VALUE' => 'value',
@@ -1781,6 +1865,11 @@ final class ConfigurationTest extends TestCase
 
         $sdk = $factory->process([Yaml::parse(sprintf(<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
                 - name: key
@@ -2429,6 +2518,29 @@ final class ConfigurationTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $factory->process([Yaml::parse('file_format: "1.0"')])->create(new Context());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/opentelemetry_configuration.yaml
+     */
+    #[DataProvider('configuredProviderProvider')]
+    public function test_omitted_providers_are_noop(string $yaml, ?string $configured): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context())->build();
+
+        $this->assertInstanceOf($configured === 'tracer_provider' ? TracerProvider::class : NoopTracerProvider::class, $sdk->getTracerProvider());
+        $this->assertInstanceOf($configured === 'meter_provider' ? MeterProvider::class : NoopMeterProvider::class, $sdk->getMeterProvider());
+        $this->assertInstanceOf($configured === 'logger_provider' ? LoggerProvider::class : NoopLoggerProvider::class, $sdk->getLoggerProvider());
+        $this->assertInstanceOf($configured === 'logger_provider' ? EventLoggerProvider::class : NoopEventLoggerProvider::class, $sdk->getEventLoggerProvider());
+    }
+
+    public static function configuredProviderProvider(): iterable
+    {
+        yield 'none' => ['', null];
+        yield 'tracer_provider' => ["tracer_provider:\n  processors:\n  - simple:\n      exporter:\n        console:", 'tracer_provider'];
+        yield 'meter_provider' => ["meter_provider:\n  readers:\n  - periodic:\n      exporter:\n        console:", 'meter_provider'];
+        yield 'logger_provider' => ["logger_provider:\n  processors:\n  - simple:\n      exporter:\n        console:", 'logger_provider'];
     }
 
     /**

@@ -4,3 +4,9 @@ distribution:
   opentelemetry_php/development:
     span_suppression_strategy/development:
       semconv:
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:

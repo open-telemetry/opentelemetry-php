@@ -6,3 +6,9 @@ resource:
       value: ${CONFIG_SOURCE_TEST_ONLY}
     - name: from_getenv
       value: ${OTEL_PHP_TEST_GETENV_ONLY}
+
+tracer_provider:
+  processors:
+    - simple:
+        exporter:
+          console:

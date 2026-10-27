@@ -133,7 +133,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         composite_list: ?string,
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
-     *     tracer_provider: array{
+     *     tracer_provider?: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
      *             attribute_count_limit: ?int<0, max>,
@@ -156,7 +156,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *              }>
      *           }
      *     },
-     *     meter_provider: array{
+     *     meter_provider?: array{
      *         views: list<array{
      *             stream: array{
      *                 name: ?string,
@@ -191,7 +191,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             }>
      *          },
      *     },
-     *     logger_provider: array{
+     *     logger_provider?: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
      *             attribute_count_limit: ?int<0, max>,
@@ -303,178 +303,184 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $context = $context->withExtension($resource, ResourceInfo::class);
 
-        // <editor-fold desc="meter_provider">
+        $meterProvider = null;
+        if (isset($properties['meter_provider'])) {
+            // <editor-fold desc="meter_provider">
 
-        $metricReaders = [];
-        foreach ($properties['meter_provider']['readers'] as $reader) {
-            $metricReaders[] = $reader->create($context);
-        }
-
-        $viewRegistry = new CriteriaViewRegistry();
-        foreach ($properties['meter_provider']['views'] as $view) {
-            $criteria = [];
-            if (isset($view['selector']['instrument_type'])) {
-                $criteria[] = new InstrumentTypeCriteria(match ($view['selector']['instrument_type']) {
-                    'counter' => InstrumentType::COUNTER,
-                    'gauge' => InstrumentType::GAUGE,
-                    'histogram' => InstrumentType::HISTOGRAM,
-                    'observable_counter' => InstrumentType::ASYNCHRONOUS_COUNTER,
-                    'observable_gauge' => InstrumentType::ASYNCHRONOUS_GAUGE,
-                    'observable_up_down_counter' => InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
-                    'up_down_counter' => InstrumentType::UP_DOWN_COUNTER,
-                });
-            }
-            if (isset($view['selector']['instrument_name'])) {
-                $criteria[] = new InstrumentNameCriteria($view['selector']['instrument_name']);
-            }
-            if (isset($view['selector']['unit'])) {
-                $criteria[] = new InstrumentUnitCriteria($view['selector']['unit']);
-            }
-            if (isset($view['selector']['meter_name'])) {
-                $criteria[] = new InstrumentationScopeNameCriteria($view['selector']['meter_name']);
-            }
-            if (isset($view['selector']['meter_version'])) {
-                $criteria[] = new InstrumentationScopeVersionCriteria($view['selector']['meter_version']);
-            }
-            if (isset($view['selector']['meter_schema_url'])) {
-                $criteria[] = new InstrumentationScopeSchemaUrlCriteria($view['selector']['meter_schema_url']);
+            $metricReaders = [];
+            foreach ($properties['meter_provider']['readers'] as $reader) {
+                $metricReaders[] = $reader->create($context);
             }
 
-            $viewTemplate = ViewTemplate::create();
-            if (isset($view['stream']['name'])) {
-                $viewTemplate = $viewTemplate->withName($view['stream']['name']);
-            }
-            if (isset($view['stream']['description'])) {
-                $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
-            }
-            $included = ($view['stream']['attribute_keys']['included'] ?? []) ?: null;
-            $excluded = ($view['stream']['attribute_keys']['excluded'] ?? []) ?: null;
-            if ($included !== null || $excluded !== null) {
-                $viewTemplate = $viewTemplate->withAttributeKeyFilter($included, $excluded);
-            }
-            if (isset($view['stream']['aggregation'])) {
-                $viewTemplate = $viewTemplate->withAggregationResolver($view['stream']['aggregation']->create($context));
-            }
-            // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
+            $viewRegistry = new CriteriaViewRegistry();
+            foreach ($properties['meter_provider']['views'] as $view) {
+                $criteria = [];
+                if (isset($view['selector']['instrument_type'])) {
+                    $criteria[] = new InstrumentTypeCriteria(match ($view['selector']['instrument_type']) {
+                        'counter' => InstrumentType::COUNTER,
+                        'gauge' => InstrumentType::GAUGE,
+                        'histogram' => InstrumentType::HISTOGRAM,
+                        'observable_counter' => InstrumentType::ASYNCHRONOUS_COUNTER,
+                        'observable_gauge' => InstrumentType::ASYNCHRONOUS_GAUGE,
+                        'observable_up_down_counter' => InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
+                        'up_down_counter' => InstrumentType::UP_DOWN_COUNTER,
+                    });
+                }
+                if (isset($view['selector']['instrument_name'])) {
+                    $criteria[] = new InstrumentNameCriteria($view['selector']['instrument_name']);
+                }
+                if (isset($view['selector']['unit'])) {
+                    $criteria[] = new InstrumentUnitCriteria($view['selector']['unit']);
+                }
+                if (isset($view['selector']['meter_name'])) {
+                    $criteria[] = new InstrumentationScopeNameCriteria($view['selector']['meter_name']);
+                }
+                if (isset($view['selector']['meter_version'])) {
+                    $criteria[] = new InstrumentationScopeVersionCriteria($view['selector']['meter_version']);
+                }
+                if (isset($view['selector']['meter_schema_url'])) {
+                    $criteria[] = new InstrumentationScopeSchemaUrlCriteria($view['selector']['meter_schema_url']);
+                }
 
-            $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
-        }
+                $viewTemplate = ViewTemplate::create();
+                if (isset($view['stream']['name'])) {
+                    $viewTemplate = $viewTemplate->withName($view['stream']['name']);
+                }
+                if (isset($view['stream']['description'])) {
+                    $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
+                }
+                $included = ($view['stream']['attribute_keys']['included'] ?? []) ?: null;
+                $excluded = ($view['stream']['attribute_keys']['excluded'] ?? []) ?: null;
+                if ($included !== null || $excluded !== null) {
+                    $viewTemplate = $viewTemplate->withAttributeKeyFilter($included, $excluded);
+                }
+                if (isset($view['stream']['aggregation'])) {
+                    $viewTemplate = $viewTemplate->withAggregationResolver($view['stream']['aggregation']->create($context));
+                }
+                // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
 
-        $disabled = !$properties['meter_provider']['meter_configurator/development']['default_config']['enabled'];
-        $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
-        foreach ($properties['meter_provider']['meter_configurator/development']['meters'] as $meter) {
-            $disabled = !$meter['config']['enabled'];
-            $configurator = $configurator->with(
-                static fn (MeterConfig $config) => $config->setDisabled($disabled),
-                name: $meter['name'],
+                $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
+            }
+
+            $disabled = !$properties['meter_provider']['meter_configurator/development']['default_config']['enabled'];
+            $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
+            foreach ($properties['meter_provider']['meter_configurator/development']['meters'] as $meter) {
+                $disabled = !$meter['config']['enabled'];
+                $configurator = $configurator->with(
+                    static fn (MeterConfig $config) => $config->setDisabled($disabled),
+                    name: $meter['name'],
+                );
+            }
+
+            /** @psalm-suppress InvalidArgument TODO update metric reader interface */
+            $meterProvider = new MeterProvider(
+                contextStorage: null,
+                resource: $resource,
+                clock: Clock::getDefault(),
+                attributesFactory: Attributes::factory(),
+                instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
+                metricReaders: $metricReaders, // @phpstan-ignore-line
+                viewRegistry: $viewRegistry,
+                // TODO apply meter_provider.exemplar_filter, see SDK/Metrics/Exemplar/ExemplarFilter
+                exemplarFilter: null,
+                stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
+                configurator: $configurator,
             );
+
+            // </editor-fold>
+            $sdkBuilder->setMeterProvider($meterProvider);
         }
-
-        /** @psalm-suppress InvalidArgument TODO update metric reader interface */
-        $meterProvider = new MeterProvider(
-            contextStorage: null,
-            resource: $resource,
-            clock: Clock::getDefault(),
-            attributesFactory: Attributes::factory(),
-            instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            metricReaders: $metricReaders, // @phpstan-ignore-line
-            viewRegistry: $viewRegistry,
-            // TODO apply meter_provider.exemplar_filter, see SDK/Metrics/Exemplar/ExemplarFilter
-            exemplarFilter: null,
-            stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
-            configurator: $configurator,
-        );
-
-        // </editor-fold>
 
         // Self-observability is opt-in, as it is for environment-based configuration. Passing the
         // meter provider to the tracer/logger providers and to components is what turns it on.
         $selfObservabilityMeterProvider = $distributionConfiguration->internalMetricsEnabled ? $meterProvider : null;
         $context = $context->withMeterProvider($selfObservabilityMeterProvider ?? new NoopMeterProvider());
 
-        $spanProcessors = [];
-        foreach ($properties['tracer_provider']['processors'] as $processor) {
-            $spanProcessors[] = $processor->create($context);
-        }
+        if (isset($properties['tracer_provider'])) {
+            $spanProcessors = [];
+            foreach ($properties['tracer_provider']['processors'] as $processor) {
+                $spanProcessors[] = $processor->create($context);
+            }
 
-        $disabled = !$properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'];
-        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
+            $disabled = !$properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'];
+            $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
-        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] as $tracer) {
-            $disabled = !$tracer['config']['enabled'];
-            $configurator = $configurator->with(
-                static fn (TracerConfig $config) => $config->setDisabled($disabled),
-                name: $tracer['name'],
+            foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] as $tracer) {
+                $disabled = !$tracer['config']['enabled'];
+                $configurator = $configurator->with(
+                    static fn (TracerConfig $config) => $config->setDisabled($disabled),
+                    name: $tracer['name'],
+                );
+            }
+
+            // <editor-fold desc="tracer_provider">
+
+            $tracerProvider = new TracerProvider(
+                spanProcessors: $spanProcessors,
+                sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
+                resource: $resource,
+                spanLimits: new SpanLimits(
+                    attributesFactory: Attributes::factory(
+                        attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
+                            ?? $properties['attribute_limits']['attribute_count_limit'],
+                        attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                            ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                    ),
+                    eventAttributesFactory: Attributes::factory(
+                        attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit'],
+                        attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                            ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                    ),
+                    linkAttributesFactory: Attributes::factory(
+                        attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit'],
+                        attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                            ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                    ),
+                    eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
+                    linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
+                ),
+                configurator: $configurator,
+                spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
+                meterProvider: $selfObservabilityMeterProvider,
             );
+
+            // </editor-fold>
+            $sdkBuilder->setTracerProvider($tracerProvider);
         }
 
-        // <editor-fold desc="tracer_provider">
+        if (isset($properties['logger_provider'])) {
+            // <editor-fold desc="logger_provider">
 
-        $tracerProvider = new TracerProvider(
-            spanProcessors: $spanProcessors,
-            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
-            resource: $resource,
-            spanLimits: new SpanLimits(
-                attributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                linkAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
-                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
-            ),
-            configurator: $configurator,
-            spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
-            meterProvider: $selfObservabilityMeterProvider,
-        );
+            $logRecordProcessors = [];
+            foreach ($properties['logger_provider']['processors'] as $processor) {
+                $logRecordProcessors[] = $processor->create($context);
+            }
 
-        // </editor-fold>
+            $disabled = !$properties['logger_provider']['logger_configurator/development']['default_config']['enabled'];
+            $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
+            foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] as $logger) {
+                $disabled = !$logger['config']['enabled'];
+                $configurator = $configurator->with(
+                    static fn (LoggerConfig $config) => $config->setDisabled($disabled),
+                    name: $logger['name'],
+                );
+            }
 
-        // <editor-fold desc="logger_provider">
-
-        $logRecordProcessors = [];
-        foreach ($properties['logger_provider']['processors'] as $processor) {
-            $logRecordProcessors[] = $processor->create($context);
-        }
-
-        $disabled = !$properties['logger_provider']['logger_configurator/development']['default_config']['enabled'];
-        $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
-        foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] as $logger) {
-            $disabled = !$logger['config']['enabled'];
-            $configurator = $configurator->with(
-                static fn (LoggerConfig $config) => $config->setDisabled($disabled),
-                name: $logger['name'],
+            // TODO apply logger_provider.limits; needs LoggerProvider to accept a LogRecordLimits,
+            // which currently hardcodes LogRecordLimitsBuilder (env vars only)
+            $loggerProvider = new LoggerProvider(
+                processor: new MultiLogRecordProcessor($logRecordProcessors),
+                instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
+                resource: $resource,
+                configurator: $configurator,
+                meterProvider: $selfObservabilityMeterProvider,
             );
+            $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
+
+            // </editor-fold>
+            $sdkBuilder->setLoggerProvider($loggerProvider);
+            $sdkBuilder->setEventLoggerProvider($eventLoggerProvider);
         }
-
-        // TODO apply logger_provider.limits; needs LoggerProvider to accept a LogRecordLimits,
-        // which currently hardcodes LogRecordLimitsBuilder (env vars only)
-        $loggerProvider = new LoggerProvider(
-            processor: new MultiLogRecordProcessor($logRecordProcessors),
-            instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            resource: $resource,
-            configurator: $configurator,
-            meterProvider: $selfObservabilityMeterProvider,
-        );
-        $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
-
-        // </editor-fold>
-
-        $sdkBuilder->setTracerProvider($tracerProvider);
-        $sdkBuilder->setMeterProvider($meterProvider);
-        $sdkBuilder->setLoggerProvider($loggerProvider);
-        $sdkBuilder->setEventLoggerProvider($eventLoggerProvider);
 
         return $sdkBuilder;
     }
@@ -629,7 +635,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('tracer_provider');
         $node
-            ->addDefaultsIfNotSet()
             ->validate()
                 ->ifTrue(static fn (?array $v): bool => ($v['processors'] ?? []) === [])
                 ->thenInvalid('A tracer provider needs at least one processor. Omit tracer_provider for a noop.')
@@ -684,7 +689,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('meter_provider');
         $node
-            ->addDefaultsIfNotSet()
             ->validate()
                 ->ifTrue(static fn (?array $v): bool => ($v['readers'] ?? []) === [])
                 ->thenInvalid('A meter provider needs at least one reader. Omit meter_provider for a noop.')
@@ -787,7 +791,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('logger_provider');
         $node
-            ->addDefaultsIfNotSet()
             ->validate()
                 ->ifTrue(static fn (?array $v): bool => ($v['processors'] ?? []) === [])
                 ->thenInvalid('A logger provider needs at least one processor. Omit logger_provider for a noop.')
