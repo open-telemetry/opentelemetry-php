@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
@@ -70,8 +69,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class OpenTelemetrySdk implements ComponentProvider
 {
-    use LogsMessagesTrait;
-
     /**
      * The schema version this SDK targets. `MINOR` versions are additive, so a file declaring a
      * newer one is accepted with a warning; a different `MAJOR` is an error.
@@ -229,6 +226,17 @@ final class OpenTelemetrySdk implements ComponentProvider
         // Applies the configured level to messages emitted while creating components, which all
         // happens before `buildAndRegisterGlobal()` sets the global minimum.
         $context = $context->withLogger(new ConfiguredLogger($logLevel));
+
+        // Warned here rather than during validation, so that it honors `log_level` and is not
+        // lost when the processed configuration is read back from the cache.
+        if ((int) explode('.', $properties['file_format'])[1] > self::FILE_FORMAT_MINOR) {
+            $context->logger->log(LogLevel::WARNING, sprintf(
+                'file_format "%s" is newer than the %d.%d implemented by this SDK; configuration it introduces may be ignored',
+                $properties['file_format'],
+                self::FILE_FORMAT_MAJOR,
+                self::FILE_FORMAT_MINOR,
+            ));
+        }
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
@@ -554,20 +562,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ));
             }
 
-            [, $major, $minor] = $matches;
-            if ((int) $major !== self::FILE_FORMAT_MAJOR) {
+            if ((int) $matches[1] !== self::FILE_FORMAT_MAJOR) {
                 throw new \InvalidArgumentException(sprintf(
                     'unsupported version "%s", this SDK implements file_format %d.x',
                     $value,
                     self::FILE_FORMAT_MAJOR,
-                ));
-            }
-            if ((int) $minor > self::FILE_FORMAT_MINOR) {
-                self::logWarning(sprintf(
-                    'file_format "%s" is newer than the %d.%d implemented by this SDK; configuration it introduces may be ignored',
-                    $value,
-                    self::FILE_FORMAT_MAJOR,
-                    self::FILE_FORMAT_MINOR,
                 ));
             }
 

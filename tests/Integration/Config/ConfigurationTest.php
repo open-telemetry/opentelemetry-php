@@ -1775,6 +1775,38 @@ final class ConfigurationTest extends TestCase
         }
     }
 
+    public function test_newer_minor_file_format_warning_respects_log_level(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+
+        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $factory->process([Yaml::parse("file_format: \"1.999\"\nlog_level: error")])->create(new Context());
+    }
+
+    public function test_newer_minor_file_format_warns_on_cache_hit(): void
+    {
+        $file = __DIR__ . '/configurations/newer-minor-file-format.yaml';
+        $cacheFile = sys_get_temp_dir() . '/' . uniqid('otel-config-', true) . '.cache';
+        Logging::disable();
+
+        try {
+            Configuration::parseFile($file, $cacheFile)->create();
+            $this->assertFileExists($cacheFile);
+
+            $logWriter = $this->createMock(LogWriterInterface::class);
+            $logWriter->expects($this->once())
+                ->method('write')
+                ->with(LogLevel::WARNING, $this->stringContains('file_format "1.999" is newer'), $this->anything());
+            Logging::setLogWriter($logWriter);
+
+            Configuration::parseFile($file, $cacheFile)->create();
+        } finally {
+            array_map(unlink(...), array_filter([$cacheFile, $cacheFile . '.meta', $cacheFile . '.meta.json'], is_file(...)));
+        }
+    }
+
     public function test_resource_attributes_take_precedence_over_default_attributes(): void
     {
         $factory = new ConfigurationFactory(
