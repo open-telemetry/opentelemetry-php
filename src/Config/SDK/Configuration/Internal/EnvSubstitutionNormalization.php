@@ -22,6 +22,7 @@ use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
 use Symfony\Component\Config\Definition\ScalarNode;
+use function trim;
 
 /**
  * @internal
@@ -83,7 +84,7 @@ final class EnvSubstitutionNormalization implements Normalization
         if ($value === $replaced) {
             return $value;
         }
-        if ($replaced === '') {
+        if (trim($replaced, " \t\r\n") === '') {
             return null;
         }
 

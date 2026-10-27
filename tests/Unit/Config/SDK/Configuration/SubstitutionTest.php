@@ -102,6 +102,40 @@ final class SubstitutionTest extends TestCase
         yield ['${env:-test}', 'test'];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#environment-variable-substitution
+     */
+    #[DataProvider('verbatimValueDataProvider')]
+    public function test_value_is_substituted_verbatim(string $value, ?string $expected): void
+    {
+        $envReader = new EnvSourceReader([new ArrayEnvSource([
+            'EMPTY' => '',
+            'BLANK' => '  ',
+            'TAB' => "\t",
+            'PADDED' => ' value ',
+        ])]);
+
+        $result = (new Processor())->process(self::node($envReader), [[
+            'key' => $value,
+        ]]);
+
+        $this->assertSame($expected, $result['key'] ?? null);
+    }
+
+    /**
+     * A blank result resolves to null, as `key:   ` would after substitution.
+     */
+    public static function verbatimValueDataProvider(): iterable
+    {
+        yield 'empty uses default' => ['${EMPTY:-fallback}', 'fallback'];
+        yield 'blank' => ['${BLANK}', null];
+        yield 'blank does not use default' => ['${BLANK:-fallback}', null];
+        yield 'tab' => ['${TAB}', null];
+        yield 'blank in text' => ['a${BLANK}b', 'a  b'];
+        yield 'padded' => ['${PADDED}', ' value '];
+        yield 'padded in text' => ['a${PADDED}b', 'a value b'];
+    }
+
     public static function invalidSubstitutionDataProvider(): iterable
     {
         yield ['${STRING_VALUE:?error}'];
