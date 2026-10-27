@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Internal\Node;
 
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\PrototypedArrayNode;
+
 /**
  * @internal
  */
@@ -42,8 +45,25 @@ trait NodeTrait
         return parent::mergeValues($leftSide, $rightSide);
     }
 
+    /**
+     * A required property or a list item must have a value, unless its schema type includes "null".
+     */
+    protected function acceptsNull(): bool
+    {
+        return !$this->required && !$this->parent instanceof PrototypedArrayNode;
+    }
+
     protected function validateType(mixed $value): void
     {
+        if ($value === null && !$this->acceptsNull()) {
+            $ex = new InvalidTypeException(\sprintf('The path "%s" cannot be null.', $this->getPath()));
+            if ($hint = $this->getInfo()) {
+                $ex->addHint($hint);
+            }
+            $ex->setPath($this->getPath());
+
+            throw $ex;
+        }
         if ($value === null && $this->allowEmptyValue) {
             return;
         }

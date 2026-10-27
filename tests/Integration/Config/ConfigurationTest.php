@@ -1578,6 +1578,7 @@ final class ConfigurationTest extends TestCase
         // an unquoted 1.0 is a YAML float, and would stringify to "1"; it must be rejected
         // outright rather than coerced into something that looks like a version
         yield 'unquoted, parsed as a float' => ['1.0', '/must be of type string/'];
+        yield 'null' => ['~', '/cannot be null/'];
     }
 
     /**
@@ -1939,6 +1940,9 @@ final class ConfigurationTest extends TestCase
         yield 'attribute_limits' => ['attribute_limits:'];
         yield 'propagator' => ['propagator:'];
         yield 'propagator.composite' => ["propagator:\n  composite:"];
+        yield 'tracer_provider.sampler' => [$tracerProvider . '  sampler:'];
+        yield 'view stream.aggregation' => ["meter_provider:\n  readers:\n  - periodic:\n      exporter:\n        console:\n  views:\n  - selector:\n      instrument_name: i\n    stream:\n      aggregation:"];
+        yield 'span_suppression_strategy' => ["distribution:\n  opentelemetry_php/development:\n    span_suppression_strategy/development:"];
         foreach (self::minItemsLists() as $name => [$yaml]) {
             yield $name => [sprintf($yaml, '~')];
         }
@@ -2031,6 +2035,145 @@ final class ConfigurationTest extends TestCase
         yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: ''\n      config: {}"];
         yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: ''\n      config: {}"];
         yield 'view instrument_name' => ["meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: ''\n    stream:\n      name: n"];
+    }
+
+    /**
+     * Only where the schema's type includes "null" may a required property or a list item be null.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    #[DataProvider('nullValueProvider')]
+    public function test_null_is_rejected_where_schema_requires_a_value(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path "[^"]*%s[^"]*" cannot be null/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context());
+    }
+
+    public static function nullValueProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $composite = "tracer_provider:\n$processors  sampler:\n    composite/development:\n";
+        $rule = "$composite      rule_based:\n        rules:\n        - sampler:\n            always_on:\n";
+
+        foreach (['tracer_provider', 'logger_provider'] as $provider) {
+            foreach (['simple', 'batch'] as $processor) {
+                yield "$provider $processor exporter" => ["$provider:\n  processors:\n  - $processor:\n      exporter:", "$processor.exporter"];
+            }
+            yield "$provider processors item" => ["$provider:\n  processors: [~]", "$provider.processors"];
+        }
+        yield 'periodic exporter' => ["meter_provider:\n  readers:\n  - periodic:\n      exporter:", 'periodic.exporter'];
+        yield 'readers item' => ["meter_provider:\n  readers: [~]", 'meter_provider.readers'];
+
+        yield 'parent_threshold root' => ["$composite      parent_threshold:\n        root:", 'parent_threshold.root'];
+        yield 'rule sampler' => ["$composite      rule_based:\n        rules:\n        - sampler:", '.sampler'];
+        yield 'rules item' => ["$composite      rule_based:\n        rules: [~]", 'rule_based.rules'];
+        yield 'rule attribute_values key' => ["$rule          attribute_values:\n            key: ~\n            values: [v]", 'attribute_values.key'];
+        yield 'rule attribute_values values' => ["$rule          attribute_values:\n            key: k\n            values: ~", 'attribute_values.values'];
+        yield 'rule attribute_values values item' => ["$rule          attribute_values:\n            key: k\n            values: [~]", 'attribute_values.values'];
+        yield 'rule attribute_patterns key' => ["$rule          attribute_patterns:\n            key: ~\n            included: [v]", 'attribute_patterns.key'];
+        yield 'rule attribute_patterns included item' => ["$rule          attribute_patterns:\n            key: k\n            included: [~]", 'attribute_patterns.included'];
+        yield 'rule attribute_patterns excluded item' => ["$rule          attribute_patterns:\n            key: k\n            excluded: [~]", 'attribute_patterns.excluded'];
+
+        yield 'resource attribute name' => ["resource:\n  attributes:\n  - name: ~\n    value: v", 'resource.attributes..name'];
+        yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: ~\n      config: {}", 'tracers..name'];
+        yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: ~\n      config: {}", 'meters..name'];
+        yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: ~\n      config: {}", 'loggers..name'];
+        yield 'response propagator composite item' => ["distribution:\n  opentelemetry_php/development:\n    response_propagator/development:\n      composite: [~]", 'response_propagator/development.composite'];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter header name" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:\n          - name: ~\n            value: v",
+                    "$exporter.headers..name",
+                ];
+            }
+        }
+
+        foreach (self::minItemsLists() as $name => [$yaml, $path]) {
+            yield "$name item" => [sprintf($yaml, '[~]'), $path];
+        }
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    #[DataProvider('wrongTypeProvider')]
+    public function test_wrong_type_is_rejected(string $yaml, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context());
+    }
+
+    public static function wrongTypeProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $rule = "tracer_provider:\n$processors  sampler:\n    composite/development:\n      rule_based:\n        rules:\n        - sampler:\n            always_on:\n";
+        $notString = static fn (string $path): string => sprintf('/path "[^"]*%s": must be of type string/', preg_quote($path, '/'));
+        $notArray = static fn (string $path): string => sprintf('/path "[^"]*%s"\. Expected "array", but got "int"/', preg_quote($path, '/'));
+
+        yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: 123\n      config: {}", $notString('tracers..name')];
+        yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: 123\n      config: {}", $notString('meters..name')];
+        yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: 123\n      config: {}", $notString('loggers..name')];
+        yield 'resource attribute name' => ["resource:\n  attributes:\n  - name: 123\n    value: v", $notString('resource.attributes..name')];
+        yield 'rule attribute_values key' => ["$rule          attribute_values:\n            key: 123\n            values: [v]", $notString('attribute_values.key')];
+        yield 'rule attribute_patterns key' => ["$rule          attribute_patterns:\n            key: 123\n            included: [v]", $notString('attribute_patterns.key')];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter header name" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:\n          - name: 123\n            value: v",
+                    $notString("$exporter.headers..name"),
+                ];
+            }
+        }
+
+        $responsePropagator = "distribution:\n  opentelemetry_php/development:\n    response_propagator/development:\n";
+        yield 'propagator composite_list int' => ["propagator:\n  composite_list: 123", $notString('propagator.composite_list')];
+        yield 'propagator composite_list bool' => ["propagator:\n  composite_list: true", $notString('propagator.composite_list')];
+        yield 'propagator composite_list list' => ["propagator:\n  composite_list: [tracecontext]", '/path "[^"]*propagator\.composite_list"\. Expected "scalar", but got "array"/'];
+        yield 'response propagator composite_list' => ["{$responsePropagator}      composite_list: 1", $notString('response_propagator/development.composite_list')];
+        yield 'deprecated response propagator composite_list' => ["response_propagator/development:\n  composite_list: 1", $notString('response_propagator/development.composite_list')];
+        yield 'propagator composite' => ["propagator:\n  composite: 5", $notArray('propagator.composite')];
+        yield 'propagator composite item' => ["propagator:\n  composite: [5]", $notArray('propagator.composite.0')];
+        yield 'response propagator composite item' => ["{$responsePropagator}      composite: [5]", $notArray('response_propagator/development.composite.0')];
+
+        $notMap = static fn (string $path): string => sprintf('/path "[^"]*%s": Component "[^"]*" must be keyed by provider name, got 0/', preg_quote($path, '/'));
+        $composite = "tracer_provider:\n$processors  sampler:\n    composite/development:";
+        yield 'sampler list' => ["tracer_provider:\n$processors  sampler: [always_on]", $notMap('tracer_provider.sampler')];
+        yield 'exporter list' => ["tracer_provider:\n  processors:\n  - simple:\n      exporter: [console]", $notMap('simple.exporter')];
+        yield 'processors item list' => ["tracer_provider:\n  processors: [[simple]]", $notMap('tracer_provider.processors.0')];
+        yield 'propagator composite item list' => ["propagator:\n  composite: [[tracecontext]]", $notMap('propagator.composite.0')];
+        yield 'composite sampler list' => ["$composite [always_on]", $notMap('composite/development')];
+        yield 'composite sampler null list' => ["$composite [~]", $notMap('composite/development')];
+        yield 'distribution list' => ['distribution: [opentelemetry_php/development]', $notMap('open_telemetry.distribution')];
+    }
+
+    public function test_instrumentation_list_is_rejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/path "[^"]*instrumentation\/development\.php": Component "[^"]*" must be keyed by provider name, got 0/');
+
+        self::instrumentationFactory()->process([Yaml::parse("instrumentation/development:\n  php: [x]")])->create(new Context());
     }
 
     /**
@@ -2361,6 +2504,7 @@ final class ConfigurationTest extends TestCase
         yield 'trace_id_ratio_based null' => ['trace_id_ratio_based:', 'TraceIdRatioBased{1.000000}'];
         yield 'parent_based omitted root' => ['parent_based: {}', 'ParentBased+AlwaysOnSampler'];
         yield 'parent_based null' => ['parent_based:', 'ParentBased+AlwaysOnSampler'];
+        yield 'parent_based null root' => ['parent_based: {root: ~}', 'ParentBased+AlwaysOnSampler'];
     }
 
     /**

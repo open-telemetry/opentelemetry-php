@@ -10,6 +10,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanKind;
+use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableRuleBased;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
@@ -38,8 +39,8 @@ final class ComposableSamplerRuleBased implements ComponentProvider
      * @param array{
      *     rules: list<array{
      *         sampler: ComponentPlugin<ComposableSamplerInterface>,
-     *         span_kinds: list<string>,
-     *         parent: list<string>,
+     *         span_kinds: list<?string>,
+     *         parent: list<?string>,
      *         attribute_values: ?array{key: string, values: list<string>},
      *         attribute_patterns: ?array{key: string, included: list<string>, excluded: list<string>},
      *     }>,
@@ -71,23 +72,23 @@ final class ComposableSamplerRuleBased implements ComponentProvider
         $ruleChildren->arrayNode('span_kinds')
             ->defaultValue([])
             ->requiresAtLeastOneElement()
-            ->enumPrototype()->values(array_keys(self::SPAN_KINDS))->end()
+            ->enumPrototype()->values([...array_keys(self::SPAN_KINDS), null])->end()
         ->end();
         $ruleChildren->arrayNode('parent')
             ->defaultValue([])
             ->requiresAtLeastOneElement()
-            ->enumPrototype()->values(self::PARENTS)->end()
+            ->enumPrototype()->values([...self::PARENTS, null])->end()
         ->end();
         $ruleChildren->arrayNode('attribute_values')
             ->children()
-                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('values')->isRequired()->cannotBeEmpty()->scalarPrototype()->end()->end()
             ->end()
         ->end();
 
         $ruleChildren->arrayNode('attribute_patterns')
             ->children()
-                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('included')->defaultValue([])->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
                 ->arrayNode('excluded')->defaultValue([])->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
             ->end()
@@ -98,20 +99,27 @@ final class ComposableSamplerRuleBased implements ComponentProvider
 
     /**
      * All configured conditions of a rule must match; a rule without conditions matches every span.
+     * A null list item matches nothing, so a list of only nulls is no condition at all.
      */
     private static function createPredicate(array $rule): PredicateInterface
     {
         $predicates = [];
 
-        if (($rule['span_kinds'] ?? []) !== []) {
-            $predicates[] = Predicate::spanKindIn(...array_map(
-                static fn (string $kind): int => self::SPAN_KINDS[$kind],
-                $rule['span_kinds'],
-            ));
+        $spanKinds = [];
+        foreach ($rule['span_kinds'] ?? [] as $kind) {
+            if ($kind !== null) {
+                $spanKinds[] = self::SPAN_KINDS[$kind];
+            }
+        }
+        if ($spanKinds !== []) {
+            $predicates[] = Predicate::spanKindIn(...$spanKinds);
         }
         // any of the listed parent types matches
         $parentPredicate = null;
         foreach ($rule['parent'] ?? [] as $parent) {
+            if ($parent === null) {
+                continue;
+            }
             $predicate = match ($parent) {
                 'none' => Predicate::isRootSpan(),
                 'remote' => Predicate::hasRemoteParent(),

@@ -40,7 +40,7 @@ final class OtlpExporterNodes
                     ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
                             ->scalarNode('value')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                         ->end()
                     ->end()

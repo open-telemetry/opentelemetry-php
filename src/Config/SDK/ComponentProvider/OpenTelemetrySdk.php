@@ -566,7 +566,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
                             ->variableNode('value')->isRequired()->end()
                             ->enumNode('type')->defaultNull()
                                 ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
@@ -661,7 +661,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
                                         ->addDefaultsIfNotSet()
@@ -764,7 +764,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
                                         ->addDefaultsIfNotSet()
@@ -809,7 +809,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                                     ->append($this->getLoggerConfig($builder, 'config')->isRequired())
                                 ->end()
                             ->end()
@@ -850,9 +850,15 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function (array $value): array {
+                    // Left for type validation to reject.
+                    if (!is_array($value['composite'] ?? []) || !is_string($value['composite_list'] ?? '')) {
+                        return $value;
+                    }
                     $existing = [];
                     foreach ($value['composite'] ?? [] as $item) {
-                        $existing[] = key($item);
+                        if (is_array($item)) {
+                            $existing[] = key($item);
+                        }
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);
@@ -890,9 +896,15 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->beforeNormalization()
             ->ifArray()
             ->then(static function (array $value): array {
+                // Left for type validation to reject.
+                if (!is_array($value['composite'] ?? []) || !is_string($value['composite_list'] ?? '')) {
+                    return $value;
+                }
                 $existing = [];
                 foreach ($value['composite'] ?? [] as $item) {
-                    $existing[] = key($item);
+                    if (is_array($item)) {
+                        $existing[] = key($item);
+                    }
                 }
                 foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                     $name = trim($name);

@@ -10,6 +10,7 @@ use function array_map;
 use function count;
 use function implode;
 use InvalidArgumentException;
+use function is_string;
 use LogicException;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
@@ -103,6 +104,7 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
             $ignoreUnknown = $node->ignoresUnknownProviders();
             $components = [];
             foreach ($value ?? [] as $key => $config) {
+                self::ensureProviderName($key, $type);
                 $components[] = $ignoreUnknown && !isset($this->providers[$type][$key])
                     ? $this->skip($name, (string) $key, $type)
                     : $this->process($type, $key, [$key => $config]);
@@ -141,7 +143,11 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
         $node->info(sprintf('Component "%s"', $type));
         $node->performNoDeepMerging();
         $node->ignoreExtraKeys(false);
-        $node->validate()->always(function (array $value) use ($name, $type, $optIn): \OpenTelemetry\API\Configuration\Config\ComponentPlugin {
+        // Null reaches here only for an optional component, which then takes its default.
+        $node->validate()->always(function (?array $value) use ($name, $type, $optIn): ?\OpenTelemetry\API\Configuration\Config\ComponentPlugin {
+            if ($value === null) {
+                return null;
+            }
             if (count($value) !== 1) {
                 throw new InvalidArgumentException(sprintf(
                     'Component "%s" must have exactly one provider defined, got %s',
@@ -151,12 +157,29 @@ final class ComponentProviderRegistry implements \OpenTelemetry\API\Configuratio
             }
 
             $key = array_key_first($value);
+            self::ensureProviderName($key, $type);
             if ($optIn?->ignoresUnknownProviders() && !isset($this->providers[$type][$key])) {
                 return $this->skip($name, (string) $key, $type);
             }
 
             return $this->process($type, $key, $value);
         });
+    }
+
+    /**
+     * A list where a map is expected has integer keys.
+     *
+     * @psalm-assert string $key
+     */
+    private static function ensureProviderName(int|string $key, string $type): void
+    {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(sprintf(
+                'Component "%s" must be keyed by provider name, got %d',
+                $type,
+                $key,
+            ));
+        }
     }
 
     private function skip(string $name, string $key, string $type): SkippedComponentPlugin

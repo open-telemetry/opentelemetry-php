@@ -241,6 +241,32 @@ final class ConsistentSamplerConfigurationTest extends TestCase
         yield 'excluded' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        excluded: ~\n      sampler:\n        always_on:\n", SamplingResult::DROP];
     }
 
+    /**
+     * The schema makes these items nullable, so that an unset environment variable still
+     * substitutes into a valid list. A null item matches nothing, and a list of nothing but
+     * nulls is ignored, as an omitted list is.
+     */
+    #[DataProvider('nullListItemProvider')]
+    public function test_null_list_items_are_ignored(string $condition, int $kind, int $decision): void
+    {
+        $sampler = $this->sampler("composite/development:\n  rule_based:\n    rules:\n    - $condition\n      sampler:\n        always_on:\n");
+
+        $this->assertSame($decision, $this->decide($sampler, $kind)->getDecision());
+    }
+
+    public static function nullListItemProvider(): iterable
+    {
+        $server = SpanKind::KIND_SERVER;
+        $consumer = SpanKind::KIND_CONSUMER;
+
+        yield 'span_kinds of only null' => ['span_kinds: [~]', $server, SamplingResult::RECORD_AND_SAMPLE];
+        yield 'span_kinds with null, not matching' => ['span_kinds: [consumer, ~]', $server, SamplingResult::DROP];
+        yield 'span_kinds with null, matching' => ['span_kinds: [consumer, ~]', $consumer, SamplingResult::RECORD_AND_SAMPLE];
+        yield 'span_kinds with unset variable' => ["span_kinds: [consumer, '\${OTEL_PHP_TEST_UNSET_SPAN_KIND}']", $server, SamplingResult::DROP];
+        yield 'parent of only null' => ['parent: [~]', $server, SamplingResult::RECORD_AND_SAMPLE];
+        yield 'parent with null' => ['parent: [remote, ~]', $server, SamplingResult::DROP];
+    }
+
     public function test_rule_based_without_rules_drops_everything(): void
     {
         // omitting rules (or the whole rule_based body) is valid: "no span is sampled"
