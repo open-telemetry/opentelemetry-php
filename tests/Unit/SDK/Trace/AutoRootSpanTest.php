@@ -627,6 +627,32 @@ class AutoRootSpanTest extends TestCase
         }
     }
 
+    public function test_create_does_not_keep_the_request_of_a_previous_span_for_a_cli_span(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+        $span = $this->createMock(SpanInterface::class);
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+        $property = new \ReflectionProperty(AutoRootSpan::class, 'request');
+
+        $rootScope = new \ReflectionProperty(AutoRootSpan::class, 'rootScope');
+
+        AutoRootSpan::create($request);
+        $webScope = $rootScope->getValue();
+        $this->assertSame($request, $property->getValue());
+        AutoRootSpan::create($request, true);
+        $cliScope = $rootScope->getValue();
+
+        try {
+            $this->assertNull($property->getValue());
+        } finally {
+            // leave the global context storage as it was found
+            $cliScope->detach();
+            $webScope->detach();
+        }
+    }
+
     public function test_create_survives_a_failing_log_writer_when_the_body_configuration_is_invalid(): void
     {
         $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');

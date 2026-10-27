@@ -122,6 +122,7 @@ class AutoRootSpan
      */
     public static function create(ServerRequestInterface $request, bool $cli = false): void
     {
+        self::$request = null;
         $tracer = Globals::tracerProvider()->getTracer(
             'io.opentelemetry.php.auto-root-span',
             null,

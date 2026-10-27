@@ -45,6 +45,7 @@ class HttpBodyCaptureTest extends TestCase
             'charset parameter' => ['application/custom; charset=utf-8', true],
             'octet-stream' => ['application/octet-stream', false],
             'fake charset inside a quoted value' => ['application/octet-stream; note="x;charset=utf-8"', false],
+            'multipart with charset' => ['multipart/form-data; charset=utf-8; boundary=x', false],
             'fake charset after an escaped quote' => ['application/octet-stream; note="a\\"; charset=utf-8"', false],
             'charset after a quoted value' => ['application/octet-stream; note="a;b"; charset=utf-8', true],
             'image' => ['image/png', false],
@@ -240,6 +241,24 @@ class HttpBodyCaptureTest extends TestCase
         } finally {
             Logging::reset();
         }
+    }
+
+    public function test_extract_treats_an_empty_read_as_the_end_of_the_body(): void
+    {
+        // like php://input, the stream does not report eof() until a read returns nothing
+        $stream = $this->createMock(StreamInterface::class);
+        $stream->method('isReadable')->willReturn(true);
+        $stream->method('isSeekable')->willReturn(true);
+        $stream->method('tell')->willReturn(0);
+        $stream->method('eof')->willReturn(false);
+        $stream->method('read')->willReturnOnConsecutiveCalls('hello', '');
+
+        $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 1024));
+    }
+
+    public function test_extract_accepts_a_limit_that_would_overflow(): void
+    {
+        $this->assertSame('hello', HttpBodyCapture::extract(self::request('hello', 'text/plain'), PHP_INT_MAX));
     }
 
     public function test_extract_reads_more_than_one_chunk(): void
