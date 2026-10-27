@@ -468,11 +468,20 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
         new BatchLogRecordProcessor($exporter, $this->testClock, 2048, 5000, 30000, -1);
     }
 
-    public function test_logs_processor_throws_on_invalid_max_export_batch_size_exceeding_max_queue_size(): void
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/sdk.md#batching-processor
+     */
+    public function test_max_export_batch_size_exceeding_max_queue_size_is_clamped_with_warning(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $exporter = $this->createStub(LogRecordExporterInterface::class);
-        new BatchLogRecordProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+        $this->logWriter->expects($this->once())->method('write')->with(LogLevel::WARNING);
+        $exporter = $this->createMock(LogRecordExporterInterface::class);
+        $exporter->expects($this->once())->method('export')
+            ->with($this->countOf(2))
+            ->willReturn(new CompletedFuture(0));
+
+        $processor = new BatchLogRecordProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+        $processor->onEmit($this->createMock(ReadWriteLogRecord::class));
+        $processor->onEmit($this->createMock(ReadWriteLogRecord::class));
     }
 
     public function test_self_diagnostics_processed_and_exported_counter_values(): void

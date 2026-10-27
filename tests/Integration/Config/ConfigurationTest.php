@@ -1308,6 +1308,39 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#batchspanprocessor
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#batchlogrecordprocessor
+     */
+    public function test_batch_processor_accepts_max_queue_size_below_default_batch_size(): void
+    {
+        $yaml = /** @lang yaml */ <<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - batch:
+                  max_queue_size: 100
+                  exporter:
+                    console:
+            logger_provider:
+              processors:
+              - batch:
+                  max_queue_size: 100
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse($yaml)])->create(new Context())->build();
+
+        $tracerSharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($sdk->getTracerProvider());
+        $spanProcessor = $tracerSharedState->getSpanProcessor();
+        $loggerSharedState = (new \ReflectionProperty(LoggerProvider::class, 'loggerSharedState'))->getValue($sdk->getLoggerProvider());
+        $logProcessor = (new \ReflectionProperty(MultiLogRecordProcessor::class, 'processors'))->getValue($loggerSharedState->getProcessor())[0];
+
+        $this->assertSame(100, (new \ReflectionProperty(BatchSpanProcessor::class, 'maxExportBatchSize'))->getValue($spanProcessor));
+        $this->assertSame(100, (new \ReflectionProperty(BatchLogRecordProcessor::class, 'maxExportBatchSize'))->getValue($logProcessor));
+    }
+
+    /**
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#periodicmetricreader
      */
     public function test_periodic_reader_defaults_match_schema(): void
