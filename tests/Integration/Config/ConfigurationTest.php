@@ -26,6 +26,7 @@ use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Configuration\Internal\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
@@ -1304,6 +1305,29 @@ final class ConfigurationTest extends TestCase
             BatchLogRecordProcessor::DEFAULT_SCHEDULE_DELAY * 1_000_000,
             (new \ReflectionProperty(BatchLogRecordProcessor::class, 'scheduledDelayNanos'))->getValue($logProcessor),
         );
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#periodicmetricreader
+     */
+    public function test_periodic_reader_defaults_match_schema(): void
+    {
+        $yaml = /** @lang yaml */ <<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $properties = new \ReflectionProperty(ComponentPlugin::class, 'properties');
+        $reader = $properties->getValue($factory->process([Yaml::parse($yaml)]))['meter_provider']['readers'][0];
+
+        $this->assertSame(['interval' => 60000, 'timeout' => 30000], array_intersect_key(
+            $properties->getValue($reader),
+            ['interval' => null, 'timeout' => null],
+        ));
     }
 
     /**
