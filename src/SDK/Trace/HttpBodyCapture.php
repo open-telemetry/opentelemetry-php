@@ -93,7 +93,9 @@ final class HttpBodyCapture
         }
         $cut = strlen($raw) > $maxSize;
 
-        return self::toValidUtf8($cut ? substr($raw, 0, $maxSize) : $raw, $cut);
+        return $cut
+            ? self::toValidUtf8(substr($raw, 0, $maxSize), ord($raw[$maxSize]))
+            : self::toValidUtf8($raw, null);
     }
 
     /**
@@ -238,20 +240,24 @@ final class HttpBodyCapture
      * When the body was cut at the size limit, drops the trailing bytes of a valid but incomplete multi-byte
      * character. Returns null when the data is not valid UTF-8 (a body that was not cut is never altered, and
      * malformed bytes are never dropped).
+     *
+     * @param int|null $nextByte the byte that follows the cut, or null when the body was not cut
      */
-    private static function toValidUtf8(string $data, bool $cut): ?string
+    private static function toValidUtf8(string $data, ?int $nextByte): ?string
     {
-        if ($cut) {
-            $data = substr($data, 0, strlen($data) - self::incompleteTrailingBytes($data));
+        if ($nextByte !== null) {
+            $data = substr($data, 0, strlen($data) - self::incompleteTrailingBytes($data, $nextByte));
         }
 
         return $data !== '' && preg_match('//u', $data) === 1 ? $data : null;
     }
 
     /**
-     * Number of trailing bytes that start a multi-byte character without finishing it (0 to 3).
+     * Number of trailing bytes that start a multi-byte character the cut interrupted (0 to 3). It is 0 when
+     * the end is complete, or when the bytes are already malformed, including when the byte after the cut
+     * cannot continue the character.
      */
-    private static function incompleteTrailingBytes(string $data): int
+    private static function incompleteTrailingBytes(string $data, int $nextByte): int
     {
         $length = strlen($data);
         for ($back = 1; $back <= 3 && $back <= $length; $back++) {
@@ -268,8 +274,13 @@ final class HttpBodyCapture
             if ($expected <= $back) {
                 return 0;
             }
-            // A second byte outside the allowed range is malformed already (overlong, surrogate, above U+10FFFF)
-            if ($back >= 2 && !self::isAllowedSecondByte($byte, ord($data[$length - $back + 1]))) {
+            // A second byte outside the allowed range is malformed already (overlong, surrogate, above U+10FFFF).
+            // The byte after the cut is the next byte of the character, so it has to fit as well.
+            $second = $back >= 2 ? ord($data[$length - $back + 1]) : $nextByte;
+            if (!self::isAllowedSecondByte($byte, $second)) {
+                return 0;
+            }
+            if ($back >= 2 && ($nextByte < 0x80 || $nextByte > 0xBF)) {
                 return 0;
             }
 
