@@ -41,6 +41,9 @@ final class HttpBodyCapture
 
     private const READ_CHUNK_SIZE = 8192;
 
+    /** Upper bound for the recorded size, so that a huge configured limit cannot overflow `$maxSize + 1` */
+    private const MAX_RECORDED_SIZE = 1 << 30;
+
     private const TEXTUAL_SUBTYPE_SUFFIXES = ['/json', '+json', '/xml', '+xml', '/yaml', '+yaml'];
 
     public static function isEnabled(): bool
@@ -74,6 +77,7 @@ final class HttpBodyCapture
         if ($maxSize <= 0) {
             return null;
         }
+        $maxSize = min($maxSize, self::MAX_RECORDED_SIZE);
         $contentType = $request->getHeaderLine('Content-Type');
         if (!self::isTextual($contentType)
             || self::hasContentCoding($request->getHeaderLine('Content-Encoding'))
@@ -95,12 +99,12 @@ final class HttpBodyCapture
     /**
      * Content-Type heuristic from the semantic conventions: type/subtype (case-insensitive, without parameters)
      * starts with `text/`, ends with `/json`, `+json`, `/xml`, `+xml`, `/yaml` or `+yaml`, is
-     * `application/x-www-form-urlencoded`, or the header declares a `charset` parameter.
+     * `application/x-www-form-urlencoded`, or the header declares a `charset` parameter. `multipart/*` is never textual: its parts may be binary or files.
      */
     public static function isTextual(string $contentType): bool
     {
         [$mediaType, $parameters] = self::parseContentType($contentType);
-        if ($mediaType === '') {
+        if ($mediaType === '' || str_starts_with($mediaType, 'multipart/')) {
             return false;
         }
         if (str_starts_with($mediaType, 'text/') || $mediaType === 'application/x-www-form-urlencoded') {
@@ -209,6 +213,7 @@ final class HttpBodyCapture
             while (strlen($data) < $maxSize && !$stream->eof()) {
                 $chunk = $stream->read(min($maxSize - strlen($data), self::READ_CHUNK_SIZE));
                 if ($chunk === '') {
+                    // php://input only reports its end by returning nothing, so this is the normal end of the body
                     break;
                 }
                 $data .= $chunk;

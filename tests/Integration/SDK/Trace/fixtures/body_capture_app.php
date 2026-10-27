@@ -12,7 +12,7 @@ declare(strict_types=1);
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
 use OpenTelemetry\SDK\Trace\HttpBodyCapture;
 
-require dirname(__DIR__, 4) . '/../vendor/autoload.php';
+require dirname(__DIR__, 5) . '/vendor/autoload.php';
 
 /** @psalm-suppress InternalMethod */
 $request = AutoRootSpan::createRequest();
