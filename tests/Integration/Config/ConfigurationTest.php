@@ -1646,6 +1646,29 @@ final class ConfigurationTest extends TestCase
         $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
     }
 
+    public function test_resource_keeps_numeric_attribute_names(): void
+    {
+        $factory = new ConfigurationFactory(
+            [],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            resource:
+              attributes:
+              - { name: '123', value: from_attributes }
+              attributes_list: '123=from_list,7=b'
+            YAML)]);
+        $attributes = $this->getResource($sdk->create(new Context())->build())->getAttributes();
+
+        $this->assertSame('from_attributes', $attributes->get('123'));
+        $this->assertSame('b', $attributes->get('7'));
+        $this->assertFalse($attributes->has('0'));
+        $this->assertFalse($attributes->has('1'));
+    }
+
     #[Depends('test_resource_attributes_take_precedence_over_default_attributes')]
     #[Depends('test_resource_detectors_take_precedence_over_default_attributes')]
     public function test_resource_attributes_take_precedence_over_resource_detectors(): void

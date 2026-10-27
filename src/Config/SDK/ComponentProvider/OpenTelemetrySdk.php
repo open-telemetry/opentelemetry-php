@@ -291,7 +291,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $resource = ResourceInfo::create(Attributes::create($attrs), $resource->getSchemaUrl());
 
         $attributes = AttributesParser::parseAttributesList($properties['resource']['attributes_list']);
-        $attributes = array_merge($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
+        $attributes = array_replace($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
 
         $resource = $mandatory
             ->merge($resource)
