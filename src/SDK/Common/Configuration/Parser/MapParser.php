@@ -23,6 +23,9 @@ class MapParser
         }
 
         foreach (explode(self::VARIABLE_SEPARATOR, (string) $value) as $pair) {
+            if (trim($pair) === '') {
+                continue;
+            }
             self::validateKeyValuePair($pair);
 
             /** @psalm-suppress PossiblyUndefinedArrayOffset */
@@ -40,6 +43,12 @@ class MapParser
                 'Key-Value pair "%s" does not contain separator "%s"',
                 $pair,
                 self::KEY_VALUE_SEPARATOR
+            ));
+        }
+        if (trim(explode(self::KEY_VALUE_SEPARATOR, $pair, 2)[0]) === '') {
+            throw new InvalidArgumentException(sprintf(
+                'Key-Value pair "%s" has an empty key',
+                $pair,
             ));
         }
     }

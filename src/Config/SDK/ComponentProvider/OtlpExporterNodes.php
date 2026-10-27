@@ -46,7 +46,7 @@ final class OtlpExporterNodes
                         ->end()
                     ->end()
                 ->end()
-                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('headers_list')->defaultNull()->validate()->always(Validation::ensureKeyValueList())->end()->end()
                 ->enumNode('compression')->values(['gzip', 'none', null])->defaultNull()->end()
                 ->integerNode('timeout')->min(0)->defaultValue(10000)->end()
             ->end()

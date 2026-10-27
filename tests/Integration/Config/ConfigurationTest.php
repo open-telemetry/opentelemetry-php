@@ -2230,6 +2230,59 @@ final class ConfigurationTest extends TestCase
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
      */
+    #[DataProvider('malformedListProvider')]
+    public function test_malformed_key_value_list_is_rejected_with_path(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path "[^"]*%s": Key-Value pair "c"/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function malformedListProvider(): iterable
+    {
+        yield 'resource attributes_list' => ["resource:\n  attributes_list: a=b,c", 'resource.attributes_list'];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter headers_list" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers_list: a=b,c",
+                    "$exporter.headers_list",
+                ];
+            }
+        }
+    }
+
+    public function test_key_value_list_tolerates_blank_entries(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            resource:
+              attributes_list: a=b,,c=d,
+            YAML)]);
+
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('b', $resource->getAttributes()->get('a'));
+        $this->assertSame('d', $resource->getAttributes()->get('c'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
     #[DataProvider('wrongTypeProvider')]
     public function test_wrong_type_is_rejected(string $yaml, string $expectedMessage): void
     {

@@ -585,7 +585,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         })->end()
                     ->end()
                 ->end()
-                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureKeyValueList())->end()->end()
                 ->arrayNode('detection/development')
                     ->addDefaultsIfNotSet()
                     ->children()
