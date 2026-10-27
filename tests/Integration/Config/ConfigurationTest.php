@@ -2200,6 +2200,64 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('invalidTlsProvider')]
+    public function test_invalid_tls_is_rejected(string $yaml, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context());
+    }
+
+    public static function invalidTlsProvider(): iterable
+    {
+        $cases = [
+            'relative ca_file' => ['{ca_file: certs/ca.pem}', '/path "[^"]*tls\.ca_file": must be an absolute path/'],
+            'empty ca_file' => ["{ca_file: ''}", '/path "[^"]*tls\.ca_file": must be an absolute path/'],
+            'relative cert_file' => ['{cert_file: cert.pem, key_file: /certs/key.pem}', '/path "[^"]*tls\.cert_file": must be an absolute path/'],
+            'relative key_file' => ['{cert_file: /certs/cert.pem, key_file: ./key.pem}', '/path "[^"]*tls\.key_file": must be an absolute path/'],
+            'cert_file without key_file' => ['{cert_file: /certs/cert.pem}', '/path "[^"]*\.tls": key_file must be set when cert_file is set/'],
+            'key_file without cert_file' => ['{key_file: /certs/key.pem}', '/path "[^"]*\.tls": cert_file must be set when key_file is set/'],
+        ];
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                foreach ($cases as $name => [$tls, $expectedMessage]) {
+                    yield "$provider $exporter $name" => ["$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          tls: $tls", $expectedMessage];
+                }
+            }
+        }
+    }
+
+    #[DataProvider('validTlsProvider')]
+    public function test_valid_tls_parses(string $tls): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\ntracer_provider:\n  processors:\n  - simple:\n      exporter:\n        otlp_http:\n          tls: $tls")]);
+    }
+
+    public static function validTlsProvider(): iterable
+    {
+        yield 'unix ca_file' => ['{ca_file: /certs/ca.pem}'];
+        yield 'windows ca_file' => ['{ca_file: "C:\\\\certs\\\\ca.pem"}'];
+        yield 'windows ca_file with forward slashes' => ['{ca_file: "C:/certs/ca.pem"}'];
+        yield 'unc ca_file' => ['{ca_file: "\\\\\\\\server\\\\certs\\\\ca.pem"}'];
+        yield 'cert_file and key_file' => ['{cert_file: /certs/cert.pem, key_file: /certs/key.pem}'];
+        yield 'null cert_file and key_file' => ['{cert_file: ~, key_file: ~}'];
+    }
+
+    /**
      * The SDK lists with `minItems: 1`, as YAML with `%s` for the list value and the node path.
      * `processors` and `readers` have their own check, in
      * {@see self::test_provider_without_processors_is_rejected()}.

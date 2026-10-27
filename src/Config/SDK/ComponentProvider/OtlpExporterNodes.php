@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
+use InvalidArgumentException;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -60,15 +61,31 @@ final class OtlpExporterNodes
         $children = $node
             ->addDefaultsIfNotSet()
             ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
+            ->validate()->always(self::ensureCertAndKey(...))->end()
             ->children()
-                ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('ca_file')->defaultNull()->validate()->always(Validation::ensureAbsolutePath())->end()->end()
+                ->scalarNode('cert_file')->defaultNull()->validate()->always(Validation::ensureAbsolutePath())->end()->end()
+                ->scalarNode('key_file')->defaultNull()->validate()->always(Validation::ensureAbsolutePath())->end()->end()
         ;
         if ($insecure) {
             $children->booleanNode('insecure')->defaultNull()->end();
         }
 
         return $node;
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml
+     */
+    private static function ensureCertAndKey(array $tls): array
+    {
+        if ($tls['cert_file'] !== null && $tls['key_file'] === null) {
+            throw new InvalidArgumentException('key_file must be set when cert_file is set');
+        }
+        if ($tls['key_file'] !== null && $tls['cert_file'] === null) {
+            throw new InvalidArgumentException('cert_file must be set when key_file is set');
+        }
+
+        return $tls;
     }
 }
