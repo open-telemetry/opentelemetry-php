@@ -502,6 +502,13 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->scalarNode('file_format')
                     ->isRequired()
                     ->example('1.0')
+                    ->validate()
+                        ->ifTrue(static fn (mixed $v): bool => is_int($v) || is_float($v))
+                        ->then(static fn (int|float $v) => throw new \InvalidArgumentException(sprintf(
+                            'must be a quoted string, such as "1.0"; got the YAML number %s',
+                            var_export($v, true),
+                        )))
+                    ->end()
                     ->validate()->always(Validation::ensureString())->end()
                     ->validate()->always(self::ensureSupportedFileFormat())->end()
                 ->end()

@@ -1743,7 +1743,9 @@ final class ConfigurationTest extends TestCase
         yield 'release candidate rc.2' => ['"1.0-rc.2"', '/expected MAJOR\.MINOR/'];
         // an unquoted 1.0 is a YAML float, and would stringify to "1"; it must be rejected
         // outright rather than coerced into something that looks like a version
-        yield 'unquoted, parsed as a float' => ['1.0', '/must be of type string/'];
+        yield 'unquoted, parsed as a float' => ['1.0', '/must be a quoted string, such as "1\.0"; got the YAML number 1\.0/'];
+        yield 'unquoted, parsed as an int' => ['1', '/must be a quoted string, such as "1\.0"; got the YAML number 1$/'];
+        yield 'boolean' => ['true', '/must be of type string/'];
         yield 'null' => ['~', '/cannot be null/'];
     }
 

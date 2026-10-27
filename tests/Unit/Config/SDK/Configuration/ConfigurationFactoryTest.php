@@ -505,6 +505,17 @@ final class ConfigurationFactoryTest extends TestCase
         self::factory()->parseFile($file);
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#yaml-file-format
+     */
+    public function test_file_without_yaml_extension_is_rejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Configuration file "%s" must have a .yaml or .yml extension', __FILE__));
+
+        self::factory()->parseFile(__FILE__);
+    }
+
     private function factory(): ConfigurationFactory
     {
         return new ConfigurationFactory(
