@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use Nyholm\Psr7\ServerRequest;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -601,6 +603,61 @@ class AutoRootSpanTest extends TestCase
 
         AutoRootSpan::create($request);
         AutoRootSpan::shutdownHandler();
+    }
+
+    public function test_shutdown_ends_the_span_when_logging_the_failure_throws(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('isRecording')->willReturn(true);
+        $span->method('setAttribute')->willThrowException(new \Error('boom'));
+        $span->expects($this->once())->method('end');
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        $this->useThrowingLogWriter();
+
+        try {
+            AutoRootSpan::create($request);
+            AutoRootSpan::shutdownHandler();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public function test_create_survives_a_failing_log_writer_when_the_body_configuration_is_invalid(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'not-a-boolean');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+
+        $span = $this->createMock(SpanInterface::class);
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        $this->useThrowingLogWriter();
+
+        try {
+            AutoRootSpan::create($request);
+        } finally {
+            Logging::reset();
+        }
+
+        $this->assertNotNull((new \ReflectionProperty(AutoRootSpan::class, 'rootScope'))->getValue());
+        $this->assertNull((new \ReflectionProperty(AutoRootSpan::class, 'request'))->getValue());
+        (new \ReflectionProperty(AutoRootSpan::class, 'rootScope'))->getValue()->detach();
+    }
+
+    private function useThrowingLogWriter(): void
+    {
+        Logging::setLogWriter(new class() implements LogWriterInterface {
+            #[\Override]
+            public function write($level, string $message, array $context): void
+            {
+                throw new \ErrorException('log writer failure');
+            }
+        });
     }
 
     /**
