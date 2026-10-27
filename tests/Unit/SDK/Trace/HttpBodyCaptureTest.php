@@ -317,6 +317,41 @@ class HttpBodyCaptureTest extends TestCase
         $this->assertNull(HttpBodyCapture::extract(self::request("abc\xc0Z", 'text/plain'), 4));
     }
 
+    #[DataProvider('malformedPrefixProvider')]
+    public function test_extract_rejects_a_malformed_prefix_cut_by_the_limit(string $body, int $maxSize): void
+    {
+        $this->assertNull(HttpBodyCapture::extract(self::request($body, 'text/plain'), $maxSize));
+    }
+
+    public static function malformedPrefixProvider(): array
+    {
+        return [
+            'overlong three byte (E0 80)' => ["ab\xe0\x80Z", 4],
+            'overlong three byte, lead only valid continuation range (E0 9F)' => ["ab\xe0\x9fZ", 4],
+            'surrogate (ED A0)' => ["ab\xed\xa0Z", 4],
+            'overlong four byte (F0 80)' => ["ab\xf0\x80\x80Z", 5],
+            'above U+10FFFF (F4 90)' => ["ab\xf4\x90\x80Z", 5],
+            'four byte with a bad third byte' => ["ab\xf0\x9f\x28Z", 5],
+        ];
+    }
+
+    #[DataProvider('validPrefixProvider')]
+    public function test_extract_drops_a_valid_incomplete_prefix_at_the_range_edges(string $body, int $maxSize, string $expected): void
+    {
+        $this->assertSame($expected, HttpBodyCapture::extract(self::request($body, 'text/plain'), $maxSize));
+    }
+
+    public static function validPrefixProvider(): array
+    {
+        return [
+            'E0 A0 is the lowest valid second byte' => ["ab\xe0\xa0\x80Z", 4, 'ab'],
+            'ED 9F is the highest valid second byte' => ["ab\xed\x9f\x80Z", 4, 'ab'],
+            'F0 90 is the lowest valid second byte' => ["ab\xf0\x90\x80\x80Z", 5, 'ab'],
+            'F4 8F is the highest valid second byte' => ["ab\xf4\x8f\x80\x80Z", 5, 'ab'],
+            'a lead byte alone at the end' => ["ab\xe2\x82\xacZ", 3, 'ab'],
+        ];
+    }
+
     public function test_extract_drops_an_incomplete_three_and_four_byte_character(): void
     {
         $this->assertSame('ab', HttpBodyCapture::extract(self::request('ab€c', 'text/plain'), 4));

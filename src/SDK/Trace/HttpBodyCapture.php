@@ -265,10 +265,30 @@ final class HttpBodyCapture
                 $byte >= 0xC2 && $byte <= 0xDF => 2,
                 default => 1,
             };
+            if ($expected <= $back) {
+                return 0;
+            }
+            // A second byte outside the allowed range is malformed already (overlong, surrogate, above U+10FFFF)
+            if ($back >= 2 && !self::isAllowedSecondByte($byte, ord($data[$length - $back + 1]))) {
+                return 0;
+            }
 
-            return $expected > $back ? $back : 0;
+            return $back;
         }
 
         return 0;
+    }
+
+    private static function isAllowedSecondByte(int $lead, int $second): bool
+    {
+        [$min, $max] = match ($lead) {
+            0xE0 => [0xA0, 0xBF],
+            0xED => [0x80, 0x9F],
+            0xF0 => [0x90, 0xBF],
+            0xF4 => [0x80, 0x8F],
+            default => [0x80, 0xBF],
+        };
+
+        return $second >= $min && $second <= $max;
     }
 }
