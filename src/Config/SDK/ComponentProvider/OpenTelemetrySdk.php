@@ -345,6 +345,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                 $viewTemplate = ViewTemplate::create();
                 if (isset($view['stream']['name'])) {
                     $viewTemplate = $viewTemplate->withName($view['stream']['name']);
+                    if (strpbrk($view['selector']['instrument_name'] ?? '*', '*?') !== false) {
+                        $context->logger->log(LogLevel::WARNING, sprintf(
+                            'View stream name "%s" is used with a selector that can match more than one instrument',
+                            $view['stream']['name'],
+                        ));
+                    }
                 }
                 if (isset($view['stream']['description'])) {
                     $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);

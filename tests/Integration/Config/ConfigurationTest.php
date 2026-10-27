@@ -101,6 +101,7 @@ final class ConfigurationTest extends TestCase
     public function tearDown(): void
     {
         OutputStreamParser::reset();
+        Logging::reset();
     }
 
     #[DataProvider('openTelemetryConfigurationDataProvider')]
@@ -812,6 +813,7 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('instrumentTypeSelectorProvider')]
     public function test_view_selects_on_instrument_type(string $instrumentType, string $expected): void
     {
+        Logging::disable();
         $factory = new ConfigurationFactory(
             [new MetricReaderPeriodic(), new MetricExporterConsole()],
             new OpenTelemetrySdk(),
@@ -867,8 +869,54 @@ final class ConfigurationTest extends TestCase
         yield 'up_down_counter' => ['up_down_counter', InstrumentType::UP_DOWN_COUNTER];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#stream-configuration
+     */
+    #[DataProvider('viewStreamNameSelectorProvider')]
+    public function test_view_stream_name_warns_when_selector_can_match_many(string $view, bool $warns): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($warns ? $this->once() : $this->never())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('renamed'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        try {
+            $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                  views:
+                  - $view
+                YAML)])->create(new Context())->build();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public static function viewStreamNameSelectorProvider(): iterable
+    {
+        yield 'exact name' => ["selector: {instrument_name: requests}\n    stream: {name: renamed}", false];
+        yield 'asterisk' => ["selector: {instrument_name: '*'}\n    stream: {name: renamed}", true];
+        yield 'trailing asterisk' => ["selector: {instrument_name: 'http.*'}\n    stream: {name: renamed}", true];
+        yield 'question mark' => ["selector: {instrument_name: 'request?'}\n    stream: {name: renamed}", true];
+        yield 'no instrument name' => ["selector: {unit: ms}\n    stream: {name: renamed}", true];
+        yield 'wildcard without stream name' => ["selector: {instrument_name: '*'}\n    stream: {description: renamed}", false];
+    }
+
     public function test_view_selects_on_unit(): void
     {
+        Logging::disable();
         $factory = new ConfigurationFactory(
             [new MetricReaderPeriodic(), new MetricExporterConsole()],
             new OpenTelemetrySdk(),
@@ -1313,6 +1361,7 @@ final class ConfigurationTest extends TestCase
      */
     public function test_batch_processor_accepts_max_queue_size_below_default_batch_size(): void
     {
+        Logging::disable();
         $yaml = /** @lang yaml */ <<<'YAML'
             file_format: "1.0"
             tracer_provider:
