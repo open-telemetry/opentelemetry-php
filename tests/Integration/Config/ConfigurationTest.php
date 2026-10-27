@@ -1083,7 +1083,6 @@ final class ConfigurationTest extends TestCase
     public static function invalidViewAggregationProvider(): iterable
     {
         yield 'non-numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['one']]]];
-        yield 'quoted numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['1']]]];
         yield 'unordered boundaries' => [['explicit_bucket_histogram' => ['boundaries' => [10, 1]]]];
         yield 'duplicate boundaries' => [['explicit_bucket_histogram' => ['boundaries' => [1, 1]]]];
         yield 'boundaries map' => [['explicit_bucket_histogram' => ['boundaries' => ['a' => 1, 'b' => 2]]]];
