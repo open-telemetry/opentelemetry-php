@@ -332,6 +332,11 @@ class HttpBodyCaptureTest extends TestCase
             'overlong four byte (F0 80)' => ["ab\xf0\x80\x80Z", 5],
             'above U+10FFFF (F4 90)' => ["ab\xf4\x90\x80Z", 5],
             'four byte with a bad third byte' => ["ab\xf0\x9f\x28Z", 5],
+            'lead byte followed by a non continuation byte after the cut (C2 Z)' => ["abc\xc2Z", 4],
+            'lead byte followed by a byte outside its second byte range (E0 80)' => ["ab\xe0\x80Z", 3],
+            'three byte lead, one continuation, then a plain byte' => ["ab\xe2\x82Z", 4],
+            'four byte lead, two continuations, then a plain byte' => ["ab\xf0\x9f\x98Z", 5],
+            'incomplete lead followed by another lead byte' => ["ab\xe2\xe2\x82\xac", 3],
         ];
     }
 
@@ -349,6 +354,8 @@ class HttpBodyCaptureTest extends TestCase
             'F0 90 is the lowest valid second byte' => ["ab\xf0\x90\x80\x80Z", 5, 'ab'],
             'F4 8F is the highest valid second byte' => ["ab\xf4\x8f\x80\x80Z", 5, 'ab'],
             'a lead byte alone at the end' => ["ab\xe2\x82\xacZ", 3, 'ab'],
+            'two byte character cut after its lead' => ["abc\xc3\xa9Z", 4, 'abc'],
+            'continuation after the cut is the last one needed' => ["ab\xe2\x82\xacZ", 4, 'ab'],
         ];
     }
 
