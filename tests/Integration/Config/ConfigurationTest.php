@@ -117,6 +117,18 @@ final class ConfigurationTest extends TestCase
         Configuration::parseFile($file)->getInstrumentationConfig((new Context())->withLogger(new NullLogger()));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    public function test_parse_file_takes_one_file(): void
+    {
+        $file = __DIR__ . '/configurations/minimal.yaml';
+
+        $this->expectException(\TypeError::class);
+        /** @psalm-suppress InvalidArgument @phpstan-ignore argument.type */
+        Configuration::parseFile([$file, $file]);
+    }
+
     public function test_one_load_serves_both_roots(): void
     {
         $config = Configuration::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml');

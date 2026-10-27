@@ -183,6 +183,19 @@ class SdkAutoloaderTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk-environment-variables.md#declarative-configuration
+     */
+    public function test_autoload_from_config_file_with_comma_in_path(): void
+    {
+        $this->logger->expects($this->never())->method('log')->with($this->equalTo(LogLevel::ERROR));
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk,with-comma.yaml');
+
+        $this->assertTrue(SdkAutoloader::autoload());
+        $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+    }
+
+    /**
      * Tests the scenario where the SDK is created from config file, but a custom component
      * uses composer's autoload->files to add its own initializer
      */

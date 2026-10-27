@@ -33,11 +33,8 @@ final class Instrumentation
         return $this->configuration->getInstrumentationConfig($context);
     }
 
-    /**
-     * @param string|list<string> $file
-     */
     public static function parseFile(
-        string|array $file,
+        string $file,
         ?string $cacheFile = null,
         bool $debug = true,
         ?EnvReader $envReader = null,

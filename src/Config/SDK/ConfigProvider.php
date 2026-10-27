@@ -35,7 +35,7 @@ final class ConfigProvider implements ConfigProviderInterface
         }
 
         try {
-            return Configuration::parseInstrumentationConfig(EnvConfiguration::getList(Variables::OTEL_CONFIG_FILE), $context);
+            return Configuration::parseInstrumentationConfig(EnvConfiguration::getString(Variables::OTEL_CONFIG_FILE), $context);
         } catch (Throwable $e) {
             $context->logger->log(LogLevel::WARNING, sprintf('Error during opentelemetry initialization: %s', $e->getMessage()), ['exception' => $e]);
 

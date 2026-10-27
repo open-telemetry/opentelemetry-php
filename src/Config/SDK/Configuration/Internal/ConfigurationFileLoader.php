@@ -18,10 +18,9 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 final class ConfigurationFileLoader
 {
     /**
-     * @param string|list<string> $file path(s) to load
      * @return array loaded configurations, one entry per file
      */
-    public static function load(string|array $file, ?ResourceCollection $resources = null): array
+    public static function load(string $file, ?ResourceCollection $resources = null): array
     {
         $loader = new ConfigurationLoader($resources);
         $cwd = getcwd() ?: [];
@@ -31,9 +30,7 @@ final class ConfigurationFileLoader
             new YamlExtensionFileLoader($loader, $locator),
         ]));
 
-        foreach ((array) $file as $path) {
-            $fileLoader->load($path);
-        }
+        $fileLoader->load($file);
 
         return $loader->getConfigurations();
     }
