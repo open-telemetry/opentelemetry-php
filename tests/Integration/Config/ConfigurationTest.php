@@ -2469,6 +2469,55 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * The SDK has no metric producers, so a valid entry parses and has no effect.
+     */
+    #[DataProvider('validProducerProvider')]
+    public function test_valid_producer_parses(string $producers): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $this->createMeterProviderWithProducers($producers);
+    }
+
+    public static function validProducerProvider(): iterable
+    {
+        yield 'opencensus null' => ['[{opencensus: ~}]'];
+        yield 'opencensus empty' => ['[{opencensus: {}}]'];
+        yield 'custom null' => ['[{custom: ~}]'];
+        yield 'custom with properties' => ['[{custom/development: {any: 1}}]'];
+        yield 'several' => ['[{opencensus: ~}, {custom: ~}]'];
+    }
+
+    #[DataProvider('invalidProducerProvider')]
+    public function test_invalid_producer_is_rejected(string $producers, string $expectedMessage): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $this->createMeterProviderWithProducers($producers);
+    }
+
+    public static function invalidProducerProvider(): iterable
+    {
+        $oneKey = '/path "[^"]*periodic\.producers\.0": Metric producer must have exactly one key/';
+
+        yield 'string' => ['[opencensus]', $oneKey];
+        yield 'list' => ['[[opencensus]]', $oneKey];
+        yield 'empty' => ['[{}]', $oneKey];
+        yield 'two keys' => ['[{opencensus: ~, custom: ~}]', $oneKey];
+        yield 'scalar properties' => ['[{custom: 5}]', '/path "[^"]*periodic\.producers\.0": Metric producer "custom" must be null or a map/'];
+        yield 'opencensus properties' => ['[{opencensus: {x: 1}}]', '/path "[^"]*periodic\.producers\.0": Metric producer "opencensus" takes no properties/'];
+    }
+
+    private function createMeterProviderWithProducers(string $producers): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\nmeter_provider:\n  readers:\n  - periodic:\n      exporter:\n        console:\n      producers: $producers")])
+            ->create(new Context());
+    }
+
+    /**
      * The configured `probability/development` ratio should reach the sampler rather than being
      * parsed and dropped.
      */
