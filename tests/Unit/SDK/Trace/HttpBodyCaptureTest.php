@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use Nyholm\Psr7\ServerRequest;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\NoopLogWriter;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Trace\HttpBodyCapture;
@@ -41,6 +44,9 @@ class HttpBodyCaptureTest extends TestCase
             'form' => ['application/x-www-form-urlencoded', true],
             'charset parameter' => ['application/custom; charset=utf-8', true],
             'octet-stream' => ['application/octet-stream', false],
+            'fake charset inside a quoted value' => ['application/octet-stream; note="x;charset=utf-8"', false],
+            'fake charset after an escaped quote' => ['application/octet-stream; note="a\\"; charset=utf-8"', false],
+            'charset after a quoted value' => ['application/octet-stream; note="a;b"; charset=utf-8', true],
             'image' => ['image/png', false],
             'multipart' => ['multipart/form-data; boundary=x', false],
             'empty' => ['', false],
@@ -171,8 +177,69 @@ class HttpBodyCaptureTest extends TestCase
         $stream->method('tell')->willReturn(0);
         $stream->method('read')->willReturn('hello');
         $stream->method('seek')->willThrowException(new \RuntimeException('stream failure'));
+        Logging::setLogWriter(new NoopLogWriter());
 
-        $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
+        try {
+            $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public function test_extract_warns_when_the_position_cannot_be_restored(): void
+    {
+        $state = new class() {
+            /** @var list<array{mixed, string}> */
+            public array $messages = [];
+        };
+        Logging::setLogWriter(new class($state) implements LogWriterInterface {
+            public function __construct(private readonly object $state)
+            {
+            }
+
+            #[\Override]
+            public function write($level, string $message, array $context): void
+            {
+                $this->state->messages[] = [$level, $message];
+            }
+        });
+        $stream = $this->createMock(StreamInterface::class);
+        $stream->method('isReadable')->willReturn(true);
+        $stream->method('isSeekable')->willReturn(true);
+        $stream->method('tell')->willReturn(0);
+        $stream->method('read')->willReturn('hello');
+        $stream->method('seek')->willThrowException(new \RuntimeException('stream failure'));
+
+        try {
+            $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
+        } finally {
+            Logging::reset();
+        }
+
+        $this->assertSame([['warning', 'Unable to restore the request body stream position']], $state->messages);
+    }
+
+    public function test_extract_survives_a_failing_log_writer(): void
+    {
+        Logging::setLogWriter(new class() implements LogWriterInterface {
+            #[\Override]
+            public function write($level, string $message, array $context): void
+            {
+                throw new \ErrorException('log writer failure');
+            }
+        });
+        $stream = $this->createMock(StreamInterface::class);
+        $stream->method('isReadable')->willReturn(true);
+        $stream->method('isSeekable')->willReturn(true);
+        $stream->method('tell')->willReturn(0);
+        $stream->method('read')->willReturn('hello');
+        $stream->method('seek')->willThrowException(new \RuntimeException('stream failure'));
+
+        try {
+            $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
+        } finally {
+            Logging::reset();
+        }
     }
 
     public function test_extract_reads_more_than_one_chunk(): void
@@ -220,6 +287,25 @@ class HttpBodyCaptureTest extends TestCase
         $this->assertSame('café', HttpBodyCapture::extract(self::request('café', 'text/plain'), 5));
     }
 
+    public function test_extract_rejects_malformed_bytes_near_the_limit(): void
+    {
+        // 0xFF can never be part of UTF-8: the body is not text, whatever the limit
+        $this->assertNull(HttpBodyCapture::extract(self::request("abc\xffZ", 'text/plain'), 4));
+        // a lone continuation byte, a lead byte followed by a wrong byte
+        $this->assertNull(HttpBodyCapture::extract(self::request("abc\x80Z", 'text/plain'), 4));
+        $this->assertNull(HttpBodyCapture::extract(self::request("ab\xe2\x28Z", 'text/plain'), 4));
+        // overlong lead byte
+        $this->assertNull(HttpBodyCapture::extract(self::request("abc\xc0Z", 'text/plain'), 4));
+    }
+
+    public function test_extract_drops_an_incomplete_three_and_four_byte_character(): void
+    {
+        $this->assertSame('ab', HttpBodyCapture::extract(self::request('ab€c', 'text/plain'), 4));
+        $this->assertSame('ab€', HttpBodyCapture::extract(self::request('ab€c', 'text/plain'), 5));
+        $this->assertSame('ab', HttpBodyCapture::extract(self::request('ab😀c', 'text/plain'), 5));
+        $this->assertSame('ab😀', HttpBodyCapture::extract(self::request('ab😀c', 'text/plain'), 6));
+    }
+
     public function test_extract_returns_null_when_the_limit_cuts_the_first_character(): void
     {
         $this->assertNull(HttpBodyCapture::extract(self::request('żółć', 'text/plain'), 1));
@@ -240,6 +326,7 @@ class HttpBodyCaptureTest extends TestCase
             'utf8 alias' => ['text/plain; charset=utf8', 'hello'],
             'ascii' => ['text/plain; charset=US-ASCII', 'hello'],
             'other charset' => ['text/plain; charset=windows-1250', null],
+            'fake charset inside a quoted value' => ['text/plain; note="x;charset=windows-1250"', 'hello'],
         ];
     }
 

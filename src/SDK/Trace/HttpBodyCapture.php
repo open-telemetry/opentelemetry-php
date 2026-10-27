@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -27,6 +28,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class HttpBodyCapture
 {
+    use LogsMessagesTrait;
+
     /**
      * Not taken from the semantic conventions package on purpose: the attribute is not in any released
      * semantic conventions version yet (the latest, 1.44.0, lacks it), and this package still allows older
@@ -96,8 +99,7 @@ final class HttpBodyCapture
      */
     public static function isTextual(string $contentType): bool
     {
-        $parts = explode(';', $contentType);
-        $mediaType = strtolower(trim($parts[0]));
+        [$mediaType, $parameters] = self::parseContentType($contentType);
         if ($mediaType === '') {
             return false;
         }
@@ -110,26 +112,74 @@ final class HttpBodyCapture
             }
         }
 
-        return self::charset($contentType) !== null;
+        return isset($parameters['charset']);
     }
 
-    private static function charset(string $contentType): ?string
+    /**
+     * Splits a Content-Type header value into the lower case media type and its parameters (lower case names).
+     * Semicolons and escaped characters inside quoted values do not separate parameters.
+     *
+     * @return array{0: string, 1: array<string, string>}
+     */
+    private static function parseContentType(string $contentType): array
     {
-        $parts = explode(';', $contentType);
-        array_shift($parts);
+        $parts = [];
+        $current = '';
+        $quoted = false;
+        $length = strlen($contentType);
+        for ($i = 0; $i < $length; $i++) {
+            $char = $contentType[$i];
+            if ($quoted && $char === '\\' && $i + 1 < $length) {
+                $current .= $char . $contentType[++$i];
+
+                continue;
+            }
+            if ($char === '"') {
+                $quoted = !$quoted;
+            }
+            if ($char === ';' && !$quoted) {
+                $parts[] = $current;
+                $current = '';
+
+                continue;
+            }
+            $current .= $char;
+        }
+        $parts[] = $current;
+
+        $mediaType = strtolower(trim(array_shift($parts)));
+        $parameters = [];
         foreach ($parts as $part) {
             $pair = explode('=', $part, 2);
-            if (count($pair) === 2 && strtolower(trim($pair[0])) === 'charset') {
-                return strtolower(trim($pair[1], " \t\"'"));
+            if (count($pair) !== 2) {
+                continue;
             }
+            $name = strtolower(trim($pair[0]));
+            $value = trim($pair[1]);
+            if (preg_match('/^"((?:[^"\\\\]|\\\\.)*)"?$/s', $value, $m) === 1) {
+                $value = preg_replace('/\\\\(.)/s', '$1', $m[1]) ?? '';
+            }
+            $parameters[$name] ??= strtolower(trim($value, " \t'"));
         }
 
-        return null;
+        return [$mediaType, $parameters];
+    }
+
+    /**
+     * Logging is best effort and must never break the request.
+     */
+    private static function warn(string $message, array $context): void
+    {
+        try {
+            self::logWarning($message, $context);
+        } catch (\Throwable) {
+            // nothing more can be done
+        }
     }
 
     private static function isUtf8Charset(string $contentType): bool
     {
-        $charset = self::charset($contentType);
+        $charset = self::parseContentType($contentType)[1]['charset'] ?? null;
 
         return $charset === null || $charset === 'utf-8' || $charset === 'utf8' || $charset === 'us-ascii';
     }
@@ -169,8 +219,9 @@ final class HttpBodyCapture
             if ($position !== null) {
                 try {
                     $stream->seek($position);
-                } catch (\RuntimeException) {
-                    // nothing more can be done
+                } catch (\RuntimeException $e) {
+                    // the body is still returned, but the application may see another stream position
+                    self::warn('Unable to restore the request body stream position', ['exception' => $e]);
                 }
             }
         }
@@ -179,15 +230,40 @@ final class HttpBodyCapture
     }
 
     /**
-     * When the body was cut at the size limit, drops the incomplete trailing multi-byte character.
-     * Returns null when the data is not valid UTF-8 (a body that was not cut is never altered).
+     * When the body was cut at the size limit, drops the trailing bytes of a valid but incomplete multi-byte
+     * character. Returns null when the data is not valid UTF-8 (a body that was not cut is never altered, and
+     * malformed bytes are never dropped).
      */
     private static function toValidUtf8(string $data, bool $cut): ?string
     {
-        for ($i = 0; $cut && $i < 3 && $data !== '' && preg_match('//u', $data) !== 1; $i++) {
-            $data = substr($data, 0, -1);
+        if ($cut) {
+            $data = substr($data, 0, strlen($data) - self::incompleteTrailingBytes($data));
         }
 
         return $data !== '' && preg_match('//u', $data) === 1 ? $data : null;
+    }
+
+    /**
+     * Number of trailing bytes that start a multi-byte character without finishing it (0 to 3).
+     */
+    private static function incompleteTrailingBytes(string $data): int
+    {
+        $length = strlen($data);
+        for ($back = 1; $back <= 3 && $back <= $length; $back++) {
+            $byte = ord($data[$length - $back]);
+            if (($byte & 0xC0) === 0x80) {
+                continue; // continuation byte, keep looking for its lead byte
+            }
+            $expected = match (true) {
+                $byte >= 0xF0 && $byte <= 0xF4 => 4,
+                $byte >= 0xE0 && $byte <= 0xEF => 3,
+                $byte >= 0xC2 && $byte <= 0xDF => 2,
+                default => 1,
+            };
+
+            return $expected > $back ? $back : 0;
+        }
+
+        return 0;
     }
 }
