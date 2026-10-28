@@ -31,7 +31,8 @@
             "php-http/discovery": true,
             "symfony/runtime": true,
             "tbachert/spi": true
-        }
+        },
+        "lock": false
     },
     "authors": [
         {
@@ -69,6 +70,7 @@
             "src/SDK/Logs/Exporter/_register.php",
             "src/SDK/Metrics/MetricExporter/_register.php",
             "src/SDK/Propagation/_register.php",
+            "src/SDK/Trace/AutoRootSpan/_register.php",
             "src/SDK/Trace/SpanExporter/_register.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
             "src/SDK/Common/Util/functions.php",
@@ -180,6 +182,8 @@
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk",
 
+                "OpenTelemetry\\SDK\\Trace\\AutoRootSpan\\ComponentProvider",
+
                 "OpenTelemetry\\Example\\ExampleConfigProvider",
 
                 "OpenTelemetry\\Tests\\Integration\\Config\\ComponentProvider\\Detector\\Container",
@@ -199,6 +203,8 @@
 
                 "OpenTelemetry\\SDK\\ConfigEnv\\Distribution\\DistributionConfigurationSdk",
 
+                "OpenTelemetry\\SDK\\Trace\\AutoRootSpan\\EnvComponentLoader",
+
                 "OpenTelemetry\\Example\\ExampleConfigLoader"
             ],
             "OpenTelemetry\\API\\Configuration\\ConfigProviderInterface": [
@@ -208,6 +214,7 @@
               "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
+                "OpenTelemetry\\SDK\\Trace\\AutoRootSpan\\AutoRootSpanInstrumentation",
                 "OpenTelemetry\\Example\\ExampleInstrumentation"
             ],
             "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
