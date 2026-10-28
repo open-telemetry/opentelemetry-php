@@ -67,7 +67,15 @@
                 "OpenTelemetry\\SDK\\ConfigEnv\\Trace\\SpanSuppressionStrategySemConv",
                 "OpenTelemetry\\SDK\\ConfigEnv\\Trace\\SpanSuppressionStrategySpanKind",
 
-                "OpenTelemetry\\SDK\\ConfigEnv\\Distribution\\DistributionConfigurationSdk"
+                "OpenTelemetry\\SDK\\ConfigEnv\\Distribution\\DistributionConfigurationSdk",
+
+                "OpenTelemetry\\SDK\\Trace\\AutoRootSpan\\EnvComponentLoader"
+            ],
+            "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "OpenTelemetry\\SDK\\Trace\\AutoRootSpan\\ComponentProvider"
+            ],
+            "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation": [
+                "OpenTelemetry\\SDK\\Trace\\AutoRootSpan\\AutoRootSpanInstrumentation"
             ],
             "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\ResolverInterface": [
                 "OpenTelemetry\\SDK\\Common\\Configuration\\Resolver\\SdkConfigurationResolver"
