@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
-use function str_replace;
 use function strtolower;
 use UnexpectedValueException;
 
@@ -30,10 +29,10 @@ final class TemporalityPreference implements AggregationTemporalitySelectorInter
      */
     public static function fromName(string $name): self
     {
-        return match (str_replace('_', '', strtolower($name))) {
+        return match (strtolower($name)) {
             'cumulative' => self::cumulative(),
             'delta' => self::delta(),
-            'lowmemory' => self::lowMemory(),
+            'lowmemory', 'low_memory' => self::lowMemory(),
             default => throw new UnexpectedValueException('Unknown temporality: ' . $name),
         };
     }

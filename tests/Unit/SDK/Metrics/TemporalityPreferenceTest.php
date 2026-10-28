@@ -65,9 +65,18 @@ final class TemporalityPreferenceTest extends TestCase
         yield 'case insensitive' => ['Delta', TemporalityPreference::delta()];
     }
 
-    public function test_from_name_rejects_unknown_name(): void
+    #[DataProvider('unknownNameProvider')]
+    public function test_from_name_rejects_unknown_name(string $name): void
     {
         $this->expectException(\UnexpectedValueException::class);
-        TemporalityPreference::fromName('sometimes');
+        TemporalityPreference::fromName($name);
+    }
+
+    public static function unknownNameProvider(): iterable
+    {
+        yield 'unknown' => ['sometimes'];
+        yield 'misplaced underscore' => ['low_mem_ory'];
+        yield 'underscore in delta' => ['del_ta'];
+        yield 'leading underscore' => ['_cumulative'];
     }
 }
