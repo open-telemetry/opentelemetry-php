@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Resource;
 
 use Generator;
-use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -97,12 +96,19 @@ class ResourceInfoFactoryTest extends TestCase
         $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/resource/sdk.md#specifying-resource-information-via-an-environment-variable
+     */
     #[Group('compliance')]
     public function test_resource_with_invalid_environment_variable(): void
     {
-        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo');
-        $this->expectException(InvalidArgumentException::class);
-        $this->assertInstanceOf(ResourceInfo::class, ResourceInfoFactory::defaultResource());
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', 'foo,service.name=from-resource-attributes');
+        $this->logWriter->expects($this->once())->method('write')->with($this->equalTo('warning'));
+
+        $resource = ResourceInfoFactory::defaultResource();
+
+        $this->assertFalse($resource->getAttributes()->has('foo'));
+        $this->assertNotSame('from-resource-attributes', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
     }
 
     #[Group('compliance')]

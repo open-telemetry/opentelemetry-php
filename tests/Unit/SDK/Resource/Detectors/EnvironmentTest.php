@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Resource\Detectors\Environment;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 
 #[CoversClass(Environment::class)]
 class EnvironmentTest extends TestCase
@@ -70,5 +74,24 @@ class EnvironmentTest extends TestCase
 
         $this->assertNotEmpty($resource->getAttributes());
         $this->assertSame('test-service', $resource->getAttributes()->get(ResourceAttributes::SERVICE_NAME));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/resource/sdk.md#specifying-resource-information-via-an-environment-variable
+     */
+    #[TestWith(['foo'])]
+    #[TestWith(['=x,service.name=a'])]
+    #[TestWith(['service.name=a,foo'])]
+    public function test_malformed_resource_attributes_are_discarded_with_a_warning(string $value): void
+    {
+        $this->setEnvironmentVariable('OTEL_RESOURCE_ATTRIBUTES', $value);
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')
+            ->with(LogLevel::WARNING, $this->stringContains('OTEL_RESOURCE_ATTRIBUTES'), $this->anything());
+        Logging::setLogWriter($logWriter);
+
+        $resource = $this->detector->getResource();
+
+        $this->assertEmpty($resource->getAttributes());
     }
 }
