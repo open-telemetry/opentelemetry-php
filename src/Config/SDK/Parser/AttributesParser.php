@@ -7,7 +7,6 @@ namespace OpenTelemetry\Config\SDK\Parser;
 use function array_is_list;
 use const FILTER_FLAG_ALLOW_HEX;
 use const FILTER_NULL_ON_FAILURE;
-use const FILTER_VALIDATE_BOOLEAN;
 use const FILTER_VALIDATE_FLOAT;
 use const FILTER_VALIDATE_INT;
 use function filter_var;
@@ -22,6 +21,7 @@ use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use function sprintf;
 use function str_ends_with;
 use function substr;
+use function trim;
 
 /**
  * @internal
@@ -85,7 +85,11 @@ class AttributesParser
     {
         $resolved = match ($type) {
             'string' => is_string($value) ? $value : null,
-            'bool' => is_bool($value) ? $value : self::filterString($value, FILTER_VALIDATE_BOOLEAN),
+            'bool' => is_bool($value) ? $value : match (is_string($value) ? trim($value) : $value) {
+                'true', 'True', 'TRUE' => true,
+                'false', 'False', 'FALSE' => false,
+                default => null,
+            },
             'int' => is_int($value) ? $value : self::filterString($value, FILTER_VALIDATE_INT, FILTER_FLAG_ALLOW_HEX),
             'double' => is_int($value) || is_float($value) ? (float) $value : self::filterString($value, FILTER_VALIDATE_FLOAT),
             default => null,

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Config\SDK\Parser;
 
+use InvalidArgumentException;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AttributesParser::class)]
@@ -78,6 +80,24 @@ class AttributesParserTest extends TestCase
          * @phpstan-ignore-next-line
          */
         $this->assertEquals($expected, AttributesParser::parseAttributes($input));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#yaml-file-format
+     */
+    #[TestWith(['True', true])]
+    #[TestWith(['FALSE', false])]
+    #[TestWith(['on', null])]
+    #[TestWith(['yes', null])]
+    #[TestWith(['1', null])]
+    public function test_apply_bool_type_reads_core_schema_strings(string $value, ?bool $expected): void
+    {
+        if ($expected === null) {
+            $this->expectException(InvalidArgumentException::class);
+        }
+
+        $this->assertSame($expected, AttributesParser::applyType($value, 'bool'));
+        $this->assertSame([$expected], AttributesParser::applyType([$value], 'bool_array'));
     }
 
     public function test_empty_included(): void

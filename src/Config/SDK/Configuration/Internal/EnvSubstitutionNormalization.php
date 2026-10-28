@@ -7,14 +7,12 @@ namespace OpenTelemetry\Config\SDK\Configuration\Internal;
 use const FILTER_DEFAULT;
 use const FILTER_FLAG_ALLOW_HEX;
 use const FILTER_NULL_ON_FAILURE;
-use const FILTER_VALIDATE_BOOLEAN;
 use const FILTER_VALIDATE_FLOAT;
 use const FILTER_VALIDATE_INT;
 use function filter_var;
 use function is_array;
 use function is_string;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
-use OpenTelemetry\Config\SDK\Configuration\Internal\Node\BooleanNode;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Node\FloatNode;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Node\IntegerNode;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Node\VariableNode;
@@ -62,7 +60,6 @@ final class EnvSubstitutionNormalization implements Normalization
         }
         if ($node instanceof ScalarNode && is_string($value)) {
             [$filter, $flags] = match (true) {
-                $node instanceof BooleanNode => [FILTER_VALIDATE_BOOLEAN, 0],
                 $node instanceof IntegerNode => [FILTER_VALIDATE_INT, FILTER_FLAG_ALLOW_HEX],
                 $node instanceof FloatNode => [FILTER_VALIDATE_FLOAT, 0],
                 default => [FILTER_DEFAULT, 0],

@@ -11,11 +11,13 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\EnvReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\EnvSubstitutionNormalization;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\ArrayNodeDefinition;
+use OpenTelemetry\Config\SDK\Configuration\Internal\NodeDefinition\BooleanNodeDefinition;
 use OpenTelemetry\Config\SDK\Configuration\Internal\NormalizationsAware;
 use OpenTelemetry\Config\SDK\Configuration\Internal\Substitution;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
 
@@ -134,6 +136,39 @@ final class SubstitutionTest extends TestCase
         yield 'blank in text' => ['a${BLANK}b', 'a  b'];
         yield 'padded' => ['${PADDED}', ' value '];
         yield 'padded in text' => ['a${PADDED}b', 'a value b'];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#yaml-file-format
+     */
+    #[DataProvider('booleanSubstitutionDataProvider')]
+    public function test_boolean_substitution(string $env, ?bool $expected): void
+    {
+        $envReader = new EnvSourceReader([new ArrayEnvSource(['BOOL_VALUE' => $env])]);
+        $node = new ArrayNodeDefinition('');
+        $node->append(new BooleanNodeDefinition('key'));
+        $node = $node->getNode(true);
+        assert($node instanceof NormalizationsAware);
+        $node->setNormalizations([new EnvSubstitutionNormalization($envReader)]);
+
+        if ($expected === null) {
+            $this->expectException(InvalidTypeException::class);
+        }
+        $result = (new Processor())->process($node, [['key' => '${BOOL_VALUE}']]);
+
+        $this->assertSame($expected, $result['key']);
+    }
+
+    public static function booleanSubstitutionDataProvider(): iterable
+    {
+        yield 'true' => ['true', true];
+        yield 'title case' => ['True', true];
+        yield 'upper case' => ['FALSE', false];
+        yield 'mixed case' => ['tRUE', null];
+        yield 'yaml 1.1 on' => ['on', null];
+        yield 'yaml 1.1 yes' => ['yes', null];
+        yield 'one' => ['1', null];
+        yield 'zero' => ['0', null];
     }
 
     public static function invalidSubstitutionDataProvider(): iterable
