@@ -42,6 +42,7 @@
             "Logs/Exporter/_register.php",
             "Metrics/MetricExporter/_register.php",
             "Propagation/_register.php",
+            "Trace/AutoRootSpan/_register.php",
             "Trace/SpanExporter/_register.php",
             "Common/Dev/Compatibility/_load.php",
             "_autoload.php"
