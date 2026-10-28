@@ -19,6 +19,11 @@ The spec says files SHOULD be parsed with the
 `symfony/yaml` follows it for booleans. ext-yaml parses YAML 1.1, where `yes`, `no`, `on` and `off`
 are booleans. With ext-yaml, quote those values when you mean a string.
 
+The spec doesn't list boolean values itself. The core schema's booleans are `true`, `True`, `TRUE`,
+`false`, `False` and `FALSE`, and a boolean setting accepts only those, including from `${VAR}`. An
+unquoted `on` or `yes` is accepted with ext-yaml but is an error with `symfony/yaml`, and `${VAR}` set
+to `on`, `yes` or `1` is an error with either.
+
 When both are installed, `symfony/yaml` is used.
 
 ## Usage
@@ -145,6 +150,14 @@ These are validated, so a file that sets them still parses, but the SDK doesn't 
 - A view whose aggregation doesn't suit the instrument, such as `explicit_bucket_histogram` on an
   asynchronous instrument, is applied as given. The spec says it
   [SHOULD warn and ignore the view](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#measurement-processing).
+
+### Quoted values on typed settings
+
+A quoted value on a boolean, integer or float setting is converted, so `"true"` is `true` and `"5"`
+is `5`. In the core schema a quoted value is a string, and the spec's
+[substitution examples](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#environment-variable-substitution)
+resolve `"${BOOL_VALUE}"` to the string `"true"`. The YAML parsers don't report quoting, so a quoted
+value can't be told apart from an unquoted one.
 
 ### Instrumentation configuration
 
