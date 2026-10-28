@@ -9,7 +9,6 @@ use Nevay\SPI\ServiceLoader;
 use Nevay\SPI\ServiceProviderDependency\PackageDependency;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceProvider;
-use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Environment\LazyEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
@@ -54,7 +53,7 @@ class SdkConfigurationResolver implements ResolverInterface
     }
 
     /**
-     * Unlike {@see EnvSourceReader}, which reads values verbatim for declarative configuration,
+     * Unlike {@see \OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader}, which reads values verbatim for declarative configuration,
      * this trims them and skips a blank value in favor of the next source.
      */
     private function read(string $variableName): ?string
