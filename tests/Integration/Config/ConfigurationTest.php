@@ -786,6 +786,69 @@ final class ConfigurationTest extends TestCase
         }
     }
 
+    #[DataProvider('batchProcessorProvider')]
+    public function test_batch_size_warning_honours_log_level(string $provider): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                log_level: error
+                $provider:
+                  processors:
+                  - batch:
+                      max_queue_size: 10
+                      max_export_batch_size: 100
+                      exporter:
+                        console:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $sdk->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    #[DataProvider('batchProcessorProvider')]
+    public function test_batch_size_warning_is_logged(string $provider): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('exceeds maximum queue size'),
+            $this->anything(),
+        );
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                $provider:
+                  processors:
+                  - batch:
+                      max_queue_size: 10
+                      max_export_batch_size: 100
+                      exporter:
+                        console:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $sdk->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public static function batchProcessorProvider(): iterable
+    {
+        yield 'span' => ['tracer_provider'];
+        yield 'log record' => ['logger_provider'];
+    }
+
     /**
      * Unlike resource detectors, every other component type must fail rather than be skipped.
      */
@@ -2346,6 +2409,11 @@ final class ConfigurationTest extends TestCase
         yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: ~\n      config: {}", 'tracers..name'];
         yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: ~\n      config: {}", 'meters..name'];
         yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: ~\n      config: {}", 'loggers..name'];
+        yield 'tracers config' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: t\n      config: ~", 'tracers..config'];
+        yield 'meters config' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: m\n      config: ~", 'meters..config'];
+        yield 'loggers config' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: l\n      config: ~", 'loggers..config'];
+        yield 'view selector' => ["meter_provider:\n$readers  views:\n  - selector: ~\n    stream:\n      name: n", 'views..selector'];
+        yield 'view stream' => ["meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: i\n    stream: ~", 'views..stream'];
         yield 'response propagator composite item' => ["distribution:\n  opentelemetry_php/development:\n    response_propagator/development:\n      composite: [~]", 'response_propagator/development.composite'];
 
         $exporters = [
@@ -2880,6 +2948,7 @@ final class ConfigurationTest extends TestCase
         yield 'empty' => ['[{}]', $oneKey];
         yield 'two keys' => ['[{opencensus: ~, custom: ~}]', $oneKey];
         yield 'scalar properties' => ['[{custom: 5}]', '/path "[^"]*periodic\.producers\.0": Metric producer "custom" must be null or a map/'];
+        yield 'list properties' => ['[{custom: [1, 2]}]', '/path "[^"]*periodic\.producers\.0": Metric producer "custom" must be null or a map/'];
         yield 'opencensus properties' => ['[{opencensus: {x: 1}}]', '/path "[^"]*periodic\.producers\.0": Metric producer "opencensus" takes no properties/'];
     }
 

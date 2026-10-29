@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
+use function array_is_list;
 use function array_key_first;
 use function count;
 use InvalidArgumentException;
@@ -95,7 +96,8 @@ final class MetricReaderPeriodic implements ComponentProvider
             throw new InvalidArgumentException('Metric producer must have exactly one key, naming the producer');
         }
         $properties = $producer[$name];
-        if ($properties !== null && !is_array($properties)) {
+        // Both YAML parsers give `{}` as `[]`, so only a non-empty list is known to be a sequence.
+        if ($properties !== null && (!is_array($properties) || ($properties !== [] && array_is_list($properties)))) {
             throw new InvalidArgumentException(sprintf('Metric producer "%s" must be null or a map', $name));
         }
         if ($name === 'opencensus' && $properties) {
