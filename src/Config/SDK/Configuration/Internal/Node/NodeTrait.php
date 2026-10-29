@@ -14,7 +14,7 @@ trait NodeTrait
 {
     protected function preNormalize(mixed $value): mixed
     {
-        if ($value === null && $this->allowEmptyValue && $this->hasDefaultValue()) {
+        if ($value === null && $this->allowEmptyValue && $this->hasDefaultValue() && $this->acceptsNull()) {
             $value = $this->getDefaultValue();
         }
 

@@ -73,7 +73,7 @@ final class ArrayNode extends \Symfony\Component\Config\Definition\ArrayNode imp
 
         // Treated as `{}`, so that missing children take their defaults unfinalized. Finalizing a
         // `requiresAtLeastOneElement()` child's `[]` default would fail its minimum count.
-        if ($value === null && $this->allowEmptyValue && $this->addIfNotSet && !$this->defaultValueSet) {
+        if ($value === null && $this->allowEmptyValue && $this->addIfNotSet && !$this->defaultValueSet && $this->acceptsNull()) {
             return [];
         }
 
