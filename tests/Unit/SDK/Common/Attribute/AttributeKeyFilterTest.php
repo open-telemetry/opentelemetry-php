@@ -48,12 +48,11 @@ final class AttributeKeyFilterTest extends TestCase
     public function test_caches_decision_per_key(): void
     {
         $filter = new AttributeKeyFilter(['foo*'], null);
-        $filter->accepts('foo');
 
-        $included = new \ReflectionProperty($filter, 'included');
-        $included->setValue($filter, []);
+        $accepted = new \ReflectionProperty($filter, 'accepted');
+        $accepted->setValue($filter, ['foo' => false]);
 
-        $this->assertTrue($filter->accepts('foo'));
+        $this->assertFalse($filter->accepts('foo'));
     }
 
     public function test_filter_keeps_accepted_keys(): void
