@@ -71,7 +71,7 @@ final class ConfigurationFactory
     }
 
     /**
-     * @param string|list<string> $file path(s) to parse
+     * @param string $file path to parse
      * @param string|null $cacheFile path to cache parsed configuration to
      * @param bool $debug will check for cache freshness if debug mode enabled
      * @throws Exception if loading of a configuration file fails for any reason
@@ -81,7 +81,7 @@ final class ConfigurationFactory
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
      */
     public function parseFile(
-        string|array $file,
+        string $file,
         ?string $cacheFile = null,
         bool $debug = true,
     ): ComponentPlugin {

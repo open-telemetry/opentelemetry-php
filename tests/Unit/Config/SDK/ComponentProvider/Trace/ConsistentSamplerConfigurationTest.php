@@ -20,7 +20,6 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterMemory;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
-use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
 use OpenTelemetry\Context\Context as OtelContext;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -46,7 +45,6 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(ComposableSamplerRuleBased::class)]
 #[CoversClass(SamplerComposite::class)]
 #[CoversClass(SamplerProbability::class)]
-#[CoversClass(NonEmptyList::class)]
 final class ConsistentSamplerConfigurationTest extends TestCase
 {
     private const TRACE_ID = '0af7651916cd43dd8448eb211c80319c';
@@ -223,6 +221,50 @@ final class ConsistentSamplerConfigurationTest extends TestCase
         yield 'included' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        included: []\n      sampler:\n        always_on:\n"];
         yield 'excluded' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        excluded: []\n      sampler:\n        always_on:\n"];
         yield 'values' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_values:\n        key: k\n        values: []\n      sampler:\n        always_on:\n"];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('nullListProvider')]
+    public function test_null_lists_take_defaults(string $yaml, int $decision): void
+    {
+        $this->assertSame($decision, $this->decide($this->sampler($yaml))->getDecision());
+    }
+
+    public static function nullListProvider(): iterable
+    {
+        yield 'rules' => ["composite/development:\n  rule_based:\n    rules: ~\n", SamplingResult::DROP];
+        yield 'span_kinds' => ["composite/development:\n  rule_based:\n    rules:\n    - span_kinds: ~\n      sampler:\n        always_on:\n", SamplingResult::RECORD_AND_SAMPLE];
+        yield 'parent' => ["composite/development:\n  rule_based:\n    rules:\n    - parent: ~\n      sampler:\n        always_on:\n", SamplingResult::RECORD_AND_SAMPLE];
+        yield 'included' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        included: ~\n      sampler:\n        always_on:\n", SamplingResult::DROP];
+        yield 'excluded' => ["composite/development:\n  rule_based:\n    rules:\n    - attribute_patterns:\n        key: k\n        excluded: ~\n      sampler:\n        always_on:\n", SamplingResult::DROP];
+    }
+
+    /**
+     * The schema makes these items nullable, so that an unset environment variable still
+     * substitutes into a valid list. A null item matches nothing, and a list of nothing but
+     * nulls is ignored, as an omitted list is.
+     */
+    #[DataProvider('nullListItemProvider')]
+    public function test_null_list_items_are_ignored(string $condition, int $kind, int $decision): void
+    {
+        $sampler = $this->sampler("composite/development:\n  rule_based:\n    rules:\n    - $condition\n      sampler:\n        always_on:\n");
+
+        $this->assertSame($decision, $this->decide($sampler, $kind)->getDecision());
+    }
+
+    public static function nullListItemProvider(): iterable
+    {
+        $server = SpanKind::KIND_SERVER;
+        $consumer = SpanKind::KIND_CONSUMER;
+
+        yield 'span_kinds of only null' => ['span_kinds: [~]', $server, SamplingResult::RECORD_AND_SAMPLE];
+        yield 'span_kinds with null, not matching' => ['span_kinds: [consumer, ~]', $server, SamplingResult::DROP];
+        yield 'span_kinds with null, matching' => ['span_kinds: [consumer, ~]', $consumer, SamplingResult::RECORD_AND_SAMPLE];
+        yield 'span_kinds with unset variable' => ["span_kinds: [consumer, '\${OTEL_PHP_TEST_UNSET_SPAN_KIND}']", $server, SamplingResult::DROP];
+        yield 'parent of only null' => ['parent: [~]', $server, SamplingResult::RECORD_AND_SAMPLE];
+        yield 'parent with null' => ['parent: [remote, ~]', $server, SamplingResult::DROP];
     }
 
     public function test_rule_based_without_rules_drops_everything(): void

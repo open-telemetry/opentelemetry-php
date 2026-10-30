@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\Configuration\Loader;
 
+use function count;
 use function error_get_last;
 use function extension_loaded;
 use InvalidArgumentException;
@@ -40,11 +41,14 @@ final class YamlExtensionFileLoader extends FileLoader
         $path = $this->locator->locate($resource);
         $this->configuration->addResource(new FileResource($path));
 
-        if (($content = @\yaml_parse_file($path)) === false) {
+        if (($documents = @\yaml_parse_file($path, -1)) === false) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not contain valid YAML: %s', $path, error_get_last()['message'] ?? ''));
         }
+        if (count($documents) > 1) {
+            throw new InvalidArgumentException(sprintf('The file "%s" contains more than one YAML document', $path));
+        }
 
-        $this->configuration->loadConfiguration(self::unreference($content, $path));
+        $this->configuration->loadConfiguration(self::unreference($documents[0] ?? null, $path));
 
         return null;
     }

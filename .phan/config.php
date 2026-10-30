@@ -282,6 +282,7 @@ return [
     // to this deny-list to inhibit them from being reported.
     'suppress_issue_types' => [
         'PhanAccessClassInternal',
+        'PhanAccessClassConstantInternal',
         'PhanAccessMethodInternal',
         'PhanAccessPropertyInternal',
         'PhanTypeMismatchPropertyReal',

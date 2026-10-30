@@ -7,8 +7,10 @@ namespace OpenTelemetry\SDK\Trace\Sampler;
 use function assert;
 use function bin2hex;
 use InvalidArgumentException;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
 use OpenTelemetry\SDK\Trace\Span;
@@ -29,8 +31,11 @@ use function unpack;
  */
 class TraceIdRatioBasedSampler implements SamplerInterface
 {
+    use LogsMessagesTrait;
+
     private readonly float $probability;
     private readonly string $tv;
+    private bool $warnedAsChild = false;
 
     /**
      * @param float $probability Probability float value between 0.0 and 1.0.
@@ -46,6 +51,11 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         $this->tv = rtrim(bin2hex(substr(pack('J', self::computeTValue($probability, $precision, 4)), 1)), '0') ?: '0';
     }
 
+    /**
+     * Warns once per instance when used as a child sampler.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#compatibility-warnings-for-traceidratiobased-sampler
+     */
     #[\Override]
     public function shouldSample(
         ContextInterface $parentContext,
@@ -55,7 +65,16 @@ class TraceIdRatioBasedSampler implements SamplerInterface
         AttributesInterface $attributes,
         array $links,
     ): SamplingResult {
-        $traceState = Span::fromContext($parentContext)->getContext()->getTraceState();
+        $parentSpanContext = Span::fromContext($parentContext)->getContext();
+        $traceState = $parentSpanContext->getTraceState();
+
+        if (!$this->warnedAsChild && $parentSpanContext->isValid()) {
+            $this->warnedAsChild = true;
+            $otelTraceState = OtelTraceState::parse($traceState?->get(OtelTraceState::TRACE_STATE_KEY));
+            self::logWarning($otelTraceState->hasValidThreshold() || $otelTraceState->hasValidRandomValue()
+                ? 'The TraceIdRatioBased sampler is operating as a child sampler and a parent is using ProbabilitySampler. Please upgrade this SDK configuration to use ProbabilitySampler.'
+                : 'The TraceIdRatioBased sampler is operating as a child sampler; the behavior is subject to change. Please upgrade this SDK configuration to use ProbabilitySampler.');
+        }
 
         $decision = $this->probability >= 2 ** -56 && substr_compare($traceId, $this->tv, -14) >= 0
             ? SamplingResult::RECORD_AND_SAMPLE

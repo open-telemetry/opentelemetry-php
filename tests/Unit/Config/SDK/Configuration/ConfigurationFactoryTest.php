@@ -366,6 +366,50 @@ final class ConfigurationFactoryTest extends TestCase
     }
 
     /**
+     * ext-yaml returns the first document of a stream and drops the rest. symfony/yaml rejects
+     * the file, so ext-yaml must too.
+     */
+    #[RequiresPhpExtension('yaml')]
+    #[CoversNothing]
+    #[TestWith(["file_format: \"1.0\"\n---\nfile_format: \"1.0\"\n"], 'two documents')]
+    #[TestWith(["file_format: \"1.0\"\n---\n"], 'trailing separator')]
+    public function test_multiple_yaml_documents_are_rejected(string $yaml): void
+    {
+        $file = $this->cacheDir . '/multiple-documents.yaml';
+        file_put_contents($file, $yaml);
+
+        try {
+            $loader = new Internal\ConfigurationLoader(null);
+
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionMessageMatches('/more than one YAML document/');
+
+            (new Loader\YamlExtensionFileLoader($loader, new FileLocator($this->cacheDir)))->load($file);
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    #[RequiresPhpExtension('yaml')]
+    #[CoversNothing]
+    #[TestWith(["---\nfile_format: \"1.0\"\n"], 'leading separator')]
+    #[TestWith(["file_format: \"1.0\"\n...\n"], 'document end marker')]
+    public function test_single_yaml_document_with_markers_is_accepted(string $yaml): void
+    {
+        $file = $this->cacheDir . '/single-document.yaml';
+        file_put_contents($file, $yaml);
+
+        try {
+            $loader = new Internal\ConfigurationLoader(null);
+            (new Loader\YamlExtensionFileLoader($loader, new FileLocator($this->cacheDir)))->load($file);
+
+            $this->assertSame([['file_format' => '1.0']], $loader->getConfigurations());
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    /**
      * If a property has a default value defined (i.e. is _not_ required) and is
      * missing or present but null, Create MUST ensure the SDK component is configured
      * with the default value.
@@ -459,6 +503,17 @@ final class ConfigurationFactoryTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
         self::factory()->parseFile($file);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/data-model.md#yaml-file-format
+     */
+    public function test_file_without_yaml_extension_is_rejected(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('Configuration file "%s" must have a .yaml or .yml extension', __FILE__));
+
+        self::factory()->parseFile(__FILE__);
     }
 
     private function factory(): ConfigurationFactory

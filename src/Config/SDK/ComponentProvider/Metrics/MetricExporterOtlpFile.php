@@ -37,11 +37,7 @@ final class MetricExporterOtlpFile implements ComponentProvider
     {
         $endpoint = OutputStreamParser::parse($properties['output_stream']);
 
-        $temporality = match ($properties['temporality_preference']) {
-            'cumulative' => TemporalityPreference::cumulative(),
-            'delta' => TemporalityPreference::delta(),
-            'low_memory' => TemporalityPreference::lowMemory(),
-        };
+        $temporality = TemporalityPreference::fromName($properties['temporality_preference']);
 
         return new MetricExporter(Registry::transportFactory('stream')->create(
             endpoint: $endpoint,

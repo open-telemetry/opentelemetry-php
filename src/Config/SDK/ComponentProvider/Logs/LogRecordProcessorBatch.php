@@ -9,6 +9,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\Config\SDK\ComponentProvider\BatchSize;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -39,7 +40,7 @@ final class LogRecordProcessorBatch implements ComponentProvider
             maxQueueSize: $properties['max_queue_size'],
             scheduledDelayMillis: $properties['schedule_delay'],
             exportTimeoutMillis: $properties['export_timeout'],
-            maxExportBatchSize: $properties['max_export_batch_size'],
+            maxExportBatchSize: BatchSize::clamp($properties['max_export_batch_size'], $properties['max_queue_size'], $context),
             meterProvider: $context->meterProvider,
         );
     }

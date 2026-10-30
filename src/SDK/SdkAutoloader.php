@@ -74,7 +74,7 @@ class SdkAutoloader
                 try {
                     // One parse serves both configuration roots. Registering no initializer on
                     // failure leaves Globals to fall back to its noop configurator.
-                    $config = SdkConfiguration::parseFile(Configuration::getList(Variables::OTEL_CONFIG_FILE));
+                    $config = SdkConfiguration::parseFile(Configuration::getString(Variables::OTEL_CONFIG_FILE));
                     Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator, $config));
                 } catch (Throwable $t) {
                     self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);

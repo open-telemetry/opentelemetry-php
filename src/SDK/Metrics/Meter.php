@@ -451,8 +451,8 @@ final class Meter implements MeterInterface, Configurable
         return serialize([
             $instrument->type,
             $instrument->name,
-            $instrument->unit ?? '',
-            $instrument->description ?? '',
+            $instrument->unit,
+            $instrument->description,
         ]);
     }
 }

@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace\Sampler;
 
 use function bin2hex;
 use InvalidArgumentException;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -15,12 +17,19 @@ use function pack;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use function rtrim;
 use function substr;
 
 #[CoversClass(TraceIdRatioBasedSampler::class)]
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Logging::reset();
+    }
+
     #[DataProvider('shouldSampleProvider')]
     public function test_should_sample(string $traceId, float $probability, int $result): void
     {
@@ -95,6 +104,44 @@ class TraceIdRatioBasedSamplerTest extends TestCase
             'greater than one' => [1.5],
             'NaN' => [NAN],
         ];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#compatibility-warnings-for-traceidratiobased-sampler
+     */
+    #[DataProvider('childSamplerWarningProvider')]
+    public function test_warns_once_when_operating_as_child_sampler(?string $parentTraceState, ?string $expected): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($expected === null ? $this->never() : $this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains((string) $expected),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $parent = $parentTraceState === null
+            ? Context::getRoot()
+            : API\Span::wrap(API\SpanContext::create(
+                '4bf92f3577b34da6a3ce929d0e0e4736',
+                '00f067aa0ba902b7',
+                API\TraceFlags::SAMPLED,
+                new API\TraceState($parentTraceState),
+            ))->storeInContext(Context::getRoot());
+
+        $sampler = new TraceIdRatioBasedSampler(0.5);
+        for ($i = 0; $i < 2; $i++) {
+            $sampler->shouldSample($parent, '4bf92f3577b34da6a3ce929d0e0e4736', 'span', API\SpanKind::KIND_INTERNAL, Attributes::create([]), []);
+        }
+    }
+
+    public static function childSamplerWarningProvider(): iterable
+    {
+        yield 'root span' => [null, null];
+        yield 'child span' => ['', 'operating as a child sampler;'];
+        yield 'child of a probability sampler threshold' => ['ot=th:8', 'a parent is using ProbabilitySampler'];
+        yield 'child of a probability sampler random value' => ['ot=rv:0123456789abcd', 'a parent is using ProbabilitySampler'];
+        yield 'child with other ot subkeys' => ['ot=foo:bar', 'operating as a child sampler;'];
     }
 
     /**

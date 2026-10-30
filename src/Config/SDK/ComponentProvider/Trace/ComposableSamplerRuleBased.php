@@ -10,7 +10,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Trace\SpanKind;
-use OpenTelemetry\Config\SDK\Configuration\Internal\NonEmptyList;
+use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableRuleBased;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\ComposableSamplerInterface;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\Predicate;
@@ -39,8 +39,8 @@ final class ComposableSamplerRuleBased implements ComponentProvider
      * @param array{
      *     rules: list<array{
      *         sampler: ComponentPlugin<ComposableSamplerInterface>,
-     *         span_kinds: list<string>,
-     *         parent: list<string>,
+     *         span_kinds: list<?string>,
+     *         parent: list<?string>,
      *         attribute_values: ?array{key: string, values: list<string>},
      *         attribute_patterns: ?array{key: string, included: list<string>, excluded: list<string>},
      *     }>,
@@ -64,35 +64,33 @@ final class ComposableSamplerRuleBased implements ComponentProvider
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
     {
         $node = $builder->arrayNode('rule_based');
-        $node->beforeNormalization()->always(NonEmptyList::normalizer('rules'))->end();
 
-        $rule = $node->children()->arrayNode('rules')->defaultValue([])->arrayPrototype();
-        $rule->beforeNormalization()->always(NonEmptyList::normalizer('span_kinds', 'parent'))->end();
+        $rule = $node->children()->arrayNode('rules')->defaultValue([])->requiresAtLeastOneElement()->arrayPrototype();
 
         $ruleChildren = $rule->children();
         $ruleChildren->append($registry->component('sampler', ComposableSamplerInterface::class)->isRequired());
         $ruleChildren->arrayNode('span_kinds')
             ->defaultValue([])
-            ->enumPrototype()->values(array_keys(self::SPAN_KINDS))->end()
+            ->requiresAtLeastOneElement()
+            ->enumPrototype()->values([...array_keys(self::SPAN_KINDS), null])->end()
         ->end();
         $ruleChildren->arrayNode('parent')
             ->defaultValue([])
-            ->enumPrototype()->values(self::PARENTS)->end()
+            ->requiresAtLeastOneElement()
+            ->enumPrototype()->values([...self::PARENTS, null])->end()
         ->end();
         $ruleChildren->arrayNode('attribute_values')
             ->children()
-                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
                 ->arrayNode('values')->isRequired()->cannotBeEmpty()->scalarPrototype()->end()->end()
             ->end()
         ->end();
 
-        $patterns = $ruleChildren->arrayNode('attribute_patterns');
-        $patterns->beforeNormalization()->always(NonEmptyList::normalizer('included', 'excluded'))->end();
-        $patterns
+        $ruleChildren->arrayNode('attribute_patterns')
             ->children()
-                ->scalarNode('key')->isRequired()->cannotBeEmpty()->end()
-                ->arrayNode('included')->defaultValue([])->scalarPrototype()->end()->end()
-                ->arrayNode('excluded')->defaultValue([])->scalarPrototype()->end()->end()
+                ->scalarNode('key')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
+                ->arrayNode('included')->defaultValue([])->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
+                ->arrayNode('excluded')->defaultValue([])->requiresAtLeastOneElement()->scalarPrototype()->end()->end()
             ->end()
         ;
 
@@ -101,20 +99,27 @@ final class ComposableSamplerRuleBased implements ComponentProvider
 
     /**
      * All configured conditions of a rule must match; a rule without conditions matches every span.
+     * A null list item matches nothing, so a list of only nulls is no condition at all.
      */
     private static function createPredicate(array $rule): PredicateInterface
     {
         $predicates = [];
 
-        if (($rule['span_kinds'] ?? []) !== []) {
-            $predicates[] = Predicate::spanKindIn(...array_map(
-                static fn (string $kind): int => self::SPAN_KINDS[$kind],
-                $rule['span_kinds'],
-            ));
+        $spanKinds = [];
+        foreach ($rule['span_kinds'] ?? [] as $kind) {
+            if ($kind !== null) {
+                $spanKinds[] = self::SPAN_KINDS[$kind];
+            }
+        }
+        if ($spanKinds !== []) {
+            $predicates[] = Predicate::spanKindIn(...$spanKinds);
         }
         // any of the listed parent types matches
         $parentPredicate = null;
         foreach ($rule['parent'] ?? [] as $parent) {
+            if ($parent === null) {
+                continue;
+            }
             $predicate = match ($parent) {
                 'none' => Predicate::isRootSpan(),
                 'remote' => Predicate::hasRemoteParent(),

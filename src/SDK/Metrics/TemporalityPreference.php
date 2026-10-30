@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use function strtolower;
+use UnexpectedValueException;
 
 /**
  * Chooses aggregation temporality by instrument kind, as for
@@ -19,6 +21,20 @@ final class TemporalityPreference implements AggregationTemporalitySelectorInter
      */
     private function __construct(private readonly array $deltaInstrumentTypes)
     {
+    }
+
+    /**
+     * Accepts the environment variable values (`lowmemory`) and the declarative config ones
+     * (`low_memory`), in any case.
+     */
+    public static function fromName(string $name): self
+    {
+        return match (strtolower($name)) {
+            'cumulative' => self::cumulative(),
+            'delta' => self::delta(),
+            'lowmemory', 'low_memory' => self::lowMemory(),
+            default => throw new UnexpectedValueException('Unknown temporality: ' . $name),
+        };
     }
 
     public static function cumulative(): self

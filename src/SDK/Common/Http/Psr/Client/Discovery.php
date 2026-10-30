@@ -32,7 +32,7 @@ class Discovery
      */
     public static function find(array $options = []): ClientInterface
     {
-        $options = array_filter($options);
+        $options = array_filter($options, static fn ($option): bool => $option !== null);
 
         foreach (self::discoverers() as $clientDiscovery) {
             /** @var DiscoveryInterface $clientDiscovery */

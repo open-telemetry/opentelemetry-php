@@ -71,6 +71,12 @@ final class ArrayNode extends \Symfony\Component\Config\Definition\ArrayNode imp
             $value = $normalization->applyToNode($this, $value);
         }
 
+        // Treated as `{}`, so that missing children take their defaults unfinalized. Finalizing a
+        // `requiresAtLeastOneElement()` child's `[]` default would fail its minimum count.
+        if ($value === null && $this->allowEmptyValue && $this->addIfNotSet && !$this->defaultValueSet && $this->acceptsNull()) {
+            return [];
+        }
+
         return $this->preNormalizeNode($value);
     }
 }

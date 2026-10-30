@@ -7,7 +7,6 @@ namespace OpenTelemetry\Config\SDK\Parser;
 use function array_is_list;
 use const FILTER_FLAG_ALLOW_HEX;
 use const FILTER_NULL_ON_FAILURE;
-use const FILTER_VALIDATE_BOOLEAN;
 use const FILTER_VALIDATE_FLOAT;
 use const FILTER_VALIDATE_INT;
 use function filter_var;
@@ -17,10 +16,12 @@ use function is_bool;
 use function is_float;
 use function is_int;
 use function is_string;
+use OpenTelemetry\SDK\Common\Attribute\AttributeKeyFilter;
 use OpenTelemetry\SDK\Common\Configuration\Parser\MapParser;
 use function sprintf;
 use function str_ends_with;
 use function substr;
+use function trim;
 
 /**
  * @internal
@@ -84,7 +85,11 @@ class AttributesParser
     {
         $resolved = match ($type) {
             'string' => is_string($value) ? $value : null,
-            'bool' => is_bool($value) ? $value : self::filterString($value, FILTER_VALIDATE_BOOLEAN),
+            'bool' => is_bool($value) ? $value : match (is_string($value) ? trim($value) : $value) {
+                'true', 'True', 'TRUE' => true,
+                'false', 'False', 'FALSE' => false,
+                default => null,
+            },
             'int' => is_int($value) ? $value : self::filterString($value, FILTER_VALIDATE_INT, FILTER_FLAG_ALLOW_HEX),
             'double' => is_int($value) || is_float($value) ? (float) $value : self::filterString($value, FILTER_VALIDATE_FLOAT),
             default => null,
@@ -98,39 +103,12 @@ class AttributesParser
         return is_string($value) ? filter_var($value, $filter, $flags | FILTER_NULL_ON_FAILURE) : null;
     }
 
+    /**
+     * @param list<string>|null $included
+     * @param list<string>|null $excluded
+     */
     public static function applyIncludeExclude(array $attributes, ?array $included, ?array $excluded): array
     {
-        if ($included !== null) {
-            $attributes = array_filter($attributes, static function ($k) use ($included) {
-                foreach ($included as $pattern) {
-                    $regex = '/^' . strtr(preg_quote($pattern, '/'), [
-                            '\?' => '.',
-                            '\*' => '.*',
-                        ]) . '$/';
-                    if (preg_match($regex, $k)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            }, ARRAY_FILTER_USE_KEY);
-        }
-        if ($excluded) {
-            $attributes = array_filter($attributes, static function ($k) use ($excluded) {
-                foreach ($excluded as $pattern) {
-                    $regex = '/^' . strtr(preg_quote($pattern, '/'), [
-                            '\?' => '.',
-                            '\*' => '.*',
-                        ]) . '$/';
-                    if (preg_match($regex, $k)) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }, ARRAY_FILTER_USE_KEY);
-        }
-
-        return $attributes;
+        return (new AttributeKeyFilter($included, $excluded))->filter($attributes);
     }
 }

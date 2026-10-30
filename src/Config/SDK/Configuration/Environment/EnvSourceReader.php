@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\Configuration\Environment;
 
 use function is_string;
-use function trim;
 
 final class EnvSourceReader implements EnvReader
 {
@@ -21,7 +20,7 @@ final class EnvSourceReader implements EnvReader
     public function read(string $name): ?string
     {
         foreach ($this->envSources as $envSource) {
-            if (is_string($value = $envSource->readRaw($name)) && ($value = trim($value, " \t")) !== '') {
+            if (is_string($value = $envSource->readRaw($name)) && $value !== '') {
                 return $value;
             }
         }

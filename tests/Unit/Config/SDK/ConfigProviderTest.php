@@ -40,6 +40,19 @@ class ConfigProviderTest extends TestCase
         );
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk-environment-variables.md#declarative-configuration
+     */
+    public function test_config_file_path_may_contain_comma(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/../../SDK/fixtures/otel-sdk,with-comma.yaml');
+
+        $this->assertInstanceOf(
+            HttpConfig::class,
+            (new ConfigProvider())->getInstrumentationConfig()->get(HttpConfig::class),
+        );
+    }
+
     public function test_invalid_sdk_config_does_not_affect_instrumentation_config(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/../../SDK/fixtures/otel-sdk-invalid-sdk.yaml');

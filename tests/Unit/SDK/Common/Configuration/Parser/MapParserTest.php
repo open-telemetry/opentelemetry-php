@@ -34,11 +34,25 @@ class MapParserTest extends TestCase
             'Authorization=Basic 1234abc=,bar=baz',
             ['Authorization' => 'Basic 1234abc=', 'bar' => 'baz'],
         ],
+        'trailing comma' => [
+            'foo=bar,',
+            ['foo' => 'bar'],
+        ],
+        'leading comma' => [
+            ',foo=bar',
+            ['foo' => 'bar'],
+        ],
+        'empty and blank entries' => [
+            'foo=bar,, ,bar=baz',
+            ['foo' => 'bar', 'bar' => 'baz'],
+        ],
     ];
 
     private const INVALID_VALUES = [
         'string' => ['foobar'],
         'no equals' => ['foo=bar,barbaz'],
+        'empty key' => ['foo=bar,=baz'],
+        'blank key' => ['foo=bar, =baz'],
     ];
 
     #[DataProvider('mapValueProvider')]

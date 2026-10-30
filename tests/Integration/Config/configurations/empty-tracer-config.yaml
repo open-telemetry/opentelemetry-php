@@ -7,7 +7,7 @@ tracer_provider:
   tracer_configurator/development:
     tracers:
       - name: test
-        config:
+        config: {}
 meter_provider:
   readers:
     - periodic:
@@ -16,7 +16,7 @@ meter_provider:
   meter_configurator/development:
     meters:
       - name: test
-        config:
+        config: {}
 logger_provider:
   processors:
     - simple:
@@ -25,4 +25,4 @@ logger_provider:
   logger_configurator/development:
     loggers:
       - name: test
-        config:
+        config: {}

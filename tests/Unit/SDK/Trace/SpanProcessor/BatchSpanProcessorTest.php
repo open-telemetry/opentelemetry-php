@@ -523,11 +523,20 @@ class BatchSpanProcessorTest extends MockeryTestCase
         new BatchSpanProcessor($exporter, $this->testClock, 2048, 5000, 30000, -1);
     }
 
-    public function test_span_processor_throws_on_invalid_max_export_batch_size_exceeding_max_queue_size(): void
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/sdk.md#batching-processor
+     */
+    public function test_max_export_batch_size_exceeding_max_queue_size_is_clamped_with_warning(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $exporter = $this->createStub(SpanExporterInterface::class);
-        new BatchSpanProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+        $this->logWriter->expects($this->once())->method('write')->with(LogLevel::WARNING);
+        $exporter = $this->createMock(SpanExporterInterface::class);
+        $exporter->expects($this->once())->method('export')
+            ->with($this->countOf(2))
+            ->willReturn(new CompletedFuture(0));
+
+        $processor = new BatchSpanProcessor($exporter, $this->testClock, 2, 5000, 30000, 3);
+        $processor->onEnd($this->createSampledSpanMock());
+        $processor->onEnd($this->createSampledSpanMock());
     }
 
     public function test_get_builder(): void

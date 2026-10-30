@@ -12,6 +12,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
+use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopCounter;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
@@ -25,6 +26,7 @@ use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
+use OpenTelemetry\Config\SDK\Configuration\Internal\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
 use OpenTelemetry\Config\SDK\Instrumentation;
 use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
@@ -35,7 +37,9 @@ use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
+use OpenTelemetry\SDK\Logs\EventLoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
+use OpenTelemetry\SDK\Logs\NoopLoggerProvider;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\Processor\MultiLogRecordProcessor;
 use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
@@ -45,9 +49,12 @@ use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\InstrumentType;
+use OpenTelemetry\SDK\Metrics\MeterProvider;
+use OpenTelemetry\SDK\Metrics\NoopMeterProvider;
 use OpenTelemetry\SDK\Metrics\ViewRegistryInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
+use OpenTelemetry\SDK\Trace\NoopTracerProvider;
 use OpenTelemetry\SDK\Trace\Sampler\AlwaysOnSampler;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\CompositeSampler;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
@@ -94,6 +101,7 @@ final class ConfigurationTest extends TestCase
     public function tearDown(): void
     {
         OutputStreamParser::reset();
+        Logging::reset();
     }
 
     #[DataProvider('openTelemetryConfigurationDataProvider')]
@@ -109,6 +117,18 @@ final class ConfigurationTest extends TestCase
         $this->expectNotToPerformAssertions();
         // The upstream kitchen sink has a "php: example" entry with no provider, so it warns.
         Configuration::parseFile($file)->getInstrumentationConfig((new Context())->withLogger(new NullLogger()));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    public function test_parse_file_takes_one_file(): void
+    {
+        $file = __DIR__ . '/configurations/minimal.yaml';
+
+        $this->expectException(\TypeError::class);
+        /** @psalm-suppress InvalidArgument @phpstan-ignore argument.type */
+        Configuration::parseFile([$file, $file]);
     }
 
     public function test_one_load_serves_both_roots(): void
@@ -382,6 +402,35 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('capturedHeadersProvider')]
+    public function test_captured_headers_reject_empty_list(string $side, string $key): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path ".*%s\.%s" should have at least 1 element/', $side, $key));
+
+        self::instrumentationFactory()->process([Yaml::parse(sprintf("instrumentation/development:\n  general:\n    http:\n      %s:\n        %s: []", $side, $key))]);
+    }
+
+    #[DataProvider('capturedHeadersProvider')]
+    public function test_captured_headers_accept_null(string $side, string $key): void
+    {
+        $registry = self::instrumentationFactory()->process([Yaml::parse(sprintf("instrumentation/development:\n  general:\n    http:\n      %s:\n        %s: ~", $side, $key))])->create(new Context());
+
+        $this->assertSame([], $registry->get(HttpConfig::class)?->config[$side][$key]);
+    }
+
+    public static function capturedHeadersProvider(): iterable
+    {
+        foreach (['client', 'server'] as $side) {
+            foreach (['request_captured_headers', 'response_captured_headers'] as $key) {
+                yield "$side $key" => [$side, $key];
+            }
+        }
+    }
+
+    /**
      * The counterpart to the above: an environment placeholder resolves to a string, so a variable
      * whose value merely looks numeric must still pass.
      */
@@ -605,8 +654,8 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('emptyDistributionProvider')]
     public function test_empty_distribution_falls_back_to_the_default_strategy(string $distribution): void
     {
-        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
-        $sdk = $factory->process([Yaml::parse(sprintf("file_format: \"1.0\"\n%s", $distribution))]);
+        $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(sprintf("file_format: \"1.0\"\ntracer_provider:\n  processors:\n  - simple:\n      exporter:\n        console:\n%s", $distribution))]);
         $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
 
         $strategy = (new \ReflectionClass($tracerProvider))
@@ -638,9 +687,14 @@ final class ConfigurationTest extends TestCase
         Logging::setLogWriter($logWriter);
 
         try {
-            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
             $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - simple:
+                      exporter:
+                        console:
                 distribution:
                   some_vendor:
                     profiler:
@@ -678,6 +732,11 @@ final class ConfigurationTest extends TestCase
             $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
             $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - simple:
+                      exporter:
+                        console:
                 resource:
                   detection/development:
                     detectors:
@@ -727,6 +786,69 @@ final class ConfigurationTest extends TestCase
         }
     }
 
+    #[DataProvider('batchProcessorProvider')]
+    public function test_batch_size_warning_honours_log_level(string $provider): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                log_level: error
+                $provider:
+                  processors:
+                  - batch:
+                      max_queue_size: 10
+                      max_export_batch_size: 100
+                      exporter:
+                        console:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $sdk->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    #[DataProvider('batchProcessorProvider')]
+    public function test_batch_size_warning_is_logged(string $provider): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('exceeds maximum queue size'),
+            $this->anything(),
+        );
+
+        try {
+            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                $provider:
+                  processors:
+                  - batch:
+                      max_queue_size: 10
+                      max_export_batch_size: 100
+                      exporter:
+                        console:
+                YAML)]);
+
+            Logging::setLogWriter($logWriter);
+            $sdk->create(new Context());
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public static function batchProcessorProvider(): iterable
+    {
+        yield 'span' => ['tracer_provider'];
+        yield 'log record' => ['logger_provider'];
+    }
+
     /**
      * Unlike resource detectors, every other component type must fail rather than be skipped.
      */
@@ -754,6 +876,7 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('instrumentTypeSelectorProvider')]
     public function test_view_selects_on_instrument_type(string $instrumentType, string $expected): void
     {
+        Logging::disable();
         $factory = new ConfigurationFactory(
             [new MetricReaderPeriodic(), new MetricExporterConsole()],
             new OpenTelemetrySdk(),
@@ -809,8 +932,54 @@ final class ConfigurationTest extends TestCase
         yield 'up_down_counter' => ['up_down_counter', InstrumentType::UP_DOWN_COUNTER];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#stream-configuration
+     */
+    #[DataProvider('viewStreamNameSelectorProvider')]
+    public function test_view_stream_name_warns_when_selector_can_match_many(string $view, bool $warns): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($warns ? $this->once() : $this->never())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('renamed'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        try {
+            $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                  views:
+                  - $view
+                YAML)])->create(new Context())->build();
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public static function viewStreamNameSelectorProvider(): iterable
+    {
+        yield 'exact name' => ["selector: {instrument_name: requests}\n    stream: {name: renamed}", false];
+        yield 'asterisk' => ["selector: {instrument_name: '*'}\n    stream: {name: renamed}", true];
+        yield 'trailing asterisk' => ["selector: {instrument_name: 'http.*'}\n    stream: {name: renamed}", true];
+        yield 'question mark' => ["selector: {instrument_name: 'request?'}\n    stream: {name: renamed}", true];
+        yield 'no instrument name' => ["selector: {unit: ms}\n    stream: {name: renamed}", true];
+        yield 'wildcard without stream name' => ["selector: {instrument_name: '*'}\n    stream: {description: renamed}", false];
+    }
+
     public function test_view_selects_on_unit(): void
     {
+        Logging::disable();
         $factory = new ConfigurationFactory(
             [new MetricReaderPeriodic(), new MetricExporterConsole()],
             new OpenTelemetrySdk(),
@@ -894,6 +1063,40 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/common.yaml
+     */
+    #[DataProvider('emptyViewAttributeKeysProvider')]
+    public function test_view_attribute_keys_rejects_empty_list(string $attributeKeys): void
+    {
+        $factory = new ConfigurationFactory(
+            [new MetricReaderPeriodic(), new MetricExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $this->expectException(InvalidConfigurationException::class);
+        $factory->process([Yaml::parse(<<<YAML
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+              views:
+              - selector:
+                  instrument_name: i
+                stream:
+                  $attributeKeys
+            YAML)]);
+    }
+
+    public static function emptyViewAttributeKeysProvider(): iterable
+    {
+        yield 'empty included' => ['attribute_keys: {included: []}'];
+        yield 'empty excluded' => ['attribute_keys: {excluded: []}'];
+    }
+
+    /**
      * A null projection means the reader's default aggregation applies.
      */
     #[DataProvider('viewAggregationProvider')]
@@ -947,6 +1150,11 @@ final class ConfigurationTest extends TestCase
             $histogram,
             new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
         ];
+        yield 'explicit_bucket_histogram null boundaries is SDK default' => [
+            ['explicit_bucket_histogram' => ['boundaries' => null]],
+            $histogram,
+            new ExplicitBucketHistogramAggregation([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]),
+        ];
         yield 'explicit_bucket_histogram without min and max' => [
             ['explicit_bucket_histogram' => ['record_min_max' => false]],
             $histogram,
@@ -987,7 +1195,6 @@ final class ConfigurationTest extends TestCase
     public static function invalidViewAggregationProvider(): iterable
     {
         yield 'non-numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['one']]]];
-        yield 'quoted numeric boundary' => [['explicit_bucket_histogram' => ['boundaries' => ['1']]]];
         yield 'unordered boundaries' => [['explicit_bucket_histogram' => ['boundaries' => [10, 1]]]];
         yield 'duplicate boundaries' => [['explicit_bucket_histogram' => ['boundaries' => [1, 1]]]];
         yield 'boundaries map' => [['explicit_bucket_histogram' => ['boundaries' => ['a' => 1, 'b' => 2]]]];
@@ -1126,6 +1333,13 @@ final class ConfigurationTest extends TestCase
     #[DataProvider('internalMetricsDataProvider')]
     public function test_self_observability_is_opt_in(string $yaml, bool $expected): void
     {
+        $yaml .= "\n" . /** @lang yaml */ <<<'YAML'
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            YAML;
         $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
         $tracerProvider = $factory->process([Yaml::parse($yaml)])->create(new Context())->build()->getTracerProvider();
 
@@ -1205,6 +1419,63 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#batchspanprocessor
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#batchlogrecordprocessor
+     */
+    public function test_batch_processor_accepts_max_queue_size_below_default_batch_size(): void
+    {
+        Logging::disable();
+        $yaml = /** @lang yaml */ <<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - batch:
+                  max_queue_size: 100
+                  exporter:
+                    console:
+            logger_provider:
+              processors:
+              - batch:
+                  max_queue_size: 100
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse($yaml)])->create(new Context())->build();
+
+        $tracerSharedState = (new \ReflectionProperty(TracerProvider::class, 'tracerSharedState'))->getValue($sdk->getTracerProvider());
+        $spanProcessor = $tracerSharedState->getSpanProcessor();
+        $loggerSharedState = (new \ReflectionProperty(LoggerProvider::class, 'loggerSharedState'))->getValue($sdk->getLoggerProvider());
+        $logProcessor = (new \ReflectionProperty(MultiLogRecordProcessor::class, 'processors'))->getValue($loggerSharedState->getProcessor())[0];
+
+        $this->assertSame(100, (new \ReflectionProperty(BatchSpanProcessor::class, 'maxExportBatchSize'))->getValue($spanProcessor));
+        $this->assertSame(100, (new \ReflectionProperty(BatchLogRecordProcessor::class, 'maxExportBatchSize'))->getValue($logProcessor));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#periodicmetricreader
+     */
+    public function test_periodic_reader_defaults_match_schema(): void
+    {
+        $yaml = /** @lang yaml */ <<<'YAML'
+            file_format: "1.0"
+            meter_provider:
+              readers:
+              - periodic:
+                  exporter:
+                    console:
+            YAML;
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $properties = new \ReflectionProperty(ComponentPlugin::class, 'properties');
+        $reader = $properties->getValue($factory->process([Yaml::parse($yaml)]))['meter_provider']['readers'][0];
+
+        $this->assertSame(['interval' => 60000, 'timeout' => 30000], array_intersect_key(
+            $properties->getValue($reader),
+            ['interval' => null, 'timeout' => null],
+        ));
+    }
+
+    /**
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#spanlimits
      */
     #[DataProvider('attributeCountLimitProvider')]
@@ -1237,11 +1508,27 @@ final class ConfigurationTest extends TestCase
 
     public static function internalMetricsDataProvider(): iterable
     {
-        yield 'omitted' => ['file_format: "1.0"', false];
+        yield 'omitted' => [
+            /** @lang yaml */
+            <<<'YAML'
+                file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                YAML,
+            false,
+        ];
         yield 'disabled' => [
             /** @lang yaml */
             <<<'YAML'
                 file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
                 distribution:
                   opentelemetry_php/development:
                     internal_metrics_enabled: false
@@ -1252,6 +1539,11 @@ final class ConfigurationTest extends TestCase
             /** @lang yaml */
             <<<'YAML'
                 file_format: "1.0"
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
                 distribution:
                   opentelemetry_php/development:
                     internal_metrics_enabled: true
@@ -1276,6 +1568,11 @@ final class ConfigurationTest extends TestCase
             );
             $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
+                tracer_provider:
+                  processors:
+                  - simple:
+                      exporter:
+                        console:
                 distribution:
                   some_vendor:
                     profiler:
@@ -1509,7 +1806,10 @@ final class ConfigurationTest extends TestCase
         yield 'release candidate rc.2' => ['"1.0-rc.2"', '/expected MAJOR\.MINOR/'];
         // an unquoted 1.0 is a YAML float, and would stringify to "1"; it must be rejected
         // outright rather than coerced into something that looks like a version
-        yield 'unquoted, parsed as a float' => ['1.0', '/must be of type string/'];
+        yield 'unquoted, parsed as a float' => ['1.0', '/must be a quoted string, such as "1\.0"; got the YAML number 1\.0/'];
+        yield 'unquoted, parsed as an int' => ['1', '/must be a quoted string, such as "1\.0"; got the YAML number 1$/'];
+        yield 'boolean' => ['true', '/must be of type string/'];
+        yield 'null' => ['~', '/cannot be null/'];
     }
 
     /**
@@ -1527,8 +1827,8 @@ final class ConfigurationTest extends TestCase
         Logging::setLogWriter($logWriter);
 
         try {
-            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
-            $sdk = $factory->process([Yaml::parse('file_format: "1.999"')]);
+            $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse("file_format: \"1.999\"\ntracer_provider:\n  processors:\n  - simple:\n      exporter:\n        console:")]);
 
             $tracerProvider = $sdk->create(new Context())->build()->getTracerProvider();
 
@@ -1538,16 +1838,53 @@ final class ConfigurationTest extends TestCase
         }
     }
 
+    public function test_newer_minor_file_format_warning_respects_log_level(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+
+        $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $factory->process([Yaml::parse("file_format: \"1.999\"\nlog_level: error")])->create(new Context());
+    }
+
+    public function test_newer_minor_file_format_warns_on_cache_hit(): void
+    {
+        $file = __DIR__ . '/configurations/newer-minor-file-format.yaml';
+        $cacheFile = sys_get_temp_dir() . '/' . uniqid('otel-config-', true) . '.cache';
+        Logging::disable();
+
+        try {
+            Configuration::parseFile($file, $cacheFile)->create();
+            $this->assertFileExists($cacheFile);
+
+            $logWriter = $this->createMock(LogWriterInterface::class);
+            $logWriter->expects($this->once())
+                ->method('write')
+                ->with(LogLevel::WARNING, $this->stringContains('file_format "1.999" is newer'), $this->anything());
+            Logging::setLogWriter($logWriter);
+
+            Configuration::parseFile($file, $cacheFile)->create();
+        } finally {
+            array_map(unlink(...), array_filter([$cacheFile, $cacheFile . '.meta', $cacheFile . '.meta.json'], is_file(...)));
+        }
+    }
+
     public function test_resource_attributes_take_precedence_over_default_attributes(): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -1560,13 +1897,18 @@ final class ConfigurationTest extends TestCase
     public function test_resource_detectors_take_precedence_over_default_attributes(): void
     {
         $factory = new ConfigurationFactory(
-            [new ServiceName('test-service')],
+            [new ServiceName('test-service'), new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               detection/development:
                 detectors:
@@ -1577,18 +1919,51 @@ final class ConfigurationTest extends TestCase
         $this->assertSame('test-service', $resource->getAttributes()->get('service.name'));
     }
 
-    #[Depends('test_resource_attributes_take_precedence_over_default_attributes')]
-    #[Depends('test_resource_detectors_take_precedence_over_default_attributes')]
-    public function test_resource_attributes_take_precedence_over_resource_detectors(): void
+    public function test_resource_keeps_numeric_attribute_names(): void
     {
         $factory = new ConfigurationFactory(
-            [new ServiceName('should-be-overridden')],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            resource:
+              attributes:
+              - { name: '123', value: from_attributes }
+              attributes_list: '123=from_list,7=b'
+            YAML)]);
+        $attributes = $this->getResource($sdk->create(new Context())->build())->getAttributes();
+
+        $this->assertSame('from_attributes', $attributes->get('123'));
+        $this->assertSame('b', $attributes->get('7'));
+        $this->assertFalse($attributes->has('0'));
+        $this->assertFalse($attributes->has('1'));
+    }
+
+    #[Depends('test_resource_attributes_take_precedence_over_default_attributes')]
+    #[Depends('test_resource_detectors_take_precedence_over_default_attributes')]
+    public function test_resource_attributes_take_precedence_over_resource_detectors(): void
+    {
+        $factory = new ConfigurationFactory(
+            [new ServiceName('should-be-overridden'), new SpanProcessorSimple(), new SpanExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
               - { name: service.name, value: test-service }
@@ -1608,13 +1983,18 @@ final class ConfigurationTest extends TestCase
     {
         $this->setEnvironmentVariable('OTEL_SERVICE_NAME', 'from-env');
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               detection/development:
                 attributes:
@@ -1626,18 +2006,51 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#resource
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/resource/sdk.md#sdk-provided-resource-attributes
      */
-    public function test_resource_keeps_configured_schema_url(): void
+    public function test_resource_falls_back_to_unknown_service_when_service_name_is_excluded(): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([]),
         );
 
         $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            resource:
+              detection/development:
+                attributes:
+                  excluded: [service.name]
+            YAML)]);
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('unknown_service:php', $resource->getAttributes()->get('service.name'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema-docs.md#resource
+     */
+    public function test_resource_keeps_configured_schema_url(): void
+    {
+        $factory = new ConfigurationFactory(
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
+            new OpenTelemetrySdk(),
+            new EnvSourceReader([]),
+        );
+
+        $sdk = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               schema_url: https://opentelemetry.io/schemas/1.16.0
             YAML)]);
@@ -1653,7 +2066,7 @@ final class ConfigurationTest extends TestCase
     public function test_resource_attribute_type_is_applied_after_substitution(string $type, string $value, mixed $expected): void
     {
         $factory = new ConfigurationFactory(
-            [],
+            [new SpanProcessorSimple(), new SpanExporterConsole()],
             new OpenTelemetrySdk(),
             new EnvSourceReader([new ArrayEnvSource([
                 'STRING_VALUE' => 'value',
@@ -1666,6 +2079,11 @@ final class ConfigurationTest extends TestCase
 
         $sdk = $factory->process([Yaml::parse(sprintf(<<<'YAML'
             file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
             resource:
               attributes:
                 - name: key
@@ -1848,18 +2266,383 @@ final class ConfigurationTest extends TestCase
         yield 'attribute_limits' => ['attribute_limits:'];
         yield 'propagator' => ['propagator:'];
         yield 'propagator.composite' => ["propagator:\n  composite:"];
-        yield 'resource.attributes' => ["resource:\n  attributes:"];
-        yield 'meter_provider.views' => [
-            /** @lang yaml */
-            <<<'YAML'
-                meter_provider:
-                  readers:
-                  - periodic:
-                      exporter:
-                        console:
-                  views:
-                YAML,
+        yield 'tracer_provider.sampler' => [$tracerProvider . '  sampler:'];
+        yield 'view stream.aggregation' => ["meter_provider:\n  readers:\n  - periodic:\n      exporter:\n        console:\n  views:\n  - selector:\n      instrument_name: i\n    stream:\n      aggregation:"];
+        yield 'span_suppression_strategy' => ["distribution:\n  opentelemetry_php/development:\n    span_suppression_strategy/development:"];
+        foreach (self::minItemsLists() as $name => [$yaml]) {
+            yield $name => [sprintf($yaml, '~')];
+        }
+    }
+
+    /**
+     * A present null takes the default, so only an explicitly empty list breaks `minItems: 1`.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('emptyMinItemsListProvider')]
+    public function test_empty_list_is_rejected_where_schema_has_min_items(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path ".*%s" should have at least 1 element/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function emptyMinItemsListProvider(): iterable
+    {
+        foreach (self::minItemsLists() as $name => [$yaml, $path]) {
+            yield $name => [sprintf($yaml, '[]'), $path];
+        }
+    }
+
+    /**
+     * The schema allows an empty string here, but an attribute key must not be empty, and
+     * neither may an HTTP header name.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/common/README.md#attribute
+     */
+    #[DataProvider('emptyKeyProvider')]
+    public function test_empty_key_is_rejected(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path ".*%s" cannot contain an empty value/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function emptyKeyProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $sampler = "tracer_provider:\n$processors  sampler:\n    composite/development:\n      rule_based:\n        rules:\n        - sampler:\n            always_on:\n";
+
+        yield 'resource attribute name' => ["resource:\n  attributes:\n  - name: ''\n    value: v", 'resource.attributes..name'];
+        yield 'rule_based attribute_values key' => ["$sampler          attribute_values:\n            key: ''\n            values: [v]", 'attribute_values.key'];
+        yield 'rule_based attribute_patterns key' => ["$sampler          attribute_patterns:\n            key: ''\n            included: [v]", 'attribute_patterns.key'];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
         ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter header name" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:\n          - name: ''\n            value: v",
+                    "$exporter.headers..name",
+                ];
+            }
+        }
+    }
+
+    /**
+     * An empty scope or instrument name is schema-valid, and only fails to match.
+     */
+    #[DataProvider('emptyMatcherNameProvider')]
+    public function test_empty_matcher_name_is_accepted(string $yaml): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function emptyMatcherNameProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+
+        yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: ''\n      config: {}"];
+        yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: ''\n      config: {}"];
+        yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: ''\n      config: {}"];
+        yield 'view instrument_name' => ["meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: ''\n    stream:\n      name: n"];
+    }
+
+    /**
+     * Only where the schema's type includes "null" may a required property or a list item be null.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    #[DataProvider('nullValueProvider')]
+    public function test_null_is_rejected_where_schema_requires_a_value(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path "[^"]*%s[^"]*" cannot be null/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context());
+    }
+
+    public static function nullValueProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $composite = "tracer_provider:\n$processors  sampler:\n    composite/development:\n";
+        $rule = "$composite      rule_based:\n        rules:\n        - sampler:\n            always_on:\n";
+
+        foreach (['tracer_provider', 'logger_provider'] as $provider) {
+            foreach (['simple', 'batch'] as $processor) {
+                yield "$provider $processor exporter" => ["$provider:\n  processors:\n  - $processor:\n      exporter:", "$processor.exporter"];
+            }
+            yield "$provider processors item" => ["$provider:\n  processors: [~]", "$provider.processors"];
+        }
+        yield 'periodic exporter' => ["meter_provider:\n  readers:\n  - periodic:\n      exporter:", 'periodic.exporter'];
+        yield 'readers item' => ["meter_provider:\n  readers: [~]", 'meter_provider.readers'];
+
+        yield 'parent_threshold root' => ["$composite      parent_threshold:\n        root:", 'parent_threshold.root'];
+        yield 'rule sampler' => ["$composite      rule_based:\n        rules:\n        - sampler:", '.sampler'];
+        yield 'rules item' => ["$composite      rule_based:\n        rules: [~]", 'rule_based.rules'];
+        yield 'rule attribute_values key' => ["$rule          attribute_values:\n            key: ~\n            values: [v]", 'attribute_values.key'];
+        yield 'rule attribute_values values' => ["$rule          attribute_values:\n            key: k\n            values: ~", 'attribute_values.values'];
+        yield 'rule attribute_values values item' => ["$rule          attribute_values:\n            key: k\n            values: [~]", 'attribute_values.values'];
+        yield 'rule attribute_patterns key' => ["$rule          attribute_patterns:\n            key: ~\n            included: [v]", 'attribute_patterns.key'];
+        yield 'rule attribute_patterns included item' => ["$rule          attribute_patterns:\n            key: k\n            included: [~]", 'attribute_patterns.included'];
+        yield 'rule attribute_patterns excluded item' => ["$rule          attribute_patterns:\n            key: k\n            excluded: [~]", 'attribute_patterns.excluded'];
+
+        yield 'resource attribute name' => ["resource:\n  attributes:\n  - name: ~\n    value: v", 'resource.attributes..name'];
+        yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: ~\n      config: {}", 'tracers..name'];
+        yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: ~\n      config: {}", 'meters..name'];
+        yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: ~\n      config: {}", 'loggers..name'];
+        yield 'tracers config' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: t\n      config: ~", 'tracers..config'];
+        yield 'meters config' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: m\n      config: ~", 'meters..config'];
+        yield 'loggers config' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: l\n      config: ~", 'loggers..config'];
+        yield 'view selector' => ["meter_provider:\n$readers  views:\n  - selector: ~\n    stream:\n      name: n", 'views..selector'];
+        yield 'view stream' => ["meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: i\n    stream: ~", 'views..stream'];
+        yield 'response propagator composite item' => ["distribution:\n  opentelemetry_php/development:\n    response_propagator/development:\n      composite: [~]", 'response_propagator/development.composite'];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter header name" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:\n          - name: ~\n            value: v",
+                    "$exporter.headers..name",
+                ];
+            }
+        }
+
+        foreach (self::minItemsLists() as $name => [$yaml, $path]) {
+            yield "$name item" => [sprintf($yaml, '[~]'), $path];
+        }
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    #[DataProvider('malformedListProvider')]
+    public function test_malformed_key_value_list_is_rejected_with_path(string $yaml, string $path): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches(sprintf('/path "[^"]*%s": Key-Value pair "c"/', preg_quote($path, '/')));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)]);
+    }
+
+    public static function malformedListProvider(): iterable
+    {
+        yield 'resource attributes_list' => ["resource:\n  attributes_list: a=b,c", 'resource.attributes_list'];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter headers_list" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers_list: a=b,c",
+                    "$exporter.headers_list",
+                ];
+            }
+        }
+    }
+
+    public function test_key_value_list_tolerates_blank_entries(): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse(<<<'YAML'
+            file_format: "1.0"
+            tracer_provider:
+              processors:
+              - simple:
+                  exporter:
+                    console:
+            resource:
+              attributes_list: a=b,,c=d,
+            YAML)]);
+
+        $resource = $this->getResource($sdk->create(new Context())->build());
+
+        $this->assertSame('b', $resource->getAttributes()->get('a'));
+        $this->assertSame('d', $resource->getAttributes()->get('c'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#parse
+     */
+    #[DataProvider('wrongTypeProvider')]
+    public function test_wrong_type_is_rejected(string $yaml, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context());
+    }
+
+    public static function wrongTypeProvider(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $rule = "tracer_provider:\n$processors  sampler:\n    composite/development:\n      rule_based:\n        rules:\n        - sampler:\n            always_on:\n";
+        $notString = static fn (string $path): string => sprintf('/path "[^"]*%s": must be of type string/', preg_quote($path, '/'));
+        $notArray = static fn (string $path): string => sprintf('/path "[^"]*%s"\. Expected "array", but got "int"/', preg_quote($path, '/'));
+
+        yield 'tracers name' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers:\n    - name: 123\n      config: {}", $notString('tracers..name')];
+        yield 'meters name' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters:\n    - name: 123\n      config: {}", $notString('meters..name')];
+        yield 'loggers name' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers:\n    - name: 123\n      config: {}", $notString('loggers..name')];
+        yield 'resource attribute name' => ["resource:\n  attributes:\n  - name: 123\n    value: v", $notString('resource.attributes..name')];
+        yield 'rule attribute_values key' => ["$rule          attribute_values:\n            key: 123\n            values: [v]", $notString('attribute_values.key')];
+        yield 'rule attribute_patterns key' => ["$rule          attribute_patterns:\n            key: 123\n            included: [v]", $notString('attribute_patterns.key')];
+
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                yield "$provider $exporter header name" => [
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:\n          - name: 123\n            value: v",
+                    $notString("$exporter.headers..name"),
+                ];
+            }
+        }
+
+        $responsePropagator = "distribution:\n  opentelemetry_php/development:\n    response_propagator/development:\n";
+        yield 'propagator composite_list int' => ["propagator:\n  composite_list: 123", $notString('propagator.composite_list')];
+        yield 'propagator composite_list bool' => ["propagator:\n  composite_list: true", $notString('propagator.composite_list')];
+        yield 'propagator composite_list list' => ["propagator:\n  composite_list: [tracecontext]", '/path "[^"]*propagator\.composite_list"\. Expected "scalar", but got "array"/'];
+        yield 'response propagator composite_list' => ["{$responsePropagator}      composite_list: 1", $notString('response_propagator/development.composite_list')];
+        yield 'deprecated response propagator composite_list' => ["response_propagator/development:\n  composite_list: 1", $notString('response_propagator/development.composite_list')];
+        yield 'propagator composite' => ["propagator:\n  composite: 5", $notArray('propagator.composite')];
+        yield 'propagator composite item' => ["propagator:\n  composite: [5]", $notArray('propagator.composite.0')];
+        yield 'response propagator composite item' => ["{$responsePropagator}      composite: [5]", $notArray('response_propagator/development.composite.0')];
+
+        $notMap = static fn (string $path): string => sprintf('/path "[^"]*%s": Component "[^"]*" must be keyed by provider name, got 0/', preg_quote($path, '/'));
+        $composite = "tracer_provider:\n$processors  sampler:\n    composite/development:";
+        yield 'sampler list' => ["tracer_provider:\n$processors  sampler: [always_on]", $notMap('tracer_provider.sampler')];
+        yield 'exporter list' => ["tracer_provider:\n  processors:\n  - simple:\n      exporter: [console]", $notMap('simple.exporter')];
+        yield 'processors item list' => ["tracer_provider:\n  processors: [[simple]]", $notMap('tracer_provider.processors.0')];
+        yield 'propagator composite item list' => ["propagator:\n  composite: [[tracecontext]]", $notMap('propagator.composite.0')];
+        yield 'composite sampler list' => ["$composite [always_on]", $notMap('composite/development')];
+        yield 'composite sampler null list' => ["$composite [~]", $notMap('composite/development')];
+        yield 'distribution list' => ['distribution: [opentelemetry_php/development]', $notMap('open_telemetry.distribution')];
+    }
+
+    public function test_instrumentation_list_is_rejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/path "[^"]*instrumentation\/development\.php": Component "[^"]*" must be keyed by provider name, got 0/');
+
+        self::instrumentationFactory()->process([Yaml::parse("instrumentation/development:\n  php: [x]")])->create(new Context());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    #[DataProvider('invalidTlsProvider')]
+    public function test_invalid_tls_is_rejected(string $yaml, string $expectedMessage): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context());
+    }
+
+    public static function invalidTlsProvider(): iterable
+    {
+        $cases = [
+            'relative ca_file' => ['{ca_file: certs/ca.pem}', '/path "[^"]*tls\.ca_file": must be an absolute path/'],
+            'empty ca_file' => ["{ca_file: ''}", '/path "[^"]*tls\.ca_file": must be an absolute path/'],
+            'relative cert_file' => ['{cert_file: cert.pem, key_file: /certs/key.pem}', '/path "[^"]*tls\.cert_file": must be an absolute path/'],
+            'relative key_file' => ['{cert_file: /certs/cert.pem, key_file: ./key.pem}', '/path "[^"]*tls\.key_file": must be an absolute path/'],
+            'cert_file without key_file' => ['{cert_file: /certs/cert.pem}', '/path "[^"]*\.tls": key_file must be set when cert_file is set/'],
+            'key_file without cert_file' => ['{key_file: /certs/key.pem}', '/path "[^"]*\.tls": cert_file must be set when key_file is set/'],
+        ];
+        $exporters = [
+            'tracer_provider' => ['processors', 'simple'],
+            'logger_provider' => ['processors', 'simple'],
+            'meter_provider' => ['readers', 'periodic'],
+        ];
+        foreach ($exporters as $provider => [$list, $component]) {
+            foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
+                foreach ($cases as $name => [$tls, $expectedMessage]) {
+                    yield "$provider $exporter $name" => ["$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          tls: $tls", $expectedMessage];
+                }
+            }
+        }
+    }
+
+    #[DataProvider('validTlsProvider')]
+    public function test_valid_tls_parses(string $tls): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $this->expectNotToPerformAssertions();
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\ntracer_provider:\n  processors:\n  - simple:\n      exporter:\n        otlp_http:\n          tls: $tls")]);
+    }
+
+    public static function validTlsProvider(): iterable
+    {
+        yield 'unix ca_file' => ['{ca_file: /certs/ca.pem}'];
+        yield 'windows ca_file' => ['{ca_file: "C:\\\\certs\\\\ca.pem"}'];
+        yield 'windows ca_file with forward slashes' => ['{ca_file: "C:/certs/ca.pem"}'];
+        yield 'unc ca_file' => ['{ca_file: "\\\\\\\\server\\\\certs\\\\ca.pem"}'];
+        yield 'cert_file and key_file' => ['{cert_file: /certs/cert.pem, key_file: /certs/key.pem}'];
+        yield 'null cert_file and key_file' => ['{cert_file: ~, key_file: ~}'];
+    }
+
+    /**
+     * The SDK lists with `minItems: 1`, as YAML with `%s` for the list value and the node path.
+     * `processors` and `readers` have their own check, in
+     * {@see self::test_provider_without_processors_is_rejected()}.
+     *
+     * @return iterable<string, array{string, string}>
+     */
+    private static function minItemsLists(): iterable
+    {
+        $processors = "  processors:\n  - simple:\n      exporter:\n        console:\n";
+        $readers = "  readers:\n  - periodic:\n      exporter:\n        console:\n";
+        $view = "meter_provider:\n$readers  views:\n  - selector:\n      instrument_name: i\n    stream:\n      attribute_keys:\n";
+
+        yield 'views' => ["meter_provider:\n$readers  views: %s", 'meter_provider.views'];
+        yield 'view attribute_keys.included' => ["$view        included: %s", 'attribute_keys.included'];
+        yield 'view attribute_keys.excluded' => ["$view        excluded: %s", 'attribute_keys.excluded'];
+        yield 'producers' => ["meter_provider:\n$readers      producers: %s", 'periodic.producers'];
+        yield 'tracers' => ["tracer_provider:\n$processors  tracer_configurator/development:\n    tracers: %s", 'tracer_configurator/development.tracers'];
+        yield 'meters' => ["meter_provider:\n$readers  meter_configurator/development:\n    meters: %s", 'meter_configurator/development.meters'];
+        yield 'loggers' => ["logger_provider:\n$processors  logger_configurator/development:\n    loggers: %s", 'logger_configurator/development.loggers'];
+        yield 'resource attributes' => ["resource:\n  attributes: %s", 'resource.attributes'];
+        yield 'detection attributes.included' => ["resource:\n  detection/development:\n    attributes:\n      included: %s", 'detection/development.attributes.included'];
+        yield 'detection attributes.excluded' => ["resource:\n  detection/development:\n    attributes:\n      excluded: %s", 'detection/development.attributes.excluded'];
+        yield 'detectors' => ["resource:\n  detection/development:\n    detectors: %s", 'detection/development.detectors'];
+        yield 'propagator composite' => ["propagator:\n  composite: %s", 'propagator.composite'];
 
         $exporters = [
             'tracer_provider' => ['processors', 'simple'],
@@ -1869,7 +2652,8 @@ final class ConfigurationTest extends TestCase
         foreach ($exporters as $provider => [$list, $component]) {
             foreach (['otlp_http', 'otlp_grpc'] as $exporter) {
                 yield "$provider $exporter headers" => [
-                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers:",
+                    "$provider:\n  $list:\n  - $component:\n      exporter:\n        $exporter:\n          headers: %s",
+                    "$exporter.headers",
                 ];
             }
         }
@@ -2009,6 +2793,29 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/opentelemetry_configuration.yaml
+     */
+    #[DataProvider('configuredProviderProvider')]
+    public function test_omitted_providers_are_noop(string $yaml, ?string $configured): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+        $sdk = $factory->process([Yaml::parse("file_format: \"1.0\"\n" . $yaml)])->create(new Context())->build();
+
+        $this->assertInstanceOf($configured === 'tracer_provider' ? TracerProvider::class : NoopTracerProvider::class, $sdk->getTracerProvider());
+        $this->assertInstanceOf($configured === 'meter_provider' ? MeterProvider::class : NoopMeterProvider::class, $sdk->getMeterProvider());
+        $this->assertInstanceOf($configured === 'logger_provider' ? LoggerProvider::class : NoopLoggerProvider::class, $sdk->getLoggerProvider());
+        $this->assertInstanceOf($configured === 'logger_provider' ? EventLoggerProvider::class : NoopEventLoggerProvider::class, $sdk->getEventLoggerProvider());
+    }
+
+    public static function configuredProviderProvider(): iterable
+    {
+        yield 'none' => ['', null];
+        yield 'tracer_provider' => ["tracer_provider:\n  processors:\n  - simple:\n      exporter:\n        console:", 'tracer_provider'];
+        yield 'meter_provider' => ["meter_provider:\n  readers:\n  - periodic:\n      exporter:\n        console:", 'meter_provider'];
+        yield 'logger_provider' => ["logger_provider:\n  processors:\n  - simple:\n      exporter:\n        console:", 'logger_provider'];
+    }
+
+    /**
      * The schema has `exclusiveMinimum: 0` on these, so zero is invalid.
      */
     #[DataProvider('zeroExclusiveMinimumProvider')]
@@ -2104,6 +2911,56 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
+     * The SDK has no metric producers, so a valid entry parses and has no effect.
+     */
+    #[DataProvider('validProducerProvider')]
+    public function test_valid_producer_parses(string $producers): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $this->createMeterProviderWithProducers($producers);
+    }
+
+    public static function validProducerProvider(): iterable
+    {
+        yield 'opencensus null' => ['[{opencensus: ~}]'];
+        yield 'opencensus empty' => ['[{opencensus: {}}]'];
+        yield 'custom null' => ['[{custom: ~}]'];
+        yield 'custom with properties' => ['[{custom/development: {any: 1}}]'];
+        yield 'several' => ['[{opencensus: ~}, {custom: ~}]'];
+    }
+
+    #[DataProvider('invalidProducerProvider')]
+    public function test_invalid_producer_is_rejected(string $producers, string $expectedMessage): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches($expectedMessage);
+
+        $this->createMeterProviderWithProducers($producers);
+    }
+
+    public static function invalidProducerProvider(): iterable
+    {
+        $oneKey = '/path "[^"]*periodic\.producers\.0": Metric producer must have exactly one key/';
+
+        yield 'string' => ['[opencensus]', $oneKey];
+        yield 'list' => ['[[opencensus]]', $oneKey];
+        yield 'empty' => ['[{}]', $oneKey];
+        yield 'two keys' => ['[{opencensus: ~, custom: ~}]', $oneKey];
+        yield 'scalar properties' => ['[{custom: 5}]', '/path "[^"]*periodic\.producers\.0": Metric producer "custom" must be null or a map/'];
+        yield 'list properties' => ['[{custom: [1, 2]}]', '/path "[^"]*periodic\.producers\.0": Metric producer "custom" must be null or a map/'];
+        yield 'opencensus properties' => ['[{opencensus: {x: 1}}]', '/path "[^"]*periodic\.producers\.0": Metric producer "opencensus" takes no properties/'];
+    }
+
+    private function createMeterProviderWithProducers(string $producers): void
+    {
+        $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+
+        $factory->process([Yaml::parse("file_format: \"1.0\"\nmeter_provider:\n  readers:\n  - periodic:\n      exporter:\n        console:\n      producers: $producers")])
+            ->create(new Context());
+    }
+
+    /**
      * The configured `probability/development` ratio should reach the sampler rather than being
      * parsed and dropped.
      */
@@ -2162,6 +3019,7 @@ final class ConfigurationTest extends TestCase
         yield 'trace_id_ratio_based null' => ['trace_id_ratio_based:', 'TraceIdRatioBased{1.000000}'];
         yield 'parent_based omitted root' => ['parent_based: {}', 'ParentBased+AlwaysOnSampler'];
         yield 'parent_based null' => ['parent_based:', 'ParentBased+AlwaysOnSampler'];
+        yield 'parent_based null root' => ['parent_based: {root: ~}', 'ParentBased+AlwaysOnSampler'];
     }
 
     /**

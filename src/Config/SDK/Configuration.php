@@ -33,12 +33,11 @@ final class Configuration
 
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
-     * @param string|list<string> $file
      * @param array|null $configs loaded configurations, null until the file is read
      */
     private function __construct(
         private readonly ComponentPlugin $sdkPlugin,
-        private readonly string|array $file,
+        private readonly string $file,
         private readonly ?EnvReader $envReader,
         private ?array $configs = null,
     ) {
@@ -73,10 +72,9 @@ final class Configuration
      * SDK root costs nothing here.
      *
      * @internal
-     * @param string|list<string> $file
      */
     public static function parseInstrumentationConfig(
-        string|array $file,
+        string $file,
         Context $context = new Context(),
         ?EnvReader $envReader = null,
     ): ConfigProperties {
@@ -85,11 +83,8 @@ final class Configuration
             ->create($context);
     }
 
-    /**
-     * @param string|list<string> $file
-     */
     public static function parseFile(
-        string|array $file,
+        string $file,
         ?string $cacheFile = null,
         bool $debug = true,
         ?EnvReader $envReader = null,

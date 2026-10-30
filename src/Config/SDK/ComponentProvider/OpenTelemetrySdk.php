@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK\ComponentProvider;
 
 use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
@@ -70,8 +69,6 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 final class OpenTelemetrySdk implements ComponentProvider
 {
-    use LogsMessagesTrait;
-
     /**
      * The schema version this SDK targets. `MINOR` versions are additive, so a file declaring a
      * newer one is accepted with a warning; a different `MAJOR` is an error.
@@ -133,7 +130,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         composite_list: ?string,
      *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
      *     },
-     *     tracer_provider: array{
+     *     tracer_provider?: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
      *             attribute_count_limit: ?int<0, max>,
@@ -156,7 +153,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *              }>
      *           }
      *     },
-     *     meter_provider: array{
+     *     meter_provider?: array{
      *         views: list<array{
      *             stream: array{
      *                 name: ?string,
@@ -191,7 +188,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *             }>
      *          },
      *     },
-     *     logger_provider: array{
+     *     logger_provider?: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
      *             attribute_count_limit: ?int<0, max>,
@@ -229,6 +226,17 @@ final class OpenTelemetrySdk implements ComponentProvider
         // Applies the configured level to messages emitted while creating components, which all
         // happens before `buildAndRegisterGlobal()` sets the global minimum.
         $context = $context->withLogger(new ConfiguredLogger($logLevel));
+
+        // Warned here rather than during validation, so that it honors `log_level` and is not
+        // lost when the processed configuration is read back from the cache.
+        if ((int) explode('.', $properties['file_format'])[1] > self::FILE_FORMAT_MINOR) {
+            $context->logger->log(LogLevel::WARNING, sprintf(
+                'file_format "%s" is newer than the %d.%d implemented by this SDK; configuration it introduces may be ignored',
+                $properties['file_format'],
+                self::FILE_FORMAT_MAJOR,
+                self::FILE_FORMAT_MINOR,
+            ));
+        }
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
@@ -291,7 +299,7 @@ final class OpenTelemetrySdk implements ComponentProvider
         $resource = ResourceInfo::create(Attributes::create($attrs), $resource->getSchemaUrl());
 
         $attributes = AttributesParser::parseAttributesList($properties['resource']['attributes_list']);
-        $attributes = array_merge($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
+        $attributes = array_replace($attributes, AttributesParser::parseAttributes($properties['resource']['attributes']));
 
         $resource = $mandatory
             ->merge($resource)
@@ -303,178 +311,190 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $context = $context->withExtension($resource, ResourceInfo::class);
 
-        // <editor-fold desc="meter_provider">
+        $meterProvider = null;
+        if (isset($properties['meter_provider'])) {
+            // <editor-fold desc="meter_provider">
 
-        $metricReaders = [];
-        foreach ($properties['meter_provider']['readers'] as $reader) {
-            $metricReaders[] = $reader->create($context);
-        }
-
-        $viewRegistry = new CriteriaViewRegistry();
-        foreach ($properties['meter_provider']['views'] as $view) {
-            $criteria = [];
-            if (isset($view['selector']['instrument_type'])) {
-                $criteria[] = new InstrumentTypeCriteria(match ($view['selector']['instrument_type']) {
-                    'counter' => InstrumentType::COUNTER,
-                    'gauge' => InstrumentType::GAUGE,
-                    'histogram' => InstrumentType::HISTOGRAM,
-                    'observable_counter' => InstrumentType::ASYNCHRONOUS_COUNTER,
-                    'observable_gauge' => InstrumentType::ASYNCHRONOUS_GAUGE,
-                    'observable_up_down_counter' => InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
-                    'up_down_counter' => InstrumentType::UP_DOWN_COUNTER,
-                });
-            }
-            if (isset($view['selector']['instrument_name'])) {
-                $criteria[] = new InstrumentNameCriteria($view['selector']['instrument_name']);
-            }
-            if (isset($view['selector']['unit'])) {
-                $criteria[] = new InstrumentUnitCriteria($view['selector']['unit']);
-            }
-            if (isset($view['selector']['meter_name'])) {
-                $criteria[] = new InstrumentationScopeNameCriteria($view['selector']['meter_name']);
-            }
-            if (isset($view['selector']['meter_version'])) {
-                $criteria[] = new InstrumentationScopeVersionCriteria($view['selector']['meter_version']);
-            }
-            if (isset($view['selector']['meter_schema_url'])) {
-                $criteria[] = new InstrumentationScopeSchemaUrlCriteria($view['selector']['meter_schema_url']);
+            $metricReaders = [];
+            foreach ($properties['meter_provider']['readers'] as $reader) {
+                $metricReaders[] = $reader->create($context);
             }
 
-            $viewTemplate = ViewTemplate::create();
-            if (isset($view['stream']['name'])) {
-                $viewTemplate = $viewTemplate->withName($view['stream']['name']);
-            }
-            if (isset($view['stream']['description'])) {
-                $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
-            }
-            $included = ($view['stream']['attribute_keys']['included'] ?? []) ?: null;
-            $excluded = ($view['stream']['attribute_keys']['excluded'] ?? []) ?: null;
-            if ($included !== null || $excluded !== null) {
-                $viewTemplate = $viewTemplate->withAttributeKeyFilter($included, $excluded);
-            }
-            if (isset($view['stream']['aggregation'])) {
-                $viewTemplate = $viewTemplate->withAggregationResolver($view['stream']['aggregation']->create($context));
-            }
-            // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
+            $viewRegistry = new CriteriaViewRegistry();
+            foreach ($properties['meter_provider']['views'] as $view) {
+                $criteria = [];
+                if (isset($view['selector']['instrument_type'])) {
+                    $criteria[] = new InstrumentTypeCriteria(match ($view['selector']['instrument_type']) {
+                        'counter' => InstrumentType::COUNTER,
+                        'gauge' => InstrumentType::GAUGE,
+                        'histogram' => InstrumentType::HISTOGRAM,
+                        'observable_counter' => InstrumentType::ASYNCHRONOUS_COUNTER,
+                        'observable_gauge' => InstrumentType::ASYNCHRONOUS_GAUGE,
+                        'observable_up_down_counter' => InstrumentType::ASYNCHRONOUS_UP_DOWN_COUNTER,
+                        'up_down_counter' => InstrumentType::UP_DOWN_COUNTER,
+                    });
+                }
+                if (isset($view['selector']['instrument_name'])) {
+                    $criteria[] = new InstrumentNameCriteria($view['selector']['instrument_name']);
+                }
+                if (isset($view['selector']['unit'])) {
+                    $criteria[] = new InstrumentUnitCriteria($view['selector']['unit']);
+                }
+                if (isset($view['selector']['meter_name'])) {
+                    $criteria[] = new InstrumentationScopeNameCriteria($view['selector']['meter_name']);
+                }
+                if (isset($view['selector']['meter_version'])) {
+                    $criteria[] = new InstrumentationScopeVersionCriteria($view['selector']['meter_version']);
+                }
+                if (isset($view['selector']['meter_schema_url'])) {
+                    $criteria[] = new InstrumentationScopeSchemaUrlCriteria($view['selector']['meter_schema_url']);
+                }
 
-            $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
-        }
+                $viewTemplate = ViewTemplate::create();
+                if (isset($view['stream']['name'])) {
+                    $viewTemplate = $viewTemplate->withName($view['stream']['name']);
+                    if (strpbrk($view['selector']['instrument_name'] ?? '*', '*?') !== false) {
+                        $context->logger->log(LogLevel::WARNING, sprintf(
+                            'View stream name "%s" is used with a selector that can match more than one instrument',
+                            $view['stream']['name'],
+                        ));
+                    }
+                }
+                if (isset($view['stream']['description'])) {
+                    $viewTemplate = $viewTemplate->withDescription($view['stream']['description']);
+                }
+                $included = ($view['stream']['attribute_keys']['included'] ?? []) ?: null;
+                $excluded = ($view['stream']['attribute_keys']['excluded'] ?? []) ?: null;
+                if ($included !== null || $excluded !== null) {
+                    $viewTemplate = $viewTemplate->withAttributeKeyFilter($included, $excluded);
+                }
+                if (isset($view['stream']['aggregation'])) {
+                    $viewTemplate = $viewTemplate->withAggregationResolver($view['stream']['aggregation']->create($context));
+                }
+                // TODO apply stream.aggregation_cardinality_limit; no cardinality limit support in SDK/Metrics
 
-        $disabled = !$properties['meter_provider']['meter_configurator/development']['default_config']['enabled'];
-        $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
-        foreach ($properties['meter_provider']['meter_configurator/development']['meters'] as $meter) {
-            $disabled = !$meter['config']['enabled'];
-            $configurator = $configurator->with(
-                static fn (MeterConfig $config) => $config->setDisabled($disabled),
-                name: $meter['name'],
+                $viewRegistry->register(new AllCriteria($criteria), $viewTemplate);
+            }
+
+            $disabled = !$properties['meter_provider']['meter_configurator/development']['default_config']['enabled'];
+            $configurator = Configurator::meter()->with(static fn (MeterConfig $config) => $config->setDisabled($disabled), null);
+            foreach ($properties['meter_provider']['meter_configurator/development']['meters'] as $meter) {
+                $disabled = !$meter['config']['enabled'];
+                $configurator = $configurator->with(
+                    static fn (MeterConfig $config) => $config->setDisabled($disabled),
+                    name: $meter['name'],
+                );
+            }
+
+            /** @psalm-suppress InvalidArgument TODO update metric reader interface */
+            $meterProvider = new MeterProvider(
+                contextStorage: null,
+                resource: $resource,
+                clock: Clock::getDefault(),
+                attributesFactory: Attributes::factory(),
+                instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
+                metricReaders: $metricReaders, // @phpstan-ignore-line
+                viewRegistry: $viewRegistry,
+                // TODO apply meter_provider.exemplar_filter, see SDK/Metrics/Exemplar/ExemplarFilter
+                exemplarFilter: null,
+                stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
+                configurator: $configurator,
             );
+
+            // </editor-fold>
+            $sdkBuilder->setMeterProvider($meterProvider);
         }
-
-        /** @psalm-suppress InvalidArgument TODO update metric reader interface */
-        $meterProvider = new MeterProvider(
-            contextStorage: null,
-            resource: $resource,
-            clock: Clock::getDefault(),
-            attributesFactory: Attributes::factory(),
-            instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            metricReaders: $metricReaders, // @phpstan-ignore-line
-            viewRegistry: $viewRegistry,
-            // TODO apply meter_provider.exemplar_filter, see SDK/Metrics/Exemplar/ExemplarFilter
-            exemplarFilter: null,
-            stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
-            configurator: $configurator,
-        );
-
-        // </editor-fold>
 
         // Self-observability is opt-in, as it is for environment-based configuration. Passing the
         // meter provider to the tracer/logger providers and to components is what turns it on.
         $selfObservabilityMeterProvider = $distributionConfiguration->internalMetricsEnabled ? $meterProvider : null;
         $context = $context->withMeterProvider($selfObservabilityMeterProvider ?? new NoopMeterProvider());
 
-        $spanProcessors = [];
-        foreach ($properties['tracer_provider']['processors'] as $processor) {
-            $spanProcessors[] = $processor->create($context);
-        }
+        if (isset($properties['tracer_provider'])) {
+            $spanProcessors = [];
+            foreach ($properties['tracer_provider']['processors'] as $processor) {
+                $spanProcessors[] = $processor->create($context);
+            }
 
-        $disabled = !$properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'];
-        $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
+            $disabled = !$properties['tracer_provider']['tracer_configurator/development']['default_config']['enabled'];
+            $configurator = Configurator::tracer()->with(static fn (TracerConfig $config) => $config->setDisabled($disabled), null);
 
-        foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] as $tracer) {
-            $disabled = !$tracer['config']['enabled'];
-            $configurator = $configurator->with(
-                static fn (TracerConfig $config) => $config->setDisabled($disabled),
-                name: $tracer['name'],
+            foreach ($properties['tracer_provider']['tracer_configurator/development']['tracers'] as $tracer) {
+                $disabled = !$tracer['config']['enabled'];
+                $configurator = $configurator->with(
+                    static fn (TracerConfig $config) => $config->setDisabled($disabled),
+                    name: $tracer['name'],
+                );
+            }
+
+            // <editor-fold desc="tracer_provider">
+
+            $tracerProvider = new TracerProvider(
+                spanProcessors: $spanProcessors,
+                sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
+                resource: $resource,
+                spanLimits: new SpanLimits(
+                    attributesFactory: Attributes::factory(
+                        attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
+                            ?? $properties['attribute_limits']['attribute_count_limit'],
+                        attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                            ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                    ),
+                    eventAttributesFactory: Attributes::factory(
+                        attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit'],
+                        attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                            ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                    ),
+                    linkAttributesFactory: Attributes::factory(
+                        attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit'],
+                        attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
+                            ?? $properties['attribute_limits']['attribute_value_length_limit'],
+                    ),
+                    eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
+                    linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
+                ),
+                configurator: $configurator,
+                spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
+                meterProvider: $selfObservabilityMeterProvider,
             );
+
+            // </editor-fold>
+            $sdkBuilder->setTracerProvider($tracerProvider);
         }
 
-        // <editor-fold desc="tracer_provider">
+        if (isset($properties['logger_provider'])) {
+            // <editor-fold desc="logger_provider">
 
-        $tracerProvider = new TracerProvider(
-            spanProcessors: $spanProcessors,
-            sampler: ($properties['tracer_provider']['sampler'] ?? null)?->create($context) ?? new ParentBased(new AlwaysOnSampler()),
-            resource: $resource,
-            spanLimits: new SpanLimits(
-                attributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['attribute_count_limit']
-                        ?? $properties['attribute_limits']['attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['event_attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                linkAttributesFactory: Attributes::factory(
-                    attributeCountLimit: $properties['tracer_provider']['limits']['link_attribute_count_limit'],
-                    attributeValueLengthLimit: $properties['tracer_provider']['limits']['attribute_value_length_limit']
-                        ?? $properties['attribute_limits']['attribute_value_length_limit'],
-                ),
-                eventCountLimit: $properties['tracer_provider']['limits']['event_count_limit'],
-                linkCountLimit: $properties['tracer_provider']['limits']['link_count_limit'],
-            ),
-            configurator: $configurator,
-            spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
-            meterProvider: $selfObservabilityMeterProvider,
-        );
+            $logRecordProcessors = [];
+            foreach ($properties['logger_provider']['processors'] as $processor) {
+                $logRecordProcessors[] = $processor->create($context);
+            }
 
-        // </editor-fold>
+            $disabled = !$properties['logger_provider']['logger_configurator/development']['default_config']['enabled'];
+            $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
+            foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] as $logger) {
+                $disabled = !$logger['config']['enabled'];
+                $configurator = $configurator->with(
+                    static fn (LoggerConfig $config) => $config->setDisabled($disabled),
+                    name: $logger['name'],
+                );
+            }
 
-        // <editor-fold desc="logger_provider">
-
-        $logRecordProcessors = [];
-        foreach ($properties['logger_provider']['processors'] as $processor) {
-            $logRecordProcessors[] = $processor->create($context);
-        }
-
-        $disabled = !$properties['logger_provider']['logger_configurator/development']['default_config']['enabled'];
-        $configurator = Configurator::logger()->with(static fn (LoggerConfig $config) => $config->setDisabled($disabled), null);
-        foreach ($properties['logger_provider']['logger_configurator/development']['loggers'] as $logger) {
-            $disabled = !$logger['config']['enabled'];
-            $configurator = $configurator->with(
-                static fn (LoggerConfig $config) => $config->setDisabled($disabled),
-                name: $logger['name'],
+            // TODO apply logger_provider.limits; needs LoggerProvider to accept a LogRecordLimits,
+            // which currently hardcodes LogRecordLimitsBuilder (env vars only)
+            $loggerProvider = new LoggerProvider(
+                processor: new MultiLogRecordProcessor($logRecordProcessors),
+                instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
+                resource: $resource,
+                configurator: $configurator,
+                meterProvider: $selfObservabilityMeterProvider,
             );
+            $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
+
+            // </editor-fold>
+            $sdkBuilder->setLoggerProvider($loggerProvider);
+            $sdkBuilder->setEventLoggerProvider($eventLoggerProvider);
         }
-
-        // TODO apply logger_provider.limits; needs LoggerProvider to accept a LogRecordLimits,
-        // which currently hardcodes LogRecordLimitsBuilder (env vars only)
-        $loggerProvider = new LoggerProvider(
-            processor: new MultiLogRecordProcessor($logRecordProcessors),
-            instrumentationScopeFactory: new InstrumentationScopeFactory(Attributes::factory()),
-            resource: $resource,
-            configurator: $configurator,
-            meterProvider: $selfObservabilityMeterProvider,
-        );
-        $eventLoggerProvider = new EventLoggerProvider($loggerProvider);
-
-        // </editor-fold>
-
-        $sdkBuilder->setTracerProvider($tracerProvider);
-        $sdkBuilder->setMeterProvider($meterProvider);
-        $sdkBuilder->setLoggerProvider($loggerProvider);
-        $sdkBuilder->setEventLoggerProvider($eventLoggerProvider);
 
         return $sdkBuilder;
     }
@@ -490,6 +510,13 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->scalarNode('file_format')
                     ->isRequired()
                     ->example('1.0')
+                    ->validate()
+                        ->ifTrue(static fn (mixed $v): bool => is_int($v) || is_float($v))
+                        ->then(static fn (int|float $v) => throw new \InvalidArgumentException(sprintf(
+                            'must be a quoted string, such as "1.0"; got the YAML number %s',
+                            var_export($v, true),
+                        )))
+                    ->end()
                     ->validate()->always(Validation::ensureString())->end()
                     ->validate()->always(self::ensureSupportedFileFormat())->end()
                 ->end()
@@ -517,8 +544,8 @@ final class OpenTelemetrySdk implements ComponentProvider
 
     /**
      * Applies the `file_format` compatibility rules from upstream's versioning policy: a matching
-     * `MAJOR` is required and a newer `MINOR` only warns. Anything else is rejected, including the
-     * `1.0-rc.*` release candidates and the superseded `0.x` formats.
+     * `MAJOR` is required. Anything else is rejected, including the `1.0-rc.*` release candidates
+     * and the superseded `0.x` formats. A newer `MINOR` is accepted, and {@see createPlugin()} warns.
      *
      * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/VERSIONING.md#file-format
      */
@@ -535,20 +562,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ));
             }
 
-            [, $major, $minor] = $matches;
-            if ((int) $major !== self::FILE_FORMAT_MAJOR) {
+            if ((int) $matches[1] !== self::FILE_FORMAT_MAJOR) {
                 throw new \InvalidArgumentException(sprintf(
                     'unsupported version "%s", this SDK implements file_format %d.x',
                     $value,
                     self::FILE_FORMAT_MAJOR,
-                ));
-            }
-            if ((int) $minor > self::FILE_FORMAT_MINOR) {
-                self::logWarning(sprintf(
-                    'file_format "%s" is newer than the %d.%d implemented by this SDK; configuration it introduces may be ignored',
-                    $value,
-                    self::FILE_FORMAT_MAJOR,
-                    self::FILE_FORMAT_MINOR,
                 ));
             }
 
@@ -560,14 +578,13 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('resource');
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('attributes')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
+                    ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
-                            ->scalarNode('name')->isRequired()->end()
+                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->validate()->always(Validation::ensureString())->end()->end()
                             ->variableNode('value')->isRequired()->end()
                             ->enumNode('type')->defaultNull()
                                 ->values(['string', 'bool', 'int', 'double', 'string_array', 'bool_array', 'int_array', 'double_array'])
@@ -580,7 +597,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         })->end()
                     ->end()
                 ->end()
-                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
+                ->scalarNode('attributes_list')->defaultNull()->validate()->always(Validation::ensureKeyValueList())->end()->end()
                 ->arrayNode('detection/development')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -589,9 +606,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->children()
                                 ->arrayNode('included')
                                     ->defaultNull()
+                                    ->requiresAtLeastOneElement()
                                     ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                 ->end()
                                 ->arrayNode('excluded')
+                                    ->requiresAtLeastOneElement()
                                     ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                 ->end()
                             ->end()
@@ -600,6 +619,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                         // that a portable config may name detectors another SDK provides.
                         ->append(
                             $registry->componentList('detectors', ResourceDetectorInterface::class)
+                                ->requiresAtLeastOneElement()
                                 ->attribute(IgnoresUnknownProviders::ATTRIBUTE, true)
                         )
                     ->end()
@@ -614,7 +634,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('attribute_limits');
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
@@ -628,14 +647,12 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('tracer_provider');
         $node
-            ->addDefaultsIfNotSet()
             ->validate()
                 ->ifTrue(static fn (?array $v): bool => ($v['processors'] ?? []) === [])
                 ->thenInvalid('A tracer provider needs at least one processor. Omit tracer_provider for a noop.')
             ->end()
             ->children()
                 ->arrayNode('limits')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->integerNode('attribute_value_length_limit')->min(0)->defaultNull()->end()
@@ -658,12 +675,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->end()
                         ->end()
                         ->arrayNode('tracers')
+                            ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
-                                        ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                                         ->addDefaultsIfNotSet()
                                         ->children()
                                             ->booleanNode('enabled')->defaultTrue()->end()
@@ -684,7 +701,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('meter_provider');
         $node
-            ->addDefaultsIfNotSet()
             ->validate()
                 ->ifTrue(static fn (?array $v): bool => ($v['readers'] ?? []) === [])
                 ->thenInvalid('A meter provider needs at least one reader. Omit meter_provider for a noop.')
@@ -699,7 +715,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->defaultValue('trace_based')
                 ->end()
                 ->arrayNode('views')
-                    ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
+                    ->requiresAtLeastOneElement()
                     ->arrayPrototype()
                         ->children()
                             ->arrayNode('stream')
@@ -712,9 +728,11 @@ final class OpenTelemetrySdk implements ComponentProvider
                                     ->arrayNode('attribute_keys')
                                         ->children()
                                             ->arrayNode('included')
+                                                ->requiresAtLeastOneElement()
                                                 ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                             ->end()
                                             ->arrayNode('excluded')
+                                                ->requiresAtLeastOneElement()
                                                 ->scalarPrototype()->validate()->always(Validation::ensureString())->end()->end()
                                             ->end()
                                         ->end()
@@ -738,7 +756,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                                         ])
                                         ->defaultNull()
                                     ->end()
-                                    ->scalarNode('instrument_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->cannotBeEmpty()->end()
+                                    ->scalarNode('instrument_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('unit')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('meter_name')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                                     ->scalarNode('meter_version')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
@@ -759,12 +777,12 @@ final class OpenTelemetrySdk implements ComponentProvider
                             ->end()
                         ->end()
                         ->arrayNode('meters')
+                            ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                                     ->arrayNode('config')
                                         ->isRequired()
-                                        ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
                                         ->addDefaultsIfNotSet()
                                         ->children()
                                             ->booleanNode('enabled')->defaultTrue()->end()
@@ -785,7 +803,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('logger_provider');
         $node
-            ->addDefaultsIfNotSet()
             ->validate()
                 ->ifTrue(static fn (?array $v): bool => ($v['processors'] ?? []) === [])
                 ->thenInvalid('A logger provider needs at least one processor. Omit logger_provider for a noop.')
@@ -804,9 +821,10 @@ final class OpenTelemetrySdk implements ComponentProvider
                     ->children()
                         ->append($this->getLoggerConfig($builder, 'default_config'))
                         ->arrayNode('loggers')
+                            ->requiresAtLeastOneElement()
                             ->arrayPrototype()
                                 ->children()
-                                    ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
+                                    ->scalarNode('name')->isRequired()->validate()->always(Validation::ensureString())->end()->end()
                                     ->append($this->getLoggerConfig($builder, 'config')->isRequired())
                                 ->end()
                             ->end()
@@ -828,7 +846,6 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode($name);
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->addDefaultsIfNotSet()
             ->children()
                 ->booleanNode('enabled')->defaultTrue()->end()
@@ -845,13 +862,18 @@ final class OpenTelemetrySdk implements ComponentProvider
     {
         $node = $builder->arrayNode('propagator');
         $node
-            ->beforeNormalization()->ifNull()->then(static fn (): array => [])->end()
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function (array $value): array {
+                    // Left for type validation to reject.
+                    if (!is_array($value['composite'] ?? []) || !is_string($value['composite_list'] ?? '')) {
+                        return $value;
+                    }
                     $existing = [];
                     foreach ($value['composite'] ?? [] as $item) {
-                        $existing[] = key($item);
+                        if (is_array($item)) {
+                            $existing[] = key($item);
+                        }
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);
@@ -871,7 +893,7 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-                ->append($registry->componentList('composite', TextMapPropagatorInterface::class))
+                ->append($registry->componentList('composite', TextMapPropagatorInterface::class)->requiresAtLeastOneElement())
             ->end()
         ;
 
@@ -889,9 +911,15 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->beforeNormalization()
             ->ifArray()
             ->then(static function (array $value): array {
+                // Left for type validation to reject.
+                if (!is_array($value['composite'] ?? []) || !is_string($value['composite_list'] ?? '')) {
+                    return $value;
+                }
                 $existing = [];
                 foreach ($value['composite'] ?? [] as $item) {
-                    $existing[] = key($item);
+                    if (is_array($item)) {
+                        $existing[] = key($item);
+                    }
                 }
                 foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                     $name = trim($name);

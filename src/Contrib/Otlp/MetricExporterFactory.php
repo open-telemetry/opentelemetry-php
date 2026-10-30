@@ -72,14 +72,9 @@ class MetricExporterFactory implements MetricExporterFactoryInterface
 
     private function getTemporality(): TemporalityPreference
     {
-        $value = Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE);
-
-        return match (strtolower($value)) {
-            'cumulative' => TemporalityPreference::cumulative(),
-            'delta' => TemporalityPreference::delta(),
-            'lowmemory' => TemporalityPreference::lowMemory(),
-            default => throw new \UnexpectedValueException('Unknown temporality: ' . $value),
-        };
+        return TemporalityPreference::fromName(
+            Configuration::getEnum(Variables::OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE),
+        );
     }
 
     private function getCompression(): string

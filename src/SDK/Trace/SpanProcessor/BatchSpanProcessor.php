@@ -87,7 +87,8 @@ class BatchSpanProcessor implements SpanProcessorInterface
             throw new InvalidArgumentException(sprintf('Maximum export batch size (%d) must be greater than zero', $maxExportBatchSize));
         }
         if ($maxExportBatchSize > $maxQueueSize) {
-            throw new InvalidArgumentException(sprintf('Maximum export batch size (%d) must be less than or equal to maximum queue size (%d)', $maxExportBatchSize, $maxQueueSize));
+            self::logWarning(sprintf('Maximum export batch size (%d) exceeds maximum queue size (%d), using %2$d', $maxExportBatchSize, $maxQueueSize));
+            $maxExportBatchSize = $maxQueueSize;
         }
         $this->maxQueueSize = $maxQueueSize;
         $this->scheduledDelayNanos = $scheduledDelayMillis * 1_000_000;

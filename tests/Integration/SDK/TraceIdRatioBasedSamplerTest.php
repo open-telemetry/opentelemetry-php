@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Integration\SDK;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Trace as API;
 use OpenTelemetry\API\Trace\NonRecordingSpan;
 use OpenTelemetry\API\Trace\SpanContext;
@@ -18,6 +19,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversNothing]
 class TraceIdRatioBasedSamplerTest extends TestCase
 {
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Logging::reset();
+    }
+
     public function test_never_trace_id_ratio_based_sampler_decision(): void
     {
         $sampler = new TraceIdRatioBasedSampler(0.0);
@@ -76,6 +83,7 @@ class TraceIdRatioBasedSamplerTest extends TestCase
 
     public function test_ignore_parent_sampled_flag(): void
     {
+        Logging::disable();
         $parentTraceState = $this->createStub(API\TraceStateInterface::class);
         $sampler = new TraceIdRatioBasedSampler(0.0);
         $samplingResult = $sampler->shouldSample(

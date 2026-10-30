@@ -82,9 +82,15 @@ final class DistributionConfigurationSdk implements ComponentProvider
             ->beforeNormalization()
                 ->ifArray()
                 ->then(static function (array $value): array {
+                    // Left for type validation to reject.
+                    if (!is_array($value['composite'] ?? []) || !is_string($value['composite_list'] ?? '')) {
+                        return $value;
+                    }
                     $existing = [];
                     foreach ($value['composite'] ?? [] as $item) {
-                        $existing[] = key($item);
+                        if (is_array($item)) {
+                            $existing[] = key($item);
+                        }
                     }
                     foreach (explode(',', $value['composite_list'] ?? '') as $name) {
                         $name = trim($name);

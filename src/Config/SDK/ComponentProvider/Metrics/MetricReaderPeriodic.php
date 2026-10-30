@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Config\SDK\ComponentProvider\Metrics;
 
+use function array_is_list;
+use function array_key_first;
+use function count;
+use InvalidArgumentException;
+use function is_array;
+use function is_string;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
@@ -11,6 +17,7 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
 use OpenTelemetry\SDK\Metrics\MetricReaderInterface;
+use function sprintf;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
@@ -52,11 +59,12 @@ final class MetricReaderPeriodic implements ComponentProvider
         $node = $builder->arrayNode('periodic');
         $node
             ->children()
-                ->integerNode('interval')->min(0)->defaultValue(5000)->end()
+                ->integerNode('interval')->min(0)->defaultValue(60000)->end()
                 ->integerNode('timeout')->min(0)->defaultValue(30000)->end()
                 ->append($registry->component('exporter', MetricExporterInterface::class)->isRequired())
                 ->arrayNode('producers') //TODO not implemented in metrics SDK
-                    ->variablePrototype()->end()
+                    ->requiresAtLeastOneElement()
+                    ->variablePrototype()->validate()->always(self::validateProducer(...))->end()->end()
                 ->end()
                 ->arrayNode('cardinality_limits') //TODO not implemented in metrics SDK
                     ->addDefaultsIfNotSet()
@@ -75,5 +83,27 @@ final class MetricReaderPeriodic implements ComponentProvider
         ;
 
         return $node;
+    }
+
+    /**
+     * No producer is implemented, so this checks only the schema's `MetricProducer` shape.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-configuration/blob/v1.0.0/schema/meter_provider.yaml
+     */
+    private static function validateProducer(mixed $producer): array
+    {
+        if (!is_array($producer) || count($producer) !== 1 || !is_string($name = array_key_first($producer))) {
+            throw new InvalidArgumentException('Metric producer must have exactly one key, naming the producer');
+        }
+        $properties = $producer[$name];
+        // Both YAML parsers give `{}` as `[]`, so only a non-empty list is known to be a sequence.
+        if ($properties !== null && (!is_array($properties) || ($properties !== [] && array_is_list($properties)))) {
+            throw new InvalidArgumentException(sprintf('Metric producer "%s" must be null or a map', $name));
+        }
+        if ($name === 'opencensus' && $properties) {
+            throw new InvalidArgumentException('Metric producer "opencensus" takes no properties');
+        }
+
+        return $producer;
     }
 }
