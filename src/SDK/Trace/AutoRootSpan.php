@@ -99,7 +99,7 @@ class AutoRootSpan
 
         $request = self::createRequest();
         if ($request === null) {
-            self::warn('Unable to create server request');
+            self::logWarning('Unable to create server request');
 
             return;
         }
@@ -187,19 +187,6 @@ class AutoRootSpan
     }
 
     /**
-     * Logging is best effort: a failing log writer (for example an error handler that throws on `trigger_error`)
-     * must not break the request or keep the root span from ending.
-     */
-    private static function warn(string $message, array $context = []): void
-    {
-        try {
-            self::logWarning($message, $context);
-        } catch (\Throwable) {
-            // nothing more can be done
-        }
-    }
-
-    /**
      * The request is kept only when its body is going to be recorded, a bad configuration must not break the request.
      */
     private static function requestForBodyCapture(ServerRequestInterface $request): ?ServerRequestInterface
@@ -207,7 +194,7 @@ class AutoRootSpan
         try {
             return HttpBodyCapture::isEnabled() ? $request : null;
         } catch (\Throwable $e) {
-            self::warn('Unable to read the request body capture configuration', ['exception' => $e]);
+            self::logWarning('Unable to read the request body capture configuration', ['exception' => $e]);
 
             return null;
         }
@@ -323,7 +310,7 @@ class AutoRootSpan
                 HttpBodyCapture::captureRequestBody($span, $request);
             } catch (\Throwable $e) {
                 // recording the body must never prevent the root span from ending
-                self::warn('Unable to record the request body', ['exception' => $e]);
+                self::logWarning('Unable to record the request body', ['exception' => $e]);
             }
         }
         $span->end();

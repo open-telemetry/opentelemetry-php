@@ -619,12 +619,8 @@ class AutoRootSpanTest extends TestCase
 
         $this->useThrowingLogWriter();
 
-        try {
-            AutoRootSpan::create($request);
-            AutoRootSpan::shutdownHandler();
-        } finally {
-            Logging::reset();
-        }
+        AutoRootSpan::create($request);
+        AutoRootSpan::shutdownHandler();
     }
 
     public function test_create_does_not_keep_the_request_of_a_previous_span_for_a_cli_span(): void
@@ -664,11 +660,7 @@ class AutoRootSpanTest extends TestCase
 
         $this->useThrowingLogWriter();
 
-        try {
-            AutoRootSpan::create($request);
-        } finally {
-            Logging::reset();
-        }
+        AutoRootSpan::create($request);
 
         $this->assertNotNull((new \ReflectionProperty(AutoRootSpan::class, 'rootScope'))->getValue());
         $this->assertNull((new \ReflectionProperty(AutoRootSpan::class, 'request'))->getValue());
