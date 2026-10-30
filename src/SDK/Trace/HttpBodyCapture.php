@@ -171,18 +171,6 @@ final class HttpBodyCapture
         return [$mediaType, $parameters];
     }
 
-    /**
-     * Logging is best effort and must never break the request.
-     */
-    private static function warn(string $message, array $context): void
-    {
-        try {
-            self::logWarning($message, $context);
-        } catch (\Throwable) {
-            // nothing more can be done
-        }
-    }
-
     private static function isUtf8Charset(string $contentType): bool
     {
         $charset = self::parseContentType($contentType)[1]['charset'] ?? null;
@@ -228,7 +216,7 @@ final class HttpBodyCapture
                     $stream->seek($position);
                 } catch (\RuntimeException $e) {
                     // the body is still returned, but the application may see another stream position
-                    self::warn('Unable to restore the request body stream position', ['exception' => $e]);
+                    self::logWarning('Unable to restore the request body stream position', ['exception' => $e]);
                 }
             }
         }

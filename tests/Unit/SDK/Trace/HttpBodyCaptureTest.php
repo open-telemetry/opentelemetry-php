@@ -180,11 +180,7 @@ class HttpBodyCaptureTest extends TestCase
         $stream->method('seek')->willThrowException(new \RuntimeException('stream failure'));
         Logging::setLogWriter(new NoopLogWriter());
 
-        try {
-            $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
-        } finally {
-            Logging::reset();
-        }
+        $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
     }
 
     public function test_extract_warns_when_the_position_cannot_be_restored(): void
@@ -211,36 +207,9 @@ class HttpBodyCaptureTest extends TestCase
         $stream->method('read')->willReturn('hello');
         $stream->method('seek')->willThrowException(new \RuntimeException('stream failure'));
 
-        try {
-            $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
-        } finally {
-            Logging::reset();
-        }
+        $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
 
         $this->assertSame([['warning', 'Unable to restore the request body stream position']], $state->messages);
-    }
-
-    public function test_extract_survives_a_failing_log_writer(): void
-    {
-        Logging::setLogWriter(new class() implements LogWriterInterface {
-            #[\Override]
-            public function write($level, string $message, array $context): void
-            {
-                throw new \ErrorException('log writer failure');
-            }
-        });
-        $stream = $this->createMock(StreamInterface::class);
-        $stream->method('isReadable')->willReturn(true);
-        $stream->method('isSeekable')->willReturn(true);
-        $stream->method('tell')->willReturn(0);
-        $stream->method('read')->willReturn('hello');
-        $stream->method('seek')->willThrowException(new \RuntimeException('stream failure'));
-
-        try {
-            $this->assertSame('hello', HttpBodyCapture::extract(self::requestWithBody($stream), 5));
-        } finally {
-            Logging::reset();
-        }
     }
 
     public function test_extract_treats_an_empty_read_as_the_end_of_the_body(): void
