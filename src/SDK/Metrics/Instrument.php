@@ -11,6 +11,9 @@ final class Instrument
 
     /**
      * A null unit or description is stored as an empty string. The spec treats them as the same.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#instrument-unit
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#instrument-description
      */
     public function __construct(
         public readonly string|InstrumentType $type,
