@@ -64,7 +64,10 @@
         </PossiblyNullReference>
         <MoreSpecificImplementedParamType>
             <errorLevel type="suppress">
+                <directory name="src/API/Baggage/Propagation/Config"/>
+                <directory name="src/API/Trace/Propagation/Config"/>
                 <directory name="src/Config/SDK/ComponentProvider"/>
+                <directory name="src/Extension/Propagator/B3/Config"/>
                 <directory name="tests"/>
             </errorLevel>
         </MoreSpecificImplementedParamType>

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Instrumentation\General;
+namespace OpenTelemetry\API\Instrumentation\Configuration\General\Config;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;

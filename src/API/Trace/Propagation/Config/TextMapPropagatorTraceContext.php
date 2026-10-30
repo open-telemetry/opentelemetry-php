@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Propagator;
+namespace OpenTelemetry\API\Trace\Propagation\Config;
 
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;

@@ -2,9 +2,27 @@ deptrac:
   skip_violations:
     /src/Extension/Propagator/B3/_register.php:
       - OpenTelemetry\SDK\Registry
+    OpenTelemetry\API\Baggage\Propagation\Config\TextMapPropagatorBaggage:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
     OpenTelemetry\API\Configuration\Config\ComponentProvider:
       - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
       - Symfony\Component\Config\Definition\Builder\NodeBuilder
     OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry:
       - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
       - Symfony\Component\Config\Definition\Builder\NodeDefinition
+    OpenTelemetry\API\Instrumentation\Configuration\General\Config\HttpConfigProvider:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
+    OpenTelemetry\API\Instrumentation\Configuration\General\Config\SemconvConfig:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
+    OpenTelemetry\API\Trace\Propagation\Config\TextMapPropagatorTraceContext:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
+    OpenTelemetry\Extension\Propagator\B3\Config\TextMapPropagatorB3:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder
+    OpenTelemetry\Extension\Propagator\B3\Config\TextMapPropagatorB3Multi:
+      - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
+      - Symfony\Component\Config\Definition\Builder\NodeBuilder

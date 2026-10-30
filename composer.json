@@ -126,10 +126,10 @@
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
+                "OpenTelemetry\\API\\Baggage\\Propagation\\Config\\TextMapPropagatorBaggage",
+                "OpenTelemetry\\API\\Trace\\Propagation\\Config\\TextMapPropagatorTraceContext",
+                "OpenTelemetry\\Extension\\Propagator\\B3\\Config\\TextMapPropagatorB3",
+                "OpenTelemetry\\Extension\\Propagator\\B3\\Config\\TextMapPropagatorB3Multi",
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOff",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOn",

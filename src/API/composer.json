@@ -22,7 +22,8 @@
         "psr/log": "^1.1|^2.0|^3.0"
     },
     "conflict": {
-        "open-telemetry/sdk": "<=1.11"
+        "open-telemetry/sdk": "<=1.11",
+        "open-telemetry/sdk-configuration": "<0.10"
     },
     "suggest": {
         "symfony/config": "To implement a ComponentProvider for declarative configuration"
@@ -40,6 +41,10 @@
             "dev-main": "1.11.x-dev"
         },
         "spi": {
+            "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "OpenTelemetry\\API\\Baggage\\Propagation\\Config\\TextMapPropagatorBaggage",
+                "OpenTelemetry\\API\\Trace\\Propagation\\Config\\TextMapPropagatorTraceContext"
+            ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
                 "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ]

@@ -31,6 +31,9 @@
             "OpenTelemetry\\Config\\SDK\\": ""
         }
     },
+    "conflict": {
+        "open-telemetry/extension-propagator-b3": "<1.3"
+    },
     "suggest": {
         "ext-yaml": "Allows loading config from yaml files",
         "symfony/yaml": "Allows loading config from yaml files"
@@ -41,11 +44,6 @@
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorB3Multi",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorBaggage",
-                "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Propagator\\TextMapPropagatorTraceContext",
-
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOff",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerAlwaysOn",
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Trace\\ComposableSamplerParentThreshold",
