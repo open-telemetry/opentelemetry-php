@@ -33,4 +33,28 @@ final class ValidationTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         Validation::ensureNumber()('one');
     }
+
+    public function test_ensure_regex_pattern_accepts_null(): void
+    {
+        $this->assertNull(Validation::ensureRegexPattern()(null));
+    }
+
+    public function test_ensure_regex_pattern_returns_valid_pattern(): void
+    {
+        $this->assertSame('/^GET /i', Validation::ensureRegexPattern()('/^GET /i'));
+    }
+
+    public function test_ensure_regex_pattern_rejects_non_string(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be of type string');
+        Validation::ensureRegexPattern()(1);
+    }
+
+    public function test_ensure_regex_pattern_rejects_invalid_pattern(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/^must be a valid regex pattern: (?!preg_match\(\): )/');
+        Validation::ensureRegexPattern()('/unclosed');
+    }
 }
