@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace;
 
 use Http\Discovery\Exception\NotFoundException;
+use Http\Discovery\Psr17Factory;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Nyholm\Psr7Server\ServerRequestCreator;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Globals;
@@ -235,14 +235,16 @@ class AutoRootSpan
     public static function createRequest(): ?ServerRequestInterface
     {
         try {
-            $creator = new ServerRequestCreator(
+            $factory = new Psr17Factory(
+                Psr17FactoryDiscovery::findRequestFactory(),
+                Psr17FactoryDiscovery::findResponseFactory(),
                 Psr17FactoryDiscovery::findServerRequestFactory(),
-                Psr17FactoryDiscovery::findUriFactory(),
-                Psr17FactoryDiscovery::findUploadedFileFactory(),
                 Psr17FactoryDiscovery::findStreamFactory(),
+                Psr17FactoryDiscovery::findUploadedFileFactory(),
+                Psr17FactoryDiscovery::findUriFactory(),
             );
 
-            return $creator->fromGlobals();
+            return $factory->createServerRequestFromGlobals();
         } catch (NotFoundException $e) {
             self::logError('Unable to initialize server request creator for auto root span creation', ['exception' => $e]);
         }
