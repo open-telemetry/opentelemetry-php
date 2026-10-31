@@ -67,6 +67,8 @@ error straight away, with no deprecation step.
   `@internal`. `EnvResource` and `OutputStreamParser` are final ([#2097]).
 - Requires PHP 8.2 ([#2091]), `open-telemetry/api` 1.11 and `open-telemetry/sdk` 1.16 ([#2076]),
   `composer-runtime-api` 2 and `psr/log` ([#2097]).
+- Conflicts with `open-telemetry/extension-propagator-b3` below 1.3, which doesn't register the
+  `b3` and `b3multi` providers. Upgrade it with this package ([#2107]).
 
 ### Added
 
@@ -116,6 +118,10 @@ error straight away, with no deprecation step.
 - `Validation::ensureNumber()` returns a number, not the string it was given ([#2097]).
 - A file without a `.yaml` or `.yml` extension throws `InvalidArgumentException`, not symfony's
   `LoaderLoadException` ([#2105]).
+- The `tracecontext` and `baggage` propagator providers and the HTTP instrumentation config
+  provider are registered by `open-telemetry/api`, and `b3` and `b3multi` by
+  `open-telemetry/extension-propagator-b3`. They were `@internal`, so only the class names change
+  ([#2107]).
 
 ### Deprecated
 
@@ -136,7 +142,6 @@ These are to be removed before 1.0.
 
 - `SpanExporterZipkin` and `PeerConfigProvider`, with their schema nodes ([#2068]).
 - `TextMapPropagatorComposite` and `ResponsePropagatorComposite` ([#2097]).
-- `Validation::ensureRegexPattern()` ([#2097]).
 
 ### Fixed
 
@@ -176,3 +181,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
+[#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
