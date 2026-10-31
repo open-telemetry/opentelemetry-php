@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Integration\Config;
 
 use Nevay\SPI\ServiceLoader;
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\API\Baggage\Propagation\Config\TextMapPropagatorBaggage;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
@@ -14,6 +15,7 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopCounter;
+use OpenTelemetry\API\Trace\Propagation\Config\TextMapPropagatorTraceContext;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
 use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricExporterConsole;
@@ -35,6 +37,8 @@ use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
+use OpenTelemetry\Extension\Propagator\B3\Config\TextMapPropagatorB3;
+use OpenTelemetry\Extension\Propagator\B3\Config\TextMapPropagatorB3Multi;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Logs\EventLoggerProvider;
@@ -1591,6 +1595,20 @@ final class ConfigurationTest extends TestCase
         } finally {
             Logging::reset();
         }
+    }
+
+    #[DataProvider('propagatorProviderProvider')]
+    public function test_propagator_provider_is_registered(string $provider): void
+    {
+        $this->assertContains($provider, array_map(get_class(...), self::spiComponentProviders()));
+    }
+
+    public static function propagatorProviderProvider(): iterable
+    {
+        yield 'baggage' => [TextMapPropagatorBaggage::class];
+        yield 'tracecontext' => [TextMapPropagatorTraceContext::class];
+        yield 'b3' => [TextMapPropagatorB3::class];
+        yield 'b3multi' => [TextMapPropagatorB3Multi::class];
     }
 
     public function test_duplicate_propagators(): void

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK\ComponentProvider\Propagator;
+namespace OpenTelemetry\API\Baggage\Propagation\Config;
 
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;

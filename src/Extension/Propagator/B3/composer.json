@@ -18,8 +18,14 @@
     ],
     "require": {
         "php": "^8.2",
-        "open-telemetry/api": "^1.0",
+        "open-telemetry/api": "^1.4",
         "open-telemetry/context": "^1.0"
+    },
+    "conflict": {
+        "open-telemetry/sdk-configuration": "<0.10"
+    },
+    "suggest": {
+        "open-telemetry/sdk-configuration": "To configure the B3 propagators from a declarative configuration file"
     },
     "autoload": {
         "psr-4": {
@@ -32,6 +38,12 @@
     "extra": {
         "branch-alias": {
             "dev-main": "1.0.x-dev"
+        },
+        "spi": {
+            "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [
+                "OpenTelemetry\\Extension\\Propagator\\B3\\Config\\TextMapPropagatorB3",
+                "OpenTelemetry\\Extension\\Propagator\\B3\\Config\\TextMapPropagatorB3Multi"
+            ]
         }
     }
 }
