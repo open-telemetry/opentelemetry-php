@@ -148,6 +148,20 @@ Files marked "DO NOT EDIT" are generated. Don't edit them by hand:
 - `src/SemConv/`: `SEMCONV_VERSION=x.y.z make semconv`
 - `proto/otel/`: `make protobuf`
 
+## Changelogs
+
+Each split package has a `CHANGELOG.md` in its directory. When a change affects a package's users, add an entry
+under `Unreleased` in that package's changelog, in the same PR. Follow the existing sections and end each entry with
+the PR link. A change to several packages gets an entry in each. A semconv or protobuf regeneration gets one line
+naming the new upstream version.
+
+Write for someone upgrading: what changed for them and what they must do. Put anything that can break code or
+configuration under `Breaking changes`, including a raised PHP or dependency minimum. Skip tests, CI, tooling and
+internal refactoring.
+
+`script/check_changelog.sh` lists the packages changed since `origin/main` whose changelogs didn't change. CI runs it
+on pull requests, unless the PR has the `skip-changelog` label.
+
 ## CI Requirements
 
 The blocking checks in `.github/workflows/php.yml` run on PHP 8.2 to 8.5:
