@@ -17,6 +17,7 @@ require dirname(__DIR__, 5) . '/vendor/autoload.php';
 /** @psalm-suppress InternalMethod */
 $request = AutoRootSpan::createRequest();
 $max = filter_var($_GET['max'] ?? 1024, FILTER_VALIDATE_INT) ?: 1024;
+/** @psalm-suppress InternalMethod */
 $captured = $request === null ? null : HttpBodyCapture::extract($request, $max);
 $applicationBody = (string) file_get_contents('php://input');
 

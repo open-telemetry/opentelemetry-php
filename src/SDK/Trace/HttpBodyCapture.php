@@ -24,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Enable it only where that is acceptable.
  *
  * @see https://github.com/open-telemetry/semantic-conventions/pull/3521
- * @experimental
+ * @internal
  */
 final class HttpBodyCapture
 {
