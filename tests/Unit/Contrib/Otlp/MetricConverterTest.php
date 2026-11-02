@@ -163,6 +163,7 @@ final class MetricConverterTest extends TestCase
         ]);
 
         /** @var \Opentelemetry\Proto\Metrics\V1\HistogramDataPoint $dataPoint */
+        /** @psalm-suppress PossiblyNullReference */
         $dataPoint = $request->getResourceMetrics()[0]->getScopeMetrics()[0]->getMetrics()[0]->getHistogram()->getDataPoints()[0];
         $this->assertFalse($dataPoint->hasMin());
         $this->assertFalse($dataPoint->hasMax());

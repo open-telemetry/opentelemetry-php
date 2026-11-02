@@ -38,6 +38,7 @@ class LogsConverterTest extends TestCase
         $request = $this->converter->convert([$this->record]);
         /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $row = $request->getResourceLogs()[0]->getScopeLogs()[0]->getLogRecords()[0];
+        /** @psalm-suppress PossiblyNullReference */
         $this->assertSame('body', $row->getBody()->getStringValue());
     }
 
