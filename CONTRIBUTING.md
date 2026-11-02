@@ -72,6 +72,19 @@ This does the following things:
 * Performs static analysis with [Phan](https://github.com/phan/phan), [Psalm](https://psalm.dev/)
   and [PHPStan](https://phpstan.org/user-guide/getting-started)
 
+### Changelog
+
+If the package you change has a `CHANGELOG.md`, and the change affects its users, add an entry under `Unreleased`.
+Use the `Breaking changes`, `Added`, `Changed`, `Deprecated`, `Removed` or `Fixed` heading, and end the entry with a
+link to your pull request. Say what changed for the user and what they need to do, if anything. Put anything that can
+break existing code or configuration under `Breaking changes`.
+
+A change that touches several packages gets an entry in each one it affects. Tests, CI, tooling and internal
+refactoring don't need an entry.
+
+A check flags a pull request that changes a package without changing its changelog. If no entry is needed, a
+maintainer adds the `skip-changelog` label. To run the check locally, use `script/check_changelog.sh`.
+
 ## Local Run/Build 
 
 To ensure you have all the correct packages installed locally in your dev environment, you can run
