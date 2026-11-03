@@ -20,6 +20,9 @@
         "php": "^8.0",
         "google/protobuf": "^4.31 || ^5.0"
     },
+    "conflict": {
+        "ext-protobuf": "<4.31"
+    },
     "autoload": {
         "psr-4": {
             "Opentelemetry\\Proto\\": "Opentelemetry/Proto/",

@@ -10,6 +10,17 @@ the protocol itself are in the
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `google/protobuf` 4.31, and conflicts with `ext-protobuf` older than 4.31 ([#2110]).
+
+### Changed
+
+- Generated from `opentelemetry-proto` v1.11.1, up from v1.8.0. This adds the `Processcontext`
+  messages ([#2110]).
+
 ## 1.10.0 and earlier
 
 See the [GitHub releases](https://github.com/opentelemetry-php/gen-otlp-protobuf/releases).
+
+[#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110

@@ -12,7 +12,10 @@ use Google\Protobuf\PrintOptions;
 use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
+use function phpversion;
+use RuntimeException;
 use function sprintf;
+use function version_compare;
 
 /**
  * @internal
@@ -21,8 +24,26 @@ final class ProtobufSerializer
 {
     use LogsMessagesTrait;
 
+    private const MIN_EXTENSION_VERSION = '4.31.0';
+
     private function __construct(private readonly string $contentType)
     {
+        self::ensureSupportedExtension(phpversion('protobuf'));
+    }
+
+    /**
+     * ext-protobuf replaces the google/protobuf classes when loaded, so the
+     * Composer constraint on google/protobuf doesn't cover it.
+     */
+    public static function ensureSupportedExtension(string|false $version): void
+    {
+        if ($version !== false && version_compare($version, self::MIN_EXTENSION_VERSION, '<')) {
+            throw new RuntimeException(sprintf(
+                'ext-protobuf %s is installed, but %s or later is required',
+                $version,
+                self::MIN_EXTENSION_VERSION,
+            ));
+        }
     }
 
     public static function getDefault(): ProtobufSerializer
