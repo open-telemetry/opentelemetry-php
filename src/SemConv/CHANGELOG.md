@@ -10,6 +10,12 @@ conventions themselves are in the
 
 ## Unreleased
 
+### Changed
+
+- Generated from semantic conventions 1.45.0 ([#2111]).
+
+[#2111]: https://github.com/open-telemetry/opentelemetry-php/pull/2111
+
 ## 1.44.0 and earlier
 
 See the [GitHub releases](https://github.com/opentelemetry-php/sem-conv/releases).

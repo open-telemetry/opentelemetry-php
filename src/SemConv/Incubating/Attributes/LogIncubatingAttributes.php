@@ -14,35 +14,35 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface LogIncubatingAttributes
 {
     /**
-     * The basename of the file.
+     * The basename of the file to which the log record was emitted.
      *
      * @experimental
      */
     public const LOG_FILE_NAME = 'log.file.name';
 
     /**
-     * The basename of the file, with symlinks resolved.
+     * The basename of the file to which the log record was emitted, with symlinks resolved.
      *
      * @experimental
      */
     public const LOG_FILE_NAME_RESOLVED = 'log.file.name_resolved';
 
     /**
-     * The full path to the file.
+     * The full path to the file to which the log record was emitted.
      *
      * @experimental
      */
     public const LOG_FILE_PATH = 'log.file.path';
 
     /**
-     * The full path to the file, with symlinks resolved.
+     * The full path to the file to which the log record was emitted, with symlinks resolved.
      *
      * @experimental
      */
     public const LOG_FILE_PATH_RESOLVED = 'log.file.path_resolved';
 
     /**
-     * The stream associated with the log. See below for a list of well-known values.
+     * The stream the log record was emitted to.
      *
      * @experimental
      */

@@ -14,7 +14,7 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface DbIncubatingAttributes
 {
     /**
-     * The name of the connection pool; unique within the instrumented application. In case the connection pool implementation doesn't provide a name, instrumentation SHOULD use a combination of parameters that would make the name unique, for example, combining attributes `server.address`, `server.port`, and `db.namespace`, formatted as `server.address:server.port/db.namespace`. Instrumentations that generate connection pool name following different patterns SHOULD document it.
+     * The name of the connection pool. If the connection pool does not have a name, instrumentation SHOULD use `db.namespace`; otherwise `server.address`, with `server.port` appended using `:` if set. When appending a port to an IPv6 address, instrumentation MUST enclose the address in square brackets. If `server.address` is not available, instrumentation SHOULD use `db.system.name`; otherwise the connection pool library name.
      *
      * @experimental
      */
@@ -204,6 +204,7 @@ interface DbIncubatingAttributes
     /**
      * Database response status code.
      * The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+     * The value MAY use a standardized string representation of a numeric status code, if one exists, instead of the numeric code. The value MAY be a synthetic status provided by the client library rather than returned by the remote service.
      * Semantic conventions for individual database systems SHOULD document what `db.response.status_code` means in the context of that system.
      *
      * @stable
@@ -358,7 +359,7 @@ interface DbIncubatingAttributes
     public const DB_SYSTEM_NAME_VALUE_HSQLDB = 'hsqldb';
 
     /**
-     * [IBM Db2](https://www.ibm.com/db2)
+     * [IBM Db2](https://www.ibm.com/products/db2)
      * @stable
      */
     public const DB_SYSTEM_NAME_VALUE_IBM_DB2 = 'ibm.db2';

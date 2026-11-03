@@ -129,6 +129,7 @@ interface DbAttributes
     /**
      * Database response status code.
      * The status code returned by the database. Usually it represents an error code, but may also represent partial success, warning, or differentiate between various types of successful outcomes.
+     * The value MAY use a standardized string representation of a numeric status code, if one exists, instead of the numeric code. The value MAY be a synthetic status provided by the client library rather than returned by the remote service.
      * Semantic conventions for individual database systems SHOULD document what `db.response.status_code` means in the context of that system.
      *
      * @stable
