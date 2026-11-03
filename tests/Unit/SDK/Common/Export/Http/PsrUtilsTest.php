@@ -24,6 +24,7 @@ use function random_bytes;
 use RuntimeException;
 use function str_repeat;
 use function str_split;
+use function strlen;
 use function substr;
 use function time;
 use UnexpectedValueException;
@@ -136,7 +137,11 @@ final class PsrUtilsTest extends TestCase
     public function test_read_body_decoded_over_limit(string $encoding, callable $compress): void
     {
         $this->expectException(ResponseBodyTooLargeException::class);
-        PsrUtils::readBody(new Response(200, [], $compress(str_repeat('a', 100_000))), [$encoding], 4);
+        // the compressed body is below the limit, so only the decoded output can exceed it
+        $body = $compress(str_repeat('a', 100_000));
+        $this->assertLessThan(1_000, strlen($body));
+
+        PsrUtils::readBody(new Response(200, [], $body), [$encoding], 1_000);
     }
 
     public static function compressors(): iterable

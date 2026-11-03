@@ -20,6 +20,7 @@ use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
 use OpenTelemetry\SDK\Common\Export\Http\ResponseBodyTooLargeException;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
@@ -156,6 +157,28 @@ final class PsrTransportTest extends TestCase
             $this->callback(fn (array $context): bool => $context['limit'] === PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE),
         );
         Logging::setLogWriter($logWriter);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    #[DataProvider('oversizedBodies')]
+    public function test_send_oversized_retryable_response_is_not_retried(callable $createResponse): void
+    {
+        $this->expectDiscardedResponseWarning();
+        $this->client->expects($this->once())->method('sendRequest')->willReturn($createResponse());
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10, 3);
+
+        $this->expectException(ResponseBodyTooLargeException::class);
+        $transport->send('')->await();
+    }
+
+    public static function oversizedBodies(): iterable
+    {
+        $limit = PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE;
+
+        yield '503' => [static fn () => new Response(503, [], str_repeat('a', $limit + 1))];
+        yield '429 compressed' => [static fn () => new Response(429, ['Content-Encoding' => 'gzip'], gzencode(str_repeat('a', $limit + 1)))];
     }
 
     public function test_send_decode_unknown_encoding_returns_error(): void

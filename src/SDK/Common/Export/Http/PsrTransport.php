@@ -106,6 +106,17 @@ final class PsrTransport implements TransportInterface
                 return new ErrorFuture($e);
             }
 
+            // An oversized response is not retried, whatever its status.
+            if ($response !== null) {
+                try {
+                    $this->readBody($response);
+                } catch (ResponseBodyTooLargeException $tooLarge) {
+                    return new ErrorFuture($tooLarge);
+                } catch (Throwable) {
+                    // An unreadable body does not change the decision to retry.
+                }
+            }
+
             if ($retries >= $this->maxRetries) {
                 return new ErrorFuture(new RuntimeException('Export retry limit exceeded', 0, $e));
             }
@@ -123,21 +134,30 @@ final class PsrTransport implements TransportInterface
         assert(isset($response));
 
         try {
-            $body = PsrUtils::readBody(
-                $response,
-                self::parseContentEncoding($response),
-                $this->maxResponseBodySize,
-            );
-        } catch (ResponseBodyTooLargeException $e) {
-            // Not retried, the response has been received already.
-            self::logWarning('OTLP/HTTP response body discarded, it exceeds the size limit', ['limit' => $e->limit]);
-
-            return new ErrorFuture($e);
+            $body = $this->readBody($response);
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         }
 
         return new CompletedFuture($body);
+    }
+
+    /**
+     * @throws ResponseBodyTooLargeException if the body exceeds the limit, after logging a warning
+     */
+    private function readBody(ResponseInterface $response): string
+    {
+        try {
+            return PsrUtils::readBody(
+                $response,
+                self::parseContentEncoding($response),
+                $this->maxResponseBodySize,
+            );
+        } catch (ResponseBodyTooLargeException $e) {
+            self::logWarning('OTLP/HTTP response body discarded, it exceeds the size limit', ['limit' => $e->limit]);
+
+            throw $e;
+        }
     }
 
     /**
