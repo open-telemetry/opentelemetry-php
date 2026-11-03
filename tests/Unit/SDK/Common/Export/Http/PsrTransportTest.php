@@ -28,6 +28,7 @@ use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LogLevel;
+use RuntimeException;
 
 #[CoversClass(PsrTransportFactory::class)]
 #[CoversClass(PsrTransport::class)]
@@ -163,7 +164,7 @@ final class PsrTransportTest extends TestCase
      * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
      */
     #[DataProvider('oversizedBodies')]
-    public function test_send_oversized_retryable_response_is_not_retried(callable $createResponse): void
+    public function test_send_oversized_error_response_is_not_retried(callable $createResponse): void
     {
         $this->expectDiscardedResponseWarning();
         $this->client->expects($this->once())->method('sendRequest')->willReturn($createResponse());
@@ -178,7 +179,19 @@ final class PsrTransportTest extends TestCase
         $limit = PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE;
 
         yield '503' => [static fn () => new Response(503, [], str_repeat('a', $limit + 1))];
+        yield '403' => [static fn () => new Response(403, [], str_repeat('a', $limit + 1))];
+        yield '500' => [static fn () => new Response(500, [], str_repeat('a', $limit + 1))];
         yield '429 compressed' => [static fn () => new Response(429, ['Content-Encoding' => 'gzip'], gzencode(str_repeat('a', $limit + 1)))];
+    }
+
+    public function test_send_error_response_with_unreadable_body_keeps_status_error(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(403, ['Content-Encoding' => 'invalid'], 'foo'));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(403);
+        $transport->send('')->await();
     }
 
     public function test_send_decode_unknown_encoding_returns_error(): void

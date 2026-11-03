@@ -98,23 +98,15 @@ final class PsrTransport implements TransportInterface
                     break;
                 }
 
+                // An oversized response is not retried, whatever its status.
+                $this->checkBodySize($response);
+
                 if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 600 && !in_array($response->getStatusCode(), [429, 502, 503, 504], true)) {
                     throw new RuntimeException($response->getReasonPhrase(), $response->getStatusCode());
                 }
             } catch (NetworkExceptionInterface $e) {
             } catch (Throwable $e) {
                 return new ErrorFuture($e);
-            }
-
-            // An oversized response is not retried, whatever its status.
-            if ($response !== null) {
-                try {
-                    $this->readBody($response);
-                } catch (ResponseBodyTooLargeException $tooLarge) {
-                    return new ErrorFuture($tooLarge);
-                } catch (Throwable) {
-                    // An unreadable body does not change the decision to retry.
-                }
             }
 
             if ($retries >= $this->maxRetries) {
@@ -140,6 +132,22 @@ final class PsrTransport implements TransportInterface
         }
 
         return new CompletedFuture($body);
+    }
+
+    /**
+     * Checks the body of a response that is not going to be used, such as an error. An unreadable body is
+     * ignored, so that the status of the response stays the reason for the failure.
+     *
+     * @throws ResponseBodyTooLargeException if the body exceeds the limit, after logging a warning
+     */
+    private function checkBodySize(ResponseInterface $response): void
+    {
+        try {
+            $this->readBody($response);
+        } catch (ResponseBodyTooLargeException $e) {
+            throw $e;
+        } catch (Throwable) {
+        }
     }
 
     /**
