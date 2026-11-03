@@ -7,22 +7,12 @@ namespace OpenTelemetry\Contrib\Otlp;
 use function base64_decode;
 use function bin2hex;
 use Exception;
-use Google\Protobuf\Descriptor;
-use Google\Protobuf\DescriptorPool;
-use Google\Protobuf\FieldDescriptor;
-use Google\Protobuf\Internal\GPBType;
 use Google\Protobuf\Internal\Message;
+use Google\Protobuf\PrintOptions;
 use InvalidArgumentException;
-use function json_decode;
-use function json_encode;
-use const JSON_UNESCAPED_SLASHES;
-use const JSON_UNESCAPED_UNICODE;
-use function lcfirst;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
-use function property_exists;
 use function sprintf;
-use function ucwords;
 
 /**
  * @internal
@@ -93,79 +83,12 @@ final class ProtobufSerializer
     }
 
     /**
-     * [JSON Protobuf Encoding](https://opentelemetry.io/docs/specs/otlp/#json-protobuf-encoding):
-     * > Values of enum fields MUST be encoded as integer values.
+     * Enum values are encoded as integers, not names.
      *
-     * @see https://github.com/open-telemetry/opentelemetry-php/issues/978
-     * @see https://github.com/protocolbuffers/protobuf/pull/12707
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#json-protobuf-encoding
      */
     private static function serializeToJsonString(Message $message): string
     {
-        // @phan-suppress-next-line PhanUndeclaredClassReference
-        if (\class_exists(\Google\Protobuf\PrintOptions::class)) {
-            try {
-                /** @psalm-suppress TooManyArguments @phan-suppress-next-line PhanParamTooManyInternal,PhanUndeclaredClassConstant */
-                return $message->serializeToJsonString(\Google\Protobuf\PrintOptions::ALWAYS_PRINT_ENUMS_AS_INTS);
-            } catch (\TypeError) {
-                // google/protobuf ^4.31 w/ ext-protobuf <4.31 installed
-            }
-        }
-
-        $payload = $message->serializeToJsonString();
-        $pool = DescriptorPool::getGeneratedPool();
-        $desc = $pool->getDescriptorByClassName($message::class);
-        if (!$desc instanceof Descriptor) {
-            return $payload;
-        }
-
-        $data = json_decode((string) $payload);
-        unset($payload);
-        self::traverseDescriptor($data, $desc);
-
-        $encoded = json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        assert($encoded !== false);
-
-        return $encoded;
-    }
-
-    private static function traverseDescriptor(object $data, Descriptor $desc): void
-    {
-        for ($i = 0, $n = $desc->getFieldCount(); $i < $n; $i++) {
-            // @phan-suppress-next-line PhanParamTooManyInternal
-            $field = $desc->getField($i);
-            $name = lcfirst(strtr(ucwords((string) $field->getName(), '_'), ['_' => '']));
-            if (!property_exists($data, $name)) {
-                continue;
-            }
-
-            if ($field->isRepeated()) {
-                foreach ($data->$name as $key => $value) {
-                    $data->$name[$key] = self::traverseFieldDescriptor($value, $field);
-                }
-            } else {
-                $data->$name = self::traverseFieldDescriptor($data->$name, $field);
-            }
-        }
-    }
-
-    private static function traverseFieldDescriptor($data, FieldDescriptor $field)
-    {
-        switch ($field->getType()) {
-            case GPBType::MESSAGE:
-                self::traverseDescriptor($data, $field->getMessageType());
-
-                break;
-            case GPBType::ENUM:
-                $enum = $field->getEnumType();
-                for ($i = 0, $n = $enum->getValueCount(); $i < $n; $i++) {
-                    if ($data === $enum->getValue($i)->getName()) {
-                        return $enum->getValue($i)->getNumber();
-                    }
-                }
-
-                break;
-        }
-
-        return $data;
+        return $message->serializeToJsonString(PrintOptions::ALWAYS_PRINT_ENUMS_AS_INTS);
     }
 }
