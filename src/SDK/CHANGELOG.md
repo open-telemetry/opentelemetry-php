@@ -37,6 +37,10 @@ upgraders can check them in one place.
   `TransportInterface` ([#2095]).
 - `SdkBuilder::setLogLevel()`, applied by `buildAndRegisterGlobal()` until its scope is detached
   ([#2068]).
+- `OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY` makes the auto root span record the
+  request body as `http.request.body.content`, cut at
+  `OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY_MAX_SIZE` bytes (1024 by default).
+  It is off by default, records only textual bodies, and does not redact them ([#2101]).
 
 ### Changed
 
@@ -100,4 +104,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2093]: https://github.com/open-telemetry/opentelemetry-php/pull/2093
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
+[#2101]: https://github.com/open-telemetry/opentelemetry-php/pull/2101
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105

@@ -36,6 +36,8 @@ upgraders can check them in one place.
   `NoopConfigProperties` ([#2076]), `ConfigProperties` and `ConfigurationRegistry` ([#2093]),
   `HttpConfig` and `PeerConfig` ([#2097]).
 - Each `SystemClock` has its own reference time. It used to be shared by all instances ([#2041]).
+- A log writer that throws no longer breaks the code that logs. `LogsMessagesTrait` swallows the
+  exception ([#2101]).
 
 ### Deprecated
 
@@ -52,4 +54,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2092]: https://github.com/open-telemetry/opentelemetry-php/pull/2092
 [#2093]: https://github.com/open-telemetry/opentelemetry-php/pull/2093
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
+[#2101]: https://github.com/open-telemetry/opentelemetry-php/pull/2101
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
