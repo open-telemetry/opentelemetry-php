@@ -75,6 +75,11 @@ upgraders can check them in one place.
 
 ### Fixed
 
+- `PsrTransport` limits the OTLP/HTTP response body to 4 MiB, also after decompression, as the
+  specification requires. A larger response is discarded with a warning and the export fails without
+  a retry, even if the server accepted the data. Decompression is streamed and checked in small
+  steps. A brotli response is only checked after decoding, because ext-brotli can't cap its output.
+  The PSR-18 client may buffer the whole response before the limit applies ([#1932]).
 - `OTEL_ATTRIBUTE_COUNT_LIMIT` and `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` were ignored. They apply to
   span, event, link and log record limits that aren't set more specifically ([#2058]).
 - `PsrTransportFactory` ignored its `cacert`, `cert` and `key` arguments. It passes them to the
@@ -87,6 +92,7 @@ upgraders can check them in one place.
 
 See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 
+[#1932]: https://github.com/open-telemetry/opentelemetry-php/issues/1932
 [#2057]: https://github.com/open-telemetry/opentelemetry-php/pull/2057
 [#2058]: https://github.com/open-telemetry/opentelemetry-php/pull/2058
 [#2060]: https://github.com/open-telemetry/opentelemetry-php/pull/2060

@@ -8,6 +8,7 @@ use function assert;
 use BadMethodCallException;
 use function explode;
 use function in_array;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -30,6 +31,15 @@ use function trim;
  */
 final class PsrTransport implements TransportInterface
 {
+    use LogsMessagesTrait;
+
+    /**
+     * Default limit for the response body, also after decompression.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public const DEFAULT_MAX_RESPONSE_BODY_SIZE = 4 * 1024 * 1024;
+
     private bool $closed = false;
 
     /**
@@ -45,6 +55,7 @@ final class PsrTransport implements TransportInterface
         private readonly array $compression,
         private readonly int $retryDelay,
         private readonly int $maxRetries,
+        private readonly int $maxResponseBodySize = self::DEFAULT_MAX_RESPONSE_BODY_SIZE,
     ) {
     }
 
@@ -112,10 +123,16 @@ final class PsrTransport implements TransportInterface
         assert(isset($response));
 
         try {
-            $body = PsrUtils::decode(
-                $response->getBody()->__toString(),
+            $body = PsrUtils::readBody(
+                $response,
                 self::parseContentEncoding($response),
+                $this->maxResponseBodySize,
             );
+        } catch (ResponseBodyTooLargeException $e) {
+            // Not retried, the response has been received already.
+            self::logWarning('OTLP/HTTP response body discarded, it exceeds the size limit', ['limit' => $e->limit]);
+
+            return new ErrorFuture($e);
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         }

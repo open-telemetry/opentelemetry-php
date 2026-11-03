@@ -13,8 +13,12 @@ use function gzencode;
 use InvalidArgumentException;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Http\ResponseBodyTooLargeException;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -22,11 +26,14 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LogLevel;
 
 #[CoversClass(PsrTransportFactory::class)]
 #[CoversClass(PsrTransport::class)]
 final class PsrTransportTest extends TestCase
 {
+    use TestState;
+
     /**
      * @var MockObject&ClientInterface
      */
@@ -99,6 +106,56 @@ final class PsrTransportTest extends TestCase
         $transport = $this->factory->create('http://localhost', 'text/plain');
 
         $this->assertSame('abc', $transport->send('')->await());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public function test_send_response_body_at_limit_is_returned(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, [], str_repeat('a', PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE)));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->assertSame(PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE, strlen($transport->send('')->await()));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public function test_send_response_body_over_limit_returns_error_without_retry(): void
+    {
+        $this->expectDiscardedResponseWarning();
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, [], str_repeat('a', PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE + 1)));
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10, 3);
+
+        $this->expectException(ResponseBodyTooLargeException::class);
+        $transport->send('')->await();
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public function test_send_response_body_over_limit_after_decompression_returns_error(): void
+    {
+        $this->expectDiscardedResponseWarning();
+        $body = gzencode(str_repeat('a', PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE + 1));
+        $this->assertLessThan(PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE, strlen($body));
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'gzip'], $body));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->expectException(ResponseBodyTooLargeException::class);
+        $transport->send('')->await();
+    }
+
+    private function expectDiscardedResponseWarning(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('discarded'),
+            $this->callback(fn (array $context): bool => $context['limit'] === PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE),
+        );
+        Logging::setLogWriter($logWriter);
     }
 
     public function test_send_decode_unknown_encoding_returns_error(): void
