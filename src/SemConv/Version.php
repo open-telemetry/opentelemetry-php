@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SemConv;
 
+// @mago-expect lint:too-many-enum-cases
 enum Version: string
 {
     case VERSION_1_45_0 = '1.45.0';
