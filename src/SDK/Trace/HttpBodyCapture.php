@@ -23,7 +23,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * The body is recorded as is, without redaction, and may contain sensitive data such as passwords or tokens.
  * Enable it only where that is acceptable.
  *
- * @see https://github.com/open-telemetry/semantic-conventions/pull/3521
+ * @see https://github.com/open-telemetry/semantic-conventions/blob/v1.45.0/docs/registry/attributes/http.md#http-request-body-content
  * @internal
  */
 final class HttpBodyCapture
@@ -31,11 +31,10 @@ final class HttpBodyCapture
     use LogsMessagesTrait;
 
     /**
-     * Not taken from the semantic conventions package on purpose: the attribute is not in any released
-     * semantic conventions version yet (the latest, 1.44.0, lacks it), and this package still allows older
-     * open-telemetry/sem-conv versions.
+     * Not taken from the semantic conventions package on purpose: this package still allows open-telemetry/sem-conv
+     * versions that do not have the constant (1.38.0 has none), and referencing a missing constant fails at runtime.
      *
-     * @see https://github.com/open-telemetry/semantic-conventions/pull/3521 Merged, but not in a released version yet (expected in 1.45); pin it to that tag once it is.
+     * @see https://github.com/open-telemetry/semantic-conventions/blob/v1.45.0/docs/registry/attributes/http.md#http-request-body-content
      */
     private const REQUEST_BODY_CONTENT = 'http.request.body.content';
 
