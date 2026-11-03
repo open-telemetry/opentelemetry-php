@@ -51,6 +51,24 @@ interface ServiceIncubatingAttributes
     public const SERVICE_CRITICALITY_VALUE_LOW = 'low';
 
     /**
+     * Identifier of the cost center associated with the service instance.
+     *
+     * The cost center identifier enables tracking and attribution of service resource costs to organizational units, billing accounts, or teams. It is typically a string identifier such as a billing account ID, cost allocation code, or internal accounting ID.
+     *
+     * @experimental
+     */
+    public const SERVICE_INSTANCE_COST_CENTER_ID = 'service.instance.cost_center.id';
+
+    /**
+     * Name of the cost center associated with the service instance.
+     *
+     * A human-readable name of the cost center, department, or organizational unit responsible for the service instance costs.
+     *
+     * @experimental
+     */
+    public const SERVICE_INSTANCE_COST_CENTER_NAME = 'service.instance.cost_center.name';
+
+    /**
      * The string ID of the service instance.
      *
      * MUST be unique for each instance of the same `service.namespace,service.name` pair (in other words
@@ -102,20 +120,6 @@ interface ServiceIncubatingAttributes
      * @stable
      */
     public const SERVICE_NAMESPACE = 'service.namespace';
-
-    /**
-     * Logical name of the service on the other side of the connection. SHOULD be equal to the actual [`service.name`](/docs/resource/README.md#service) resource attribute of the remote service if any.
-     *
-     * @experimental
-     */
-    public const SERVICE_PEER_NAME = 'service.peer.name';
-
-    /**
-     * Logical namespace of the service on the other side of the connection. SHOULD be equal to the actual [`service.namespace`](/docs/resource/README.md#service) resource attribute of the remote service if any.
-     *
-     * @experimental
-     */
-    public const SERVICE_PEER_NAMESPACE = 'service.peer.namespace';
 
     /**
      * The version string of the service component. The format is not defined by these conventions.

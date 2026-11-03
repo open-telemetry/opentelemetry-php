@@ -55,6 +55,15 @@ interface DbIncubatingMetrics
      * Unit: {connection}
      * @experimental
      */
+    public const DB_CLIENT_CONNECTION_LIMIT = 'db.client.connection.limit';
+
+    /**
+     * Deprecated, use `db.client.connection.limit` instead.
+     *
+     * Instrument: updowncounter
+     * Unit: {connection}
+     * @experimental
+     */
     public const DB_CLIENT_CONNECTION_MAX = 'db.client.connection.max';
 
     /**
@@ -121,7 +130,7 @@ interface DbIncubatingMetrics
     public const DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle.min';
 
     /**
-     * Deprecated, use `db.client.connection.max` instead.
+     * Deprecated, use `db.client.connection.limit` instead.
      *
      * Instrument: updowncounter
      * Unit: {connection}
