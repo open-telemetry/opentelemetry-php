@@ -10,9 +10,11 @@ conventions themselves are in the
 
 ## Unreleased
 
+## 1.45.0 - 2026-11-04
+
 ### Changed
 
-- Generated from semantic conventions 1.45.0 ([#2111]).
+- Generated from [semantic conventions 1.45.0](https://github.com/open-telemetry/semantic-conventions/releases/tag/v1.45.0) ([#2111]).
 
 [#2111]: https://github.com/open-telemetry/opentelemetry-php/pull/2111
 
