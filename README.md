@@ -12,6 +12,9 @@ Please read the official documentation: https://opentelemetry.io/docs/instrument
 
 API Documentation is available here: https://open-telemetry.github.io/opentelemetry-php/
 
+For applications using FrankenPHP worker mode, RoadRunner, queue workers, or
+another long-lived PHP runtime, see the [worker-mode guide](docs/worker-mode.md).
+
 ## AI Assistance
 If you're planning on using AI to contribute to the OpenTelemetry PHP repositories, please follow the [OpenTelemetry GenAI Policies](https://github.com/open-telemetry/community/blob/main/policies/genai.md).
 ## Packages and versions
