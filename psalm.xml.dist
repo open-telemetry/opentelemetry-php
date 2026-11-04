@@ -31,13 +31,13 @@
         </UndefinedClass>
         <UndefinedMethod>
             <errorLevel type="suppress">
-                <referencedMethod name="Google\Protobuf\Internal\RepeatedField::offsetGet"/>
-                <referencedMethod name="Google\Protobuf\Internal\RepeatedField::offsetSet"/>
+                <referencedMethod name="Google\Protobuf\RepeatedField::offsetGet"/>
+                <referencedMethod name="Google\Protobuf\RepeatedField::offsetSet"/>
             </errorLevel>
         </UndefinedMethod>
         <UndefinedDocblockClass>
             <errorLevel type="suppress">
-                <referencedClass name="Google\Protobuf\Internal\RepeatedField"/>
+                <referencedClass name="Google\Protobuf\RepeatedField"/>
             </errorLevel>
         </UndefinedDocblockClass>
         <ArgumentTypeCoercion>

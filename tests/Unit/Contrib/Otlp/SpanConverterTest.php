@@ -363,6 +363,7 @@ class SpanConverterTest extends TestCase
         $span = (new SpanData())->setStatus(StatusData::error());
         /** @psalm-suppress InvalidArgument,PossiblyNullReference */
         $row = (new SpanConverter())->convert([$span])->getResourceSpans()[0]->getScopeSpans()[0]->getSpans()[0];
+        /** @psalm-suppress PossiblyNullReference */
         $this->assertSame(V1\Status\StatusCode::STATUS_CODE_ERROR, $row->getStatus()->getCode());
     }
 }

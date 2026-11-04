@@ -9,6 +9,11 @@ upgraders can check them in one place.
 ### Breaking changes
 
 - Requires PHP 8.2 ([#2091]) and `open-telemetry/sdk` 1.16 ([#2095]).
+- Requires `open-telemetry/gen-otlp-protobuf` 1.11.1, which requires `google/protobuf` 4.31.
+  `ext-protobuf`, if installed, must also be 4.31. The exporters throw a `RuntimeException` on
+  construction if it is older. JSON export encodes enums with
+  `PrintOptions::ALWAYS_PRINT_ENUMS_AS_INTS`, and the fallback for older versions is removed
+  ([#2110]).
 
 ### Added
 
@@ -52,3 +57,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2092]: https://github.com/open-telemetry/opentelemetry-php/pull/2092
 [#2093]: https://github.com/open-telemetry/opentelemetry-php/pull/2093
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
+[#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110

@@ -21,6 +21,8 @@ namespace Opentelemetry\Proto\Collector\Profiles\V1development;
 /**
  * Service that can be used to push profiles between one Application instrumented with
  * OpenTelemetry and a collector, or between a collector and a central collector.
+ *
+ * [Since v1.4.0]
  */
 class ProfilesServiceClient extends \Grpc\BaseStub {
 
@@ -37,7 +39,7 @@ class ProfilesServiceClient extends \Grpc\BaseStub {
      * @param \Opentelemetry\Proto\Collector\Profiles\V1development\ExportProfilesServiceRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
-     * @return \Grpc\UnaryCall
+     * @return \Grpc\UnaryCall<\Opentelemetry\Proto\Collector\Profiles\V1development\ExportProfilesServiceResponse>
      */
     public function Export(\Opentelemetry\Proto\Collector\Profiles\V1development\ExportProfilesServiceRequest $argument,
       $metadata = [], $options = []) {
