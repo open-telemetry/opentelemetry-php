@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
 use Nyholm\Psr7\ServerRequest;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -57,6 +59,7 @@ class AutoRootSpanTest extends TestCase
         (new \ReflectionProperty(AutoRootSpan::class, 'hookManager'))->setValue(null, null);
         (new \ReflectionProperty(AutoRootSpan::class, 'responseHeaderHookRegistered'))->setValue(null, false);
         (new \ReflectionProperty(AutoRootSpan::class, 'capturedResponseHeaders'))->setValue(null, []);
+        (new \ReflectionProperty(AutoRootSpan::class, 'request'))->setValue(null, null);
         $this->scope->detach();
     }
 
@@ -535,6 +538,144 @@ class AutoRootSpanTest extends TestCase
         $this->tracer->expects($this->never())->method('spanBuilder');
 
         AutoRootSpan::start();
+    }
+
+    public function test_shutdown_records_request_body_when_enabled(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'application/json'], '{"a":1}');
+
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('isRecording')->willReturn(true);
+        $span->expects($this->once())
+            ->method('setAttribute')
+            ->with('http.request.body.content', '{"a":1}');
+        $span->expects($this->once())->method('end');
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        AutoRootSpan::create($request);
+        AutoRootSpan::shutdownHandler();
+    }
+
+    public function test_shutdown_does_not_record_request_body_by_default(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'application/json'], '{"a":1}');
+
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('isRecording')->willReturn(true);
+        $span->expects($this->never())->method('setAttribute');
+        $span->expects($this->once())->method('end');
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        AutoRootSpan::create($request);
+        AutoRootSpan::shutdownHandler();
+    }
+
+    public function test_shutdown_does_not_record_request_body_in_cli(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'application/json'], '{"a":1}');
+
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('isRecording')->willReturn(true);
+        $span->expects($this->never())->method('setAttribute');
+        $span->expects($this->once())->method('end');
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        AutoRootSpan::create($request, true);
+        AutoRootSpan::shutdownHandler();
+    }
+
+    public function test_shutdown_ends_the_span_when_recording_the_body_fails(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('isRecording')->willReturn(true);
+        $span->method('setAttribute')->willThrowException(new \Error('boom'));
+        $span->expects($this->once())->method('end');
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        AutoRootSpan::create($request);
+        AutoRootSpan::shutdownHandler();
+    }
+
+    public function test_shutdown_ends_the_span_when_logging_the_failure_throws(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+
+        $span = $this->createMock(SpanInterface::class);
+        $span->method('isRecording')->willReturn(true);
+        $span->method('setAttribute')->willThrowException(new \Error('boom'));
+        $span->expects($this->once())->method('end');
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        $this->useThrowingLogWriter();
+
+        AutoRootSpan::create($request);
+        AutoRootSpan::shutdownHandler();
+    }
+
+    public function test_create_does_not_keep_the_request_of_a_previous_span_for_a_cli_span(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'true');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+        $span = $this->createMock(SpanInterface::class);
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+        $property = new \ReflectionProperty(AutoRootSpan::class, 'request');
+
+        $rootScope = new \ReflectionProperty(AutoRootSpan::class, 'rootScope');
+
+        AutoRootSpan::create($request);
+        $webScope = $rootScope->getValue();
+        $this->assertSame($request, $property->getValue());
+        AutoRootSpan::create($request, true);
+        $cliScope = $rootScope->getValue();
+
+        try {
+            $this->assertNull($property->getValue());
+        } finally {
+            // leave the global context storage as it was found
+            $cliScope->detach();
+            $webScope->detach();
+        }
+    }
+
+    public function test_create_survives_a_failing_log_writer_when_the_body_configuration_is_invalid(): void
+    {
+        $this->setEnvironmentVariable('OTEL_PHP_DEBUG_SCOPES_DISABLED', 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY, 'not-a-boolean');
+        $request = new ServerRequest('POST', 'https://example.com/foo', ['Content-Type' => 'text/plain'], 'hello');
+
+        $span = $this->createMock(SpanInterface::class);
+        $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        $this->useThrowingLogWriter();
+
+        AutoRootSpan::create($request);
+
+        $this->assertNotNull((new \ReflectionProperty(AutoRootSpan::class, 'rootScope'))->getValue());
+        $this->assertNull((new \ReflectionProperty(AutoRootSpan::class, 'request'))->getValue());
+        (new \ReflectionProperty(AutoRootSpan::class, 'rootScope'))->getValue()->detach();
+    }
+
+    private function useThrowingLogWriter(): void
+    {
+        Logging::setLogWriter(new class() implements LogWriterInterface {
+            #[\Override]
+            public function write($level, string $message, array $context): void
+            {
+                throw new \ErrorException('log writer failure');
+            }
+        });
     }
 
     /**

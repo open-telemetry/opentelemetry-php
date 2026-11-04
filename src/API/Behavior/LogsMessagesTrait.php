@@ -14,12 +14,20 @@ trait LogsMessagesTrait
         return Logging::level($level) >= Logging::logLevel();
     }
 
+    /**
+     * Logging is best effort: a failing log writer (for example an error handler that throws on `trigger_error`)
+     * must not break the code that is being observed.
+     */
     private static function doLog(string $level, string $message, array $context): void
     {
-        $writer = Logging::logWriter();
-        if (self::shouldLog($level)) {
-            $context['source'] = get_called_class();
-            $writer->write($level, $message, $context);
+        try {
+            $writer = Logging::logWriter();
+            if (self::shouldLog($level)) {
+                $context['source'] = get_called_class();
+                $writer->write($level, $message, $context);
+            }
+        } catch (\Throwable) {
+            // nothing more can be done
         }
     }
 

@@ -31,6 +31,9 @@ class AutoRootSpan
 
     private static ?ContextStorageScopeInterface $rootScope = null;
 
+    /** The request of the root span, kept to record its body when the span ends. Not set for the CLI. */
+    private static ?ServerRequestInterface $request = null;
+
     /** @var array<string, string[]> Response headers captured via the header() hook, reset for each request */
     private static array $capturedResponseHeaders = [];
 
@@ -119,6 +122,7 @@ class AutoRootSpan
      */
     public static function create(ServerRequestInterface $request, bool $cli = false): void
     {
+        self::$request = null;
         $tracer = Globals::tracerProvider()->getTracer(
             'io.opentelemetry.php.auto-root-span',
             null,
@@ -150,6 +154,7 @@ class AutoRootSpan
             ->setAttribute(TraceAttributes::URL_PATH, $request->getUri()->getPath())
             ->startSpan();
         self::captureRequestHeaders($request, $span);
+        self::$request = self::requestForBodyCapture($request);
         self::$capturedResponseHeaders = [];
         self::registerResponseHeaderHookIfNeeded();
         self::$rootScope = Context::storage()->attach($span->storeInContext($parent));
@@ -179,6 +184,20 @@ class AutoRootSpan
         }
 
         return (new WildcardListMatcher($groups))->match($path) ?? $path;
+    }
+
+    /**
+     * The request is kept only when its body is going to be recorded, a bad configuration must not break the request.
+     */
+    private static function requestForBodyCapture(ServerRequestInterface $request): ?ServerRequestInterface
+    {
+        try {
+            return HttpBodyCapture::isEnabled() ? $request : null;
+        } catch (\Throwable $e) {
+            self::logWarning('Unable to read the request body capture configuration', ['exception' => $e]);
+
+            return null;
+        }
     }
 
     private static function captureRequestHeaders(ServerRequestInterface $request, SpanInterface $span): void
@@ -270,7 +289,9 @@ class AutoRootSpan
     {
         // Use the saved root scope: storage->scope() may return another scope if user code detached scopes out of order
         $scope = self::$rootScope ?? Context::storage()->scope();
+        $request = self::$request;
         self::$rootScope = null;
+        self::$request = null;
         if (!$scope) {
             return;
         }
@@ -283,6 +304,14 @@ class AutoRootSpan
         }
         foreach (self::$capturedResponseHeaders as $name => $values) {
             $span->setAttribute('http.response.header.' . $name, $values);
+        }
+        if ($request !== null) {
+            try {
+                HttpBodyCapture::captureRequestBody($span, $request);
+            } catch (\Throwable $e) {
+                // recording the body must never prevent the root span from ending
+                self::logWarning('Unable to record the request body', ['exception' => $e]);
+            }
         }
         $span->end();
     }
