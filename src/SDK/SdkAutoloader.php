@@ -346,7 +346,7 @@ class SdkAutoloader
             return false;
         }
 
-        return ExcludedRequestHeaders::fromConfiguration()->matches(ExcludedRequestHeaders::headersFromServer($_SERVER));
+        return ExcludedRequestHeaders::matchesServer($_SERVER);
     }
 
     /**

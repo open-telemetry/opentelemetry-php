@@ -53,7 +53,7 @@ final class ExcludedRequestHeaders
     {
         foreach ($entries as $entry) {
             $colon = strpos($entry, ':');
-            $name = strtr(strtolower(trim($colon === false ? $entry : substr($entry, 0, $colon))), '_', '-');
+            $name = self::normalizeName(trim($colon === false ? $entry : substr($entry, 0, $colon)));
             if ($name === '') {
                 continue;
             }
@@ -77,9 +77,9 @@ final class ExcludedRequestHeaders
                 continue;
             }
             if (str_starts_with($key, 'HTTP_')) {
-                $headers[strtr(strtolower(substr($key, 5)), '_', '-')] = $value;
+                $headers[self::normalizeName(substr($key, 5))] = $value;
             } elseif ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH') {
-                $headers[strtr(strtolower($key), '_', '-')] = $value;
+                $headers[self::normalizeName($key)] = $value;
             }
         }
 
@@ -92,6 +92,25 @@ final class ExcludedRequestHeaders
     }
 
     /**
+     * Whether a request with these $_SERVER variables is excluded. The headers are only collected when there is a
+     * rule, so nothing is done for a request when the option is not set.
+     *
+     * @param array<array-key, mixed> $server
+     */
+    public static function matchesServer(array $server): bool
+    {
+        $excluded = self::fromConfiguration();
+
+        return $excluded->rules !== [] && $excluded->matches(self::headersFromServer($server));
+    }
+
+    /** Header names are case-insensitive, and `_` is the same as `-` as in $_SERVER */
+    private static function normalizeName(string $name): string
+    {
+        return strtr(strtolower($name), '_', '-');
+    }
+
+    /**
      * @param array<array-key, string|string[]> $headers header name => value(s), as returned by PSR-7 getHeaders()
      */
     public function matches(array $headers): bool
@@ -100,7 +119,7 @@ final class ExcludedRequestHeaders
             return false;
         }
         foreach ($headers as $name => $values) {
-            $matchers = $this->rules[strtr(strtolower((string) $name), '_', '-')] ?? null;
+            $matchers = $this->rules[self::normalizeName((string) $name)] ?? null;
             if ($matchers === null) {
                 continue;
             }
