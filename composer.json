@@ -89,7 +89,7 @@
         "dg/bypass-finals": "^1.4",
         "grpc/grpc": "^1.30",
         "guzzlehttp/guzzle": "^7.4",
-        "guzzlehttp/psr7": "^2.1",
+        "guzzlehttp/psr7": "^3.0",
         "mikey179/vfsstream": "^1.6.11",
         "mockery/mockery": "^1.5.1",
         "monolog/monolog": "^3.0",
