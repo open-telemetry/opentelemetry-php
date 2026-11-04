@@ -372,6 +372,46 @@ class AutoRootSpanTest extends TestCase
     }
 
     #[BackupGlobals(true)]
+    public function test_start_does_nothing_for_excluded_request_header(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'X-Skip: yes*');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/orders';
+        $_SERVER['HTTP_X_SKIP'] = 'yes please';
+        $this->tracer->expects($this->never())->method('spanBuilder');
+
+        AutoRootSpan::start();
+    }
+
+    #[BackupGlobals(true)]
+    public function test_start_ignores_excluded_request_headers_in_cli(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'X-Skip');
+        unset($_SERVER['REQUEST_METHOD']);
+        $_SERVER['HTTP_X_SKIP'] = 'yes';
+        $this->tracer->expects($this->once())->method('spanBuilder')->willThrowException(new \RuntimeException('reached'));
+
+        $this->expectExceptionMessage('reached');
+        AutoRootSpan::start();
+    }
+
+    #[BackupGlobals(true)]
+    public function test_start_creates_span_when_request_header_does_not_match(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'X-Skip: yes*');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/orders';
+        $_SERVER['HTTP_X_SKIP'] = 'no';
+        $this->tracer->expects($this->once())->method('spanBuilder')->willThrowException(new \RuntimeException('reached'));
+
+        $this->expectExceptionMessage('reached');
+        AutoRootSpan::start();
+    }
+
+    #[BackupGlobals(true)]
     public function test_start_creates_span_for_url_not_excluded(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');

@@ -26,6 +26,12 @@ class WildcardListMatcherTest extends TestCase
     public static function provider(): array
     {
         return [
+            'literals in the wrong order' => [['*health*probe*'], 'client/probe/health', null],
+            'literals in order' => [['*health*probe*'], 'client/health/probe', '*health*probe*'],
+            'overlapping last literal' => [['ab*bc'], 'abc', null],
+            'last literal after the wildcard' => [['ab*bc'], 'abxbc', 'ab*bc'],
+            'last literal right after the first' => [['ab*bc'], 'abbc', 'ab*bc'],
+            'same character on both sides' => [['a*a'], 'a', null],
             'prefix' => [['/users/*'], '/users/42', '/users/*'],
             'suffix' => [['*.php'], '/a/b.php', '*.php'],
             'exact' => [['/health'], '/health', '/health'],

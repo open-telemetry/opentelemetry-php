@@ -26,6 +26,7 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use Override;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -170,6 +171,41 @@ class SdkAutoloaderTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, '.*');
         $_SERVER['REQUEST_URI'] = '/test';
         $this->assertFalse(SdkAutoloader::autoload());
+    }
+
+    #[BackupGlobals(true)]
+    public function test_enabled_with_excluded_request_header(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'User-Agent: kube-probe*');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['HTTP_USER_AGENT'] = 'kube-probe/1.28';
+        $this->assertTrue(SdkAutoloader::isExcludedRequestHeader());
+        $this->assertFalse(SdkAutoloader::autoload());
+        $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+        $this->assertInstanceOf(NoopTextMapPropagator::class, Globals::propagator());
+    }
+
+    #[BackupGlobals(true)]
+    public function test_request_header_not_excluded(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'User-Agent: kube-probe*');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['HTTP_USER_AGENT'] = 'curl/8';
+        $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
+    }
+
+    #[BackupGlobals(true)]
+    public function test_request_header_exclusion_ignores_cli_environment(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'Proxy');
+        unset($_SERVER['REQUEST_METHOD']);
+        $_SERVER['HTTP_PROXY'] = 'http://proxy';
+        $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
+
+        // an empty REQUEST_METHOD is not a web request either, as for the root span
+        $_SERVER['REQUEST_METHOD'] = '';
+        $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
     }
 
     public function test_autoload_from_config_file(): void

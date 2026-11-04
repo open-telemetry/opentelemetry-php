@@ -140,6 +140,7 @@ interface Variables
     public const OTEL_PHP_INTERNAL_METRICS_ENABLED = 'OTEL_PHP_INTERNAL_METRICS_ENABLED'; //whether the SDK should emit its own metrics
     public const OTEL_PHP_DISABLED_INSTRUMENTATIONS = 'OTEL_PHP_DISABLED_INSTRUMENTATIONS';
     public const OTEL_PHP_EXCLUDED_URLS = 'OTEL_PHP_EXCLUDED_URLS';
+    public const OTEL_PHP_EXCLUDED_REQUEST_HEADERS = 'OTEL_PHP_EXCLUDED_REQUEST_HEADERS';
     /**
      * @deprecated use OTEL_PHP_TRANSACTION_SPAN_ENABLED, this will be removed in SDK v2
      */
