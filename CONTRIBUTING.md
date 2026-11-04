@@ -295,16 +295,14 @@ This will start a HTTP server running at <http://localhost:8080> serving the upd
 
 ## Maintainers
 
-- [Bob Strecansky](https://github.com/bobstrecansky), Intuit
 - [Brett McBride](https://github.com/brettmc/), Deakin University
 
 For more information about the maintainer role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).
 
 ## Approvers
 
-- [Ago Allikmaa](https://github.com/agoallikmaa)
-- [Cedriz Ziel](https://github.com/cedricziel)
 - [Chris Lightfoot-Wild](https://github.com/ChrisLightfootWild)
+- [Pawel Filipczak](https://github.com/intuibase), Elastic
 
 For more information about the approver role, see the [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).
 
@@ -321,6 +319,9 @@ For more information about the triager role, see the [community repository](http
 - [Levi Morrison](https://github.com/morrisonlevi)
 - [Przemek Delewski](https://github.com/pdelewski)
 - [Timo Michna](https://github.com/tidal/)
+- [Bob Strecansky](https://github.com/bobstrecansky)
+- [Ago Allikmaa](https://github.com/agoallikmaa)
+- [Cedriz Ziel](https://github.com/cedricziel)
 
 For more information about the emeritus role, see the [community repository](https://github.com/open-telemetry/community/blob/main/guides/contributor/membership.md#emeritus-maintainerapprovertriager).
 
@@ -329,7 +330,7 @@ For more information about the emeritus role, see the [community repository](htt
 Most of our communication is done on CNCF Slack in the channel [otel-php](https://cloud-native.slack.com/archives/C01NFPCV44V).
 To sign up, create a CNCF Slack account [here](http://slack.cncf.io/)
 
-Our meetings are held weekly on zoom on Wednesdays at 10:30am PST / 1:30pm EST.
+Our meetings are held weekly on zoom on Wednesdays at 07:30am UTC.
 A Google calendar invite with the included zoom link can be found [here](https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VtZXZmYnVmbzZkYjZkbTYxdjZvYTdxN21fMjAyMDA5MTZUMTczMDAwWiBrYXJlbnlyeHVAbQ&tmsrc=google.com_b79e3e90j7bbsa2n2p5an5lf60%40group.calendar.google.com&scp=ALL)
 
 Our open issues can all be found in the [GitHub issues tab](https://github.com/open-telemetry/opentelemetry-php/issues).  Feel free to reach out on Slack if you have any additional questions about these issues; we are always happy to talk through implementation details.
