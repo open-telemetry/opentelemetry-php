@@ -64,12 +64,7 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        if (!self::isEnabled()) {
-            return false;
-        }
-        if (self::isExcludedUrl() || self::isExcludedRequestHeader()) {
-            self::propagateOnly();
-
+        if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
         $config = null;
@@ -94,28 +89,6 @@ class SdkAutoloader
         AutoRootSpan::start();
 
         return true;
-    }
-
-    /**
-     * An excluded request produces no telemetry, but the incoming trace context is still extracted and made current
-     * for the rest of the request, so that outgoing calls carry it on. Like with OTEL_SDK_DISABLED, only the
-     * propagators (OTEL_PROPAGATORS) are set up. Globals are not initialised here, only when something asks for them.
-     *
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/api.md#behavior-of-the-api-in-the-absence-of-an-installed-sdk
-     * @phan-suppress PhanDeprecatedFunction
-     */
-    private static function propagateOnly(): void
-    {
-        Globals::registerInitializer(
-            static fn (Configurator $configurator): Configurator => $configurator
-                ->withPropagator((new PropagatorFactory())->create())
-                ->withResponsePropagator((new ResponsePropagatorFactory())->create()),
-        );
-        $current = Context::getCurrent();
-        $context = (new PropagatorFactory())->create()->extract(ExcludedRequestHeaders::headersFromServer($_SERVER), null, $current);
-        if ($context !== $current) {
-            ShutdownHandler::register(Context::storage()->attach($context)->detach(...));
-        }
     }
 
     /**

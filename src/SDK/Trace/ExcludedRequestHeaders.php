@@ -95,7 +95,7 @@ final class ExcludedRequestHeaders
             return false;
         }
         foreach ($headers as $name => $values) {
-            $matchers = $this->rules[strtolower((string) $name)] ?? null;
+            $matchers = $this->rules[strtr(strtolower((string) $name), '_', '-')] ?? null;
             if ($matchers === null) {
                 continue;
             }

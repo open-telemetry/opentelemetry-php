@@ -9,7 +9,7 @@ use OpenTelemetry\API\Globals;
 /**
  * Define OTEL_PHP_EXCLUDED_URLS to include a pattern that matches
  * REQUEST_URI, which effectively disables the SDK autoloader for some URLs,
- * meaning no telemetry signals will be emitted. The incoming trace context is still propagated to outgoing calls.
+ * meaning no telemetry signals will be emitted.
  */
 putenv('OTEL_PHP_AUTOLOAD_ENABLED=true');
 putenv('OTEL_TRACES_EXPORTER=console');

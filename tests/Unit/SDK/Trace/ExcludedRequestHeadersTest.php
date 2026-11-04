@@ -32,6 +32,7 @@ final class ExcludedRequestHeadersTest extends TestCase
         yield 'exact value' => [['X-Skip: true'], ['X-Skip' => ['true']], true];
         yield 'different value' => [['X-Skip: true'], ['X-Skip' => ['false']], false];
         yield 'name is case-insensitive' => [['x-skip: true'], ['X-SKIP' => ['true']], true];
+        yield 'underscore in incoming name' => [['X-Skip-Me: 1'], ['X_Skip_Me' => ['1']], true];
         yield 'underscore in name' => [['X_Skip_Me: 1'], ['X-Skip-Me' => ['1']], true];
         yield 'value is case-insensitive' => [['X-Skip: TRUE'], ['X-Skip' => ['true']], true];
         yield 'case-sensitive value' => [['X-Skip: (?-i)TRUE'], ['X-Skip' => ['true']], false];
