@@ -17,6 +17,17 @@ upgraders can check them in one place.
 
 ### Added
 
+- `OTEL_PHP_EXCLUDED_REQUEST_HEADERS` disables the SDK for web requests that have a matching
+  header, like `OTEL_PHP_EXCLUDED_URLS` does for a URL, for example
+  `User-Agent: kube-probe*,X-Skip-Tracing`. Entries are `name: value` or `name`, the name ignores
+  case and treats `_` as `-`, and the value takes `*` wildcards. A value cannot contain a comma,
+  and a header sent more than once is matched as one value joined with `, `.
+- A request excluded by `OTEL_PHP_EXCLUDED_URLS` or `OTEL_PHP_EXCLUDED_REQUEST_HEADERS` still
+  extracts the incoming trace context and sets up the propagators from `OTEL_PROPAGATORS`, so
+  outgoing calls carry the caller's trace on, as with `OTEL_SDK_DISABLED`. It still produces no
+  telemetry. This changes `OTEL_PHP_EXCLUDED_URLS`, which used to propagate nothing. Both
+  settings are evaluated when the SDK autoloads, so they need an autoload per request and do not
+  work in workers that autoload once at boot.
 - Composable samplers in `OpenTelemetry\SDK\Trace\Sampler\Consistent`, led by
   `CompositeSampler`. All are experimental ([#2077]).
 - The auto root span names spans `METHOD path`, grouped by `OTEL_PHP_TRANSACTION_URL_GROUPS`. It

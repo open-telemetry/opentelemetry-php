@@ -48,6 +48,7 @@ use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Propagation\ResponsePropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
+use OpenTelemetry\SDK\Trace\ExcludedRequestHeaders;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -63,7 +64,12 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        if (!self::isEnabled() || self::isExcludedUrl()) {
+        if (!self::isEnabled()) {
+            return false;
+        }
+        if (self::isExcludedUrl() || self::isExcludedRequestHeader()) {
+            self::propagateOnly();
+
             return false;
         }
         $config = null;
@@ -88,6 +94,28 @@ class SdkAutoloader
         AutoRootSpan::start();
 
         return true;
+    }
+
+    /**
+     * An excluded request produces no telemetry, but the incoming trace context is still extracted and made current
+     * for the rest of the request, so that outgoing calls carry it on. Like with OTEL_SDK_DISABLED, only the
+     * propagators (OTEL_PROPAGATORS) are set up. Globals are not initialised here, only when something asks for them.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/api.md#behavior-of-the-api-in-the-absence-of-an-installed-sdk
+     * @phan-suppress PhanDeprecatedFunction
+     */
+    private static function propagateOnly(): void
+    {
+        Globals::registerInitializer(
+            static fn (Configurator $configurator): Configurator => $configurator
+                ->withPropagator((new PropagatorFactory())->create())
+                ->withResponsePropagator((new ResponsePropagatorFactory())->create()),
+        );
+        $current = Context::getCurrent();
+        $context = (new PropagatorFactory())->create()->extract(ExcludedRequestHeaders::headersFromServer($_SERVER), null, $current);
+        if ($context !== $current) {
+            ShutdownHandler::register(Context::storage()->attach($context)->detach(...));
+        }
     }
 
     /**
@@ -331,6 +359,21 @@ class SdkAutoloader
     public static function isEnabled(): bool
     {
         return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+    }
+
+    /**
+     * Test whether a request header matches the excluded request headers configuration option
+     *
+     * @internal
+     */
+    public static function isExcludedRequestHeader(): bool
+    {
+        // In the CLI $_SERVER holds the process environment, so HTTP_* variables there are not request headers
+        if (PHP_SAPI === 'cli' && !isset($_SERVER['REQUEST_METHOD'])) {
+            return false;
+        }
+
+        return ExcludedRequestHeaders::fromConfiguration()->matches(ExcludedRequestHeaders::headersFromServer($_SERVER));
     }
 
     /**

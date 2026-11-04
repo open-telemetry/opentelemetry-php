@@ -69,7 +69,8 @@ class AutoRootSpan
      * OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI (CLI). Both default to false, a distro can default them to true.
      * Does nothing when a root span was already started by this class.
      *
-     * @param callable|null $notifySpanEnded called at shutdown, right before the root span ends
+     * @param callable|null $notifySpanEnded called at shutdown, right before the root span ends; not called when no root
+     *                                    span was created, for example for an excluded request
      */
     public static function start(?callable $notifySpanEnded = null): void
     {
@@ -93,6 +94,12 @@ class AutoRootSpan
 
         if (SdkAutoloader::isExcludedUrl()) {
             self::logDebug('URL is excluded by OTEL_PHP_EXCLUDED_URLS');
+
+            return;
+        }
+
+        if (SdkAutoloader::isExcludedRequestHeader()) {
+            self::logDebug('Request is excluded by OTEL_PHP_EXCLUDED_REQUEST_HEADERS');
 
             return;
         }

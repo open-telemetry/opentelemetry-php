@@ -18,6 +18,7 @@ use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\API\Trace\NoopTracerProvider;
+use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -26,6 +27,7 @@ use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use Override;
+use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -170,6 +172,83 @@ class SdkAutoloaderTest extends TestCase
         $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, '.*');
         $_SERVER['REQUEST_URI'] = '/test';
         $this->assertFalse(SdkAutoloader::autoload());
+    }
+
+    #[BackupGlobals(true)]
+    public function test_enabled_with_excluded_request_header(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'User-Agent: kube-probe*');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['HTTP_USER_AGENT'] = 'kube-probe/1.28';
+        $this->assertTrue(SdkAutoloader::isExcludedRequestHeader());
+        $this->assertFalse(SdkAutoloader::autoload());
+    }
+
+    #[BackupGlobals(true)]
+    public function test_request_header_not_excluded(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'User-Agent: kube-probe*');
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['HTTP_USER_AGENT'] = 'curl/8';
+        $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
+    }
+
+    #[BackupGlobals(true)]
+    public function test_request_header_exclusion_ignores_cli_environment(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'Proxy');
+        unset($_SERVER['REQUEST_METHOD']);
+        $_SERVER['HTTP_PROXY'] = 'http://proxy';
+        $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
+    }
+
+    #[BackupGlobals(true)]
+    #[DataProvider('excludedRequestProvider')]
+    public function test_excluded_request_still_propagates_incoming_context(string $variable, string $value): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PROPAGATORS, 'tracecontext');
+        $this->setEnvironmentVariable($variable, $value);
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['REQUEST_URI'] = '/healthcheck';
+        $_SERVER['HTTP_X_SKIP'] = '1';
+        $_SERVER['HTTP_TRACEPARENT'] = '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
+        $scope = null;
+
+        try {
+            $this->assertFalse(SdkAutoloader::autoload());
+            $scope = \OpenTelemetry\Context\Context::storage()->scope();
+            $this->assertInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+            $this->assertSame('0af7651916cd43dd8448eb211c80319c', Span::getCurrent()->getContext()->getTraceId());
+
+            $carrier = [];
+            Globals::propagator()->inject($carrier);
+            $this->assertSame('00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01', $carrier['traceparent'] ?? null);
+        } finally {
+            $scope?->detach();
+        }
+    }
+
+    public function test_excluded_request_does_not_initialise_globals(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_EXCLUDED_URLS, 'healthcheck');
+        $_SERVER['REQUEST_URI'] = '/healthcheck';
+        $this->assertFalse(SdkAutoloader::autoload());
+
+        // an initializer registered after autoload() is still honoured
+        $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        Globals::registerInitializer(static fn (Configurator $c) => $c->withPropagator($propagator));
+        $this->assertSame($propagator, Globals::propagator());
+    }
+
+    public static function excludedRequestProvider(): array
+    {
+        return [
+            'url' => [Variables::OTEL_PHP_EXCLUDED_URLS, 'healthcheck'],
+            'header' => [Variables::OTEL_PHP_EXCLUDED_REQUEST_HEADERS, 'X-Skip'],
+        ];
     }
 
     public function test_autoload_from_config_file(): void
