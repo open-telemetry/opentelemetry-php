@@ -342,7 +342,7 @@ class SdkAutoloader
     public static function isExcludedRequestHeader(): bool
     {
         // In the CLI $_SERVER holds the process environment, so HTTP_* variables there are not request headers
-        if (PHP_SAPI === 'cli' && !isset($_SERVER['REQUEST_METHOD'])) {
+        if (AutoRootSpan::isCliScript()) {
             return false;
         }
 

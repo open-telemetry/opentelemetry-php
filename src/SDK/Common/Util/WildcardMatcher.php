@@ -98,7 +98,7 @@ final class WildcardMatcher
             if (!$allowAnyPrefix && $literalPartMatchPos !== $textPos) {
                 return false;
             }
-            $textPos += strlen($currentLiteralPart);
+            $textPos = $literalPartMatchPos + strlen($currentLiteralPart);
             $allowAnyPrefix = true;
         }
         if ($numberOfPartsToCheckInLoop < count($this->literalParts)) {
@@ -108,7 +108,8 @@ final class WildcardMatcher
                     return false;
                 }
             } else {
-                if (!self::isSuffixOf($lastPart, $text, $this->isCaseSensitive)) {
+                // the suffix must not overlap the literals that were already consumed
+                if (strlen($text) - strlen($lastPart) < $textPos || !self::isSuffixOf($lastPart, $text, $this->isCaseSensitive)) {
                     return false;
                 }
             }

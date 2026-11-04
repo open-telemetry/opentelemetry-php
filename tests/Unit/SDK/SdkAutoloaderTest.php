@@ -202,6 +202,10 @@ class SdkAutoloaderTest extends TestCase
         unset($_SERVER['REQUEST_METHOD']);
         $_SERVER['HTTP_PROXY'] = 'http://proxy';
         $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
+
+        // an empty REQUEST_METHOD is not a web request either, as for the root span
+        $_SERVER['REQUEST_METHOD'] = '';
+        $this->assertFalse(SdkAutoloader::isExcludedRequestHeader());
     }
 
     public function test_autoload_from_config_file(): void

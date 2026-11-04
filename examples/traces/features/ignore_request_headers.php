@@ -10,7 +10,8 @@ use OpenTelemetry\API\Globals;
  * OTEL_PHP_EXCLUDED_REQUEST_HEADERS is a list of `name: value` entries (or just `name`, to match any value).
  * A web request that has a matching header disables the SDK autoloader, like OTEL_PHP_EXCLUDED_URLS does for a URL,
  * so no telemetry signals are emitted. The name is case-insensitive and the value accepts `*` wildcards.
- * The list is comma-separated, so a value cannot contain a comma.
+ * The list is comma-separated, so a value cannot contain a comma. The headers are set by the client, so use one
+ * that a trusted proxy sets or removes if clients must not be able to opt out.
  *
  * Usage: php -S localhost:8080 examples/traces/features/ignore_request_headers.php
  *   curl localhost:8080                                   # spans

@@ -117,8 +117,10 @@ class AutoRootSpan
     /**
      * A script run in the CLI SAPI that does not emulate a web request (it has no REQUEST_METHOD).
      * A request emulated in the CLI (e.g. by a test harness) is still treated as a web request, as it always was.
+     *
+     * @internal
      */
-    private static function isCliScript(): bool
+    public static function isCliScript(): bool
     {
         return php_sapi_name() === 'cli' && empty($_SERVER['REQUEST_METHOD'] ?? null);
     }

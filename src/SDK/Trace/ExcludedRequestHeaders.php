@@ -20,13 +20,18 @@ use function trim;
  * Decides whether a request should be ignored because of its headers, as configured by
  * OTEL_PHP_EXCLUDED_REQUEST_HEADERS.
  *
- * Each entry is `name: value` or just `name`. The name is case-insensitive and `_` is the same as `-`, as in $_SERVER. The value accepts `*` wildcards and is
- * case-insensitive unless it starts with `(?-i)`. An entry without a value (`name` or `name:`) matches whenever the
- * header is present, a rule for an empty value cannot be written.
+ * Each entry is `name: value` or just `name`. The name is case-insensitive and `_` is the same as `-`, as in
+ * $_SERVER. The value accepts `*` wildcards and is case-insensitive unless it starts with `(?-i)`. An entry without a
+ * value (`name` or `name:`) matches whenever the header is present, a rule for an empty value cannot be written.
  *
  * The configuration is a comma-separated list, as everywhere in the SDK, so a value cannot contain a comma and there
  * is no escaping. A header sent more than once reaches the matcher as one value joined with `, ` by the SAPI, so use
  * wildcards to match one of them (`*b*`).
+ *
+ * The headers are read from $_SERVER ({@see self::headersFromServer()}), so a header that the web server does not
+ * expose there (for example `Authorization` with some Apache setups) cannot be matched. They are also chosen by the
+ * client: anybody can send a matching header to keep their own request out of the telemetry, so use a header that a
+ * trusted proxy sets or removes if the exclusion must not be bypassed.
  *
  * The object holds no state beyond the parsed rules and {@see self::fromConfiguration()} reads the configuration on
  * every call, so a value changed at runtime (for example pushed by a central configuration) applies to the next
