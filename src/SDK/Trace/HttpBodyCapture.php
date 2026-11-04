@@ -8,6 +8,7 @@ use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Trace\SpanInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SemConv\Incubating\Attributes\HttpIncubatingAttributes;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -29,14 +30,6 @@ use Psr\Http\Message\ServerRequestInterface;
 final class HttpBodyCapture
 {
     use LogsMessagesTrait;
-
-    /**
-     * Not taken from the semantic conventions package on purpose: this package still allows open-telemetry/sem-conv
-     * versions that do not have the constant (1.38.0 has none), and referencing a missing constant fails at runtime.
-     *
-     * @see https://github.com/open-telemetry/semantic-conventions/blob/v1.45.0/docs/registry/attributes/http.md#http-request-body-content
-     */
-    private const REQUEST_BODY_CONTENT = 'http.request.body.content';
 
     private const READ_CHUNK_SIZE = 8192;
 
@@ -63,7 +56,7 @@ final class HttpBodyCapture
             Configuration::getInt(Variables::OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY_MAX_SIZE),
         );
         if ($body !== null) {
-            $span->setAttribute(self::REQUEST_BODY_CONTENT, $body);
+            $span->setAttribute(HttpIncubatingAttributes::HTTP_REQUEST_BODY_CONTENT, $body);
         }
     }
 

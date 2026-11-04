@@ -12,6 +12,8 @@ upgraders can check them in one place.
   ([#2105]).
 - Requires PHP 8.2, and no longer requires `symfony/polyfill-php82` ([#2091]).
 - Requires `open-telemetry/api` 1.11, for `Logging::setLogLevel()` ([#2068]).
+- Requires `open-telemetry/sem-conv` 1.45, for `HttpIncubatingAttributes::HTTP_REQUEST_BODY_CONTENT`
+  ([#2101]).
 
 ### Added
 
