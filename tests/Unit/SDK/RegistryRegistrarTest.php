@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
@@ -32,6 +33,7 @@ class RegistryRegistrarTest extends TestCase
         $this->serviceLoaderMappings = (new ReflectionClass(ServiceLoader::class))->getStaticPropertyValue('mappings');
         $this->resetRegistry();
         CountingRegistrar::$runs = 0;
+        Logging::reset();
         LoggerHolder::set($this->createMock(LoggerInterface::class));
     }
 
@@ -39,6 +41,7 @@ class RegistryRegistrarTest extends TestCase
     protected function tearDown(): void
     {
         LoggerHolder::unset();
+        Logging::reset();
         $registry = new ReflectionClass(Registry::class);
         foreach ($this->registryState as $name => $value) {
             $registry->setStaticPropertyValue($name, $value);
