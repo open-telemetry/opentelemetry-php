@@ -25,6 +25,8 @@ upgraders can check them in one place.
   `exporter-otlp/_register.php` could register the OTLP factories. The providers then stayed noop for the whole
   process, with `Span exporter factory not defined for: otlp` in the log. This also hit `OTEL_CONFIG_FILE`
   (`Transport factory not defined for protocol: http`) ([#2120]).
+- `AutoRootSpan::start($notifySpanEnded)` registers the callback also when the root span was already started, for
+  example by `SdkAutoloader::autoload()`. The callback used to be dropped ([#2120]).
 
 ## 1.16.0 - 2026-11-06
 
