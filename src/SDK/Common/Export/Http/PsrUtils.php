@@ -171,57 +171,8 @@ final class PsrUtils
             throw new UnexpectedValueException('Decoding a gzip response body requires the zlib extension');
         }
 
-        $context = self::withoutWarnings(static fn () => inflate_init(ZLIB_ENCODING_GZIP), $error);
-        if ($context === false) {
-            throw new UnexpectedValueException('Failed to initialize gzip decompression: ' . $error);
-        }
-
-        $output = '';
-        $outputLength = 0;
-        $n = strlen($value);
-        for ($offset = 0; $offset < $n; $offset += self::INFLATE_CHUNK_SIZE) {
-            $chunk = self::withoutWarnings(
-                static fn () => inflate_add(
-                    $context,
-                    substr($value, $offset, self::INFLATE_CHUNK_SIZE),
-                    $offset + self::INFLATE_CHUNK_SIZE >= $n ? ZLIB_FINISH : ZLIB_SYNC_FLUSH,
-                ),
-                $error,
-            );
-            if ($chunk === false) {
-                throw new UnexpectedValueException('Failed to decode gzip response body: ' . $error);
-            }
-            $outputLength += strlen($chunk);
-            if ($outputLength > $maxSize) {
-                throw new ResponseBodyTooLargeException($maxSize);
-            }
-            $output .= $chunk;
-
-            if (inflate_get_status($context) === ZLIB_STREAM_END) {
-                // Data after the end of the gzip stream, such as a second gzip member, is not decoded, so it
-                // would escape the limit and be dropped silently.
-                if (inflate_get_read_len($context) < $n) {
-                    throw new UnexpectedValueException('Unexpected data after the end of the gzip response body');
-                }
-
-                return $output;
-            }
-        }
-
-        throw new UnexpectedValueException('Truncated gzip response body');
-    }
-
-    /**
-     * Calls `$callable`, keeping its warnings out of the application's error handler, and returns the message
-     * of the last one in `$error`.
-     *
-     * @template T
-     * @param callable(): T $callable
-     * @return T
-     */
-    private static function withoutWarnings(callable $callable, ?string &$error = null): mixed
-    {
-        $error = null;
+        // Keep the warnings of zlib out of the application's error handler, which may throw.
+        $error = 'unknown error';
         set_error_handler(static function (int $errno, string $errstr) use (&$error): bool {
             $error = $errstr;
 
@@ -229,11 +180,44 @@ final class PsrUtils
         });
 
         try {
-            return $callable();
+            $context = inflate_init(ZLIB_ENCODING_GZIP);
+            if ($context === false) {
+                throw new UnexpectedValueException('Failed to initialize gzip decompression: ' . $error);
+            }
+
+            $output = '';
+            $outputLength = 0;
+            $n = strlen($value);
+            for ($offset = 0; $offset < $n; $offset += self::INFLATE_CHUNK_SIZE) {
+                $chunk = inflate_add(
+                    $context,
+                    substr($value, $offset, self::INFLATE_CHUNK_SIZE),
+                    $offset + self::INFLATE_CHUNK_SIZE >= $n ? ZLIB_FINISH : ZLIB_SYNC_FLUSH,
+                );
+                if ($chunk === false) {
+                    throw new UnexpectedValueException('Failed to decode gzip response body: ' . $error);
+                }
+                $outputLength += strlen($chunk);
+                if ($outputLength > $maxSize) {
+                    throw new ResponseBodyTooLargeException($maxSize);
+                }
+                $output .= $chunk;
+
+                if (inflate_get_status($context) === ZLIB_STREAM_END) {
+                    // Data after the end of the gzip stream, such as a second gzip member, is not decoded, so it
+                    // would escape the limit and be dropped silently.
+                    if (inflate_get_read_len($context) < $n) {
+                        throw new UnexpectedValueException('Unexpected data after the end of the gzip response body');
+                    }
+
+                    return $output;
+                }
+            }
         } finally {
             restore_error_handler();
-            $error ??= 'unknown error';
         }
+
+        throw new UnexpectedValueException('Truncated gzip response body');
     }
 
     /**
