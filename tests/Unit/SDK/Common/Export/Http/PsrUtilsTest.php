@@ -9,6 +9,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Http;
 use ArrayObject;
 use function date;
 use const DATE_RFC7231;
+use ErrorException;
 use GuzzleHttp\Psr7\FnStream;
 use function gzdecode;
 use function gzencode;
@@ -19,7 +20,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use function random_bytes;
+use function restore_error_handler;
 use RuntimeException;
+use function set_error_handler;
 use function str_repeat;
 use function strlen;
 use function substr;
@@ -179,6 +182,22 @@ final class PsrUtilsTest extends TestCase
 
         $this->expectException(UnexpectedValueException::class);
         PsrUtils::readBody(new Response(200, [], substr($body, 0, -10)), ['gzip'], 30_000);
+    }
+
+    public function test_read_body_is_not_affected_by_the_application_error_handler(): void
+    {
+        set_error_handler(static function (int $errno, string $errstr): never {
+            throw new ErrorException($errstr, 0, $errno);
+        });
+
+        try {
+            PsrUtils::readBody(new Response(200, [], 'not gzip'), ['gzip'], 100);
+            $this->fail('An exception was expected');
+        } catch (UnexpectedValueException $e) {
+            $this->assertStringContainsString('Failed to decode gzip response body', $e->getMessage());
+        } finally {
+            restore_error_handler();
+        }
     }
 
     public function test_read_body_concatenated_gzip_members_throw(): void

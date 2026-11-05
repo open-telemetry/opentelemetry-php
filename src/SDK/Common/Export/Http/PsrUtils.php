@@ -7,8 +7,6 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 use function array_filter;
 use function array_map;
 use function count;
-use function error_clear_last;
-use function error_get_last;
 use ErrorException;
 use function function_exists;
 use function in_array;
@@ -100,7 +98,8 @@ final class PsrUtils
     /**
      * Reads a response body, decoding it with the given content encodings, without exceeding `$maxSize` bytes.
      *
-     * The limit applies to the body as received and to the output of every decoding step, so a small compressed
+     * The limit applies to the body as received (compressed, so a body of incompressible data close to the
+     * limit is rejected too) and to the output of every decoding step, so a small compressed
      * body can't expand into an unbounded amount of memory. Zlib output is checked after every 512 bytes of
      * input, which is at most about 0.5 MiB. Only gzip is decoded, as the specification only requires gzip
      * and none.
@@ -165,27 +164,32 @@ final class PsrUtils
     {
         // The specification only requires gzip and none for OTLP/HTTP.
         // x-gzip is an alias of gzip.
-        if (!in_array($encoding, [TransportFactoryInterface::COMPRESSION_GZIP, 'x-gzip'], true) || !function_exists('inflate_init')) {
+        if (!in_array($encoding, [TransportFactoryInterface::COMPRESSION_GZIP, 'x-gzip'], true)) {
             throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encoding));
         }
+        if (!function_exists('inflate_init')) {
+            throw new UnexpectedValueException('Decoding a gzip response body requires the zlib extension');
+        }
 
-        error_clear_last();
-        $context = @inflate_init(ZLIB_ENCODING_GZIP);
+        $context = self::withoutWarnings(static fn () => inflate_init(ZLIB_ENCODING_GZIP), $error);
         if ($context === false) {
-            throw new UnexpectedValueException('Failed to initialize gzip decompression: ' . self::lastErrorMessage());
+            throw new UnexpectedValueException('Failed to initialize gzip decompression: ' . $error);
         }
 
         $output = '';
         $outputLength = 0;
         $n = strlen($value);
         for ($offset = 0; $offset < $n; $offset += self::INFLATE_CHUNK_SIZE) {
-            $chunk = @inflate_add(
-                $context,
-                substr($value, $offset, self::INFLATE_CHUNK_SIZE),
-                $offset + self::INFLATE_CHUNK_SIZE >= $n ? ZLIB_FINISH : ZLIB_SYNC_FLUSH,
+            $chunk = self::withoutWarnings(
+                static fn () => inflate_add(
+                    $context,
+                    substr($value, $offset, self::INFLATE_CHUNK_SIZE),
+                    $offset + self::INFLATE_CHUNK_SIZE >= $n ? ZLIB_FINISH : ZLIB_SYNC_FLUSH,
+                ),
+                $error,
             );
             if ($chunk === false) {
-                throw new UnexpectedValueException('Failed to decode gzip response body: ' . self::lastErrorMessage());
+                throw new UnexpectedValueException('Failed to decode gzip response body: ' . $error);
             }
             $outputLength += strlen($chunk);
             if ($outputLength > $maxSize) {
@@ -207,9 +211,29 @@ final class PsrUtils
         throw new UnexpectedValueException('Truncated gzip response body');
     }
 
-    private static function lastErrorMessage(): string
+    /**
+     * Calls `$callable`, keeping its warnings out of the application's error handler, and returns the message
+     * of the last one in `$error`.
+     *
+     * @template T
+     * @param callable(): T $callable
+     * @return T
+     */
+    private static function withoutWarnings(callable $callable, ?string &$error = null): mixed
     {
-        return error_get_last()['message'] ?? 'unknown error';
+        $error = null;
+        set_error_handler(static function (int $errno, string $errstr) use (&$error): bool {
+            $error = $errstr;
+
+            return true;
+        });
+
+        try {
+            return $callable();
+        } finally {
+            restore_error_handler();
+            $error ??= 'unknown error';
+        }
     }
 
     /**
