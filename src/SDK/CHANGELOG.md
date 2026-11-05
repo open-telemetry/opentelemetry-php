@@ -79,8 +79,9 @@ upgraders can check them in one place.
 - The console exporters' output format is unspecified and may change between releases ([#2092]).
 - `SdkDistribution` and `DistributionRegistry` are `@internal`. `DistributionConfiguration` and
   `DistributionProperties` are experimental ([#2097]).
-- `PsrTransport` only decodes gzip responses. `deflate` and `br`, which the specification doesn't
-  mention, are rejected as unsupported ([#2112]).
+- `PsrTransport` only decodes gzip responses (also as `x-gzip`). The body of a successful response
+  that can't be decoded, such as a `deflate` or `br` one that the specification doesn't mention, is
+  ignored with a warning ([#2112]).
 
 ### Deprecated
 

@@ -25,7 +25,6 @@ use function strtolower;
 use Throwable;
 use function time_nanosleep;
 use function trim;
-use UnexpectedValueException;
 
 /**
  * @template CONTENT_TYPE of string
@@ -132,6 +131,14 @@ final class PsrTransport implements TransportInterface
 
         try {
             $body = $this->readBody($response);
+        } catch (ResponseBodyTooLargeException $e) {
+            return new ErrorFuture($e);
+        } catch (RuntimeException $e) {
+            // The server accepted the export, and the body is only used for a partial success.
+            self::logWarning('OTLP/HTTP response body ignored, it can not be read or decoded: ' . $e->getMessage(), [
+                'status_code' => $response->getStatusCode(),
+            ]);
+            $body = '';
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         }
@@ -151,14 +158,13 @@ final class PsrTransport implements TransportInterface
             $this->readBody($response);
         } catch (ResponseBodyTooLargeException $e) {
             throw $e;
-        } catch (UnexpectedValueException|RuntimeException) {
+        } catch (RuntimeException) {
         }
     }
 
     /**
      * @throws ResponseBodyTooLargeException if the body exceeds the limit, after logging a warning
-     * @throws UnexpectedValueException if the body can't be decoded
-     * @throws RuntimeException if the body can't be read
+     * @throws RuntimeException if the body can't be read or decoded
      */
     private function readBody(ResponseInterface $response): string
     {

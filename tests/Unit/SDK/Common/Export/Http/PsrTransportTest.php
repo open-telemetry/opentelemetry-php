@@ -29,6 +29,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
+use function substr;
 
 #[CoversClass(PsrTransportFactory::class)]
 #[CoversClass(PsrTransport::class)]
@@ -201,15 +202,36 @@ final class PsrTransportTest extends TestCase
         $transport->send('')->await();
     }
 
-    public function test_send_decode_unknown_encoding_returns_error(): void
+    #[DataProvider('undecodableBodies')]
+    public function test_send_ignores_undecodable_body_of_successful_response(array $headers, string $body): void
     {
-        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'invalid'], 'foo'));
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('ignored'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, $headers, $body));
         $transport = $this->factory->create('http://localhost', 'text/plain');
 
-        $response = $transport->send('');
+        $this->assertSame('', $transport->send('')->await());
+    }
 
-        $this->expectException(Exception::class);
-        $response->await();
+    public static function undecodableBodies(): iterable
+    {
+        yield 'unknown encoding' => [['Content-Encoding' => 'invalid'], 'foo'];
+        yield 'deflate' => [['Content-Encoding' => 'deflate'], 'foo'];
+        yield 'invalid gzip' => [['Content-Encoding' => 'gzip'], 'foo'];
+        yield 'truncated gzip' => [['Content-Encoding' => 'gzip'], substr(gzencode('abc'), 0, -4)];
+    }
+
+    public function test_send_decodes_x_gzip_response_body(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'X-Gzip'], gzencode('abc')));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->assertSame('abc', $transport->send('')->await());
     }
 
     public function test_send_status_code4xx_returns_error(): void

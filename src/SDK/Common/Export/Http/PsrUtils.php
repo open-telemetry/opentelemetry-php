@@ -11,6 +11,7 @@ use function error_clear_last;
 use function error_get_last;
 use ErrorException;
 use function function_exists;
+use function in_array;
 use function inflate_get_read_len;
 use function inflate_get_status;
 use LogicException;
@@ -109,7 +110,7 @@ final class PsrUtils
      *
      * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
      *
-     * @param list<string> $encodings
+     * @param list<string> $encodings content encodings in the order they were applied, in lower case
      * @param positive-int $maxSize maximum size in bytes
      * @throws ResponseBodyTooLargeException if the limit is exceeded
      * @throws UnexpectedValueException if the body can't be decoded
@@ -163,7 +164,8 @@ final class PsrUtils
     private static function decodeWithLimit(string $value, string $encoding, int $maxSize): string
     {
         // The specification only requires gzip and none for OTLP/HTTP.
-        if ($encoding !== TransportFactoryInterface::COMPRESSION_GZIP || !function_exists('inflate_init')) {
+        // x-gzip is an alias of gzip.
+        if (!in_array($encoding, [TransportFactoryInterface::COMPRESSION_GZIP, 'x-gzip'], true) || !function_exists('inflate_init')) {
             throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encoding));
         }
 
