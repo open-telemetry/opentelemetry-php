@@ -23,12 +23,12 @@ class GuzzleTest extends AbstractDiscoveryTestCase
 
     public function test_response_is_not_decoded_by_the_client(): void
     {
-        $this->assertFalse($this->requestOptions(['timeout' => 1])['decode_content']);
+        $this->assertFalse($this->requestOptions(['timeout' => 1])['decode_content'] ?? null);
     }
 
     public function test_decode_content_can_be_overridden(): void
     {
-        $this->assertTrue($this->requestOptions(['decode_content' => true])['decode_content']);
+        $this->assertTrue($this->requestOptions(['decode_content' => true])['decode_content'] ?? null);
     }
 
     /**

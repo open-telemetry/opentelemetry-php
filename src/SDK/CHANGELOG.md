@@ -14,10 +14,10 @@ upgraders can check them in one place.
 - Requires `open-telemetry/api` 1.11, for `Logging::setLogLevel()` ([#2068]).
 - Requires `open-telemetry/sem-conv` 1.45, for `HttpIncubatingAttributes::HTTP_REQUEST_BODY_CONTENT`
   ([#2101]).
-- An `Accept-Encoding` header in the exporter headers must name an encoding the SDK decodes, such as
-  `gzip`. The discovered Guzzle client used to decode responses, and no longer does, so a response in
-  another encoding, such as `zstd`, makes the export fail ([#2115]).
-
+- If you set an `Accept-Encoding` header in the exporter headers, the SDK has to be able to decode
+  the encodings it names, such as `gzip`. The discovered Guzzle client used to decode responses, and no
+  longer does, so a response in another encoding, such as `zstd`, makes the export fail. Without that
+  header the SDK asks for an uncompressed response ([#2115]).
 
 ### Added
 
@@ -96,10 +96,8 @@ upgraders can check them in one place.
 - Every export failed when the HTTP client decoded a gzip response itself and left `Content-Encoding`
   in place, as Symfony HttpClient does, because the body was decoded again. `PsrTransport` now sends
   `Accept-Encoding: identity`, so the server doesn't compress the response, and the discovered Guzzle
-  client no longer decodes responses (`decode_content` is `false`). A non-empty `Accept-Encoding` in
-  the exporter headers replaces the default, which brings back the failure with a client that decodes
-  the response and keeps `Content-Encoding`. A client you pass in yourself keeps its own decoding
-  ([#2115]).
+  client no longer decodes responses (`decode_content` is `false`). A client you pass in yourself keeps
+  its own decoding, but gets the same `Accept-Encoding` header ([#2115]).
 - `OTEL_ATTRIBUTE_COUNT_LIMIT` and `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` were ignored. They apply to
   span, event, link and log record limits that aren't set more specifically ([#2058]).
 - `PsrTransportFactory` ignored its `cacert`, `cert` and `key` arguments. It passes them to the

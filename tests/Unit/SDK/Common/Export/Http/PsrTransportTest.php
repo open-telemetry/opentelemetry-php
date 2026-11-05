@@ -111,6 +111,9 @@ final class PsrTransportTest extends TestCase
         $transport->send('abc');
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
     public static function blankAcceptEncodings(): iterable
     {
         yield 'empty' => [''];
