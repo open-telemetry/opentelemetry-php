@@ -18,6 +18,12 @@ class Guzzle implements DiscoveryInterface
     #[\Override]
     public function create(mixed $options): ClientInterface
     {
+        if (is_array($options)) {
+            // By default Guzzle decodes the response body before the transport sees it, and renames the
+            // Content-Encoding header. The transport decodes the response itself.
+            $options += ['decode_content' => false];
+        }
+
         return new Client($options);
     }
 }

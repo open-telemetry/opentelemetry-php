@@ -83,6 +83,52 @@ final class PsrTransportTest extends TestCase
         $transport->send('abc');
     }
 
+    public function test_send_asks_for_an_identity_response(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {
+            $this->assertSame(['identity'], $request->getHeader('Accept-Encoding'));
+
+            return new Response();
+        });
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $transport->send('abc')->await();
+    }
+
+    public function test_send_keeps_configured_accept_encoding(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {
+            $this->assertSame(['gzip'], $request->getHeader('Accept-Encoding'));
+
+            return new Response();
+        });
+        $transport = $this->factory->create('http://localhost', 'text/plain', ['accept-encoding' => 'gzip']);
+
+        $transport->send('abc')->await();
+    }
+
+    #[DataProvider('blankAcceptEncodings')]
+    public function test_send_replaces_a_blank_accept_encoding(string $value): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {
+            $this->assertSame(['identity'], $request->getHeader('Accept-Encoding'));
+
+            return new Response();
+        });
+        $transport = $this->factory->create('http://localhost', 'text/plain', ['ACCEPT-ENCODING' => $value]);
+
+        $transport->send('abc')->await();
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function blankAcceptEncodings(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'whitespace' => [' '];
+    }
+
     public function test_send_sets_headers(): void
     {
         $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {

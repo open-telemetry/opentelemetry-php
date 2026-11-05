@@ -14,6 +14,10 @@ upgraders can check them in one place.
 - Requires `open-telemetry/api` 1.11, for `Logging::setLogLevel()` ([#2068]).
 - Requires `open-telemetry/sem-conv` 1.45, for `HttpIncubatingAttributes::HTTP_REQUEST_BODY_CONTENT`
   ([#2101]).
+- If you set an `Accept-Encoding` header in the exporter headers, only `gzip` responses are decoded.
+  The discovered Guzzle client used to decode responses, and no longer does, so the body of a response
+  in another encoding, such as `deflate` or `zstd`, is ignored with a warning. Without that header the
+  SDK asks for an uncompressed response ([#2115], [#2112]).
 - `PsrTransport` only decodes gzip responses (also as `x-gzip`). The body of a successful response
   that can't be decoded, such as a `deflate` or `br` one that the specification doesn't mention, is
   ignored with a warning ([#2112]).
@@ -92,6 +96,11 @@ upgraders can check them in one place.
 
 ### Fixed
 
+- Every export failed when the HTTP client decoded a gzip response itself and left `Content-Encoding`
+  in place, as Symfony HttpClient does, because the body was decoded again. `PsrTransport` now sends
+  `Accept-Encoding: identity`, so the server doesn't compress the response, and the discovered Guzzle
+  client no longer decodes responses (`decode_content` is `false`). A client you pass in yourself keeps
+  its own decoding, but gets the same `Accept-Encoding` header ([#2115]).
 - `PsrTransport` limits the OTLP/HTTP response body to 4 MiB, also after decompression, as the
   specification requires. A larger response is discarded with a warning and the export fails without
   a retry, whatever its status, even if the server accepted the data. Decompression is streamed and
@@ -130,3 +139,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2112]: https://github.com/open-telemetry/opentelemetry-php/pull/2112
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
+[#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
