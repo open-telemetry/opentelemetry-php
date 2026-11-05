@@ -48,6 +48,7 @@ use OpenTelemetry\SDK\Propagation\PropagatorFactory;
 use OpenTelemetry\SDK\Propagation\ResponsePropagatorFactory;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
+use OpenTelemetry\SDK\Trace\ExcludedRequestHeaders;
 use OpenTelemetry\SDK\Trace\ExporterFactory;
 use OpenTelemetry\SDK\Trace\SamplerFactory;
 use OpenTelemetry\SDK\Trace\SpanProcessorFactory;
@@ -63,7 +64,7 @@ class SdkAutoloader
 
     public static function autoload(): bool
     {
-        if (!self::isEnabled() || self::isExcludedUrl()) {
+        if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
         $config = null;
@@ -331,6 +332,21 @@ class SdkAutoloader
     public static function isEnabled(): bool
     {
         return Configuration::getBoolean(Variables::OTEL_PHP_AUTOLOAD_ENABLED);
+    }
+
+    /**
+     * Test whether a request header matches the excluded request headers configuration option
+     *
+     * @internal
+     */
+    public static function isExcludedRequestHeader(): bool
+    {
+        // In the CLI $_SERVER holds the process environment, so HTTP_* variables there are not request headers
+        if (AutoRootSpan::isCliScript()) {
+            return false;
+        }
+
+        return ExcludedRequestHeaders::matchesServer($_SERVER);
     }
 
     /**

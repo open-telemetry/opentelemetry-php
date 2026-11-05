@@ -31,6 +31,9 @@ class AutoRootSpan
 
     private static ?ContextStorageScopeInterface $rootScope = null;
 
+    /** The request of the root span, kept to record its body when the span ends. Not set for the CLI. */
+    private static ?ServerRequestInterface $request = null;
+
     /** @var array<string, string[]> Response headers captured via the header() hook, reset for each request */
     private static array $capturedResponseHeaders = [];
 
@@ -66,7 +69,8 @@ class AutoRootSpan
      * OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI (CLI). Both default to false, a distro can default them to true.
      * Does nothing when a root span was already started by this class.
      *
-     * @param callable|null $notifySpanEnded called at shutdown, right before the root span ends
+     * @param callable|null $notifySpanEnded called at shutdown, right before the root span ends; not called when no root
+     *                                    span was created, for example for an excluded request
      */
     public static function start(?callable $notifySpanEnded = null): void
     {
@@ -94,6 +98,12 @@ class AutoRootSpan
             return;
         }
 
+        if (SdkAutoloader::isExcludedRequestHeader()) {
+            self::logDebug('Request is excluded by OTEL_PHP_EXCLUDED_REQUEST_HEADERS');
+
+            return;
+        }
+
         $request = self::createRequest();
         if ($request === null) {
             self::logWarning('Unable to create server request');
@@ -107,8 +117,10 @@ class AutoRootSpan
     /**
      * A script run in the CLI SAPI that does not emulate a web request (it has no REQUEST_METHOD).
      * A request emulated in the CLI (e.g. by a test harness) is still treated as a web request, as it always was.
+     *
+     * @internal
      */
-    private static function isCliScript(): bool
+    public static function isCliScript(): bool
     {
         return php_sapi_name() === 'cli' && empty($_SERVER['REQUEST_METHOD'] ?? null);
     }
@@ -119,6 +131,7 @@ class AutoRootSpan
      */
     public static function create(ServerRequestInterface $request, bool $cli = false): void
     {
+        self::$request = null;
         $tracer = Globals::tracerProvider()->getTracer(
             'io.opentelemetry.php.auto-root-span',
             null,
@@ -150,6 +163,7 @@ class AutoRootSpan
             ->setAttribute(TraceAttributes::URL_PATH, $request->getUri()->getPath())
             ->startSpan();
         self::captureRequestHeaders($request, $span);
+        self::$request = self::requestForBodyCapture($request);
         self::$capturedResponseHeaders = [];
         self::registerResponseHeaderHookIfNeeded();
         self::$rootScope = Context::storage()->attach($span->storeInContext($parent));
@@ -179,6 +193,20 @@ class AutoRootSpan
         }
 
         return (new WildcardListMatcher($groups))->match($path) ?? $path;
+    }
+
+    /**
+     * The request is kept only when its body is going to be recorded, a bad configuration must not break the request.
+     */
+    private static function requestForBodyCapture(ServerRequestInterface $request): ?ServerRequestInterface
+    {
+        try {
+            return HttpBodyCapture::isEnabled() ? $request : null;
+        } catch (\Throwable $e) {
+            self::logWarning('Unable to read the request body capture configuration', ['exception' => $e]);
+
+            return null;
+        }
     }
 
     private static function captureRequestHeaders(ServerRequestInterface $request, SpanInterface $span): void
@@ -270,7 +298,9 @@ class AutoRootSpan
     {
         // Use the saved root scope: storage->scope() may return another scope if user code detached scopes out of order
         $scope = self::$rootScope ?? Context::storage()->scope();
+        $request = self::$request;
         self::$rootScope = null;
+        self::$request = null;
         if (!$scope) {
             return;
         }
@@ -283,6 +313,14 @@ class AutoRootSpan
         }
         foreach (self::$capturedResponseHeaders as $name => $values) {
             $span->setAttribute('http.response.header.' . $name, $values);
+        }
+        if ($request !== null) {
+            try {
+                HttpBodyCapture::captureRequestBody($span, $request);
+            } catch (\Throwable $e) {
+                // recording the body must never prevent the root span from ending
+                self::logWarning('Unable to record the request body', ['exception' => $e]);
+            }
         }
         $span->end();
     }

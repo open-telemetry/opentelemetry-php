@@ -96,7 +96,7 @@ stop-prometheus:
 fiber-ffi-example:
 	@$(DOCKER_COMPOSE) -f docker-compose.fiber-ffi.yaml -p opentelemetry-php_fiber-ffi-example up -d web
 protobuf: ## Generate protobuf files
-	./script/proto_gen.sh
+	./script/proto_gen.sh $(PROTO_VERSION)
 bash: ## bash shell into container
 	$(DC_RUN_PHP) bash
 style: ## Run style check/fix

@@ -55,6 +55,14 @@ class LogsMessagesTraitTest extends TestCase
         ];
     }
 
+    #[DataProvider('logProvider')]
+    public function test_a_failing_log_writer_does_not_break_the_caller(string $method): void
+    {
+        $this->writer->expects($this->once())->method('write')->willThrowException(new \ErrorException('log writer failure'));
+
+        $this->createInstance()->run($method, 'foo');
+    }
+
     #[DataProvider('logLevelProvider')]
     #[TestDox('Proxies logging methods through to logger')]
     public function test_log_methods(string $method, string $expectedLogLevel): void

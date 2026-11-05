@@ -34,12 +34,6 @@ parameters:
 			path: src/Contrib/Otlp/MetricExporterFactory.php
 
 		-
-			message: '#^Instanceof between Google\\Protobuf\\Descriptor and Google\\Protobuf\\Descriptor will always evaluate to true\.$#'
-			identifier: instanceof.alwaysTrue
-			count: 1
-			path: src/Contrib/Otlp/ProtobufSerializer.php
-
-		-
 			message: '#^Method OpenTelemetry\\SDK\\Common\\Configuration\\EnvResolver\:\:numeric\(\) never returns int so it can be removed from the return type\.$#'
 			identifier: return.unusedType
 			count: 1

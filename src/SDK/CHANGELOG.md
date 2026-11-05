@@ -12,9 +12,19 @@ upgraders can check them in one place.
   ([#2105]).
 - Requires PHP 8.2, and no longer requires `symfony/polyfill-php82` ([#2091]).
 - Requires `open-telemetry/api` 1.11, for `Logging::setLogLevel()` ([#2068]).
+- Requires `open-telemetry/sem-conv` 1.45, for `HttpIncubatingAttributes::HTTP_REQUEST_BODY_CONTENT`
+  ([#2101]).
 
 ### Added
 
+- `OTEL_PHP_EXCLUDED_REQUEST_HEADERS` disables the SDK for web requests that have a matching
+  header, like `OTEL_PHP_EXCLUDED_URLS` does for a URL, for example
+  `User-Agent: kube-probe*,X-Skip-Tracing`. Entries are `name: value` or `name`, the name ignores
+  case and treats `_` as `-`, and the value takes `*` wildcards. A value cannot contain a comma,
+  and a header sent more than once is matched as one value joined with `, `. Headers are read from
+  `$_SERVER` and are set by the client, so use a header that a trusted proxy sets or removes if
+  clients must not be able to opt out. It is evaluated when the SDK autoloads, so it needs an
+  autoload per request and does not work in workers that autoload once at boot ([#2113]).
 - Composable samplers in `OpenTelemetry\SDK\Trace\Sampler\Consistent`, led by
   `CompositeSampler`. All are experimental ([#2077]).
 - The auto root span names spans `METHOD path`, grouped by `OTEL_PHP_TRANSACTION_URL_GROUPS`. It
@@ -37,6 +47,10 @@ upgraders can check them in one place.
   `TransportInterface` ([#2095]).
 - `SdkBuilder::setLogLevel()`, applied by `buildAndRegisterGlobal()` until its scope is detached
   ([#2068]).
+- `OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY` makes the auto root span record the
+  request body as `http.request.body.content`, cut at
+  `OTEL_PHP_INSTRUMENTATION_HTTP_SERVER_CAPTURE_REQUEST_BODY_MAX_SIZE` bytes (1024 by default).
+  It is off by default, records only textual bodies, and does not redact them ([#2101]).
 
 ### Changed
 
@@ -87,6 +101,10 @@ upgraders can check them in one place.
   Symfony HttpClient no longer rejects them ([#2095]).
 - A zero HTTP client timeout was dropped, or applied literally by Symfony HttpClient. It means no
   limit ([#2095], [#2105]).
+- The wildcard matcher behind `OTEL_PHP_TRANSACTION_URL_GROUPS` matched texts it should not: a
+  pattern with several `*` accepted its parts in the wrong order (`*health*probe*` matched
+  `client/probe/health`) and the last part could overlap an earlier one (`ab*bc` matched `abc`)
+  ([#2113]).
 
 ## 1.15.0 and earlier
 
@@ -105,5 +123,7 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2093]: https://github.com/open-telemetry/opentelemetry-php/pull/2093
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
+[#2101]: https://github.com/open-telemetry/opentelemetry-php/pull/2101
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2112]: https://github.com/open-telemetry/opentelemetry-php/pull/2112
+[#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
