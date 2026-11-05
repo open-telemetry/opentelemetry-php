@@ -79,6 +79,16 @@ class WithSpanHandlerTest extends TestCase
         ], $span->getAttributes()->toArray());
     }
 
+    public function test_uses_named_span_name_argument(): void
+    {
+        WithSpanHandler::pre(null, [], 'My\\Class', 'some_function', null, null, ['span_name' => 'x'], []);
+        WithSpanHandler::post(null, [], null, null);
+
+        /** @var ImmutableSpan $span */
+        $span = $this->storage->offsetGet(0);
+        $this->assertSame('x', $span->getName());
+    }
+
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/exceptions.md#attributes
      */

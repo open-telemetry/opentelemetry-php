@@ -23,7 +23,7 @@ class WithSpanHandler
         static $instrumentation;
         $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.25.0');
 
-        $name = $span_args['name'] ?? null;
+        $name = $span_args['span_name'] ?? $span_args['name'] ?? null;
         if ($name === null) {
             $name = empty($class)
                 ? $function
