@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.16.0 - 2026-11-06
+
 ### Breaking changes
 
 - `OTEL_CONFIG_FILE` names one file. It used to be split on commas for instrumentation config

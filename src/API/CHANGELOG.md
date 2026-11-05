@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.11.0 - 2026-11-06
+
 ### Breaking changes
 
 - Conflicts with `open-telemetry/sdk-configuration` below 0.10, which registers the same

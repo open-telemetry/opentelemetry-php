@@ -57,7 +57,7 @@ benchmark: ## Run phpbench
 phpmetrics: ## Run php metrics
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/phpmetrics/vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
 spi: ## Validate SPI package dependencies
-	$(DC_RUN_PHP) composer spi:show-outdated-package-dependencies
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:spi:check
 smoke-test-examples: smoke-test-isolated-examples smoke-test-exporter-examples smoke-test-collector-integration smoke-test-prometheus-example ## Run smoke test examples
 smoke-test-isolated-examples: ## Run smoke test isolated examples
 	$(DC_RUN_PHP) php ./examples/traces/getting_started.php

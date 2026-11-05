@@ -10,6 +10,8 @@ the protocol itself are in the
 
 ## Unreleased
 
+## 1.11.1 - 2026-11-06
+
 ### Breaking changes
 
 - Requires `google/protobuf` 4.31, and conflicts with `ext-protobuf` older than 4.31 ([#2110]).
