@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use function assert;
 use BadMethodCallException;
+use function count;
 use function explode;
 use function in_array;
 use InvalidArgumentException;
@@ -41,7 +42,15 @@ final class PsrTransport implements TransportInterface
      */
     public const DEFAULT_MAX_RESPONSE_BODY_SIZE = 4 * 1024 * 1024;
 
+    /**
+     * Distinct reasons a response body was ignored, which have been logged as a warning already.
+     */
+    private const MAX_REPORTED_BODY_ERRORS = 16;
+
     private bool $closed = false;
+
+    /** @var array<string, true> */
+    private array $reportedBodyErrors = [];
 
     /**
      * @param CONTENT_TYPE $contentType
@@ -129,21 +138,43 @@ final class PsrTransport implements TransportInterface
 
         assert(isset($response));
 
+        // A null response is a success without a payload, which the exporters don't hydrate. An empty string
+        // would be hydrated, and is not valid JSON.
         try {
             $body = $this->readBody($response);
+            if ($body === '') {
+                $body = null;
+            }
         } catch (ResponseBodyTooLargeException $e) {
             return new ErrorFuture($e);
         } catch (RuntimeException $e) {
             // The server accepted the export, and the body is only used for a partial success.
-            self::logWarning('OTLP/HTTP response body ignored, it can not be read or decoded: ' . $e->getMessage(), [
-                'status_code' => $response->getStatusCode(),
-            ]);
-            $body = '';
+            $this->logIgnoredBody($e, $response);
+            $body = null;
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         }
 
         return new CompletedFuture($body);
+    }
+
+    /**
+     * A server that always answers in an encoding that can't be decoded would fill the log with a warning for
+     * every export, so only the first one for each reason is a warning, the rest are debug messages.
+     */
+    private function logIgnoredBody(RuntimeException $e, ResponseInterface $response): void
+    {
+        $message = 'OTLP/HTTP response body ignored, it can not be read or decoded: ' . $e->getMessage();
+        $context = ['status_code' => $response->getStatusCode()];
+
+        if (isset($this->reportedBodyErrors[$message]) || count($this->reportedBodyErrors) >= self::MAX_REPORTED_BODY_ERRORS) {
+            self::logDebug($message, $context);
+
+            return;
+        }
+
+        $this->reportedBodyErrors[$message] = true;
+        self::logWarning($message, $context);
     }
 
     /**
@@ -158,7 +189,8 @@ final class PsrTransport implements TransportInterface
             $this->readBody($response);
         } catch (ResponseBodyTooLargeException $e) {
             throw $e;
-        } catch (RuntimeException) {
+        } catch (RuntimeException $e) {
+            self::logDebug('OTLP/HTTP error response body could not be checked: ' . $e->getMessage());
         }
     }
 

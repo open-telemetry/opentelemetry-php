@@ -103,6 +103,14 @@ final class PsrTransportTest extends TestCase
         $this->assertSame('abc', $transport->send('')->await());
     }
 
+    public function test_send_returns_no_payload_for_an_empty_response_body(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(204));
+        $transport = $this->factory->create('http://localhost', 'application/json');
+
+        $this->assertNull($transport->send('')->await());
+    }
+
     public function test_send_decodes_response_body(): void
     {
         $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'gzip'], gzencode('abc')));
@@ -215,9 +223,38 @@ final class PsrTransportTest extends TestCase
         $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, $headers, $body));
         $transport = $this->factory->create('http://localhost', 'text/plain');
 
-        $this->assertSame('', $transport->send('')->await());
+        $this->assertNull($transport->send('')->await());
     }
 
+    public function test_send_warns_once_for_each_reason_a_body_is_ignored(): void
+    {
+        Logging::setLogLevel(LogLevel::DEBUG);
+        $levels = [];
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->exactly(4))->method('write')->willReturnCallback(
+            function (string $level) use (&$levels): void {
+                $levels[] = $level;
+            },
+        );
+        Logging::setLogWriter($logWriter);
+        $this->client->expects($this->exactly(4))->method('sendRequest')->willReturnOnConsecutiveCalls(
+            new Response(200, ['Content-Encoding' => 'br'], 'foo'),
+            new Response(200, ['Content-Encoding' => 'br'], 'foo'),
+            new Response(200, ['Content-Encoding' => 'zstd'], 'foo'),
+            new Response(200, ['Content-Encoding' => 'br'], 'foo'),
+        );
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        for ($i = 0; $i < 4; $i++) {
+            $transport->send('')->await();
+        }
+
+        $this->assertSame([LogLevel::WARNING, LogLevel::DEBUG, LogLevel::WARNING, LogLevel::DEBUG], $levels);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>, string}>
+     */
     public static function undecodableBodies(): iterable
     {
         yield 'unknown encoding' => [['Content-Encoding' => 'invalid'], 'foo'];
