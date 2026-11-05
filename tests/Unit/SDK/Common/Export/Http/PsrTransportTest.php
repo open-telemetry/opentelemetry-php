@@ -83,7 +83,7 @@ final class PsrTransportTest extends TestCase
         });
         $transport = $this->factory->create('http://localhost', 'text/plain');
 
-        $transport->send('abc');
+        $transport->send('abc')->await();
     }
 
     public function test_send_keeps_configured_accept_encoding(): void
@@ -95,7 +95,7 @@ final class PsrTransportTest extends TestCase
         });
         $transport = $this->factory->create('http://localhost', 'text/plain', ['accept-encoding' => 'gzip']);
 
-        $transport->send('abc');
+        $transport->send('abc')->await();
     }
 
     #[DataProvider('blankAcceptEncodings')]
@@ -108,7 +108,7 @@ final class PsrTransportTest extends TestCase
         });
         $transport = $this->factory->create('http://localhost', 'text/plain', ['ACCEPT-ENCODING' => $value]);
 
-        $transport->send('abc');
+        $transport->send('abc')->await();
     }
 
     /**
