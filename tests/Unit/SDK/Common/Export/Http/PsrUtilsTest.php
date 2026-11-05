@@ -6,12 +6,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Http;
 
-use function array_shift;
+use ArrayObject;
 use function date;
 use const DATE_RFC7231;
 use GuzzleHttp\Psr7\FnStream;
-use GuzzleHttp\Psr7\PumpStream;
-use function gzcompress;
 use function gzdecode;
 use function gzencode;
 use Nyholm\Psr7\Response;
@@ -23,7 +21,6 @@ use PHPUnit\Framework\TestCase;
 use function random_bytes;
 use RuntimeException;
 use function str_repeat;
-use function str_split;
 use function strlen;
 use function substr;
 use function time;
@@ -109,11 +106,17 @@ final class PsrUtilsTest extends TestCase
 
     public function test_read_body_reads_in_chunks(): void
     {
-        $data = str_split('abcdef');
-        // PumpStream returns at most one byte per call here, as a short read
-        $stream = new PumpStream(static function (int $length) use (&$data) {
-            return array_shift($data) ?? false;
-        });
+        $data = 'abcdef';
+        $state = new ArrayObject(['position' => 0]);
+        // read() returns one byte per call, a short read as PSR-7 allows
+        $stream = new FnStream([
+            'getSize' => static fn () => null,
+            'isSeekable' => static fn () => false,
+            'eof' => static fn () => $state['position'] >= strlen($data),
+            'read' => static function (int $length) use ($state, $data) {
+                return $state['position'] < strlen($data) ? $data[$state['position']++] : '';
+            },
+        ]);
 
         $this->assertSame('abcdef', PsrUtils::readBody(new Response(200, [], $stream), [], 10));
     }
@@ -130,24 +133,31 @@ final class PsrUtilsTest extends TestCase
     {
         $value = str_repeat('a', 30);
         $this->assertSame($value, PsrUtils::readBody(new Response(200, [], gzencode($value)), ['gzip'], 30));
-        $this->assertSame($value, PsrUtils::readBody(new Response(200, [], gzcompress($value)), ['deflate'], 30));
     }
 
-    #[DataProvider('compressors')]
-    public function test_read_body_decoded_over_limit(string $encoding, callable $compress): void
+    public function test_read_body_decoded_over_limit(): void
     {
         $this->expectException(ResponseBodyTooLargeException::class);
         // the compressed body is below the limit, so only the decoded output can exceed it
-        $body = $compress(str_repeat('a', 100_000));
+        $body = gzencode(str_repeat('a', 100_000));
         $this->assertLessThan(1_000, strlen($body));
 
-        PsrUtils::readBody(new Response(200, [], $body), [$encoding], 1_000);
+        PsrUtils::readBody(new Response(200, [], $body), ['gzip'], 1_000);
     }
 
-    public static function compressors(): iterable
+    #[DataProvider('unsupportedEncodings')]
+    public function test_read_body_only_decodes_gzip(string $encoding): void
     {
-        yield 'gzip' => ['gzip', gzencode(...)];
-        yield 'deflate' => ['deflate', gzcompress(...)];
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Not supported decompression encoding');
+        PsrUtils::readBody(new Response(200, [], 'foo'), [$encoding], 100);
+    }
+
+    public static function unsupportedEncodings(): iterable
+    {
+        yield 'deflate' => ['deflate'];
+        yield 'brotli' => ['br'];
+        yield 'unknown' => ['invalid'];
     }
 
     public function test_read_body_invalid_encoded_body_throws(): void
@@ -156,27 +166,34 @@ final class PsrUtilsTest extends TestCase
         PsrUtils::readBody(new Response(200, [], 'not gzip'), ['gzip'], 100);
     }
 
-    public function test_read_body_unknown_encoding_throws(): void
-    {
-        $this->expectException(UnexpectedValueException::class);
-        PsrUtils::readBody(new Response(200, [], 'foo'), ['invalid'], 100);
-    }
-
     public function test_read_body_multiple_chunks_round_trip(): void
     {
         $value = random_bytes(20_000);
 
         $this->assertSame($value, PsrUtils::readBody(new Response(200, [], gzencode($value)), ['gzip'], 30_000));
-        $this->assertSame($value, PsrUtils::readBody(new Response(200, [], gzcompress($value)), ['deflate'], 30_000));
     }
 
-    #[DataProvider('compressors')]
-    public function test_read_body_truncated_encoded_body_throws(string $encoding, callable $compress): void
+    public function test_read_body_truncated_encoded_body_throws(): void
     {
-        $body = $compress(random_bytes(20_000));
+        $body = gzencode(random_bytes(20_000));
 
         $this->expectException(UnexpectedValueException::class);
-        PsrUtils::readBody(new Response(200, [], substr($body, 0, -10)), [$encoding], 30_000);
+        PsrUtils::readBody(new Response(200, [], substr($body, 0, -10)), ['gzip'], 30_000);
+    }
+
+    public function test_read_body_concatenated_gzip_members_throw(): void
+    {
+        // the second member would be dropped, and would not count against the limit
+        $body = gzencode('abc') . gzencode(str_repeat('a', 100_000));
+
+        $this->expectException(UnexpectedValueException::class);
+        PsrUtils::readBody(new Response(200, [], $body), ['gzip'], 1_000);
+    }
+
+    public function test_read_body_trailing_data_after_gzip_throws(): void
+    {
+        $this->expectException(UnexpectedValueException::class);
+        PsrUtils::readBody(new Response(200, [], gzencode('abc') . 'garbage'), ['gzip'], 1_000);
     }
 
     public function test_read_body_applies_limit_to_every_encoding_step(): void

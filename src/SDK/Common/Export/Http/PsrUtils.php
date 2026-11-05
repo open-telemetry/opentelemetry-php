@@ -7,8 +7,11 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 use function array_filter;
 use function array_map;
 use function count;
+use function error_clear_last;
+use function error_get_last;
 use ErrorException;
 use function function_exists;
+use function inflate_get_read_len;
 use function inflate_get_status;
 use LogicException;
 use function max;
@@ -19,9 +22,7 @@ use function restore_error_handler;
 use RuntimeException;
 use function set_error_handler;
 use function sprintf;
-use function strcasecmp;
 use function strlen;
-use function strtolower;
 use function strtotime;
 use function substr;
 use Throwable;
@@ -100,7 +101,8 @@ final class PsrUtils
      *
      * The limit applies to the body as received and to the output of every decoding step, so a small compressed
      * body can't expand into an unbounded amount of memory. Zlib output is checked after every 512 bytes of
-     * input, which is at most about 0.5 MiB. Brotli can only be checked after decoding.
+     * input, which is at most about 0.5 MiB. Only gzip is decoded, as the specification only requires gzip
+     * and none.
      *
      * The PSR-18 client has usually buffered the response already, so this bounds what the transport keeps
      * and decodes, not what the client received.
@@ -111,6 +113,7 @@ final class PsrUtils
      * @param positive-int $maxSize maximum size in bytes
      * @throws ResponseBodyTooLargeException if the limit is exceeded
      * @throws UnexpectedValueException if the body can't be decoded
+     * @throws RuntimeException if the body can't be read
      */
     public static function readBody(ResponseInterface $response, array $encodings, int $maxSize): string
     {
@@ -147,7 +150,7 @@ final class PsrUtils
         }
 
         for ($i = count($encodings); --$i >= 0;) {
-            if (strcasecmp($encodings[$i], 'identity') === 0) {
+            if ($encodings[$i] === 'identity') {
                 continue;
             }
 
@@ -159,59 +162,52 @@ final class PsrUtils
 
     private static function decodeWithLimit(string $value, string $encoding, int $maxSize): string
     {
-        $zlibEncoding = match (strtolower($encoding)) {
-            TransportFactoryInterface::COMPRESSION_GZIP => ZLIB_ENCODING_GZIP,
-            TransportFactoryInterface::COMPRESSION_DEFLATE => ZLIB_ENCODING_DEFLATE,
-            default => null,
-        };
-
-        if ($zlibEncoding !== null && function_exists('inflate_init')) {
-            $context = @inflate_init($zlibEncoding);
-            if ($context === false) {
-                throw new UnexpectedValueException(sprintf('Failed to initialize decompression for encoding "%s"', $encoding));
-            }
-
-            $output = '';
-            $outputLength = 0;
-            $n = strlen($value);
-            for ($offset = 0; $offset < $n; $offset += self::INFLATE_CHUNK_SIZE) {
-                $chunk = @inflate_add(
-                    $context,
-                    substr($value, $offset, self::INFLATE_CHUNK_SIZE),
-                    $offset + self::INFLATE_CHUNK_SIZE >= $n ? ZLIB_FINISH : ZLIB_SYNC_FLUSH,
-                );
-                if ($chunk === false) {
-                    throw new UnexpectedValueException(sprintf('Failed to decode response body with encoding "%s"', $encoding));
-                }
-                $outputLength += strlen($chunk);
-                if ($outputLength > $maxSize) {
-                    throw new ResponseBodyTooLargeException($maxSize);
-                }
-                $output .= $chunk;
-            }
-            if (inflate_get_status($context) !== ZLIB_STREAM_END) {
-                throw new UnexpectedValueException(sprintf('Truncated response body with encoding "%s"', $encoding));
-            }
-
-            return $output;
+        // The specification only requires gzip and none for OTLP/HTTP.
+        if ($encoding !== TransportFactoryInterface::COMPRESSION_GZIP || !function_exists('inflate_init')) {
+            throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encoding));
         }
 
-        if (strtolower($encoding) === TransportFactoryInterface::COMPRESSION_BROTLI && function_exists('brotli_uncompress')) {
-            // ext-brotli can't cap its output ($max_decoded_size is not enforced, and the streaming API has no
-            // limit per call), so unlike gzip and deflate the memory is used before the size can be checked.
-            // Only the size of the received body is bounded up front.
-            $output = @brotli_uncompress($value);
-            if ($output === false) {
-                throw new UnexpectedValueException('Failed to decode response body with encoding "br"');
+        error_clear_last();
+        $context = @inflate_init(ZLIB_ENCODING_GZIP);
+        if ($context === false) {
+            throw new UnexpectedValueException('Failed to initialize gzip decompression: ' . self::lastErrorMessage());
+        }
+
+        $output = '';
+        $outputLength = 0;
+        $n = strlen($value);
+        for ($offset = 0; $offset < $n; $offset += self::INFLATE_CHUNK_SIZE) {
+            $chunk = @inflate_add(
+                $context,
+                substr($value, $offset, self::INFLATE_CHUNK_SIZE),
+                $offset + self::INFLATE_CHUNK_SIZE >= $n ? ZLIB_FINISH : ZLIB_SYNC_FLUSH,
+            );
+            if ($chunk === false) {
+                throw new UnexpectedValueException('Failed to decode gzip response body: ' . self::lastErrorMessage());
             }
-            if (strlen($output) > $maxSize) {
+            $outputLength += strlen($chunk);
+            if ($outputLength > $maxSize) {
                 throw new ResponseBodyTooLargeException($maxSize);
             }
+            $output .= $chunk;
 
-            return $output;
+            if (inflate_get_status($context) === ZLIB_STREAM_END) {
+                // Data after the end of the gzip stream, such as a second gzip member, is not decoded, so it
+                // would escape the limit and be dropped silently.
+                if (inflate_get_read_len($context) < $n) {
+                    throw new UnexpectedValueException('Unexpected data after the end of the gzip response body');
+                }
+
+                return $output;
+            }
         }
 
-        throw new UnexpectedValueException(sprintf('Not supported decompression encoding "%s"', $encoding));
+        throw new UnexpectedValueException('Truncated gzip response body');
+    }
+
+    private static function lastErrorMessage(): string
+    {
+        return error_get_last()['message'] ?? 'unknown error';
     }
 
     /**

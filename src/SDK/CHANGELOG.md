@@ -79,6 +79,8 @@ upgraders can check them in one place.
 - The console exporters' output format is unspecified and may change between releases ([#2092]).
 - `SdkDistribution` and `DistributionRegistry` are `@internal`. `DistributionConfiguration` and
   `DistributionProperties` are experimental ([#2097]).
+- `PsrTransport` only decodes gzip responses. `deflate` and `br`, which the specification doesn't
+  mention, are rejected as unsupported ([#2112]).
 
 ### Deprecated
 
@@ -91,9 +93,9 @@ upgraders can check them in one place.
 
 - `PsrTransport` limits the OTLP/HTTP response body to 4 MiB, also after decompression, as the
   specification requires. A larger response is discarded with a warning and the export fails without
-  a retry, even if the server accepted the data. Decompression is streamed and checked in small
-  steps. A brotli response is only checked after decoding, because ext-brotli can't cap its output.
-  The PSR-18 client may buffer the whole response before the limit applies ([#2112]).
+  a retry, whatever its status, even if the server accepted the data. Decompression is streamed and
+  checked in small steps. The PSR-18 client may buffer the whole response before the limit applies
+  ([#2112]).
 - `OTEL_ATTRIBUTE_COUNT_LIMIT` and `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` were ignored. They apply to
   span, event, link and log record limits that aren't set more specifically ([#2058]).
 - `PsrTransportFactory` ignored its `cacert`, `cert` and `key` arguments. It passes them to the

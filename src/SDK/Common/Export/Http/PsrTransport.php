@@ -8,6 +8,7 @@ use function assert;
 use BadMethodCallException;
 use function explode;
 use function in_array;
+use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
@@ -24,6 +25,7 @@ use function strtolower;
 use Throwable;
 use function time_nanosleep;
 use function trim;
+use UnexpectedValueException;
 
 /**
  * @template CONTENT_TYPE of string
@@ -57,6 +59,9 @@ final class PsrTransport implements TransportInterface
         private readonly int $maxRetries,
         private readonly int $maxResponseBodySize = self::DEFAULT_MAX_RESPONSE_BODY_SIZE,
     ) {
+        if ($maxResponseBodySize < 1) {
+            throw new InvalidArgumentException('The maximum response body size must be positive');
+        }
     }
 
     #[\Override]
@@ -146,12 +151,14 @@ final class PsrTransport implements TransportInterface
             $this->readBody($response);
         } catch (ResponseBodyTooLargeException $e) {
             throw $e;
-        } catch (Throwable) {
+        } catch (UnexpectedValueException|RuntimeException) {
         }
     }
 
     /**
      * @throws ResponseBodyTooLargeException if the body exceeds the limit, after logging a warning
+     * @throws UnexpectedValueException if the body can't be decoded
+     * @throws RuntimeException if the body can't be read
      */
     private function readBody(ResponseInterface $response): string
     {
@@ -162,7 +169,10 @@ final class PsrTransport implements TransportInterface
                 $this->maxResponseBodySize,
             );
         } catch (ResponseBodyTooLargeException $e) {
-            self::logWarning('OTLP/HTTP response body discarded, it exceeds the size limit', ['limit' => $e->limit]);
+            self::logWarning('OTLP/HTTP response body discarded, it exceeds the size limit', [
+                'limit' => $e->limit,
+                'status_code' => $response->getStatusCode(),
+            ]);
 
             throw $e;
         }

@@ -155,7 +155,7 @@ final class PsrTransportTest extends TestCase
         $logWriter->expects($this->once())->method('write')->with(
             LogLevel::WARNING,
             $this->stringContains('discarded'),
-            $this->callback(fn (array $context): bool => $context['limit'] === PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE),
+            $this->callback(fn (array $context): bool => $context['limit'] === PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE && isset($context['status_code'])),
         );
         Logging::setLogWriter($logWriter);
     }
@@ -182,6 +182,13 @@ final class PsrTransportTest extends TestCase
         yield '403' => [static fn () => new Response(403, [], str_repeat('a', $limit + 1))];
         yield '500' => [static fn () => new Response(500, [], str_repeat('a', $limit + 1))];
         yield '429 compressed' => [static fn () => new Response(429, ['Content-Encoding' => 'gzip'], gzencode(str_repeat('a', $limit + 1)))];
+    }
+
+    public function test_max_response_body_size_must_be_positive(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new PsrTransport($this->client, new HttpFactory(), new HttpFactory(), 'http://localhost', 'text/plain', [], [], 10, 0, 0);
     }
 
     public function test_send_error_response_with_unreadable_body_keeps_status_error(): void
