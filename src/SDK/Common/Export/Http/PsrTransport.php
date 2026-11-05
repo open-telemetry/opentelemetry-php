@@ -76,6 +76,11 @@ final class PsrTransport implements TransportInterface
         foreach ($this->headers as $header => $value) {
             $request = $request->withAddedHeader($header, $value);
         }
+        if (trim($request->getHeaderLine('Accept-Encoding')) === '') {
+            // A client that adds its own Accept-Encoding decodes the response, and may leave Content-Encoding in
+            // place, so that the body is decoded again here. Asking for an identity response avoids both.
+            $request = $request->withHeader('Accept-Encoding', 'identity');
+        }
 
         for ($retries = 0;; $retries++) {
             $response = null;
