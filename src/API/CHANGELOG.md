@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Fixed
+
+- `WithSpanHandler` uses the span name of `#[WithSpan(span_name: '...')]`. Only the positional form
+  `#[WithSpan('...')]` set it; the named form fell back to `Class::method`.
+
 ## 1.11.0 - 2026-11-06
 
 ### Breaking changes
