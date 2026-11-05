@@ -24,6 +24,9 @@ use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
+use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -408,6 +411,71 @@ class AutoRootSpanTest extends TestCase
 
         $this->assertTrue($registered->getValue());
         $this->assertCount($before + 1, $handlers->getValue());
+    }
+
+    /**
+     * The embedder calls start() after SdkAutoloader::autoload() already started the root span. Its callback must run
+     * from the queued shutdown handler, once, while the root span is still active and before it ends.
+     */
+    public function test_late_callback_runs_once_before_the_root_span_ends(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $exporter = new InMemoryExporter();
+        $scope = Configurator::create()
+            ->withTracerProvider(new TracerProvider(new SimpleSpanProcessor($exporter)))
+            ->withPropagator(new TraceContextPropagator())
+            ->activate();
+        $events = [];
+
+        try {
+            AutoRootSpan::start();
+            AutoRootSpan::start(static function () use (&$events, $exporter): void {
+                $events[] = [
+                    'callback',
+                    Span::getCurrent()->isRecording(),
+                    count($exporter->getSpans()),
+                ];
+            });
+            $this->runQueuedShutdownHandler();
+            $events[] = ['ended', count($exporter->getSpans())];
+        } finally {
+            $scope->detach();
+        }
+
+        $this->assertSame([['callback', true, 0], ['ended', 1]], $events);
+        $this->assertSame('io.opentelemetry.php.auto-root-span', $exporter->getSpans()[0]->getInstrumentationScope()->getName());
+    }
+
+    public function test_replacement_callback_supersedes_the_earlier_one(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $scope = Configurator::create()
+            ->withTracerProvider(new TracerProvider(new SimpleSpanProcessor(new InMemoryExporter())))
+            ->withPropagator(new TraceContextPropagator())
+            ->activate();
+        $calls = [];
+
+        try {
+            AutoRootSpan::start(static function () use (&$calls): void {
+                $calls[] = 'first';
+            });
+            AutoRootSpan::start(static function () use (&$calls): void {
+                $calls[] = 'second';
+            });
+            $this->runQueuedShutdownHandler();
+        } finally {
+            $scope->detach();
+        }
+
+        $this->assertSame(['second'], $calls);
+    }
+
+    private function runQueuedShutdownHandler(): void
+    {
+        $handlers = (new \ReflectionProperty(ShutdownHandler::class, 'handlers'))->getValue();
+        $this->assertNotEmpty($handlers);
+        $handler = $handlers[array_key_last($handlers)];
+        $handler();
     }
 
     public function test_start_queues_shutdown_handler_for_span_created_without_one(): void
