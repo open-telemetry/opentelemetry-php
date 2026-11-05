@@ -6,8 +6,11 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use function assert;
 use BadMethodCallException;
+use function count;
 use function explode;
 use function in_array;
+use InvalidArgumentException;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\SDK\Common\Export\TransportInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
@@ -30,7 +33,24 @@ use function trim;
  */
 final class PsrTransport implements TransportInterface
 {
+    use LogsMessagesTrait;
+
+    /**
+     * Default limit for the response body, also after decompression.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public const DEFAULT_MAX_RESPONSE_BODY_SIZE = 4 * 1024 * 1024;
+
+    /**
+     * Distinct reasons a response body was ignored, which have been logged as a warning already.
+     */
+    private const MAX_REPORTED_BODY_ERRORS = 16;
+
     private bool $closed = false;
+
+    /** @var array<string, true> */
+    private array $reportedBodyErrors = [];
 
     /**
      * @param CONTENT_TYPE $contentType
@@ -45,7 +65,11 @@ final class PsrTransport implements TransportInterface
         private readonly array $compression,
         private readonly int $retryDelay,
         private readonly int $maxRetries,
+        private readonly int $maxResponseBodySize = self::DEFAULT_MAX_RESPONSE_BODY_SIZE,
     ) {
+        if ($maxResponseBodySize < 1) {
+            throw new InvalidArgumentException('The maximum response body size must be positive');
+        }
     }
 
     #[\Override]
@@ -92,6 +116,9 @@ final class PsrTransport implements TransportInterface
                     break;
                 }
 
+                // An oversized response is not retried, whatever its status.
+                $this->checkBodySize($response);
+
                 if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 600 && !in_array($response->getStatusCode(), [429, 502, 503, 504], true)) {
                     throw new RuntimeException($response->getReasonPhrase(), $response->getStatusCode());
                 }
@@ -116,16 +143,82 @@ final class PsrTransport implements TransportInterface
 
         assert(isset($response));
 
+        // A null response is a success without a payload, which the exporters don't hydrate. An empty string
+        // would be hydrated, and is not valid JSON.
         try {
-            $body = PsrUtils::decode(
-                $response->getBody()->__toString(),
-                self::parseContentEncoding($response),
-            );
+            $body = $this->readBody($response);
+            if ($body === '') {
+                $body = null;
+            }
+        } catch (ResponseBodyTooLargeException $e) {
+            return new ErrorFuture($e);
+        } catch (RuntimeException $e) {
+            // The server accepted the export, and the body is only used for a partial success.
+            $this->logIgnoredBody($e, $response);
+            $body = null;
         } catch (Throwable $e) {
             return new ErrorFuture($e);
         }
 
         return new CompletedFuture($body);
+    }
+
+    /**
+     * A server that always answers in an encoding that can't be decoded would fill the log with a warning for
+     * every export, so only the first one for each reason is a warning, the rest are debug messages.
+     */
+    private function logIgnoredBody(RuntimeException $e, ResponseInterface $response): void
+    {
+        $message = 'OTLP/HTTP response body ignored, it can not be read or decoded: ' . $e->getMessage();
+        $context = ['status_code' => $response->getStatusCode()];
+
+        if (isset($this->reportedBodyErrors[$message]) || count($this->reportedBodyErrors) >= self::MAX_REPORTED_BODY_ERRORS) {
+            self::logDebug($message, $context);
+
+            return;
+        }
+
+        $this->reportedBodyErrors[$message] = true;
+        self::logWarning($message, $context);
+    }
+
+    /**
+     * Checks the body of a response that is not going to be used, such as an error. An unreadable body is
+     * ignored, so that the status of the response stays the reason for the failure.
+     *
+     * @throws ResponseBodyTooLargeException if the body exceeds the limit, after logging a warning
+     */
+    private function checkBodySize(ResponseInterface $response): void
+    {
+        try {
+            $this->readBody($response);
+        } catch (ResponseBodyTooLargeException $e) {
+            throw $e;
+        } catch (RuntimeException $e) {
+            self::logDebug('OTLP/HTTP error response body could not be checked: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * @throws ResponseBodyTooLargeException if the body exceeds the limit, after logging a warning
+     * @throws RuntimeException if the body can't be read or decoded
+     */
+    private function readBody(ResponseInterface $response): string
+    {
+        try {
+            return PsrUtils::readBody(
+                $response,
+                self::parseContentEncoding($response),
+                $this->maxResponseBodySize,
+            );
+        } catch (ResponseBodyTooLargeException $e) {
+            self::logWarning('OTLP/HTTP response body discarded, it exceeds the size limit', [
+                'limit' => $e->limit,
+                'status_code' => $response->getStatusCode(),
+            ]);
+
+            throw $e;
+        }
     }
 
     /**

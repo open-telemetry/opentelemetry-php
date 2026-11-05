@@ -60,6 +60,15 @@ class SpanExporterTest extends TestCase
         $this->assertTrue($result->await());
     }
 
+    public function test_json_export_without_response_payload_is_success(): void
+    {
+        $transport = $this->createMock(TransportInterface::class);
+        $transport->method('contentType')->willReturn('application/json');
+        $transport->method('send')->willReturn(new CompletedFuture(null));
+
+        $this->assertTrue((new SpanExporter($transport))->export([])->await());
+    }
+
     public function test_shutdown(): void
     {
         $this->transport->expects($this->once())->method('shutdown');

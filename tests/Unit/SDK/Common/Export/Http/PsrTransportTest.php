@@ -13,8 +13,12 @@ use function gzencode;
 use InvalidArgumentException;
 use Nyholm\Psr7\Request;
 use Nyholm\Psr7\Response;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransport;
 use OpenTelemetry\SDK\Common\Export\Http\PsrTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Http\ResponseBodyTooLargeException;
+use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,11 +27,16 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LogLevel;
+use RuntimeException;
+use function substr;
 
 #[CoversClass(PsrTransportFactory::class)]
 #[CoversClass(PsrTransport::class)]
 final class PsrTransportTest extends TestCase
 {
+    use TestState;
+
     /**
      * @var MockObject&ClientInterface
      */
@@ -140,6 +149,14 @@ final class PsrTransportTest extends TestCase
         $this->assertSame('abc', $transport->send('')->await());
     }
 
+    public function test_send_returns_no_payload_for_an_empty_response_body(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(204));
+        $transport = $this->factory->create('http://localhost', 'application/json');
+
+        $this->assertNull($transport->send('')->await());
+    }
+
     public function test_send_decodes_response_body(): void
     {
         $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'gzip'], gzencode('abc')));
@@ -148,15 +165,156 @@ final class PsrTransportTest extends TestCase
         $this->assertSame('abc', $transport->send('')->await());
     }
 
-    public function test_send_decode_unknown_encoding_returns_error(): void
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public function test_send_response_body_at_limit_is_returned(): void
     {
-        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'invalid'], 'foo'));
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, [], str_repeat('a', PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE)));
         $transport = $this->factory->create('http://localhost', 'text/plain');
 
-        $response = $transport->send('');
+        $this->assertSame(PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE, strlen($transport->send('')->await()));
+    }
 
-        $this->expectException(Exception::class);
-        $response->await();
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public function test_send_response_body_over_limit_returns_error_without_retry(): void
+    {
+        $this->expectDiscardedResponseWarning();
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, [], str_repeat('a', PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE + 1)));
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10, 3);
+
+        $this->expectException(ResponseBodyTooLargeException::class);
+        $transport->send('')->await();
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    public function test_send_response_body_over_limit_after_decompression_returns_error(): void
+    {
+        $this->expectDiscardedResponseWarning();
+        $body = gzencode(str_repeat('a', PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE + 1));
+        $this->assertLessThan(PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE, strlen($body));
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'gzip'], $body));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->expectException(ResponseBodyTooLargeException::class);
+        $transport->send('')->await();
+    }
+
+    private function expectDiscardedResponseWarning(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('discarded'),
+            $this->callback(fn (array $context): bool => $context['limit'] === PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE && isset($context['status_code'])),
+        );
+        Logging::setLogWriter($logWriter);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#otlphttp-response
+     */
+    #[DataProvider('oversizedBodies')]
+    public function test_send_oversized_error_response_is_not_retried(callable $createResponse): void
+    {
+        $this->expectDiscardedResponseWarning();
+        $this->client->expects($this->once())->method('sendRequest')->willReturn($createResponse());
+        $transport = $this->factory->create('http://localhost', 'text/plain', [], null, 10, 3);
+
+        $this->expectException(ResponseBodyTooLargeException::class);
+        $transport->send('')->await();
+    }
+
+    public static function oversizedBodies(): iterable
+    {
+        $limit = PsrTransport::DEFAULT_MAX_RESPONSE_BODY_SIZE;
+
+        yield '503' => [static fn () => new Response(503, [], str_repeat('a', $limit + 1))];
+        yield '403' => [static fn () => new Response(403, [], str_repeat('a', $limit + 1))];
+        yield '500' => [static fn () => new Response(500, [], str_repeat('a', $limit + 1))];
+        yield '429 compressed' => [static fn () => new Response(429, ['Content-Encoding' => 'gzip'], gzencode(str_repeat('a', $limit + 1)))];
+    }
+
+    public function test_max_response_body_size_must_be_positive(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new PsrTransport($this->client, new HttpFactory(), new HttpFactory(), 'http://localhost', 'text/plain', [], [], 10, 0, 0);
+    }
+
+    public function test_send_error_response_with_unreadable_body_keeps_status_error(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(403, ['Content-Encoding' => 'invalid'], 'foo'));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionCode(403);
+        $transport->send('')->await();
+    }
+
+    #[DataProvider('undecodableBodies')]
+    public function test_send_ignores_undecodable_body_of_successful_response(array $headers, string $body): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('ignored'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, $headers, $body));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->assertNull($transport->send('')->await());
+    }
+
+    public function test_send_warns_once_for_each_reason_a_body_is_ignored(): void
+    {
+        Logging::setLogLevel(LogLevel::DEBUG);
+        $levels = [];
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->exactly(4))->method('write')->willReturnCallback(
+            function (string $level) use (&$levels): void {
+                $levels[] = $level;
+            },
+        );
+        Logging::setLogWriter($logWriter);
+        $this->client->expects($this->exactly(4))->method('sendRequest')->willReturnOnConsecutiveCalls(
+            new Response(200, ['Content-Encoding' => 'br'], 'foo'),
+            new Response(200, ['Content-Encoding' => 'br'], 'foo'),
+            new Response(200, ['Content-Encoding' => 'zstd'], 'foo'),
+            new Response(200, ['Content-Encoding' => 'br'], 'foo'),
+        );
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        for ($i = 0; $i < 4; $i++) {
+            $transport->send('')->await();
+        }
+
+        $this->assertSame([LogLevel::WARNING, LogLevel::DEBUG, LogLevel::WARNING, LogLevel::DEBUG], $levels);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>, string}>
+     */
+    public static function undecodableBodies(): iterable
+    {
+        yield 'unknown encoding' => [['Content-Encoding' => 'invalid'], 'foo'];
+        yield 'deflate' => [['Content-Encoding' => 'deflate'], 'foo'];
+        yield 'invalid gzip' => [['Content-Encoding' => 'gzip'], 'foo'];
+        yield 'truncated gzip' => [['Content-Encoding' => 'gzip'], substr(gzencode('abc'), 0, -4)];
+    }
+
+    public function test_send_decodes_x_gzip_response_body(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturn(new Response(200, ['Content-Encoding' => 'X-Gzip'], gzencode('abc')));
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $this->assertSame('abc', $transport->send('')->await());
     }
 
     public function test_send_status_code4xx_returns_error(): void

@@ -14,10 +14,13 @@ upgraders can check them in one place.
 - Requires `open-telemetry/api` 1.11, for `Logging::setLogLevel()` ([#2068]).
 - Requires `open-telemetry/sem-conv` 1.45, for `HttpIncubatingAttributes::HTTP_REQUEST_BODY_CONTENT`
   ([#2101]).
-- If you set an `Accept-Encoding` header in the exporter headers, the SDK has to be able to decode
-  the encodings it names, such as `gzip`. The discovered Guzzle client used to decode responses, and no
-  longer does, so a response in another encoding, such as `zstd`, makes the export fail. Without that
-  header the SDK asks for an uncompressed response ([#2115]).
+- If you set an `Accept-Encoding` header in the exporter headers, only `gzip` responses are decoded.
+  The discovered Guzzle client used to decode responses, and no longer does, so the body of a response
+  in another encoding, such as `deflate` or `zstd`, is ignored with a warning. Without that header the
+  SDK asks for an uncompressed response ([#2115], [#2112]).
+- `PsrTransport` only decodes gzip responses (also as `x-gzip`). The body of a successful response
+  that can't be decoded, such as a `deflate` or `br` one that the specification doesn't mention, is
+  ignored with a warning ([#2112]).
 
 ### Added
 
@@ -98,6 +101,11 @@ upgraders can check them in one place.
   `Accept-Encoding: identity`, so the server doesn't compress the response, and the discovered Guzzle
   client no longer decodes responses (`decode_content` is `false`). A client you pass in yourself keeps
   its own decoding, but gets the same `Accept-Encoding` header ([#2115]).
+- `PsrTransport` limits the OTLP/HTTP response body to 4 MiB, also after decompression, as the
+  specification requires. A larger response is discarded with a warning and the export fails without
+  a retry, whatever its status, even if the server accepted the data. Decompression is streamed and
+  checked in small steps. The PSR-18 client may buffer the whole response before the limit applies
+  ([#2112]).
 - `OTEL_ATTRIBUTE_COUNT_LIMIT` and `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` were ignored. They apply to
   span, event, link and log record limits that aren't set more specifically ([#2058]).
 - `PsrTransportFactory` ignored its `cacert`, `cert` and `key` arguments. It passes them to the
@@ -129,5 +137,6 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
 [#2101]: https://github.com/open-telemetry/opentelemetry-php/pull/2101
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
+[#2112]: https://github.com/open-telemetry/opentelemetry-php/pull/2112
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
