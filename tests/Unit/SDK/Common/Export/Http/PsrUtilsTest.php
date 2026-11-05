@@ -124,6 +124,40 @@ final class PsrUtilsTest extends TestCase
         $this->assertSame('abcdef', PsrUtils::readBody(new Response(200, [], $stream), [], 10));
     }
 
+    public function test_read_body_of_unknown_size_over_limit_throws(): void
+    {
+        $this->expectException(ResponseBodyTooLargeException::class);
+        PsrUtils::readBody(new Response(200, [], $this->unknownSizeStream(str_repeat('a', 20))), [], 10);
+    }
+
+    public function test_read_body_of_unknown_size_at_limit(): void
+    {
+        $data = str_repeat('a', 10);
+
+        $this->assertSame($data, PsrUtils::readBody(new Response(200, [], $this->unknownSizeStream($data)), [], 10));
+    }
+
+    /**
+     * A stream that does not know its size, and returns 3 bytes at a time, so that the limit has to be enforced
+     * on what is read.
+     */
+    private function unknownSizeStream(string $data): FnStream
+    {
+        $state = new ArrayObject(['position' => 0]);
+
+        return new FnStream([
+            'getSize' => static fn () => null,
+            'isSeekable' => static fn () => false,
+            'eof' => static fn () => $state['position'] >= strlen($data),
+            'read' => static function (int $length) use ($state, $data) {
+                $chunk = substr($data, $state['position'], 3);
+                $state['position'] += strlen($chunk);
+
+                return $chunk;
+            },
+        ]);
+    }
+
     public function test_read_body_at_and_over_limit(): void
     {
         $this->assertSame('abcd', PsrUtils::readBody(new Response(200, [], 'abcd'), [], 4));
