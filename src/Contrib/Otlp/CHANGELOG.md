@@ -13,8 +13,8 @@ upgraders can check them in one place.
 
 ### Fixed
 
-- The `otlp` exporters and the `http` transport are available while the SDK autoloads, whatever the order in which
-  Composer includes the packages ([#2120]).
+- With the `tbachert/spi` plugin running, the `otlp` exporters and the `http` transport are available while the SDK
+  autoloads, whatever the order in which Composer includes the packages ([#2120]).
 
 ## 1.5.0 - 2026-11-06
 

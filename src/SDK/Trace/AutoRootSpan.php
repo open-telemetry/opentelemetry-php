@@ -309,8 +309,14 @@ class AutoRootSpan
             self::$shutdownHandlerRegistered = false;
             $notifySpanEnded = self::$notifySpanEnded;
             self::$notifySpanEnded = null;
-            if ($notifySpanEnded !== null) {
-                $notifySpanEnded();
+
+            try {
+                if ($notifySpanEnded !== null) {
+                    $notifySpanEnded();
+                }
+            } catch (\Throwable $e) {
+                // a failing notification must not keep the root span from ending
+                self::logWarning('Root span notification callback failed', ['exception' => $e]);
             }
             self::shutdownHandler();
         });

@@ -10,6 +10,7 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanBuilderInterface;
@@ -33,6 +34,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(AutoRootSpan::class)]
 class AutoRootSpanTest extends TestCase
@@ -468,6 +470,31 @@ class AutoRootSpanTest extends TestCase
         }
 
         $this->assertSame(['second'], $calls);
+    }
+
+    public function test_root_span_ends_even_when_the_callback_throws(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $exporter = new InMemoryExporter();
+        $scope = Configurator::create()
+            ->withTracerProvider(new TracerProvider(new SimpleSpanProcessor($exporter)))
+            ->withPropagator(new TraceContextPropagator())
+            ->activate();
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log');
+        LoggerHolder::set($logger);
+
+        try {
+            AutoRootSpan::start(static function (): void {
+                throw new \RuntimeException('callback failed');
+            });
+            $this->runQueuedShutdownHandler();
+        } finally {
+            LoggerHolder::unset();
+            $scope->detach();
+        }
+
+        $this->assertCount(1, $exporter->getSpans());
     }
 
     private function runQueuedShutdownHandler(): void

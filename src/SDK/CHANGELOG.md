@@ -11,7 +11,8 @@ upgraders can check them in one place.
 - `Registry` now gets its built-in and package components from `RegistrarInterface` providers (SPI) when it is first
   asked for one, no longer from `_register.php` files that Composer includes. A component registered with
   `Registry::register*()` before that first lookup wins over a provider's, one registered with `$clobber` always wins,
-  and a non-clobbering registration made after it is ignored for names a provider already filled. Needs the
+  and a non-clobbering registration made after it is ignored for names a provider already filled. A package that
+  registers a built-in name from its own autoload file now wins over the SDK's built-in one, it used to lose. Needs the
   `tbachert/spi` Composer plugin to run, so allow it in `config.allow-plugins` ([#2120]).
 
 ### Added
@@ -21,12 +22,13 @@ upgraders can check them in one place.
 
 ### Fixed
 
-- With the root span enabled, the SDK built its providers while `sdk/_autoload.php` ran, before
-  `exporter-otlp/_register.php` could register the OTLP factories. The providers then stayed noop for the whole
-  process, with `Span exporter factory not defined for: otlp` in the log. This also hit `OTEL_CONFIG_FILE`
-  (`Transport factory not defined for protocol: http`) ([#2120]).
+- With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
+  `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
+  them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`
+  in the log. This also hit `OTEL_CONFIG_FILE` (`Transport factory not defined for protocol: http`) ([#2120]).
 - `AutoRootSpan::start($notifySpanEnded)` registers the callback also when the root span was already started, for
-  example by `SdkAutoloader::autoload()`. The callback used to be dropped ([#2120]).
+  example by `SdkAutoloader::autoload()`. The callback used to be dropped. A callback that throws no longer keeps the
+  root span from ending ([#2120]).
 
 ## 1.16.0 - 2026-11-06
 
