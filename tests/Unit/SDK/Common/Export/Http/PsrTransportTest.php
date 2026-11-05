@@ -73,6 +73,30 @@ final class PsrTransportTest extends TestCase
         $transport->send('abc');
     }
 
+    public function test_send_asks_for_an_identity_response(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {
+            $this->assertSame(['identity'], $request->getHeader('Accept-Encoding'));
+
+            return new Response();
+        });
+        $transport = $this->factory->create('http://localhost', 'text/plain');
+
+        $transport->send('abc');
+    }
+
+    public function test_send_keeps_configured_accept_encoding(): void
+    {
+        $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {
+            $this->assertSame(['gzip'], $request->getHeader('Accept-Encoding'));
+
+            return new Response();
+        });
+        $transport = $this->factory->create('http://localhost', 'text/plain', ['accept-encoding' => 'gzip']);
+
+        $transport->send('abc');
+    }
+
     public function test_send_sets_headers(): void
     {
         $this->client->expects($this->once())->method('sendRequest')->willReturnCallback(function (RequestInterface $request): ResponseInterface {

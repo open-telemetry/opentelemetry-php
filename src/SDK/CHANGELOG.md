@@ -89,6 +89,11 @@ upgraders can check them in one place.
 
 ### Fixed
 
+- Every export failed when the HTTP client decoded a gzip response itself and left `Content-Encoding`
+  in place, as Symfony HttpClient does, because the body was decoded again. `PsrTransport` sends
+  `Accept-Encoding: identity` unless `OTEL_EXPORTER_OTLP_HEADERS` or its equivalent sets one, and the
+  discovered Guzzle client no longer decodes responses (`decode_content` is `false`), so the SDK
+  decodes them ([#2115]).
 - `OTEL_ATTRIBUTE_COUNT_LIMIT` and `OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT` were ignored. They apply to
   span, event, link and log record limits that aren't set more specifically ([#2058]).
 - `PsrTransportFactory` ignored its `cacert`, `cert` and `key` arguments. It passes them to the
@@ -121,3 +126,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2101]: https://github.com/open-telemetry/opentelemetry-php/pull/2101
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
+[#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
