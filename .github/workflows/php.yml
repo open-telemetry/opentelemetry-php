@@ -168,7 +168,7 @@ jobs:
     - name: Check for outdated SPI package dependencies
       id: spi
       continue-on-error: ${{ matrix.experimental || false }}
-      run: composer spi:show-outdated-package-dependencies
+      run: vendor/bin/otel packages:spi:check
 
     - name: Code Coverage
       uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1

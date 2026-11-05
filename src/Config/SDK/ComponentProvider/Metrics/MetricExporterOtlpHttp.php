@@ -23,7 +23,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * @internal
  * @implements ComponentProvider<MetricExporterInterface>
  */
-#[PackageDependency('open-telemetry/exporter-otlp', '^1.0.5')]
+#[PackageDependency('open-telemetry/exporter-otlp', '^1.5')]
 final class MetricExporterOtlpHttp implements ComponentProvider
 {
     /**

@@ -9,6 +9,8 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+## 0.10.0 - 2026-11-06
+
 ### Breaking changes
 
 - Configuration files must use `file_format: "1.0"`, from
@@ -69,6 +71,8 @@ error straight away, with no deprecation step.
   `composer-runtime-api` 2 and `psr/log` ([#2097]).
 - Conflicts with `open-telemetry/extension-propagator-b3` below 1.3, which doesn't register the
   `b3` and `b3multi` providers. Upgrade it with this package ([#2107]).
+- The OTLP exporters need `open-telemetry/exporter-otlp` 1.5. With an older version they are not
+  registered ([#2116]).
 
 ### Added
 
@@ -182,3 +186,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
+[#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116

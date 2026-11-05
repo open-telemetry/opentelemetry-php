@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.6.0 - 2026-11-06
+
 ### Breaking changes
 
 - Requires PHP 8.2, and no longer requires `symfony/polyfill-php82` ([#2091]).
