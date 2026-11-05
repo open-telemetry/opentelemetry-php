@@ -19,7 +19,8 @@
   "require": {
     "php": "^8.2",
     "open-telemetry/api": "^1.0",
-    "open-telemetry/sdk": "^1.0",
+    "open-telemetry/sdk": "^1.17",
+    "tbachert/spi": "^1.0.5",
     "php-http/async-client-implementation": "^1.0",
     "php-http/discovery": "^1.14",
     "psr/http-factory-implementation": "^1.0"
@@ -33,6 +34,9 @@
     ]
   },
   "extra": {
+    "spi-config": {
+      "autoload-files": ["_register.php"]
+    },
     "branch-alias": {
       "dev-main": "1.4.x-dev"
     }

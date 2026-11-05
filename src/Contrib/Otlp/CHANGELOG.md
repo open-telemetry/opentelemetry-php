@@ -6,6 +6,16 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The exporter and transport factories are registered through
+  SPI, so the `tbachert/spi` Composer plugin must be allowed ([#2120]).
+
+### Fixed
+
+- The `otlp` exporters and the `http` transport are available while the SDK autoloads, whatever the order in which
+  Composer includes the packages ([#2120]).
+
 ## 1.5.0 - 2026-11-06
 
 ### Breaking changes
@@ -60,3 +70,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2093]: https://github.com/open-telemetry/opentelemetry-php/pull/2093
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
+[#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120

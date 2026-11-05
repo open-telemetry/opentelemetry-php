@@ -66,10 +66,7 @@
             "src/Contrib/Grpc/_register.php",
             "src/Contrib/Zipkin/_register.php",
             "src/Extension/Propagator/B3/_register.php",
-            "src/SDK/Logs/Exporter/_register.php",
-            "src/SDK/Metrics/MetricExporter/_register.php",
-            "src/SDK/Propagation/_register.php",
-            "src/SDK/Trace/SpanExporter/_register.php",
+            "src/SDK/_register.php",
             "src/SDK/Common/Dev/Compatibility/_load.php",
             "src/SDK/Common/Util/functions.php",
             "src/SDK/_autoload.php"
@@ -120,6 +117,9 @@
         "symfony/yaml": "Allows loading config from yaml files"
     },
     "extra": {
+        "spi-config": {
+            "autoload-files": ["src/Contrib/Otlp/_register.php", "src/Contrib/Grpc/_register.php", "src/Contrib/Zipkin/_register.php", "src/Extension/Propagator/B3/_register.php", "src/SDK/_register.php"]
+        },
         "bamarni-bin": {
             "bin-links": false,
             "target-directory": "vendor-bin",

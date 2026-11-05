@@ -6,6 +6,26 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- `Registry` now gets its built-in and package components from `RegistrarInterface` providers (SPI) when it is first
+  asked for one, no longer from `_register.php` files that Composer includes. A component registered with
+  `Registry::register*()` before that first lookup wins over a provider's, one registered with `$clobber` always wins,
+  and a non-clobbering registration made after it is ignored for names a provider already filled. Needs the
+  `tbachert/spi` Composer plugin to run, so allow it in `config.allow-plugins` ([#2120]).
+
+### Added
+
+- `RegistrarInterface`, for packages to register exporter factories, transport factories and propagators with the
+  `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi` ([#2120]).
+
+### Fixed
+
+- With the root span enabled, the SDK built its providers while `sdk/_autoload.php` ran, before
+  `exporter-otlp/_register.php` could register the OTLP factories. The providers then stayed noop for the whole
+  process, with `Span exporter factory not defined for: otlp` in the log. This also hit `OTEL_CONFIG_FILE`
+  (`Transport factory not defined for protocol: http`) ([#2120]).
+
 ## 1.16.0 - 2026-11-06
 
 ### Breaking changes
@@ -142,3 +162,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2112]: https://github.com/open-telemetry/opentelemetry-php/pull/2112
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
+[#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120

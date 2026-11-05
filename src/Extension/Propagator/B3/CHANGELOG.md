@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- Conflicts with `open-telemetry/sdk` below 1.17. The `b3` and `b3multi` propagators are registered with the SDK
+  `Registry` through SPI, so the `tbachert/spi` Composer plugin must be allowed ([#2120]).
+
 ## 1.3.0 - 2026-11-06
 
 ### Breaking changes
@@ -25,3 +30,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/extension-propaga
 
 [#2091]: https://github.com/open-telemetry/opentelemetry-php/pull/2091
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
+[#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
