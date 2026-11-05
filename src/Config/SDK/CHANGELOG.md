@@ -186,4 +186,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
-[#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN
+[#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
