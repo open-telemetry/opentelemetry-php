@@ -17,16 +17,15 @@ class WithSpanHandler
 {
     /**
      * @psalm-suppress ArgumentTypeCoercion
-    * @psalm-suppress ArgumentTypeCoercion
-    * @param array{span_name?: ?string, name?: ?string, span_kind?: ?int}|null $span_args
-    */
+     * @param array{span_name?: ?string, name?: ?string, span_kind?: ?int}|null $span_args
+     */
     public static function pre(mixed $target, array $params, ?string $class, string $function, ?string $filename, ?int $lineno, ?array $span_args = [], ?array $attributes = []): void
     {
         static $instrumentation;
         $instrumentation ??= new CachedInstrumentation(name: 'io.opentelemetry.php.with-span', schemaUrl: 'https://opentelemetry.io/schemas/1.25.0');
 
         $name = $span_args['span_name'] ?? $span_args['name'] ?? null;
-        if ($name === null) {
+        if (!is_string($name)) {
             $name = empty($class)
                 ? $function
                 : sprintf('%s::%s', $class, $function);
