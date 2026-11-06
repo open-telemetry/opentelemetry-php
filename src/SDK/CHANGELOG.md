@@ -6,6 +6,17 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.16.1 - 2026-11-06
+
+### Security
+
+- The host detector ran `ioreg`, `kenv` and `powershell.exe` through a shell, so they were
+  looked up on `PATH`, and on Windows in the current directory. A program placed there ran
+  instead. It runs `/usr/sbin/ioreg`, `/bin/kenv` and `reg.exe` by absolute path, without a
+  shell ([GHSA-fc6f-cp96-6g5w]).
+- When the host id lookup failed, `host.id` was `""` on macOS and Windows, or `/bin/kenv` on
+  BSD. It is left out instead ([GHSA-fc6f-cp96-6g5w]).
+
 ## 1.16.0 - 2026-11-06
 
 ### Breaking changes
@@ -142,3 +153,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2112]: https://github.com/open-telemetry/opentelemetry-php/pull/2112
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
+[GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
