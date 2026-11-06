@@ -9,7 +9,8 @@ upgraders can check them in one place.
 ### Breaking changes
 
 - Conflicts with `open-telemetry/sdk` below 1.17. The `b3` and `b3multi` propagators are registered with the SDK
-  `Registry` through SPI, so the `tbachert/spi` Composer plugin must be allowed ([#2120]).
+  `Registry` through SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are
+  registered when the package's autoload file loads, as before ([#2120]).
 
 ## 1.3.0 - 2026-11-06
 

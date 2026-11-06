@@ -8,8 +8,9 @@ upgraders can check them in one place.
 
 ### Breaking changes
 
-- Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The `zipkin` exporter factory is registered through SPI, so
-  the `tbachert/spi` Composer plugin must be allowed ([#2120]).
+- Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The `zipkin` exporter factory is registered through SPI. Allow
+  the `tbachert/spi` Composer plugin for the early registration, without it the factory is registered when the
+  package's autoload file loads, as before ([#2120]).
 
 ## 1.4.0 - 2026-11-06
 

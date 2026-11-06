@@ -12,13 +12,15 @@ upgraders can check them in one place.
   asked for one, no longer from `_register.php` files that Composer includes. A component registered with
   `Registry::register*()` before that first lookup wins over a provider's, one registered with `$clobber` always wins,
   and a non-clobbering registration made after it is ignored for names a provider already filled. A package that
-  registers a built-in name from its own autoload file now wins over the SDK's built-in one, it used to lose. Needs the
-  `tbachert/spi` Composer plugin to run, so allow it in `config.allow-plugins` ([#2120]).
+  registers a built-in name from its own autoload file now wins over the SDK's built-in one, it used to lose. Allow the
+  `tbachert/spi` Composer plugin in `config.allow-plugins` for this to take effect, without it the components are
+  registered when their autoload files load, as before ([#2120]).
 
 ### Added
 
 - `RegistrarInterface`, for packages to register exporter factories, transport factories and propagators with the
-  `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi` ([#2120]).
+  `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi`. It is a bridge for SDK 1.x
+  and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
 
 ### Fixed
 

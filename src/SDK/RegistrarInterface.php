@@ -15,6 +15,11 @@ namespace OpenTelemetry\SDK;
  * Declare an implementation under `extra.spi` in `composer.json`, or call
  * `\Nevay\SPI\ServiceLoader::register(RegistrarInterface::class, MyRegistrar::class)` from a file listed in
  * `extra.spi-config.autoload-files`.
+ *
+ * This is a bridge for SDK 1.x, between the static {@see Registry} and SPI providers for each kind of component. It is
+ * short-lived: it goes away in SDK 2.0 together with the {@see Registry}.
+ *
+ * @todo [breaking] remove in SDK 2.0, together with the Registry.
  */
 interface RegistrarInterface
 {

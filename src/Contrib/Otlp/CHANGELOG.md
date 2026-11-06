@@ -9,7 +9,8 @@ upgraders can check them in one place.
 ### Breaking changes
 
 - Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The exporter and transport factories are registered through
-  SPI, so the `tbachert/spi` Composer plugin must be allowed ([#2120]).
+  SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are registered when the
+  package's autoload file loads, as before ([#2120]).
 
 ### Fixed
 

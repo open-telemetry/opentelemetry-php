@@ -54,7 +54,7 @@
             "autoload-files": ["_register.php"]
         },
         "branch-alias": {
-            "dev-main": "1.16.x-dev"
+            "dev-main": "1.17.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
