@@ -6,20 +6,35 @@ namespace OpenTelemetry\Tests\Unit\SDK\Resource\Detectors;
 
 use OpenTelemetry\SDK\Resource\Detectors\Host;
 use OpenTelemetry\SemConv\ResourceAttributes;
+use OpenTelemetry\Tests\TestState;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresOperatingSystem;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Host::class)]
 class HostTest extends TestCase
 {
+    use TestState;
+
+    private ?string $plantedDir = null;
+
     #[\Override]
     public function setUp(): void
     {
         //reset vfs between tests
         vfsStream::setup('/');
+    }
+
+    #[\Override]
+    public function tearDown(): void
+    {
+        if ($this->plantedDir !== null) {
+            array_map(unlink(...), glob($this->plantedDir . '/*') ?: []);
+            rmdir($this->plantedDir);
+        }
     }
 
     public function test_host_get_resource(): void
@@ -111,6 +126,42 @@ class HostTest extends TestCase
         return [
             ['Linux', $root],
             ['BSD', $root],
+        ];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/semantic-conventions/blob/v1.44.0/docs/resource/host.md#host
+     */
+    #[DataProvider('commandOsProvider')]
+    #[RequiresOperatingSystem('^(?!WIN)')]
+    public function test_commands_are_not_resolved_through_path(string $os): void
+    {
+        $this->plantedDir = sys_get_temp_dir() . '/' . uniqid('otel-host-', true);
+        mkdir($this->plantedDir);
+        foreach (['ioreg', 'awk', 'which', 'kenv', 'powershell.exe', 'reg.exe'] as $name) {
+            $script = $this->plantedDir . '/' . $name;
+            file_put_contents($script, sprintf(
+                "#!/bin/sh\necho %s >> %s/ran\necho '\"IOPlatformUUID\" = \"planted\"'\necho planted\n",
+                $name,
+                $this->plantedDir,
+            ));
+            chmod($script, 0755);
+        }
+        $this->setEnvironmentVariable('PATH', $this->plantedDir . PATH_SEPARATOR . getenv('PATH'));
+
+        $root = vfsStream::setup('/');
+        $resource = (new Host($root->url(), $os))->getResource();
+
+        $this->assertFileDoesNotExist($this->plantedDir . '/ran');
+        $this->assertNotSame('planted', $resource->getAttributes()->get(ResourceAttributes::HOST_ID));
+    }
+
+    public static function commandOsProvider(): array
+    {
+        return [
+            ['Darwin'],
+            ['BSD'],
+            ['Windows'],
         ];
     }
 }
