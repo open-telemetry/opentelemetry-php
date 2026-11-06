@@ -17,7 +17,9 @@ class WithSpanHandler
 {
     /**
      * @psalm-suppress ArgumentTypeCoercion
-     */
+    * @psalm-suppress ArgumentTypeCoercion
+    * @param array{span_name?: ?string, name?: ?string, span_kind?: ?int}|null $span_args
+    */
     public static function pre(mixed $target, array $params, ?string $class, string $function, ?string $filename, ?int $lineno, ?array $span_args = [], ?array $attributes = []): void
     {
         static $instrumentation;
