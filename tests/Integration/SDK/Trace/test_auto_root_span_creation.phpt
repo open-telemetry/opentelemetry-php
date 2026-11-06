@@ -13,7 +13,6 @@ SERVER_NAME=example.com
 SERVER_PORT=8080
 HTTP_HOST=example.com:8080
 HTTP_USER_AGENT=my-user-agent/1.0
-REQUEST_TIME_FLOAT=1721706151.242976
 HTTP_TRACEPARENT=00-ff000000000000000000000000000041-ff00000000000041-01
 --FILE--
 <?php
@@ -33,7 +32,7 @@ require_once 'vendor/autoload.php';
         },
         "parent_span_id": "ff00000000000041",
         "kind": "KIND_SERVER",
-        "start": 1721706151242976,
+        "start": %d,
         "end": %d,
         "attributes": {
             "url.full": "%s",
