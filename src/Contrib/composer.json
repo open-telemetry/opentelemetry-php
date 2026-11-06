@@ -36,9 +36,6 @@
         ]
     },
     "extra": {
-        "branch-alias": {
-            "dev-main": "1.0.x-dev"
-        },
         "spi-config": {
             "autoload-files": ["Grpc/_register.php", "Otlp/_register.php", "Zipkin/_register.php"]
         }
