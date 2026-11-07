@@ -39,7 +39,7 @@ jobs:
       with:
         persist-credentials: false
 
-    - uses: gacts/run-and-post-run@598d7a875d5620e0457490555b5e18e46082aa47 # v1.4.4
+    - uses: gacts/run-and-post-run@fc6503862aba998e2f2123225ad63c09a92ed46e # v1.4.5
       id: post-run-command
       with:
         post: |
@@ -62,7 +62,7 @@ jobs:
 
     - name: Setup cache environment
       id: extcache
-      uses: shivammathur/cache-extensions@22e24453af1bf3851994136f122ce065ab828a74 # 1.15.2
+      uses: shivammathur/cache-extensions@695b1b465eba861efe67cbbc31252c27f5ed253d # 1.15.11
       with:
         php-version: ${{ matrix.php-version }}
         extensions: ${{ env.extensions }}
@@ -179,7 +179,7 @@ jobs:
         verbose: false
 
   packages:
-    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@21e75f4123f69dd6c0b3acda14b90044112a2538 # main
+    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@bd76b6aaa30416f38f9a5c0562985d05fed64c61 # main
     needs: php
     with:
       matrix_extension: '["ast, json, grpc"]'
