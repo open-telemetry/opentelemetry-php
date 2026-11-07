@@ -1,7 +1,10 @@
 deptrac:
   skip_violations:
     /src/Extension/Propagator/B3/_register.php:
+      - OpenTelemetry\SDK\RegistrarInterface
+    OpenTelemetry\Extension\Propagator\B3\Registrar:
       - OpenTelemetry\SDK\Registry
+      - OpenTelemetry\SDK\RegistrarInterface
     OpenTelemetry\API\Baggage\Propagation\Config\TextMapPropagatorBaggage:
       - Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition
       - Symfony\Component\Config\Definition\Builder\NodeBuilder

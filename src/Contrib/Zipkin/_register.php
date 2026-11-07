@@ -2,4 +2,8 @@
 
 declare(strict_types=1);
 
-\OpenTelemetry\SDK\Registry::registerSpanExporterFactory('zipkin', \OpenTelemetry\Contrib\Zipkin\SpanExporterFactory::class);
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\Contrib\Zipkin\Registrar;
+use OpenTelemetry\SDK\RegistrarInterface;
+
+ServiceLoader::register(RegistrarInterface::class, Registrar::class);

@@ -16,13 +16,14 @@
         "open-telemetry/api": "^1.0",
         "open-telemetry/context": "^1.0",
         "open-telemetry/gen-otlp-protobuf": "^1.2",
-        "open-telemetry/sdk": "^1.0",
+        "open-telemetry/sdk": "^1.17",
         "open-telemetry/sem-conv": "^1.0",
         "php-http/async-client-implementation": "^1.0",
         "php-http/discovery": "^1.14",
         "psr/http-factory-implementation": "^1.0",
         "psr/log": "^1.1|^2.0|^3.0",
-        "symfony/polyfill-mbstring": "^1.23"
+        "symfony/polyfill-mbstring": "^1.23",
+        "tbachert/spi": "^1.0.5"
     },
     "autoload": {
         "psr-4": {
@@ -32,7 +33,11 @@
             "Grpc/_register.php",
             "Otlp/_register.php",
             "Zipkin/_register.php"
-
         ]
+    },
+    "extra": {
+        "spi-config": {
+            "autoload-files": ["Grpc/_register.php", "Otlp/_register.php", "Zipkin/_register.php"]
+        }
     }
 }

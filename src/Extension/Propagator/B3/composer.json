@@ -22,6 +22,7 @@
         "open-telemetry/context": "^1.0"
     },
     "conflict": {
+        "open-telemetry/sdk": "<1.17",
         "open-telemetry/sdk-configuration": "<0.10"
     },
     "suggest": {
@@ -36,8 +37,11 @@
         ]
     },
     "extra": {
+        "spi-config": {
+            "autoload-files": ["_register.php"]
+        },
         "branch-alias": {
-            "dev-main": "1.3.x-dev"
+            "dev-main": "1.4.x-dev"
         },
         "spi": {
             "OpenTelemetry\\API\\Configuration\\Config\\ComponentProvider": [

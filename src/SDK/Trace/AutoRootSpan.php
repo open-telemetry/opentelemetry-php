@@ -41,6 +41,12 @@ class AutoRootSpan
 
     private static ?HookManagerInterface $hookManager = null;
 
+    /** @var (callable(): mixed)|null called once, right before the root span ends */
+    private static $notifySpanEnded = null;
+
+    /** Whether a shutdown handler is queued, which ends the root span and calls the callback. */
+    private static bool $shutdownHandlerRegistered = false;
+
     /**
      * Whether a root span should be created for the current web request.
      * OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN is a legacy alias of OTEL_PHP_TRANSACTION_SPAN_ENABLED, used only when the latter is unset.
@@ -67,15 +73,22 @@ class AutoRootSpan
      * Creates the root span for the current request or CLI script, the same way the OpenTelemetry PHP distro does.
      * Enabled by OTEL_PHP_TRANSACTION_SPAN_ENABLED (web; OTEL_PHP_EXPERIMENTAL_AUTO_ROOT_SPAN is a legacy alias used only when it is unset) or
      * OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI (CLI). Both default to false, a distro can default them to true.
-     * Does nothing when a root span was already started by this class.
+     * When a root span was already started, for example by {@see SdkAutoloader::autoload()}, no second one is created,
+     * but a given callback is still registered, replacing one registered earlier. This lets an embedder call this method
+     * after the autoloader, whether or not the autoloader has already started the root span.
      *
-     * @param callable|null $notifySpanEnded called at shutdown, right before the root span ends; not called when no root
-     *                                    span was created, for example for an excluded request
+     * @param callable|null $notifySpanEnded called once at shutdown, while the root span is still active and right before
+     *                                    it ends; not called when no root span was created, for example for an excluded
+     *                                    request
      */
     public static function start(?callable $notifySpanEnded = null): void
     {
         if (self::$rootScope !== null) {
             self::logDebug('Root span already started');
+            if ($notifySpanEnded !== null) {
+                // the span may not come with a shutdown handler, when it was created through create()
+                self::registerShutdownHandler($notifySpanEnded);
+            }
 
             return;
         }
@@ -279,13 +292,31 @@ class AutoRootSpan
     }
 
     /**
+     * Queues the handler that ends the root span, once. There is a single callback: a later one replaces an earlier one.
+     *
      * @internal
      */
     public static function registerShutdownHandler(?callable $notifySpanEnded = null): void
     {
-        ShutdownHandler::register(static function () use ($notifySpanEnded): void {
-            if ($notifySpanEnded !== null) {
-                $notifySpanEnded();
+        if ($notifySpanEnded !== null) {
+            self::$notifySpanEnded = $notifySpanEnded;
+        }
+        if (self::$shutdownHandlerRegistered) {
+            return;
+        }
+        self::$shutdownHandlerRegistered = true;
+        ShutdownHandler::register(static function (): void {
+            self::$shutdownHandlerRegistered = false;
+            $notifySpanEnded = self::$notifySpanEnded;
+            self::$notifySpanEnded = null;
+
+            try {
+                if ($notifySpanEnded !== null) {
+                    $notifySpanEnded();
+                }
+            } catch (\Throwable $e) {
+                // a failing notification must not keep the root span from ending
+                self::logWarning('Root span notification callback failed', ['exception' => $e]);
             }
             self::shutdownHandler();
         });

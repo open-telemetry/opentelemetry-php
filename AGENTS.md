@@ -98,7 +98,10 @@ The generated protobuf classes in `proto/otel/` are a split package too.
 ### Key Architectural Patterns
 
 - **API/SDK separation**: `API/` defines interfaces and noops; `SDK/` provides real implementations. User code should depend on API only.
-- **SPI plugin discovery**: Plugins register via `composer.json` `extra.spi` for auto-discovery. The root
+- **SPI plugin discovery**: Plugins register via `composer.json` `extra.spi` for auto-discovery. Components for the
+  `Registry` (exporter and transport factories, propagators) implement `RegistrarInterface` instead, listed in a
+  `_register.php` that calls `ServiceLoader::register()` and named in `extra.spi-config.autoload-files`. The
+  `tbachert/spi` plugin collects it at install time and removes the file from `autoload.files`. The root
   `composer.json` repeats every package's `extra.spi` entries and `autoload.files` (the `_register.php` files), so a
   new ComponentProvider or exporter factory goes in both the package's `composer.json` and the root one.
 - **Late binding**: Providers can be registered after app startup; noop implementations handle the uninitialized state.
