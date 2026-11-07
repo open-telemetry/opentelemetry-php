@@ -54,9 +54,10 @@ jobs:
           echo "unit=${{steps.unit.outcome}}"
           echo "integration=${{steps.integration.outcome}}"
           echo "spi=${{steps.spi.outcome}}"
+          echo "packages=${{steps.packages.outcome}}"
           echo "::endgroup::"
 
-          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.psr4.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.spi.outcome == 'failure' }} == true ]; then \
+          if [ ${{ steps.composer.outcome == 'failure' || steps.style.outcome == 'failure' || steps.deps.outcome == 'failure' || steps.psr4.outcome == 'failure' || steps.phpstan.outcome == 'failure' || steps.unit.outcome == 'failure' || steps.integration.outcome == 'failure' || steps.spi.outcome == 'failure' || steps.packages.outcome == 'failure' }} == true ]; then \
             echo "::error::One or more steps failed"; \
           fi
 
@@ -170,6 +171,11 @@ jobs:
       continue-on-error: ${{ matrix.experimental || false }}
       run: vendor/bin/otel packages:spi:check
 
+    - name: Validate packages composer.json
+      id: packages
+      if: matrix.php-version == '8.2'
+      run: vendor/bin/otel packages:composer:validate
+
     - name: Code Coverage
       uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
       with:
@@ -177,11 +183,3 @@ jobs:
         files: ./coverage.clover
         flags: ${{ matrix.php-version }}
         verbose: false
-
-  packages:
-    uses: opentelemetry-php/gh-workflows/.github/workflows/validate-packages.yml@21e75f4123f69dd6c0b3acda14b90044112a2538 # main
-    needs: php
-    with:
-      matrix_extension: '["ast, json, grpc"]'
-      matrix_php_version: '["8.2", "8.3", "8.4", "8.5"]'
-      install_directory: '~/.test/.packages'
