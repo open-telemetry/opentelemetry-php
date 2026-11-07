@@ -2,6 +2,12 @@
 
 ![CI Build](https://github.com/open-telemetry/opentelemetry-php/workflows/PHP%20QA/badge.svg)
 [![codecov](https://codecov.io/gh/open-telemetry/opentelemetry-php/branch/master/graph/badge.svg)](https://codecov.io/gh/open-telemetry/opentelemetry-php)
+<!-- php-support-badges:start -->
+[![PHP 8.2](https://img.shields.io/badge/PHP-8.2-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
+[![PHP 8.3](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
+[![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
+[![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
+<!-- php-support-badges:end -->
 [![Slack](https://img.shields.io/badge/slack-@cncf/otel--php-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/D03FAB6GN0K)
 
 This is the **[monorepo](https://en.wikipedia.org/wiki/Monorepo)** for the **main** components of [OpenTelemetry](https://opentelemetry.io/) for PHP.
@@ -68,7 +74,14 @@ See [compatibility readme](src/SDK/Common/Dev/Compatibility/README.md).
 
 ## Versioning
 
-OpenTelemetry for PHP aims to support all officially supported PHP versions according to https://www.php.net/supported-versions.php, and
-support will be dropped for PHP versions within 12 months of that version going _End of life_.
+### PHP version support
+
+OpenTelemetry for PHP supports a PHP version until 12 months after its security support ends.
+
+<!-- php-support-summary:start -->
+The lowest supported PHP version, 8.2, is supported until 2027-12-31. See [PHP version support](docs/versioning.md#php-version-support) for the policy and the full schedule.
+<!-- php-support-summary:end -->
+
+### Versioning rationale
 
 Versioning rationale can be found in the [Versioning Documentation](/docs/versioning.md)
