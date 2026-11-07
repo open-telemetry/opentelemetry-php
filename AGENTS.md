@@ -110,8 +110,8 @@ The generated protobuf classes in `proto/otel/` are a split package too.
 ### Test Layout
 
 - `tests/Unit/` — Pure unit tests, mirrors `src/` structure
-- `tests/Integration/` — Tests that exercise several components together: config files, SPI wiring, Fiber `.phpt`
-  tests. They need no external services.
+- `tests/Integration/` — Tests that exercise several components together: config files, SPI wiring, and all
+  `.phpt` tests. They need no external services.
 - `tests/TraceContext/` — W3C TraceContext compliance tests
 - `tests/Benchmark/` — Performance benchmarks
 
@@ -122,6 +122,8 @@ The generated protobuf classes in `proto/otel/` are a split package too.
 - Tests run in random order. A test that changes globals or environment variables should `use TestState`
   (`tests/TestState.php`) and set variables with `setEnvironmentVariable()`, which restores them afterwards.
 - Reproduce an order-dependent failure with `--random-order-seed=<seed>`, using the seed from the failing run.
+- Put `.phpt` tests under `tests/Integration/`. CI runs the unit suite with code coverage, and PHPUnit wraps a
+  `.phpt` in a coverage script then, which changes object ids and adds a stack frame.
 
 ### Signal Types
 
