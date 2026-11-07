@@ -57,3 +57,5 @@ generate () {
 #TODO split stable from experimental
 #TODO one file per group? (see java's implementation)
 generate
+
+echo "${SPEC_VERSION}" > "${CODE_DIR}/VERSION"
