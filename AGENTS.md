@@ -158,6 +158,9 @@ under `Unreleased` in that package's changelog, in the same PR. Follow the exist
 the PR link. A change to several packages gets an entry in each. A semconv or protobuf regeneration gets one line
 naming the new upstream version.
 
+A release can land while a PR is open. It renames `Unreleased` to the version, and a rebase leaves the entry in that
+released section without a conflict. After rebasing, check that each entry is still under `Unreleased`.
+
 Write for someone upgrading: what changed for them and what they must do. Put anything that can break code or
 configuration under `Breaking changes`, including a raised PHP or dependency minimum. Skip tests, CI, tooling and
 internal refactoring.
