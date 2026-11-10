@@ -1,5 +1,5 @@
 --TEST--
-ShutdownHandler is triggered on shutdown
+ShutdownHandler is triggered on shutdown, most recently registered first
 --FILE--
 <?php
 use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
@@ -20,5 +20,5 @@ ShutdownHandler::register([$b, 'shutdown']);
 
 ?>
 --EXPECT--
-int(1)
 int(2)
+int(1)

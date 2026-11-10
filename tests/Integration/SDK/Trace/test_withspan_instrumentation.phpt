@@ -1,5 +1,5 @@
 --TEST--
-Auto root span creation
+WithSpan creates nested spans
 --SKIPIF--
 <?php if (!extension_loaded('opentelemetry') || phpversion('opentelemetry') < '1.1.0') die('WithSpan requires ext-opentelemetry >= 1.1.0'); ?>
 --INI--
@@ -41,8 +41,7 @@ function foo(): void
 foo();
 ?>
 --EXPECTF--
-%A
-string(10) "foo::start"
+%Astring(10) "foo::start"
 string(8) "foo::end"
 [
     {
@@ -53,7 +52,14 @@ string(8) "foo::end"
             "trace_state": "",
             "trace_flags": 3
         },
-        "resource": [],
+        "resource": {
+            "service.name": "unknown_service:php",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "%s",
+            "telemetry.distro.name": "opentelemetry-php-instrumentation",
+            "telemetry.distro.version": "%s"
+        },
         "parent_span_id": "%s",
         "kind": "KIND_INTERNAL",
         "start": %d,
@@ -82,7 +88,14 @@ string(8) "foo::end"
             "trace_state": "",
             "trace_flags": 3
         },
-        "resource": [],
+        "resource": {
+            "service.name": "unknown_service:php",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "%s",
+            "telemetry.distro.name": "opentelemetry-php-instrumentation",
+            "telemetry.distro.version": "%s"
+        },
         "parent_span_id": "%s",
         "kind": "KIND_INTERNAL",
         "start": %d,
@@ -111,7 +124,14 @@ string(8) "foo::end"
             "trace_state": "",
             "trace_flags": 3
         },
-        "resource": [],
+        "resource": {
+            "service.name": "unknown_service:php",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "%s",
+            "telemetry.distro.name": "opentelemetry-php-instrumentation",
+            "telemetry.distro.version": "%s"
+        },
         "parent_span_id": "",
         "kind": "KIND_INTERNAL",
         "start": %d,

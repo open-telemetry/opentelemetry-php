@@ -6,7 +6,7 @@ is configured such that /etc/machine-id and friends cannot be read
 --SKIPIF--
 <?php if (!in_array(PHP_OS_FAMILY, ['Linux', 'BSD'])) die('skip requires Linux or BSD'); ?>
 --INI--
-open_basedir=${PWD}
+open_basedir=.
 --FILE--
 <?php
 use OpenTelemetry\SDK\Resource\Detectors\Host;
@@ -24,9 +24,17 @@ $resource = $detector->getResource();
 var_dump($resource->getAttributes()->toArray());
 ?>
 --EXPECTF--
-array(2) {
+array(6) {
   ["host.name"]=>
   string(%d) "%s"
   ["host.arch"]=>
+  string(%d) "%s"
+  ["os.type"]=>
+  string(%d) "%s"
+  ["os.description"]=>
+  string(%d) "%s"
+  ["os.name"]=>
+  string(%d) "%s"
+  ["os.version"]=>
   string(%d) "%s"
 }

@@ -1,29 +1,41 @@
 --TEST--
-Test ending a span during OnEnding
+Test mutating a span during OnEnding
+--DESCRIPTION--
+Changes made in OnEnding are visible to OnEnd of later span processors.
 --FILE--
 <?php
 require_once 'vendor/autoload.php';
 
-use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
-use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
-use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\ExtendedSpanProcessorInterface;
+use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
+use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
 use OpenTelemetry\Context\ContextInterface;
 
-$exporter = (new \OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory())->create();
-
-$processor = new class($exporter) extends ExtendedSpanProcessorInterface {
-    #[\Override]
-    public function onEnding(ReadWriteSpanInterface $span): void {
-        $span->updateName('updated');
-        $span->setAttribute('new-key', 'new-value');
-        $span->addEvent('new-event');
-    }
-};
-
 $tracerProvider = (new TracerProviderBuilder())
-    ->addSpanProcessor($processor)
+    ->setResource(ResourceInfo::create(Attributes::create([])))
+    ->addSpanProcessor(new class implements ExtendedSpanProcessorInterface {
+        #[\Override]
+        public function onEnding(ReadWriteSpanInterface $span): void {
+            $span->updateName('updated');
+            $span->setAttribute('new-key', 'new-value');
+            $span->addEvent('new-event');
+        }
+        #[\Override]
+        public function onStart(ReadWriteSpanInterface $span, ContextInterface $parentContext): void {}
+        #[\Override]
+        public function onEnd(ReadableSpanInterface $span): void {}
+        #[\Override]
+        public function forceFlush(?CancellationInterface $cancellation = null): bool { return true; }
+        #[\Override]
+        public function shutdown(?CancellationInterface $cancellation = null): bool { return true; }
+    })
+    ->addSpanProcessor(new SimpleSpanProcessor((new ConsoleSpanExporterFactory())->create()))
     ->build();
 
 $span = $tracerProvider->getTracer('test')->spanBuilder('span')->startSpan();
@@ -39,14 +51,7 @@ $span->end();
             "trace_state": "",
             "trace_flags": 3
         },
-        "resource": {
-            "telemetry.sdk.name": "opentelemetry",
-            "telemetry.sdk.language": "php",
-            "telemetry.sdk.version": "%s",
-            "telemetry.distro.name": "opentelemetry-php-instrumentation",
-            "telemetry.distro.version": "%s",
-            "service.name": "%s"
-        },
+        "resource": [],
         "parent_span_id": "",
         "kind": "KIND_INTERNAL",
         "start": %d,
@@ -68,4 +73,4 @@ $span->end();
         "links": [],
         "schema_url": ""
     }
-]'
+]
