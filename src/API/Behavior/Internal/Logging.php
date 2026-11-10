@@ -54,9 +54,9 @@ class Logging
      */
     public static function level(string $level): int
     {
-        $value = array_search($level, self::LEVELS);
+        $value = array_search($level, self::LEVELS, true);
 
-        return $value !== false ? $value : 1; //'info'
+        return $value !== false ? $value : self::defaultLevel();
     }
 
     /**
@@ -103,10 +103,47 @@ class Logging
             $level = ini_get(self::OTEL_LOG_LEVEL);
         }
         if (!$level) {
-            $level = self::DEFAULT_LEVEL;
+            return self::defaultLevel();
         }
 
-        return self::level($level);
+        $value = array_search($level, self::LEVELS, true);
+        if ($value === false) {
+            self::warnUnknownLogLevel($level);
+
+            return self::defaultLevel();
+        }
+
+        return $value;
+    }
+
+    private static function defaultLevel(): int
+    {
+        return (int) array_search(self::DEFAULT_LEVEL, self::LEVELS, true);
+    }
+
+    /**
+     * The OpenTelemetry specification requires that an unrecognised enum value in an environment
+     * variable generates a warning and is otherwise ignored. Logging is best effort, so a failing
+     * log writer must not break resolving the log level.
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    private static function warnUnknownLogLevel(mixed $level): void
+    {
+        try {
+            self::logWriter()->write(
+                LogLevel::WARNING,
+                sprintf(
+                    'Unknown value for %s: %s, using default "%s"',
+                    self::OTEL_LOG_LEVEL,
+                    is_string($level) ? '"' . $level . '"' : get_debug_type($level),
+                    self::DEFAULT_LEVEL,
+                ),
+                ['source' => self::class],
+            );
+        } catch (\Throwable) {
+            // nothing more can be done
+        }
     }
 
     public static function reset(): void
