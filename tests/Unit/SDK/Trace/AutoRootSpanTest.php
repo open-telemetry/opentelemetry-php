@@ -10,6 +10,7 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\HookManagerInterface;
 use OpenTelemetry\API\Instrumentation\Configurator;
+use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\API\Trace\Span;
 use OpenTelemetry\API\Trace\SpanBuilderInterface;
@@ -22,13 +23,18 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\Context\ContextKeys;
 use OpenTelemetry\Context\ScopeInterface;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
+use OpenTelemetry\SDK\Common\Util\ShutdownHandler;
 use OpenTelemetry\SDK\Trace\AutoRootSpan;
+use OpenTelemetry\SDK\Trace\SpanExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Trace\SpanProcessor\SimpleSpanProcessor;
+use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\BackupGlobals;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(AutoRootSpan::class)]
 class AutoRootSpanTest extends TestCase
@@ -60,6 +66,8 @@ class AutoRootSpanTest extends TestCase
         (new \ReflectionProperty(AutoRootSpan::class, 'responseHeaderHookRegistered'))->setValue(null, false);
         (new \ReflectionProperty(AutoRootSpan::class, 'capturedResponseHeaders'))->setValue(null, []);
         (new \ReflectionProperty(AutoRootSpan::class, 'request'))->setValue(null, null);
+        (new \ReflectionProperty(AutoRootSpan::class, 'notifySpanEnded'))->setValue(null, null);
+        (new \ReflectionProperty(AutoRootSpan::class, 'shutdownHandlerRegistered'))->setValue(null, false);
         $this->scope->detach();
     }
 
@@ -358,6 +366,161 @@ class AutoRootSpanTest extends TestCase
         $scope = Context::storage()->scope();
         $this->assertNotNull($scope);
         $scope->detach();
+    }
+
+    public function test_start_registers_callback_when_root_span_was_already_started(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $span = $this->createStub(SpanInterface::class);
+        $spanBuilder = $this->createMock(SpanBuilderInterface::class);
+        $spanBuilder->method('setSpanKind')->willReturnSelf();
+        $spanBuilder->method('setStartTimestamp')->willReturnSelf();
+        $spanBuilder->method('setParent')->willReturnSelf();
+        $spanBuilder->method('startSpan')->willReturn($span);
+        // a second span would mean the call created another root span
+        $this->tracer->expects($this->once())->method('spanBuilder')->willReturn($spanBuilder);
+        $callback = static function (): void {
+        };
+
+        AutoRootSpan::start();
+        $this->assertNull($this->registeredCallback());
+        AutoRootSpan::start($callback);
+
+        $this->assertSame($callback, $this->registeredCallback());
+        Context::storage()->scope()?->detach();
+    }
+
+    public function test_start_does_not_keep_callback_when_no_root_span_is_created(): void
+    {
+        $this->tracer->expects($this->never())->method('spanBuilder');
+
+        AutoRootSpan::start(static function (): void {
+        });
+
+        $this->assertNull($this->registeredCallback());
+    }
+
+    public function test_shutdown_handler_is_registered_once(): void
+    {
+        $registered = new \ReflectionProperty(AutoRootSpan::class, 'shutdownHandlerRegistered');
+        $handlers = new \ReflectionProperty(ShutdownHandler::class, 'handlers');
+        $this->assertFalse($registered->getValue());
+        $before = count($handlers->getValue() ?? []);
+
+        AutoRootSpan::registerShutdownHandler();
+        AutoRootSpan::registerShutdownHandler(static function (): void {
+        });
+
+        $this->assertTrue($registered->getValue());
+        $this->assertCount($before + 1, $handlers->getValue());
+    }
+
+    /**
+     * The embedder calls start() after SdkAutoloader::autoload() already started the root span. Its callback must run
+     * from the queued shutdown handler, once, while the root span is still active and before it ends.
+     */
+    public function test_late_callback_runs_once_before_the_root_span_ends(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $exporter = new InMemoryExporter();
+        $scope = Configurator::create()
+            ->withTracerProvider(new TracerProvider(new SimpleSpanProcessor($exporter)))
+            ->withPropagator(new TraceContextPropagator())
+            ->activate();
+        $events = [];
+
+        try {
+            AutoRootSpan::start();
+            AutoRootSpan::start(static function () use (&$events, $exporter): void {
+                $events[] = [
+                    'callback',
+                    Span::getCurrent()->isRecording(),
+                    count($exporter->getSpans()),
+                ];
+            });
+            $this->runQueuedShutdownHandler();
+            $events[] = ['ended', count($exporter->getSpans())];
+        } finally {
+            $scope->detach();
+        }
+
+        $this->assertSame([['callback', true, 0], ['ended', 1]], $events);
+        $this->assertSame('io.opentelemetry.php.auto-root-span', $exporter->getSpans()[0]->getInstrumentationScope()->getName());
+    }
+
+    public function test_replacement_callback_supersedes_the_earlier_one(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $scope = Configurator::create()
+            ->withTracerProvider(new TracerProvider(new SimpleSpanProcessor(new InMemoryExporter())))
+            ->withPropagator(new TraceContextPropagator())
+            ->activate();
+        $calls = [];
+
+        try {
+            AutoRootSpan::start(static function () use (&$calls): void {
+                $calls[] = 'first';
+            });
+            AutoRootSpan::start(static function () use (&$calls): void {
+                $calls[] = 'second';
+            });
+            $this->runQueuedShutdownHandler();
+        } finally {
+            $scope->detach();
+        }
+
+        $this->assertSame(['second'], $calls);
+    }
+
+    public function test_root_span_ends_even_when_the_callback_throws(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_TRANSACTION_SPAN_ENABLED_CLI, 'true');
+        $exporter = new InMemoryExporter();
+        $scope = Configurator::create()
+            ->withTracerProvider(new TracerProvider(new SimpleSpanProcessor($exporter)))
+            ->withPropagator(new TraceContextPropagator())
+            ->activate();
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log');
+        LoggerHolder::set($logger);
+
+        try {
+            AutoRootSpan::start(static function (): void {
+                throw new \RuntimeException('callback failed');
+            });
+            $this->runQueuedShutdownHandler();
+        } finally {
+            LoggerHolder::unset();
+            $scope->detach();
+        }
+
+        $this->assertCount(1, $exporter->getSpans());
+    }
+
+    private function runQueuedShutdownHandler(): void
+    {
+        $handlers = (new \ReflectionProperty(ShutdownHandler::class, 'handlers'))->getValue();
+        $this->assertNotEmpty($handlers);
+        $handler = $handlers[array_key_last($handlers)];
+        $handler();
+    }
+
+    public function test_start_queues_shutdown_handler_for_span_created_without_one(): void
+    {
+        $callback = static function (): void {
+        };
+        AutoRootSpan::create(new ServerRequest('GET', 'http://localhost/'), true);
+
+        AutoRootSpan::start($callback);
+
+        $this->assertSame($callback, $this->registeredCallback());
+        $this->assertTrue((new \ReflectionProperty(AutoRootSpan::class, 'shutdownHandlerRegistered'))->getValue());
+        Context::storage()->scope()?->detach();
+    }
+
+    private function registeredCallback(): ?callable
+    {
+        return (new \ReflectionProperty(AutoRootSpan::class, 'notifySpanEnded'))->getValue();
     }
 
     #[BackupGlobals(true)]

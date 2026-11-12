@@ -20,7 +20,6 @@ SERVER_NAME=example.com
 SERVER_PORT=8080
 HTTP_HOST=example.com:8080
 HTTP_USER_AGENT=my-user-agent/1.0
-REQUEST_TIME_FLOAT=1721706151.242976
 HTTP_TRACEPARENT=00-ff000000000000000000000000000041-ff00000000000041-01
 --FILE--
 <?php
@@ -43,8 +42,7 @@ function foo(
 foo('bar');
 ?>
 --EXPECTF--
-%A
-[
+%A[
     {
         "name": "foo",
         "context": {
@@ -53,7 +51,14 @@ foo('bar');
             "trace_state": "",
             "trace_flags": 1
         },
-        "resource": [],
+        "resource": {
+            "service.name": "unknown_service:php",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "%s",
+            "telemetry.distro.name": "opentelemetry-php-instrumentation",
+            "telemetry.distro.version": "%s"
+        },
         "parent_span_id": "%s",
         "kind": "KIND_INTERNAL",
         "start": %d,
@@ -82,7 +87,14 @@ foo('bar');
             "trace_state": "",
             "trace_flags": 1
         },
-        "resource": [],
+        "resource": {
+            "service.name": "unknown_service:php",
+            "telemetry.sdk.name": "opentelemetry",
+            "telemetry.sdk.language": "php",
+            "telemetry.sdk.version": "%s",
+            "telemetry.distro.name": "opentelemetry-php-instrumentation",
+            "telemetry.distro.version": "%s"
+        },
         "parent_span_id": "ff00000000000041",
         "kind": "KIND_SERVER",
         "start": %d,

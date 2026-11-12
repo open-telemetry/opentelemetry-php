@@ -79,6 +79,37 @@ class WithSpanHandlerTest extends TestCase
         ], $span->getAttributes()->toArray());
     }
 
+    public function test_uses_named_span_name_argument(): void
+    {
+        WithSpanHandler::pre(null, [], 'My\\Class', 'some_function', null, null, ['span_name' => 'x'], []);
+        WithSpanHandler::post(null, [], null, null);
+
+        /** @var ImmutableSpan $span */
+        $span = $this->storage->offsetGet(0);
+        $this->assertSame('x', $span->getName());
+    }
+
+    public function test_span_name_takes_precedence_over_name(): void
+    {
+        WithSpanHandler::pre(null, [], 'My\\Class', 'some_function', null, null, ['span_name' => 'x', 'name' => 'y'], []);
+        WithSpanHandler::post(null, [], null, null);
+
+        /** @var ImmutableSpan $span */
+        $span = $this->storage->offsetGet(0);
+        $this->assertSame('x', $span->getName());
+    }
+
+    public function test_uses_default_name_when_span_name_is_not_a_string(): void
+    {
+        /** @psalm-suppress InvalidArgument */
+        WithSpanHandler::pre(null, [], 'My\\Class', 'some_function', null, null, ['span_name' => 123], []); // @phpstan-ignore argument.type
+        WithSpanHandler::post(null, [], null, null);
+
+        /** @var ImmutableSpan $span */
+        $span = $this->storage->offsetGet(0);
+        $this->assertSame('My\\Class::some_function', $span->getName());
+    }
+
     /**
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/trace/exceptions.md#attributes
      */

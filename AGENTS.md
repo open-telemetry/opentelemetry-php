@@ -98,7 +98,10 @@ The generated protobuf classes in `proto/otel/` are a split package too.
 ### Key Architectural Patterns
 
 - **API/SDK separation**: `API/` defines interfaces and noops; `SDK/` provides real implementations. User code should depend on API only.
-- **SPI plugin discovery**: Plugins register via `composer.json` `extra.spi` for auto-discovery. The root
+- **SPI plugin discovery**: Plugins register via `composer.json` `extra.spi` for auto-discovery. Components for the
+  `Registry` (exporter and transport factories, propagators) implement `RegistrarInterface` instead, listed in a
+  `_register.php` that calls `ServiceLoader::register()` and named in `extra.spi-config.autoload-files`. The
+  `tbachert/spi` plugin collects it at install time and removes the file from `autoload.files`. The root
   `composer.json` repeats every package's `extra.spi` entries and `autoload.files` (the `_register.php` files), so a
   new ComponentProvider or exporter factory goes in both the package's `composer.json` and the root one.
 - **Late binding**: Providers can be registered after app startup; noop implementations handle the uninitialized state.
@@ -107,8 +110,8 @@ The generated protobuf classes in `proto/otel/` are a split package too.
 ### Test Layout
 
 - `tests/Unit/` — Pure unit tests, mirrors `src/` structure
-- `tests/Integration/` — Tests that exercise several components together: config files, SPI wiring, Fiber `.phpt`
-  tests. They need no external services.
+- `tests/Integration/` — Tests that exercise several components together: config files, SPI wiring, and all
+  `.phpt` tests. They need no external services.
 - `tests/TraceContext/` — W3C TraceContext compliance tests
 - `tests/Benchmark/` — Performance benchmarks
 
@@ -119,6 +122,8 @@ The generated protobuf classes in `proto/otel/` are a split package too.
 - Tests run in random order. A test that changes globals or environment variables should `use TestState`
   (`tests/TestState.php`) and set variables with `setEnvironmentVariable()`, which restores them afterwards.
 - Reproduce an order-dependent failure with `--random-order-seed=<seed>`, using the seed from the failing run.
+- Put `.phpt` tests under `tests/Integration/`. CI runs the unit suite with code coverage, and PHPUnit wraps a
+  `.phpt` in a coverage script then, which changes object ids and adds a stack frame.
 
 ### Signal Types
 
@@ -154,6 +159,9 @@ Each split package has a `CHANGELOG.md` in its directory. When a change affects 
 under `Unreleased` in that package's changelog, in the same PR. Follow the existing sections and end each entry with
 the PR link. A change to several packages gets an entry in each. A semconv or protobuf regeneration gets one line
 naming the new upstream version.
+
+A release can land while a PR is open. It renames `Unreleased` to the version, and a rebase leaves the entry in that
+released section without a conflict. After rebasing, check that each entry is still under `Unreleased`.
 
 Write for someone upgrading: what changed for them and what they must do. Put anything that can break code or
 configuration under `Breaking changes`, including a raised PHP or dependency minimum. Skip tests, CI, tooling and

@@ -1,0 +1,99 @@
+name: Release dashboard
+
+# One issue per monorepo, all in this tracker, as contrib has issues turned off. Each is found by
+# its label. Contrib merges don't trigger this workflow, so its dashboard refreshes on the schedule,
+# or when the box at the foot of the issue is ticked.
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '17 21 * * *' # daily
+  workflow_dispatch:
+  issues:
+    types: [ edited ]
+
+permissions:
+  contents: read
+
+jobs:
+  dashboard:
+    name: Update the ${{ matrix.monorepo }} release dashboard
+    runs-on: ubuntu-latest
+    # A tick on an issue refreshes only that issue's monorepo
+    if: >-
+      github.repository == 'open-telemetry/opentelemetry-php' && (
+        github.event_name != 'issues' || (
+          github.event.issue.state == 'open' &&
+          contains(github.event.issue.body, '- [x] Refresh now') && (
+            contains(github.event.issue.labels.*.name, 'release-dashboard:core') ||
+            contains(github.event.issue.labels.*.name, 'release-dashboard:contrib')
+          )
+        )
+      )
+    strategy:
+      fail-fast: false
+      matrix:
+        include: >-
+          ${{ fromJSON(
+            github.event_name != 'issues' && '[{"monorepo": "opentelemetry-php", "dashboard": "core"}, {"monorepo": "opentelemetry-php-contrib", "dashboard": "contrib"}]' ||
+            contains(github.event.issue.labels.*.name, 'release-dashboard:contrib') && '[{"monorepo": "opentelemetry-php-contrib", "dashboard": "contrib"}]' ||
+            '[{"monorepo": "opentelemetry-php", "dashboard": "core"}]'
+          ) }}
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.monorepo }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      issues: write # to edit the dashboard issue
+    env:
+      LABEL: release-dashboard:${{ matrix.dashboard }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: open-telemetry/${{ matrix.monorepo }}
+          path: monorepo
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          coverage: none
+          # stdout is the issue body, so a notice must not land in it
+          ini-values: display_errors=stderr
+
+      # release:prep reads the #[PackageDependency] attributes through the checkout's autoloader,
+      # which needs only the runtime dependencies
+      - name: Install dependencies
+        working-directory: monorepo
+        run: composer install --no-dev --prefer-dist --no-progress --no-plugins
+
+      - name: Install dev-tools
+        run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
+
+      - name: Render the dashboard
+        working-directory: monorepo
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          "$RUNNER_TEMP/dev-tools/bin/otel" release:prep --no-interaction --dry-run --format=dashboard --tracker="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/dashboard.md"
+          printf '\n- [ ] Refresh now\n' >> "$RUNNER_TEMP/dashboard.md"
+
+      - name: Update the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          issues=$(gh issue list --label "$LABEL" --state open --json number,body --limit 2)
+          count=$(jq length <<<"$issues")
+          if [ "$count" -ne 1 ]; then
+            echo "::error::Expected one open issue labelled $LABEL, found $count"
+            exit 1
+          fi
+          number=$(jq -r '.[0].number' <<<"$issues")
+          if [ "$(jq -r '.[0].body' <<<"$issues")" = "$(cat "$RUNNER_TEMP/dashboard.md")" ]; then
+            echo "Issue #$number is up to date"
+          else
+            gh issue edit "$number" --body-file "$RUNNER_TEMP/dashboard.md"
+          fi

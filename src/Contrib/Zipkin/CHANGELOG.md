@@ -6,6 +6,12 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The `zipkin` exporter factory is registered through SPI. Allow
+  the `tbachert/spi` Composer plugin for the early registration, without it the factory is registered when the
+  package's autoload file loads, as before ([#2120]).
+
 ## 1.4.0 - 2026-11-06
 
 ### Breaking changes
@@ -24,3 +30,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-zipkin/r
 
 [#2091]: https://github.com/open-telemetry/opentelemetry-php/pull/2091
 [#2092]: https://github.com/open-telemetry/opentelemetry-php/pull/2092
+[#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120

@@ -6,6 +6,43 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- `Registry` now gets its built-in and package components from `RegistrarInterface` providers (SPI) when it is first
+  asked for one, no longer from `_register.php` files that Composer includes. A component registered with
+  `Registry::register*()` before that first lookup wins over a provider's, one registered with `$clobber` always wins,
+  and a non-clobbering registration made after it is ignored for names a provider already filled. A package that
+  registers a built-in name from its own autoload file now wins over the SDK's built-in one, it used to lose. Allow the
+  `tbachert/spi` Composer plugin in `config.allow-plugins` for this to take effect, without it the components are
+  registered when their autoload files load, as before ([#2120]).
+
+### Added
+
+- `RegistrarInterface`, for packages to register exporter factories, transport factories and propagators with the
+  `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi`. It is a bridge for SDK 1.x
+  and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
+
+### Fixed
+
+- With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
+  `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
+  them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`
+  in the log. This also hit `OTEL_CONFIG_FILE` (`Transport factory not defined for protocol: http`) ([#2120]).
+- `AutoRootSpan::start($notifySpanEnded)` registers the callback also when the root span was already started, for
+  example by `SdkAutoloader::autoload()`. The callback used to be dropped. A callback that throws no longer keeps the
+  root span from ending ([#2120]).
+
+## 1.16.1 - 2026-11-06
+
+### Security
+
+- The host detector ran `ioreg`, `kenv` and `powershell.exe` through a shell, so they were
+  looked up on `PATH`, and on Windows in the current directory. A program placed there ran
+  instead. It runs `/usr/sbin/ioreg`, `/bin/kenv` and `reg.exe` by absolute path, without a
+  shell ([GHSA-fc6f-cp96-6g5w]).
+- When the host id lookup failed, `host.id` was `""` on macOS and Windows, or `/bin/kenv` on
+  BSD. It is left out instead ([GHSA-fc6f-cp96-6g5w]).
+
 ## 1.16.0 - 2026-11-06
 
 ### Breaking changes
@@ -142,3 +179,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2112]: https://github.com/open-telemetry/opentelemetry-php/pull/2112
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
+[#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

@@ -2,18 +2,12 @@
 
 declare(strict_types=1);
 
-use OpenTelemetry\Extension\Propagator\B3\B3Propagator;
-use OpenTelemetry\SDK\Registry;
+use Nevay\SPI\ServiceLoader;
+use OpenTelemetry\Extension\Propagator\B3\Registrar;
+use OpenTelemetry\SDK\RegistrarInterface;
 
-if (!class_exists(Registry::class)) {
+if (!class_exists(ServiceLoader::class)) {
     return;
 }
 
-Registry::registerTextMapPropagator(
-    'b3',
-    B3Propagator::getB3SingleHeaderInstance()
-);
-Registry::registerTextMapPropagator(
-    'b3multi',
-    B3Propagator::getB3MultiHeaderInstance()
-);
+ServiceLoader::register(RegistrarInterface::class, Registrar::class);

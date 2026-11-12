@@ -29,24 +29,24 @@ echo StackTraceFormatter::format(Test::createStatic()), "\n", "\n";
 ?>
 --EXPECTF--
 Exception
-	at {main}(test_stacktrace_basic.php:19)
+	at {main}(%s:19)
 
 Exception: message
-	at {main}(test_stacktrace_basic.php:20)
+	at {main}(%s:20)
 
 Exception: outer
-	at {main}(test_stacktrace_basic.php:21)
+	at {main}(%s:21)
 Caused by: Exception: inner
 	... 1 more
 
 Exception
-	at create(test_stacktrace_basic.php:16)
-	at {main}(test_stacktrace_basic.php:23)
+	at create(%s:16)
+	at {main}(%s:23)
 
 Exception
-	at Test.create(test_stacktrace_basic.php:11)
-	at {main}(test_stacktrace_basic.php:24)
+	at Test.create(%s:11)
+	at {main}(%s:24)
 
 Exception
-	at Test.createStatic(test_stacktrace_basic.php:8)
-	at {main}(test_stacktrace_basic.php:25)
+	at Test.createStatic(%s:8)
+	at {main}(%s:25)

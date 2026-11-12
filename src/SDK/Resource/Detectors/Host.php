@@ -99,21 +99,17 @@ final class Host implements ResourceDetectorInterface
             return $contents;
         }
 
-        $out = exec('which kenv && kenv -q smbios.system.uuid');
+        $out = $this->run(['/bin/kenv', '-q', 'smbios.system.uuid']);
 
-        if ($out) {
-            return $out;
-        }
-
-        return null;
+        return $out !== null && $out !== '' ? $out : null;
     }
 
     private function getMacOsId(): ?string
     {
-        $out = exec('ioreg -rd1 -c IOPlatformExpertDevice | awk \'/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }\'');
+        $out = $this->run(['/usr/sbin/ioreg', '-rd1', '-c', 'IOPlatformExpertDevice']);
 
-        if ($out !== false) {
-            return $out;
+        if ($out !== null && preg_match('/"IOPlatformUUID" = "([^"]+)"/', $out, $matches)) {
+            return $matches[1];
         }
 
         return null;
@@ -121,12 +117,45 @@ final class Host implements ResourceDetectorInterface
 
     private function getWindowsId(): ?string
     {
-        $out = exec('powershell.exe -Command "Get-ItemPropertyValue -Path HKLM:\SOFTWARE\Microsoft\Cryptography -Name MachineGuid"');
+        $reg = (getenv('SystemRoot') ?: 'C:\Windows') . '\System32\reg.exe';
+        $out = $this->run([$reg, 'query', 'HKLM\SOFTWARE\Microsoft\Cryptography', '/v', 'MachineGuid', '/reg:64']);
 
-        if ($out !== false) {
-            return $out;
+        if ($out !== null && preg_match('/MachineGuid\s+REG_SZ\s+(\S+)/', $out, $matches)) {
+            return $matches[1];
         }
 
         return null;
+    }
+
+    /**
+     * The first element must be an absolute path. An argument list avoids the shell, but
+     * proc_open() still searches PATH for a bare name, and is_executable() checks a bare name
+     * against the current directory instead, so it would not stop one.
+     *
+     * @param non-empty-list<string> $command
+     */
+    private function run(array $command): ?string
+    {
+        if (!function_exists('proc_open')) {
+            return null;
+        }
+
+        set_error_handler(static fn () => true);
+
+        try {
+            if (!is_executable($command[0])) {
+                return null;
+            }
+            $process = proc_open($command, [0 => ['null'], 1 => ['pipe', 'w'], 2 => ['null']], $pipes);
+            if ($process === false) {
+                return null;
+            }
+            $out = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+
+            return proc_close($process) === 0 && $out !== false ? trim($out) : null;
+        } finally {
+            restore_error_handler();
+        }
     }
 }

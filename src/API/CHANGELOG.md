@@ -6,6 +6,13 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Fixed
+
+- `WithSpanHandler` uses the span name of `#[WithSpan(span_name: '...')]`. Only the positional form
+  `#[WithSpan('...')]` set it; the named form fell back to `Class::method` ([#2119]).
+- An unrecognised `OTEL_LOG_LEVEL` value logs a warning and falls back to `info`. It used to fall
+  back to `info` silently ([#2125]).
+
 ## 1.11.0 - 2026-11-06
 
 ### Breaking changes
@@ -58,3 +65,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2097]: https://github.com/open-telemetry/opentelemetry-php/pull/2097
 [#2101]: https://github.com/open-telemetry/opentelemetry-php/pull/2101
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
+[#2119]: https://github.com/open-telemetry/opentelemetry-php/pull/2119
+[#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
