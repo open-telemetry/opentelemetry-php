@@ -44,6 +44,25 @@ class ConsoleExporterTest extends TestCase
         $this->exporter->export($batch);
     }
 
+    public function test_export_includes_event_name(): void
+    {
+        $batch = [
+            (new ReadableLogRecord(
+                $this->createStub(InstrumentationScopeInterface::class),
+                $this->createStub(LoggerSharedState::class),
+                (new LogRecord('foo'))->setEventName('my.event'),
+            )),
+        ];
+
+        $this->transport->expects($this->once())->method('send')->with($this->callback(function (string $payload): bool {
+            $this->assertSame('my.event', json_decode($payload, true)['scopes'][0]['logs'][0]['event_name']);
+
+            return true;
+        }));
+
+        $this->exporter->export($batch);
+    }
+
     public function test_force_flush(): void
     {
         $this->assertTrue($this->exporter->forceFlush());
