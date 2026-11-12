@@ -64,10 +64,11 @@ jobs:
           ini-values: display_errors=stderr
 
       # release:prep reads the #[PackageDependency] attributes through the checkout's autoloader,
-      # which needs only the runtime dependencies
+      # which needs only the runtime dependencies. The resolver still checks the platform requirements
+      # in require-dev, and core requires ext-grpc there.
       - name: Install dependencies
         working-directory: monorepo
-        run: composer install --no-dev --prefer-dist --no-progress --no-plugins
+        run: composer install --no-dev --prefer-dist --no-progress --no-plugins --ignore-platform-req=ext-grpc
 
       - name: Install dev-tools
         run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
