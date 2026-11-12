@@ -18,7 +18,7 @@ upgraders can check them in one place.
   `TemporalityPreference::cumulative()` or `TemporalityPreference::delta()`. The delta preference keeps
   UpDownCounters cumulative, as the specification requires, where `Temporality::DELTA` made them delta. An exporter
   built without a temporality is not deprecated. It uses each stream's temporality until 2.0, and cumulative from
-  2.0. Pass `TemporalityPreference::cumulative()` to get that now ([#TBD]).
+  2.0. Pass `TemporalityPreference::cumulative()` to get that now ([#2129]).
 
 ### Fixed
 
@@ -80,3 +80,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
