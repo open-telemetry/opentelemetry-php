@@ -56,6 +56,7 @@ make test           # Unit + integration tests
 make test-unit      # Unit tests only
 make test-integration # Integration tests only
 make style          # Run php-cs-fixer (auto-fix)
+make php-support    # Update the supported PHP versions in the README and docs
 make rector-write   # Apply rector refactoring
 make deptrac        # Check architectural layer dependencies
 make phan           # Phan static analysis

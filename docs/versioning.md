@@ -1,6 +1,33 @@
 ### Assumptions
 This project uses [semver v2](https://semver.org/), as does the rest of OpenTelemetry.
 
+### PHP version support
+A PHP version is supported until 12 months after its security support ends, according to
+https://www.php.net/supported-versions.php. The first release after that date raises the minimum PHP version in a
+minor release, and the change is listed under `Breaking changes` in the changelogs. Composer does not install the new
+release on an older PHP, while the releases already published stay installable and keep working there. The generated `SemConv` and `proto` packages may keep an older minimum.
+
+A new PHP version runs as experimental in CI before it is released, and becomes supported (and blocking) in the first
+release after its general availability.
+
+<!-- php-support-table:start -->
+| PHP | Security support ends | Supported until |
+|-----|-----------------------|-----------------|
+| 8.2 | 2026-12-31 | 2027-12-31 |
+| 8.3 | 2027-12-31 | 2028-12-31 |
+| 8.4 | 2028-12-31 | 2029-12-31 |
+| 8.5 | 2029-12-31 | 2030-12-31 |
+<!-- php-support-table:end -->
+
+The dates come from [php.net](https://www.php.net/releases/states.php), and the badges and the summary in the README
+and this table are generated from them: run `make php-support` to update them. The `PHP version support` workflow
+runs monthly, and opens an issue when a version is due to be dropped or added, from the templates in
+[`.github/php-version-support`](../.github/php-version-support). `vendor/bin/otel php:support --check` tells whether
+the generated text is out of date. The commands are those of
+[opentelemetry-php/dev-tools](https://github.com/opentelemetry-php/dev-tools).
+
+See the specification on [language version support](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/versioning-and-stability.md#language-version-support).
+
 ### Goals
 #### API Stability:
 * Once the API for a given signal (spans, logs, metrics, baggage) has been officially released, that API module will function with any SDK that has the same major version and an equal or greater minor version.
