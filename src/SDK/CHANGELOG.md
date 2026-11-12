@@ -25,6 +25,7 @@ upgraders can check them in one place.
 ### Fixed
 
 - The console log exporter writes the event name of a record, as `event_name` ([#TBD]).
+- The deprecated `EventLogger` sets the event name of the record, as well as the `event.name` attribute ([#TBD]).
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
   `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
   them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`
