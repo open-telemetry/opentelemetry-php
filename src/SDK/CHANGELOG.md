@@ -24,9 +24,13 @@ upgraders can check them in one place.
 - `ReadWriteLogRecord::setAttribute()` and `removeAttribute()`. A processor can add, change and remove attributes
   of a record in `onEmit()`, and processors registered after it see the change. Added attributes are subject to the
   attribute limits ([#TBD]).
+- `ExtendedLogRecordProcessorInterface`, with `isEnabled()`. `Logger::isEnabled()` returns false when the processor
+  reports that it would drop the record. The batch, simple, multi and noop processors implement it. The interface is
+  experimental ([#TBD]).
 
 ### Fixed
 
+- `Logger::isEnabled()` returns false when the provider has no processors. It used to return true ([#TBD]).
 - The console log exporter writes the event name of a record, as `event_name` ([#TBD]).
 - The deprecated `EventLogger` sets the event name of the record, as well as the `event.name` attribute ([#TBD]).
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while

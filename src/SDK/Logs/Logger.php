@@ -9,6 +9,7 @@ use OpenTelemetry\API\Logs\LoggerInterface;
 use OpenTelemetry\API\Logs\LogRecord;
 use OpenTelemetry\API\Logs\LogRecordBuilderInterface;
 use OpenTelemetry\API\Logs\NoopLogRecordBuilder;
+use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
@@ -65,12 +66,18 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.44.0/specification/logs/api.md#enabled
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/sdk.md#enabled
      */
     #[\Override]
     public function isEnabled(?ContextInterface $context = null, ?int $severityNumber = null, ?string $eventName = null): bool
     {
-        return $this->config->isEnabled() && !$this->loggerSharedState->hasShutdown();
+        if (!$this->config->isEnabled() || $this->loggerSharedState->hasShutdown()) {
+            return false;
+        }
+        $processor = $this->loggerSharedState->getProcessor();
+
+        return !$processor instanceof ExtendedLogRecordProcessorInterface
+            || $processor->isEnabled($context ?? Context::getCurrent(), $this->scope, $severityNumber, $eventName);
     }
 
     /**

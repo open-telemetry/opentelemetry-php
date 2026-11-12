@@ -9,11 +9,13 @@ use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeFactoryInterface;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporter;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerProvider;
 use OpenTelemetry\SDK\Logs\LoggerProviderBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
+use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -84,7 +86,9 @@ class LoggerProviderTest extends TestCase
 
     public function test_update_configurator_updates_loggers(): void
     {
-        $lp = LoggerProvider::builder()->build();
+        $lp = LoggerProvider::builder()
+            ->addLogRecordProcessor(new SimpleLogRecordProcessor(new InMemoryExporter()))
+            ->build();
         $this->assertInstanceOf(LoggerProvider::class, $lp);
         $one = $lp->getLogger('one');
         $two = $lp->getLogger('two');
