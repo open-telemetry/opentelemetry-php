@@ -5,7 +5,7 @@ labels: [php-version-support]
 PHP {{ version }} was released on {{ released }} and is not in the blocking CI matrix yet.
 
 Checklist:
-- [ ] Add {{ version }} to the matrices in `.github/workflows/php.yml` (including `matrix_php_version`). If it runs as an experimental `include`, move it from there and drop its `--ignore-platform-reqs`
+- [ ] Add {{ version }} to the `php-version` matrix in `.github/workflows/php.yml`. If it runs as an experimental `include`, move it from there and drop its `--ignore-platform-reqs`
 - [ ] Add {{ version }} to the matrices in `.github/workflows/publish-otel-php-base-docker-image.yml`
 - [ ] Add a dev container for {{ version }}: `.devcontainer/compose-php*.yml` and its directory in `.devcontainer/`
 - [ ] If {{ version }} becomes the newest, update the default `PHP_VERSION` in `docker/Dockerfile` and `.devcontainer`
