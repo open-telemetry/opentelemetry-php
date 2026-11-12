@@ -19,9 +19,12 @@ release after its general availability.
 | 8.5 | 2029-12-31 | 2030-12-31 |
 <!-- php-support-table:end -->
 
-The dates are generated from [php.watch](https://php.watch/api/v1/versions) by `script/php-version-support.sh --write`.
-The `PHP version support` workflow runs monthly, and opens an issue when a version is due to be dropped or added.
-`script/php-version-support.sh --check` tells whether the generated text is out of date.
+The dates come from [php.net](https://www.php.net/releases/states.php), and the badges and the summary in the README
+and this table are generated from them: run `make php-support` to update them. The `PHP version support` workflow
+runs monthly, and opens an issue when a version is due to be dropped or added, from the templates in
+[`.github/php-version-support`](../.github/php-version-support). `vendor/bin/otel php:support --check` tells whether
+the generated text is out of date. The commands are those of
+[opentelemetry-php/dev-tools](https://github.com/opentelemetry-php/dev-tools).
 
 See the specification on [language version support](https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/versioning-and-stability.md#language-version-support).
 
