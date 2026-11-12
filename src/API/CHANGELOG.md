@@ -9,7 +9,7 @@ upgraders can check them in one place.
 ### Changed
 
 - The `LoggerInterface::isEnabled()` docblock says that calling it is optional, when it is worth calling, and that
-  its result can change over time ([#TBD]).
+  its result can change over time ([#2131]).
 
 ### Fixed
 
@@ -72,3 +72,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2119]: https://github.com/open-telemetry/opentelemetry-php/pull/2119
 [#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
+[#2131]: https://github.com/open-telemetry/opentelemetry-php/pull/2131
