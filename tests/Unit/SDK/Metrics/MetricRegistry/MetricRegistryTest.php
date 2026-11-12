@@ -184,6 +184,36 @@ final class MetricRegistryTest extends TestCase
         $registry->collectAndPush([$streamId]);
     }
 
+    public function test_collect_and_push_warns_for_callback_registered_during_collection(): void
+    {
+        Logging::setLogWriter($this->createStub(LogWriterInterface::class));
+
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
+        $stream = new AsynchronousMetricStream(new SumAggregation(true), 0);
+        $instrument = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null);
+        $streamId = $registry->registerAsynchronousStream($instrument, $stream, new MetricAggregatorFactory(null, new SumAggregation(true)));
+
+        $callbackId = null;
+        $callbackId = $registry->registerCallback(static function (ObserverInterface $o) use ($registry, $instrument, &$callbackId): int {
+            $registry->unregisterCallback($callbackId);
+            $registry->registerCallback(fn (ObserverInterface $o) => 5, $instrument);
+
+            return 5;
+        }, $instrument);
+
+        $registry->collectAndPush([$streamId]);
+
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('callback should not return a value'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $registry->collectAndPush([$streamId]);
+    }
+
     public function test_collect_and_push_does_not_warn_when_callback_returns_nothing(): void
     {
         $logWriter = $this->createMock(LogWriterInterface::class);

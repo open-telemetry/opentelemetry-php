@@ -115,8 +115,8 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     #[\Override]
     public function registerCallback(Closure $callback, Instrument $instrument, Instrument ...$instruments): int
     {
-        $callbackId = array_key_last($this->asynchronousCallbacks) + 1;
-        $this->asynchronousCallbacks[$callbackId] = $callback;
+        $this->asynchronousCallbacks[] = $callback;
+        $callbackId = array_key_last($this->asynchronousCallbacks);
 
         $instrumentId = spl_object_id($instrument);
         $this->asynchronousCallbackArguments[$callbackId] = [$instrumentId];
@@ -180,7 +180,9 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
             $callbacks[$callbackId] = static fn () => $callback(...$args);
         }
         foreach ($callbacks as $callbackId => $callback) {
-            if ($callback() !== null && !isset($this->callbacksReturningValue[$callbackId])) {
+            if ($callback() !== null
+                && isset($this->asynchronousCallbacks[$callbackId])
+                && !isset($this->callbacksReturningValue[$callbackId])) {
                 $this->callbacksReturningValue[$callbackId] = true;
                 self::logWarning('Asynchronous instrument callback should not return a value, it is ignored');
             }

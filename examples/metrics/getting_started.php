@@ -6,7 +6,6 @@ use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Metrics\MeterProvider;
 use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporter;
 use OpenTelemetry\SDK\Metrics\MetricReader\ExportingReader;
-use OpenTelemetry\SDK\Metrics\TemporalityPreference;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -18,7 +17,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
  */
 
 $reader = new ExportingReader(
-    new ConsoleMetricExporter(TemporalityPreference::delta())
+    new ConsoleMetricExporter()
 );
 
 $meterProvider = MeterProvider::builder()
