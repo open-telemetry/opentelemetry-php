@@ -12,6 +12,14 @@ upgraders can check them in one place.
   SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are registered when the
   package's autoload file loads, as before ([#2120]).
 
+### Deprecated
+
+- Passing a `Temporality` or a string as the temporality of `MetricExporter`. Pass a selector such as
+  `TemporalityPreference::cumulative()` or `TemporalityPreference::delta()`. The delta preference keeps
+  UpDownCounters cumulative, as the specification requires, where `Temporality::DELTA` made them delta. An exporter
+  built without a temporality is not deprecated. It uses each stream's temporality until 2.0, and cumulative from
+  2.0. Pass `TemporalityPreference::cumulative()` to get that now ([#TBD]).
+
 ### Fixed
 
 - With the `tbachert/spi` plugin running, the `otlp` exporters and the `http` transport are available while the SDK

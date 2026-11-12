@@ -22,17 +22,27 @@ final class InMemoryExporter implements MetricExporterInterface, AggregationTemp
     /**
      * @template-implements ArrayObject<Metric> $storage
      * @param ArrayObject $storage
-     * @param string|Temporality|null $temporality
+     * @param string|Temporality|AggregationTemporalitySelectorInterface|null $temporality
+     *        a selector such as {@see \OpenTelemetry\SDK\Metrics\TemporalityPreference}. Passing a
+     *        Temporality or a string is deprecated. Null uses each stream's temporality until 2.0,
+     *        and cumulative from 2.0.
      */
     public function __construct(
         private ArrayObject $storage = new ArrayObject(),
-        private readonly string|Temporality|null $temporality = null,
+        private readonly string|Temporality|AggregationTemporalitySelectorInterface|null $temporality = null,
     ) {
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedFunction
+     */
     #[\Override]
     public function temporality(MetricMetadataInterface $metric): string|Temporality|null
     {
+        if ($this->temporality instanceof AggregationTemporalitySelectorInterface) {
+            return $this->temporality->temporality($metric);
+        }
+
         return $this->temporality ?? $metric->temporality();
     }
 

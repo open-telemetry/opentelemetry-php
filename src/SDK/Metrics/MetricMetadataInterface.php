@@ -23,6 +23,7 @@ interface MetricMetadataInterface
      * Returns the underlying temporality of this metric.
      *
      * @return string|Temporality internal temporality
+     * @deprecated Choose temporality by instrument type, with {@see \OpenTelemetry\SDK\Metrics\TemporalityPreference}. Removed in 2.0.
      */
     public function temporality();
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricRegistry;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\API\Metrics\ObserverInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -22,13 +24,19 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactory;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use function printf;
+use Psr\Log\LogLevel;
 
 #[CoversClass(MetricRegistry::class)]
 #[CoversClass(MultiObserver::class)]
 #[CoversClass(NoopObserver::class)]
 final class MetricRegistryTest extends TestCase
 {
+    #[\Override]
+    protected function tearDown(): void
+    {
+        Logging::reset();
+    }
+
     public function test_collect_and_push_recorded_value(): void
     {
         $registry = new MetricRegistry(null, Attributes::factory(), new TestClock(1));
@@ -63,13 +71,8 @@ final class MetricRegistryTest extends TestCase
         ], Temporality::CUMULATIVE, true), $stream->collect($reader));
     }
 
-    /**
-     * @psalm-suppress RedundantFunctionCall
-     */
     public function test_collect_and_push_invokes_requested_callback_only_once(): void
     {
-        $this->expectOutputString('0');
-
         $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
         $stream0 = new AsynchronousMetricStream(new SumAggregation(true), 0);
         $stream1 = new AsynchronousMetricStream(new SumAggregation(true), 0);
@@ -78,18 +81,18 @@ final class MetricRegistryTest extends TestCase
         $streamId0 = $registry->registerAsynchronousStream($instrument, $stream0, new MetricAggregatorFactory(null, new SumAggregation(true)));
         $streamId1 = $registry->registerAsynchronousStream($instrument, $stream1, new MetricAggregatorFactory(null, new SumAggregation(true)));
 
-        $registry->registerCallback(fn (ObserverInterface $o) => printf('0'), $instrument);
+        $called = 0;
+        $registry->registerCallback(function (ObserverInterface $o) use (&$called): void {
+            $called++;
+        }, $instrument);
 
         $registry->collectAndPush([$streamId0, $streamId1]);
+
+        $this->assertSame(1, $called);
     }
 
-    /**
-     * @psalm-suppress RedundantFunctionCall
-     */
     public function test_collect_and_push_invokes_only_requested_callbacks(): void
     {
-        $this->expectOutputString('0011');
-
         $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
         $stream0 = new AsynchronousMetricStream(new SumAggregation(true), 0);
         $stream1 = new AsynchronousMetricStream(new SumAggregation(true), 0);
@@ -99,12 +102,19 @@ final class MetricRegistryTest extends TestCase
         $streamId0 = $registry->registerAsynchronousStream($instrument0, $stream0, new MetricAggregatorFactory(null, new SumAggregation(true)));
         $streamId1 = $registry->registerAsynchronousStream($instrument1, $stream1, new MetricAggregatorFactory(null, new SumAggregation(true)));
 
-        $registry->registerCallback(fn (ObserverInterface $o) => printf('0'), $instrument0);
-        $registry->registerCallback(fn (ObserverInterface $o) => printf('1'), $instrument1);
+        $called = [];
+        $registry->registerCallback(function (ObserverInterface $o) use (&$called): void {
+            $called[] = 0;
+        }, $instrument0);
+        $registry->registerCallback(function (ObserverInterface $o) use (&$called): void {
+            $called[] = 1;
+        }, $instrument1);
 
         $registry->collectAndPush([$streamId0]);
         $registry->collectAndPush([$streamId0, $streamId1]);
         $registry->collectAndPush([$streamId1]);
+
+        $this->assertSame([0, 0, 1, 1], $called);
     }
 
     public function test_collect_and_push_multi_instrument_callback_collects_only_specified_streams(): void
@@ -151,5 +161,44 @@ final class MetricRegistryTest extends TestCase
         $this->assertEquals(new Sum([
             new NumberDataPoint(0, Attributes::create([]), 5, 7),
         ], Temporality::DELTA, true), $stream1->collect($reader1));
+    }
+
+    public function test_collect_and_push_warns_once_when_callback_returns_value(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('callback should not return a value'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
+
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
+        $stream = new AsynchronousMetricStream(new SumAggregation(true), 0);
+        $instrument = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null);
+        $streamId = $registry->registerAsynchronousStream($instrument, $stream, new MetricAggregatorFactory(null, new SumAggregation(true)));
+
+        $registry->registerCallback(fn (ObserverInterface $o) => 5, $instrument);
+
+        $registry->collectAndPush([$streamId]);
+        $registry->collectAndPush([$streamId]);
+    }
+
+    public function test_collect_and_push_does_not_warn_when_callback_returns_nothing(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+
+        $registry = new MetricRegistry(null, Attributes::factory(), new TestClock());
+        $stream = new AsynchronousMetricStream(new SumAggregation(true), 0);
+        $instrument = new Instrument(InstrumentType::ASYNCHRONOUS_COUNTER, 'test', null, null);
+        $streamId = $registry->registerAsynchronousStream($instrument, $stream, new MetricAggregatorFactory(null, new SumAggregation(true)));
+
+        $registry->registerCallback(function (ObserverInterface $o): void {
+            $o->observe(5);
+        }, $instrument);
+
+        $registry->collectAndPush([$streamId]);
     }
 }

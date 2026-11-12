@@ -39,6 +39,12 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
 
     private readonly TransportInterface $transport;
 
+    /**
+     * @param Temporality|string|AggregationTemporalitySelectorInterface|null $temporality
+     *        a selector such as {@see \OpenTelemetry\SDK\Metrics\TemporalityPreference}. Passing a
+     *        Temporality or a string is deprecated. Null uses each stream's temporality until 2.0,
+     *        and cumulative from 2.0.
+     */
     public function __construct(
         private readonly Temporality|string|AggregationTemporalitySelectorInterface|null $temporality = null,
         ?TransportInterface $transport = null,
@@ -48,6 +54,7 @@ class ConsoleMetricExporter implements PushMetricExporterInterface, AggregationT
 
     /**
      * @inheritDoc
+     * @phan-suppress PhanDeprecatedFunction
      */
     #[\Override]
     public function temporality(MetricMetadataInterface $metric): Temporality|string|null

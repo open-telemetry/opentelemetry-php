@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Changed
+
+- `MeterInterface::createGauge()` and `GaugeInterface` are no longer experimental. The synchronous Gauge is stable
+  in the specification ([#TBD]).
+
 ### Fixed
 
 - `WithSpanHandler` uses the span name of `#[WithSpan(span_name: '...')]`. Only the positional form

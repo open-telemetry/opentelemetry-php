@@ -12,7 +12,7 @@ use UnexpectedValueException;
  * Chooses aggregation temporality by instrument kind, as for
  * `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`.
  *
- * @see https://opentelemetry.io/docs/specs/otel/metrics/sdk_exporters/otlp/#additional-environment-variable-configuration
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration
  */
 final class TemporalityPreference implements AggregationTemporalitySelectorInterface
 {
