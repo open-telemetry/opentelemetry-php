@@ -21,6 +21,9 @@ upgraders can check them in one place.
 - `RegistrarInterface`, for packages to register exporter factories, transport factories and propagators with the
   `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi`. It is a bridge for SDK 1.x
   and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
+- `ReadWriteLogRecord::setAttribute()` and `removeAttribute()`. A processor can add, change and remove attributes
+  of a record in `onEmit()`, and processors registered after it see the change. Added attributes are subject to the
+  attribute limits ([#TBD]).
 
 ### Fixed
 
