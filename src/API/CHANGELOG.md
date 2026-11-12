@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Changed
+
+- The `LoggerInterface::isEnabled()` docblock says that calling it is optional, when it is worth calling, and that
+  its result can change over time ([#TBD]).
+
 ### Fixed
 
 - `WithSpanHandler` uses the span name of `#[WithSpan(span_name: '...')]`. Only the positional form
