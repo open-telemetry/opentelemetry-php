@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Trace\Sampler\Consistent;
 
 use function hexdec;
 use InvalidArgumentException;
+use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use function sprintf;
 use function substr;
 
@@ -46,7 +47,7 @@ final class ConsistentSamplingUtil
     {
         self::checkProbability($probability);
 
-        return self::MAX_THRESHOLD - (int) round($probability * (float) self::MAX_THRESHOLD);
+        return TraceIdRatioBasedSampler::computeTValue($probability, 4, 4);
     }
 
     public static function isValidThreshold(int $threshold): bool
