@@ -1,0 +1,29 @@
+name: Release approval
+
+# Fails on a release pull request whose breaking changes box is unticked. The Release PR workflow
+# adds the box when release:prep warns, and unticks it when the warnings change.
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened, edited ]
+
+permissions: {}
+
+jobs:
+  approval:
+    name: Release approval
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'otelbot/release' &&
+      github.event.pull_request.user.login == 'otelbot-php[bot]'
+    steps:
+      - name: Check the breaking changes box
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if tr -d '\r' <<<"$BODY" | grep -qxF -- '- [ ] I have read the breaking changes'; then
+            echo "::error::Read the breaking changes in the description, then tick the box"
+            exit 1
+          fi

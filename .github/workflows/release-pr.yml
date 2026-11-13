@@ -1,0 +1,354 @@
+name: Release PR
+
+# Opens or refreshes a monorepo's release pull request, from release:prep on main. Contrib's is
+# opened from here, as only this repository can read the otelbot-php key. A refresh rebuilds the
+# branch from main and keeps the overrides in the description, so the pull request never conflicts.
+#
+# A dispatch, or a tick on a dashboard issue, opens one. A push to main, the schedule, or an edit
+# to the overrides refreshes one that is open. Contrib merges don't trigger this workflow, so its
+# pull request refreshes on the schedule.
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '47 21 * * *' # daily, after the dashboard
+  workflow_dispatch:
+    inputs:
+      monorepo:
+        description: Monorepo to release
+        type: choice
+        options: [ opentelemetry-php, opentelemetry-php-contrib ]
+        default: opentelemetry-php
+  issues:
+    types: [ edited ]
+  pull_request:
+    types: [ edited ]
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+env:
+  BRANCH: otelbot/release
+  BOT: otelbot-php[bot]
+  BOT_EMAIL: 356036745+otelbot-php[bot]@users.noreply.github.com
+  APPROVAL: '- [ ] I have read the breaking changes'
+  APPROVED: '- [x] I have read the breaking changes'
+
+jobs:
+  release-pr:
+    name: Release PR for ${{ matrix.monorepo }}
+    runs-on: ubuntu-latest
+    # The bot's own edits to the description are skipped, or each refresh would start another
+    if: >-
+      github.repository == 'open-telemetry/opentelemetry-php' && (
+        (github.event_name != 'issues' && github.event_name != 'pull_request') || (
+          github.event_name == 'issues' &&
+          github.event.issue.state == 'open' &&
+          contains(github.event.issue.body, '- [x] Open a release PR') && (
+            contains(github.event.issue.labels.*.name, 'release-dashboard:core') ||
+            contains(github.event.issue.labels.*.name, 'release-dashboard:contrib')
+          )
+        ) || (
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.state == 'open' &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          github.event.pull_request.head.ref == 'otelbot/release' &&
+          github.event.pull_request.user.login == 'otelbot-php[bot]' &&
+          github.event.sender.type != 'Bot' &&
+          github.event.changes.body
+        )
+      )
+    strategy:
+      fail-fast: false
+      matrix:
+        include: >-
+          ${{ fromJSON(
+            github.event_name == 'workflow_dispatch' && format('[{{"monorepo": "{0}"}}]', inputs.monorepo) ||
+            github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'release-dashboard:contrib') && '[{"monorepo": "opentelemetry-php-contrib"}]' ||
+            (github.event_name == 'issues' || github.event_name == 'pull_request') && '[{"monorepo": "opentelemetry-php"}]' ||
+            '[{"monorepo": "opentelemetry-php"}, {"monorepo": "opentelemetry-php-contrib"}]'
+          ) }}
+    # Runs queue rather than cancel, as a cancelled run can leave the description and the branch
+    # out of step. The bot's own edits get a group of their own, so their skipped runs can't
+    # replace a queued one.
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.monorepo }}${{ github.event_name == 'pull_request' && github.event.sender.type == 'Bot' && '-bot' || '' }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      issues: write # to untick the box on the dashboard issue
+    defaults:
+      run:
+        shell: bash # with pipefail, which the default shell lacks
+    env:
+      MONOREPO: open-telemetry/${{ matrix.monorepo }}
+      OPEN: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'issues' }}
+    steps:
+      # Edits made with GITHUB_TOKEN start no workflow, so this can't loop
+      - name: Untick the box on the dashboard issue
+        if: github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue view "$NUMBER" --json body --jq .body | tr -d '\r' \
+            | sed 's/^- \[x\] Open a release PR$/- [ ] Open a release PR/' > "$RUNNER_TEMP/issue.md"
+          gh issue edit "$NUMBER" --body-file "$RUNNER_TEMP/issue.md"
+
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: otelbot-token
+        with:
+          client-id: ${{ vars.OTELBOT_PHP_CLIENT_ID }}
+          private-key: ${{ secrets.OTELBOT_PHP_PRIVATE_KEY }}
+          owner: open-telemetry
+          repositories: ${{ matrix.monorepo }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Find the release pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+        run: |
+          prs=$(gh pr list --repo "$MONOREPO" --head "$BRANCH" --author app/otelbot-php --state open --json number,body --limit 2)
+          case $(jq length <<<"$prs") in
+            0)
+              if [ "$OPEN" != true ]; then
+                echo "$MONOREPO has no open release pull request to refresh"
+                echo "run=false" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              : > "$RUNNER_TEMP/body.md"
+              ;;
+            1)
+              echo "number=$(jq -r '.[0].number' <<<"$prs")" >> "$GITHUB_OUTPUT"
+              jq -r '.[0].body' <<<"$prs" | tr -d '\r' > "$RUNNER_TEMP/body.md"
+              ;;
+            *)
+              echo "::error::$MONOREPO has more than one open release pull request"
+              exit 1
+              ;;
+          esac
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
+      # The description is untrusted text. Each override must match the pattern, and is passed to
+      # release:prep as an argument, never through a shell.
+      - name: Read the overrides
+        id: overrides
+        if: steps.pr.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          BEFORE: ${{ github.event.changes.body.from }}
+          SENDER: ${{ github.event.sender.login }}
+        run: |
+          overrides() {
+            tr -d '\r' | awk '/^```overrides[[:space:]]*$/ { inside = 1; next } inside && /^```/ { exit } inside && NF { $1 = $1; print }'
+          }
+          overrides < "$RUNNER_TEMP/body.md" > "$RUNNER_TEMP/overrides.txt"
+
+          if [ "$GITHUB_EVENT_NAME" = pull_request ] && [ "$(overrides <<<"$BEFORE")" = "$(cat "$RUNNER_TEMP/overrides.txt")" ]; then
+            echo "The overrides are unchanged"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$GITHUB_EVENT_NAME" = pull_request ] || [ "$GITHUB_EVENT_NAME" = issues ]; then
+            permission=$(gh api "repos/$MONOREPO/collaborators/$SENDER/permission" --jq .permission)
+            if [ "$permission" != admin ] && [ "$permission" != write ]; then
+              echo "::error::$SENDER has $permission access to $MONOREPO, not write"
+              exit 1
+            fi
+          fi
+
+          pattern='^([a-z0-9][a-z0-9_.-]*/)?[a-z0-9][a-z0-9_.-]*=(skip|[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?)$'
+          if invalid=$(grep -Ev "$pattern" "$RUNNER_TEMP/overrides.txt"); then
+            echo "::error::Each override must be <package>=<version|skip>. Not valid: ${invalid//$'\n'/, }"
+            exit 1
+          fi
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.overrides.outputs.run == 'true'
+        with:
+          repository: ${{ env.MONOREPO }}
+          path: monorepo
+          persist-credentials: false
+
+      - name: Setup PHP
+        if: steps.overrides.outputs.run == 'true'
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          coverage: none
+          # stdout is the description, so a notice must not land in it
+          ini-values: display_errors=stderr
+
+      # As for the dashboard: release:prep needs only the runtime dependencies, and core requires
+      # ext-grpc in require-dev.
+      - name: Install dependencies
+        if: steps.overrides.outputs.run == 'true'
+        working-directory: monorepo
+        run: composer install --no-dev --prefer-dist --no-progress --no-plugins --ignore-platform-req=ext-grpc
+
+      - name: Install dev-tools
+        if: steps.overrides.outputs.run == 'true'
+        run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
+
+      - name: Prepare the release
+        id: prep
+        if: steps.overrides.outputs.run == 'true'
+        working-directory: monorepo
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          overrides=()
+          while IFS= read -r line; do
+            overrides+=("--set=$line")
+          done < "$RUNNER_TEMP/overrides.txt"
+          date=$(date -u +%Y-%m-%d)
+          prep=("$RUNNER_TEMP/dev-tools/bin/otel" release:prep --no-interaction "--date=$date" "${overrides[@]}")
+
+          # Without --dry-run the markdown ends with instructions for a person at a terminal
+          "${prep[@]}" --dry-run --format=markdown | sed '/^\[DRY-RUN\] no files were changed$/d' > "$RUNNER_TEMP/prep.md"
+          "${prep[@]}" --format=json > "$RUNNER_TEMP/prep.json"
+          release=$(jq .release "$RUNNER_TEMP/prep.json")
+          {
+            echo "date=$date"
+            echo "release=$release"
+            echo "sha=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Close the pull request, as there is nothing to release
+        if: steps.prep.outputs.release == 'false' && steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+          SHA: ${{ steps.prep.outputs.sha }}
+        run: gh pr close "$NUMBER" --repo "$MONOREPO" --delete-branch --comment "Nothing to release from \`main\` at $SHA."
+
+      - name: Commit
+        id: commit
+        if: steps.prep.outputs.release == 'true'
+        working-directory: monorepo
+        env:
+          DATE: ${{ steps.prep.outputs.date }}
+          SHA: ${{ steps.prep.outputs.sha }}
+        run: |
+          {
+            echo "Release $DATE"
+            echo
+            jq -r '.order[] as $package | .packages[] | select(.package == $package) | "\(.package) \(.version)"' "$RUNNER_TEMP/prep.json"
+          } | git -c user.name="$BOT" -c user.email="$BOT_EMAIL" commit --all --quiet --file=-
+
+          # The lease makes the push fail if another run moved the branch after this fetch
+          lease=
+          push=true
+          if git fetch --quiet --depth=2 origin "$BRANCH"; then
+            lease=$(git rev-parse FETCH_HEAD)
+            if [ "$(git rev-parse FETCH_HEAD^)" = "$SHA" ] && git diff --quiet FETCH_HEAD HEAD; then
+              push=false
+            fi
+          fi
+          {
+            echo "lease=$lease"
+            echo "push=$push"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Write the description
+        if: steps.prep.outputs.release == 'true'
+        env:
+          SHA: ${{ steps.prep.outputs.sha }}
+          # Edits to a contrib pull request start no workflow here
+          REBUILD: >-
+            ${{ matrix.monorepo == 'opentelemetry-php' && 'Saving rebuilds the pull request with them.' ||
+            'Then run the Release PR workflow in open-telemetry/opentelemetry-php for this monorepo, or wait for its daily run.' }}
+        run: |
+          # release:prep warns on a forced major as well as on breaking entries
+          checks=$(jq -c '{
+            warnings: [.packages[] | select(.warnings != []) | {package, version, warnings}],
+            constraints: .constraint_warnings
+          }' "$RUNNER_TEMP/prep.json")
+          {
+            echo "Releases [$MONOREPO](https://github.com/$MONOREPO) from \`main\` at [${SHA:0:7}](https://github.com/$MONOREPO/commit/$SHA)."
+            cat <<'EOF'
+          A workflow rebuilds this pull request from `main` on each push to it. It keeps the overrides
+          and the tick below, and replaces the rest of this description. Fix changelog entries in a pull
+          request to `main`, not here.
+
+          EOF
+            cat "$RUNNER_TEMP/prep.md"
+
+            # A tick stays while the warnings it was given for are the same
+            if [ "$(jq '[.[] | length] | add' <<<"$checks")" -gt 0 ]; then
+              hash=$(sha256sum <<<"$checks" | cut -c1-16)
+              box=$APPROVAL
+              if grep -qxF -- "$APPROVED" "$RUNNER_TEMP/body.md" && grep -qxF -- "<!-- breaking: $hash -->" "$RUNNER_TEMP/body.md"; then
+                box=$APPROVED
+              fi
+              cat <<'EOF'
+
+          ### Breaking changes
+
+          A package above records breaking changes, is a new major version, or breaks a constraint
+          between packages. Read the warnings, then tick the box. The "Release approval" check fails
+          until you do.
+
+          EOF
+              printf '%s\n<!-- breaking: %s -->\n' "$box" "$hash"
+            fi
+
+            cat <<'EOF'
+
+          ### Change a version
+
+          Edit this description, with one `<package>=<version|skip>` per line in the block below. The
+          package is the composer name or the split repository name.
+          EOF
+            echo "$REBUILD"
+            echo
+            echo '```overrides'
+            cat "$RUNNER_TEMP/overrides.txt"
+            echo '```'
+            cat <<'EOF'
+
+          ### What happens when you merge
+
+          gitsplit pushes each package to its split repository. Then tag the packages in the order above
+          with [release:run](https://github.com/opentelemetry-php/dev-tools#tag-a-release).
+          EOF
+          } > "$RUNNER_TEMP/description.md"
+
+      # The description is updated before the push, so the approval check on the new commit reads it
+      - name: Update the pull request
+        if: steps.prep.outputs.release == 'true' && steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+          TITLE: Release ${{ steps.prep.outputs.date }}
+        run: |
+          current=$(gh pr view "$NUMBER" --repo "$MONOREPO" --json title,body)
+          # An edit since this run read the description has started a run of its own
+          if [ "$(jq -r .body <<<"$current" | tr -d '\r')" != "$(cat "$RUNNER_TEMP/body.md")" ]; then
+            echo "::error::The description of #$NUMBER changed during this run. The run for that edit rebuilds the pull request."
+            exit 1
+          fi
+          if [ "$(jq -r .title <<<"$current")" != "$TITLE" ] || [ "$(jq -r .body <<<"$current")" != "$(cat "$RUNNER_TEMP/description.md")" ]; then
+            gh pr edit "$NUMBER" --repo "$MONOREPO" --title "$TITLE" --body-file "$RUNNER_TEMP/description.md"
+          fi
+
+      - name: Push
+        if: steps.prep.outputs.release == 'true' && steps.commit.outputs.push == 'true'
+        working-directory: monorepo
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          LEASE: ${{ steps.commit.outputs.lease }}
+        run: git push --quiet "--force-with-lease=refs/heads/$BRANCH:$LEASE" "https://x-access-token:$GH_TOKEN@github.com/$MONOREPO.git" "HEAD:refs/heads/$BRANCH"
+
+      - name: Open the pull request
+        if: steps.prep.outputs.release == 'true' && steps.pr.outputs.number == ''
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          TITLE: Release ${{ steps.prep.outputs.date }}
+        run: gh pr create --repo "$MONOREPO" --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/description.md"

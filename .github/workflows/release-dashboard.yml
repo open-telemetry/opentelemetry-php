@@ -2,7 +2,8 @@ name: Release dashboard
 
 # One issue per monorepo, all in this tracker, as contrib has issues turned off. Each is found by
 # its label. Contrib merges don't trigger this workflow, so its dashboard refreshes on the schedule,
-# or when the box at the foot of the issue is ticked.
+# or when the Refresh now box at the foot of the issue is ticked. The other box is read by the
+# Release PR workflow.
 
 on:
   push:
@@ -79,7 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           "$RUNNER_TEMP/dev-tools/bin/otel" release:prep --no-interaction --dry-run --format=dashboard --tracker="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/dashboard.md"
-          printf '\n- [ ] Refresh now\n' >> "$RUNNER_TEMP/dashboard.md"
+          printf '\n- [ ] Refresh now\n- [ ] Open a release PR\n' >> "$RUNNER_TEMP/dashboard.md"
 
       - name: Update the issue
         env:
