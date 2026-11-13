@@ -1,0 +1,45 @@
+name: Test otelbot token
+
+on:
+  push:
+    branches: [ test-otelbot-token ]
+
+permissions: {}
+
+jobs:
+  token:
+    runs-on: ubuntu-latest
+    if: github.repository == 'open-telemetry/opentelemetry-php'
+    steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: otelbot-token
+        with:
+          client-id: ${{ vars.OTELBOT_PHP_CLIENT_ID }}
+          private-key: ${{ secrets.OTELBOT_PHP_PRIVATE_KEY }}
+          owner: open-telemetry
+          repositories: |
+            opentelemetry-php
+            opentelemetry-php-contrib
+          # Token creation fails if the app lacks either of these
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Show the app and the repos it can reach
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+          APP_SLUG: ${{ steps.otelbot-token.outputs.app-slug }}
+        run: |
+          gh api "users/${APP_SLUG}[bot]" --jq '"Commit as: \(.login) <\(.id)+\(.login)@users.noreply.github.com>"'
+          gh api installation/repositories --jq '.repositories[].full_name'
+
+      # A dry-run push needs write access to fetch the remote's refs, but sends nothing
+      - name: Check push access to both repos
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+        run: |
+          gh auth setup-git
+          git init -q "$RUNNER_TEMP/probe" && cd "$RUNNER_TEMP/probe"
+          git -c user.name=probe -c user.email=probe@example.invalid commit -q --allow-empty -m probe
+          for repo in opentelemetry-php opentelemetry-php-contrib; do
+            git push --dry-run "https://github.com/open-telemetry/$repo.git" HEAD:refs/heads/otelbot/token-probe
+          done
