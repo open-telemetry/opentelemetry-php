@@ -1,7 +1,9 @@
 name: Release approval
 
-# Fails on a release pull request whose breaking changes box is unticked. The Release PR workflow
-# adds the box when release:prep warns, and unticks it when the warnings change.
+# Fails on a release pull request whose breaking changes box is unticked, or that is not built on
+# the tip of main. The Release PR workflow adds the box when release:prep warns, and unticks it when
+# the warnings change. Its stale job edits the description when main moves, so this runs again.
+# Skipped on other pull requests, which a required check counts as passing.
 
 on:
   pull_request:
@@ -18,6 +20,8 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.head.ref == 'otelbot/release' &&
       github.event.pull_request.user.login == 'otelbot-php[bot]'
+    permissions:
+      contents: read
     steps:
       - name: Check the breaking changes box
         env:
@@ -25,5 +29,19 @@ jobs:
         run: |
           if tr -d '\r' <<<"$BODY" | grep -qxF -- '- [ ] I have read the breaking changes'; then
             echo "::error::Read the breaking changes in the description, then tick the box"
+            exit 1
+          fi
+
+      # Update branch merges main in, which leaves main's new changelog entries unreleased
+      - name: Check the pull request is built on main
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          parents=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA" --jq '[.parents[].sha] | join(" ")')
+          main=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          if [ "$parents" != "$main" ]; then
+            echo "::error::main has moved since this pull request was built. Rebuild it: tick Open a release PR on the release dashboard issue, or run the Release PR workflow."
             exit 1
           fi

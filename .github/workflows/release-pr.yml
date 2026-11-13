@@ -1,18 +1,19 @@
 name: Release PR
 
-# Opens or refreshes a monorepo's release pull request, from release:prep on main. Contrib's is
-# opened from here, as only this repository can read the otelbot-php key. A refresh rebuilds the
-# branch from main and keeps the overrides in the description, so the pull request never conflicts.
+# Opens or rebuilds a monorepo's release pull request, from release:prep on main, when a maintainer
+# asks: by dispatch, by ticking the box on a dashboard issue, or by editing the overrides. Contrib's
+# is opened from here, as only this repository can read the otelbot-php key. A rebuild starts again
+# from main and keeps the overrides in the description, so the pull request never conflicts.
 #
-# A dispatch, or a tick on a dashboard issue, opens one. A push to main, the schedule, or an edit
-# to the overrides refreshes one that is open. Contrib merges don't trigger this workflow, so its
-# pull request refreshes on the schedule.
+# Nothing rebuilds it when main moves. The stale job adds a note to the description instead. In
+# core, that edit makes the Release approval check run again, and fail until the pull request is
+# rebuilt. Contrib merges don't trigger this workflow, so contrib's is marked on the schedule.
 
 on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '47 21 * * *' # daily, after the dashboard
+    - cron: '47 21 * * *' # daily, to mark contrib's stale
   workflow_dispatch:
     inputs:
       monorepo:
@@ -35,15 +36,16 @@ env:
   BOT_EMAIL: 356036745+otelbot-php[bot]@users.noreply.github.com
   APPROVAL: '- [ ] I have read the breaking changes'
   APPROVED: '- [x] I have read the breaking changes'
+  STALE: '`main` has moved since this pull request was built, so it would release less than `main` holds. Rebuild it to bring the changes in. <!-- stale -->'
 
 jobs:
   release-pr:
     name: Release PR for ${{ matrix.monorepo }}
     runs-on: ubuntu-latest
-    # The bot's own edits to the description are skipped, or each refresh would start another
+    # The bot's own edits to the description are skipped, or each rebuild would start another
     if: >-
       github.repository == 'open-telemetry/opentelemetry-php' && (
-        (github.event_name != 'issues' && github.event_name != 'pull_request') || (
+        github.event_name == 'workflow_dispatch' || (
           github.event_name == 'issues' &&
           github.event.issue.state == 'open' &&
           contains(github.event.issue.body, '- [x] Open a release PR') && (
@@ -67,8 +69,7 @@ jobs:
           ${{ fromJSON(
             github.event_name == 'workflow_dispatch' && format('[{{"monorepo": "{0}"}}]', inputs.monorepo) ||
             github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'release-dashboard:contrib') && '[{"monorepo": "opentelemetry-php-contrib"}]' ||
-            (github.event_name == 'issues' || github.event_name == 'pull_request') && '[{"monorepo": "opentelemetry-php"}]' ||
-            '[{"monorepo": "opentelemetry-php"}, {"monorepo": "opentelemetry-php-contrib"}]'
+            '[{"monorepo": "opentelemetry-php"}]'
           ) }}
     # Runs queue rather than cancel, as a cancelled run can leave the description and the branch
     # out of step. The bot's own edits get a group of their own, so their skipped runs can't
@@ -84,7 +85,7 @@ jobs:
         shell: bash # with pipefail, which the default shell lacks
     env:
       MONOREPO: open-telemetry/${{ matrix.monorepo }}
-      OPEN: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'issues' }}
+      OPEN: ${{ github.event_name != 'pull_request' }}
     steps:
       # Edits made with GITHUB_TOKEN start no workflow, so this can't loop
       - name: Untick the box on the dashboard issue
@@ -117,7 +118,7 @@ jobs:
           case $(jq length <<<"$prs") in
             0)
               if [ "$OPEN" != true ]; then
-                echo "$MONOREPO has no open release pull request to refresh"
+                echo "$MONOREPO has no open release pull request to rebuild"
                 echo "run=false" >> "$GITHUB_OUTPUT"
                 exit 0
               fi
@@ -263,7 +264,7 @@ jobs:
           # Edits to a contrib pull request start no workflow here
           REBUILD: >-
             ${{ matrix.monorepo == 'opentelemetry-php' && 'Saving rebuilds the pull request with them.' ||
-            'Then run the Release PR workflow in open-telemetry/opentelemetry-php for this monorepo, or wait for its daily run.' }}
+            'Then rebuild it.' }}
         run: |
           # release:prep warns on a forced major as well as on breaking entries
           checks=$(jq -c '{
@@ -273,9 +274,10 @@ jobs:
           {
             echo "Releases [$MONOREPO](https://github.com/$MONOREPO) from \`main\` at [${SHA:0:7}](https://github.com/$MONOREPO/commit/$SHA)."
             cat <<'EOF'
-          A workflow rebuilds this pull request from `main` on each push to it. It keeps the overrides
-          and the tick below, and replaces the rest of this description. Fix changelog entries in a pull
-          request to `main`, not here.
+          To bring in later changes to `main`, rebuild this pull request: tick Open a release PR on the
+          release dashboard issue, or run the Release PR workflow. Update branch doesn't rebuild it. A
+          rebuild keeps the overrides and the tick below, and replaces the rest of this description.
+          Fix changelog entries in a pull request to `main`, then rebuild.
 
           EOF
             cat "$RUNNER_TEMP/prep.md"
@@ -329,8 +331,12 @@ jobs:
           TITLE: Release ${{ steps.prep.outputs.date }}
         run: |
           current=$(gh pr view "$NUMBER" --repo "$MONOREPO" --json title,body)
-          # An edit since this run read the description has started a run of its own
-          if [ "$(jq -r .body <<<"$current" | tr -d '\r')" != "$(cat "$RUNNER_TEMP/body.md")" ]; then
+          # An edit since this run read the description has started a run of its own. The stale
+          # job's note is not such an edit, and this rebuild replaces it.
+          unmarked() {
+            tr -d '\r' | grep -vxF -- "$STALE" | sed '1{/^$/d;}'
+          }
+          if [ "$(jq -r .body <<<"$current" | unmarked)" != "$(unmarked < "$RUNNER_TEMP/body.md")" ]; then
             echo "::error::The description of #$NUMBER changed during this run. The run for that edit rebuilds the pull request."
             exit 1
           fi
@@ -352,3 +358,64 @@ jobs:
           GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
           TITLE: Release ${{ steps.prep.outputs.date }}
         run: gh pr create --repo "$MONOREPO" --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/description.md"
+
+  stale:
+    name: Mark the ${{ matrix.monorepo }} release PR stale
+    runs-on: ubuntu-latest
+    if: >-
+      github.repository == 'open-telemetry/opentelemetry-php' &&
+      (github.event_name == 'push' || github.event_name == 'schedule')
+    strategy:
+      fail-fast: false
+      matrix:
+        monorepo: ${{ fromJSON(github.event_name == 'push' && '["opentelemetry-php"]' || '["opentelemetry-php", "opentelemetry-php-contrib"]') }}
+    concurrency:
+      group: ${{ github.workflow }}-stale-${{ matrix.monorepo }}
+      cancel-in-progress: true
+    permissions: {}
+    defaults:
+      run:
+        shell: bash
+    env:
+      MONOREPO: open-telemetry/${{ matrix.monorepo }}
+    steps:
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: otelbot-token
+        with:
+          client-id: ${{ vars.OTELBOT_PHP_CLIENT_ID }}
+          private-key: ${{ secrets.OTELBOT_PHP_PRIVATE_KEY }}
+          owner: open-telemetry
+          repositories: ${{ matrix.monorepo }}
+          permission-contents: read
+          permission-pull-requests: write
+
+      # The edit is made with the app token so that it starts the Release approval check, which
+      # GITHUB_TOKEN's edits would not
+      - name: Mark the pull request stale
+        env:
+          GH_TOKEN: ${{ steps.otelbot-token.outputs.token }}
+        run: |
+          prs=$(gh pr list --repo "$MONOREPO" --head "$BRANCH" --author app/otelbot-php --state open --json number,headRefOid,body --limit 2)
+          case $(jq length <<<"$prs") in
+            0)
+              echo "$MONOREPO has no open release pull request"
+              exit 0
+              ;;
+            1) ;;
+            *)
+              echo "::error::$MONOREPO has more than one open release pull request"
+              exit 1
+              ;;
+          esac
+          number=$(jq -r '.[0].number' <<<"$prs")
+          parents=$(gh api "repos/$MONOREPO/commits/$(jq -r '.[0].headRefOid' <<<"$prs")" --jq '[.parents[].sha] | join(" ")')
+          main=$(gh api "repos/$MONOREPO/commits/main" --jq .sha)
+          body=$(jq -r '.[0].body' <<<"$prs" | tr -d '\r')
+          if [ "$parents" = "$main" ]; then
+            echo "#$number is built on main"
+          elif grep -qxF -- "$STALE" <<<"$body"; then
+            echo "#$number is already marked stale"
+          else
+            printf '%s\n\n%s\n' "$STALE" "$body" > "$RUNNER_TEMP/body.md"
+            gh pr edit "$number" --repo "$MONOREPO" --body-file "$RUNNER_TEMP/body.md"
+          fi
