@@ -35,6 +35,10 @@ class ComposableProbabilityTest extends TestCase
         yield 'half' => [0.5, 0x80000000000000];
         yield 'quarter' => [0.25, 0xc0000000000000];
         yield 'one in 2^56' => [2 ** -56, ConsistentSamplingUtil::MAX_THRESHOLD - 1];
+        yield '1/16' => [1/16, 0xf0000000000000];
+        yield '3/32' => [3/32, 0xe8000000000000];
+        yield '0.1' => [0.1, 0xe6660000000000];
+        yield '0.01' => [0.01, 0xfd70a000000000];
     }
 
     #[DataProvider('neverSampledRatioProvider')]
