@@ -10,6 +10,7 @@ use InvalidArgumentException;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
+use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use OpenTelemetry\SDK\Trace\SamplerInterface;
 use OpenTelemetry\SDK\Trace\SamplingResult;
@@ -85,6 +86,9 @@ class TraceIdRatioBasedSampler implements SamplerInterface
 
     /**
      * Computes the 56-bit rejection threshold (T-value) for a given probability.
+     *
+     * Deprecated, this implementation has rounding errors near `2**-56`. Use
+     * {@link ConsistentSamplingUtil::computeTValue()} instead.
      *
      * The T-value is computed as `2**56*(1-$probability)` with a precision of
      * `2**-($wordSize*⌈-log2($probability)/$wordSize+$precision-1⌉)`.
