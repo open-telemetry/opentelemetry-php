@@ -21,9 +21,18 @@ upgraders can check them in one place.
 - `RegistrarInterface`, for packages to register exporter factories, transport factories and propagators with the
   `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi`. It is a bridge for SDK 1.x
   and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
+- `ReadWriteLogRecord::setAttribute()` and `removeAttribute()`. A processor can add, change and remove attributes
+  of a record in `onEmit()`, and processors registered after it see the change. Added attributes are subject to the
+  attribute limits ([#2131]).
+- `ExtendedLogRecordProcessorInterface`, with `isEnabled()`. `Logger::isEnabled()` returns false when the processor
+  reports that it would drop the record. The batch, simple, multi and noop processors implement it. The interface is
+  experimental ([#2131]).
 
 ### Fixed
 
+- `Logger::isEnabled()` returns false when the provider has no processors. It used to return true ([#2131]).
+- The console log exporter writes the event name of a record, as `event_name` ([#2131]).
+- The deprecated `EventLogger` sets the event name of the record, as well as the `event.name` attribute ([#2131]).
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
   `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
   them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`
@@ -180,4 +189,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#2131]: https://github.com/open-telemetry/opentelemetry-php/pull/2131
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

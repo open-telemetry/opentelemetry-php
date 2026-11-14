@@ -14,8 +14,9 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Logs\ExtendedLogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
-use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
@@ -23,7 +24,7 @@ use OpenTelemetry\SemConv\Version;
 use SplQueue;
 use Throwable;
 
-class BatchLogRecordProcessor implements LogRecordProcessorInterface
+class BatchLogRecordProcessor implements ExtendedLogRecordProcessorInterface
 {
     use LogsMessagesTrait;
 
@@ -168,6 +169,16 @@ class BatchLogRecordProcessor implements LogRecordProcessorInterface
         if ($this->autoFlush) {
             $this->flush();
         }
+    }
+
+    #[\Override]
+    public function isEnabled(
+        ContextInterface $context,
+        InstrumentationScopeInterface $scope,
+        ?int $severityNumber,
+        ?string $eventName,
+    ): bool {
+        return true;
     }
 
     #[\Override]
