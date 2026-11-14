@@ -31,6 +31,10 @@ upgraders can check them in one place.
 - `AutoRootSpan::start($notifySpanEnded)` registers the callback also when the root span was already started, for
   example by `SdkAutoloader::autoload()`. The callback used to be dropped. A callback that throws no longer keeps the
   root span from ending ([#2120]).
+- Consistent probability samplers compute the `th` rejection threshold exactly, with the precision recommended by the
+  specification. Sampling thresholds computed from ratios that aren't a sum of 56-bit fractions used to differ from the
+  spec test vectors: `1/3` was `th:aaaaaaaaaaaaac` instead of `th:aaab`, `0.1` was `th:e6666666666666` instead of
+  `th:e666` ([#2140]).
 
 ## 1.16.1 - 2026-11-06
 
@@ -180,4 +184,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
