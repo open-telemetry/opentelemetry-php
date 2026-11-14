@@ -24,6 +24,8 @@ upgraders can check them in one place.
 
 - With the `tbachert/spi` plugin running, the `otlp` exporters and the `http` transport are available while the SDK
   autoloads, whatever the order in which Composer includes the packages ([#2120]).
+- The `otlp/stdout` metrics exporter reads `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`, as the `otlp`
+  exporter does. It used each stream's temporality, so synchronous instruments were exported as delta ([#2129]).
 
 ## 1.5.0 - 2026-11-06
 
