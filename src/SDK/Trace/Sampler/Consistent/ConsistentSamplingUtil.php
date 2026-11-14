@@ -197,8 +197,8 @@ final class ConsistentSamplingUtil
 
         // 56+1bit for rounding
         $s = $e - 1023 - 52 + 57;
-        $t = (1 << 57) - ($s < 0 ? $f >> -$s : $f << $s);
         $m = -1 << 56 >> (-($e - 1023 + 1) + $precision * $wordSize & -$wordSize);
+        $t = (1 << 57) - ($s < 0 ? ($f - 1 >> -$s) - $m & $m : $f << $s);
 
         return $t - $m >> 1 & $m;
     }

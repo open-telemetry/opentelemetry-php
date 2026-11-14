@@ -137,7 +137,8 @@ class ConsistentSamplingUtilTest extends TestCase
     }
 
     #[DataProvider('computeTValueProvider')]
-    public function test_compute_t_value(string $expected, float $probability, int $precision): void
+    #[DataProvider('computeTValueProviderAdditional')]
+    public function test_compute_t_value(string $expected, float $probability, int $precision = 4): void
     {
         $tv = ConsistentSamplingUtil::computeTValue($probability, $precision, 4);
         $this->assertSame($expected, rtrim(bin2hex(substr(pack('J', $tv), 1)), '0') ?: '0');
@@ -159,5 +160,30 @@ class ConsistentSamplingUtilTest extends TestCase
         yield from [['fff972', 1/10000, 3], ['fff9724', 1/10000, 4], ['fff97247', 1/10000, 5]];
         yield from [['ffff584', 1/100000, 3], ['ffff583a', 1/100000, 4], ['ffff583a5', 1/100000, 5]];
         yield from [['ffffef4', 1/1000000, 3], ['ffffef39', 1/1000000, 4], ['ffffef391', 1/1000000, 5]];
+    }
+
+    public static function computeTValueProviderAdditional(): iterable
+    {
+        yield ['ffffffffffffff', 2 ** -56];
+        yield ['ffffffffffffff', (2 ** -56) + 2 ** -108];
+        yield ['ffffffffffffff', (2 ** -57) + 2 ** -109];
+        yield ['ffffffffffffff', 1.25 * 2 ** -57];
+        yield ['ffffffffffffff', (1.25 * 2 ** -57) + 2 ** -109];
+        yield ['ffffffffffffff', (1.25 * 2 ** -57) - 2 ** -109];
+        yield ['fffffffffffffe', 1.75 * 2 ** -56];
+        yield ['ffffffffff8', 65537 * 2 ** -57];
+        yield ['fffffffff8', 65537 * 2 ** -53];
+
+        yield ['fffffffffbffc', 4097 * 2 ** -50];
+        yield ['fffffffffffbc', 17 * 2 ** -50];
+        yield ['ffffffffbfff',  65539 * 2 ** -50];
+
+        yield ['0',  0.0];
+        yield ['0',  -0.0];
+        yield ['0',  1.0];
+        yield ['0',  2 ** -57];
+        yield ['0',  2 ** -1022];
+        yield ['0',  2 ** -1023];
+        yield ['0',  2 ** -1074];
     }
 }
