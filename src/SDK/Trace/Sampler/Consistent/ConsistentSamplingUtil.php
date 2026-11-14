@@ -163,8 +163,6 @@ final class ConsistentSamplingUtil
      * The T-value is computed as `2**56*(1-$probability)` with a precision of
      * `2**-($wordSize*⌈-log2($probability)/$wordSize+$precision-1⌉)`.
      *
-     * Values below `2**-56` will return `0`.
-     *
      * ```
      * 1/3 w/ precision=3, wordSize=4
      * => 1 - 1/3
@@ -182,7 +180,7 @@ final class ConsistentSamplingUtil
      * @param float $probability sampling probability, must be between 0 and 1
      * @param int $precision precision in words
      * @param int $wordSize word size to use, must be a power of two
-     * @return int 56bit T-value
+     * @return int 56bit T-value, or `2**56` if out of sampling range
      *
      * @internal
      */
