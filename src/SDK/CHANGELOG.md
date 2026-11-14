@@ -205,4 +205,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
+[#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
