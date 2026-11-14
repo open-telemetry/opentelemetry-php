@@ -9,6 +9,7 @@ use OpenTelemetry\SDK\Trace\Sampler\Consistent\ConsistentSamplingUtil;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\OtelTraceState;
 use OpenTelemetry\SDK\Trace\Sampler\Consistent\SamplingIntent;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConsistentSamplingUtil::class)]
@@ -133,5 +134,30 @@ class ConsistentSamplingUtilTest extends TestCase
         $this->assertTrue(ConsistentSamplingUtil::isValidProbability(1.0));
         $this->assertFalse(ConsistentSamplingUtil::isValidProbability(-0.01));
         $this->assertFalse(ConsistentSamplingUtil::isValidProbability(1.01));
+    }
+
+    #[DataProvider('computeTValueProvider')]
+    public function test_compute_t_value(string $expected, float $probability, int $precision): void
+    {
+        $tv = ConsistentSamplingUtil::computeTValue($probability, $precision, 4);
+        $this->assertSame($expected, rtrim(bin2hex(substr(pack('J', $tv), 1)), '0') ?: '0');
+    }
+
+    public static function computeTValueProvider(): iterable
+    {
+        // see https://github.com/open-telemetry/opentelemetry-specification/pull/4166
+        yield from [['0', 1, 3], ['0', 1, 4], ['0', 1, 5]];
+        yield from [['8', 1/2, 3], ['8', 1/2, 4], ['8', 1/2, 5]];
+        yield from [['aab', 1/3, 3], ['aaab', 1/3, 4], ['aaaab', 1/3, 5]];
+        yield from [['c', 1/4, 3], ['c', 1/4, 4], ['c', 1/4, 5]];
+        yield from [['ccd', 1/5, 3], ['cccd', 1/5, 4], ['ccccd', 1/5, 5]];
+        yield from [['e', 1/8, 3], ['e', 1/8, 4], ['e', 1/8, 5]];
+        yield from [['e66', 1/10, 3], ['e666', 1/10, 4], ['e6666', 1/10, 5]];
+        yield from [['f', 1/16, 3], ['f', 1/16, 4], ['f', 1/16, 5]];
+        yield from [['fd71', 1/100, 3], ['fd70a', 1/100, 4], ['fd70a4', 1/100, 5]];
+        yield from [['ffbe7', 1/1000, 3], ['ffbe77', 1/1000, 4], ['ffbe76d', 1/1000, 5]];
+        yield from [['fff972', 1/10000, 3], ['fff9724', 1/10000, 4], ['fff97247', 1/10000, 5]];
+        yield from [['ffff584', 1/100000, 3], ['ffff583a', 1/100000, 4], ['ffff583a5', 1/100000, 5]];
+        yield from [['ffffef4', 1/1000000, 3], ['ffffef39', 1/1000000, 4], ['ffffef391', 1/1000000, 5]];
     }
 }
