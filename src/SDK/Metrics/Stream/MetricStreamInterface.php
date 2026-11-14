@@ -16,6 +16,7 @@ interface MetricStreamInterface
      * Returns the internal temporality of this stream.
      *
      * @return string|Temporality internal temporality
+     * @deprecated Choose temporality by instrument type, with {@see \OpenTelemetry\SDK\Metrics\TemporalityPreference}. Removed in 2.0.
      */
     public function temporality();
 

@@ -11,11 +11,13 @@ interface AggregationTemporalitySelectorInterface
     /**
      * Returns the temporality to use for the given metric.
      *
-     * It is recommended to return {@see MetricMetadataInterface::temporality()}
-     * if the exporter does not require a specific temporality.
+     * Return {@see Temporality::CUMULATIVE} if the exporter does not require a
+     * specific temporality.
      *
      * @return string|Temporality|null temporality to use, or null to signal
      *         that the given metric should not be exported by this exporter
+     *
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk.md#metricreader
      */
     public function temporality(MetricMetadataInterface $metric);
 }

@@ -21,6 +21,25 @@ upgraders can check them in one place.
 - `RegistrarInterface`, for packages to register exporter factories, transport factories and propagators with the
   `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi`. It is a bridge for SDK 1.x
   and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
+- `InMemoryExporter` accepts an `AggregationTemporalitySelectorInterface`, such as `TemporalityPreference`, as its
+  temporality, like the console and OTLP metric exporters ([#2129]).
+- An asynchronous instrument callback that returns a value logs a warning, once per callback. The value is ignored,
+  as it always was. Report measurements through the observer instead ([#2129]).
+
+### Changed
+
+- `InstrumentType::GAUGE` is no longer experimental. The synchronous Gauge is stable in the specification ([#2129]).
+
+### Deprecated
+
+- Passing a `Temporality` or a string as the temporality of `ConsoleMetricExporter` or `InMemoryExporter`. Pass a
+  selector such as `TemporalityPreference::cumulative()` or `TemporalityPreference::delta()`. The delta preference
+  keeps UpDownCounters cumulative, as the specification requires, where `Temporality::DELTA` made them delta. An
+  exporter built without a temporality is not deprecated. It uses each stream's temporality until 2.0, which is
+  delta for synchronous instruments and cumulative for asynchronous ones. From 2.0 it will use cumulative. Pass
+  `TemporalityPreference::cumulative()` to get that now ([#2129]).
+- `MetricMetadataInterface::temporality()` and `MetricStreamInterface::temporality()`. Choose temporality by
+  instrument type instead. They will be removed in 2.0 ([#2129]).
 
 ### Fixed
 
@@ -184,5 +203,7 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
+[#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

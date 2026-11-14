@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Changed
+
+- `MeterInterface::createGauge()` and `GaugeInterface` are no longer experimental. The synchronous Gauge is stable
+  in the specification ([#2129]).
+
 ### Fixed
 
 - `WithSpanHandler` uses the span name of `#[WithSpan(span_name: '...')]`. Only the positional form
@@ -67,3 +72,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2119]: https://github.com/open-telemetry/opentelemetry-php/pull/2119
 [#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
+[#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
