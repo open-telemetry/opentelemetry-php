@@ -6,10 +6,18 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
+use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory as InMemoryMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
+use OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +27,55 @@ use TypeError;
 #[CoversClass(Registry::class)]
 class FactoryRegistryTest extends TestCase
 {
+    public function test_transport_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerTransportFactory('Acme', StreamTransportFactory::class, true);
+        Registry::registerTransportFactory('acme', OtlpHttpTransportFactory::class);
+
+        $this->assertSame(StreamTransportFactory::class, Registry::transportFactory('acme')::class);
+        $this->assertSame(StreamTransportFactory::class, Registry::transportFactory('Acme')::class);
+        $this->assertSame(StreamTransportFactory::class, Registry::transportFactory('ACME/protobuf')::class);
+
+        Registry::registerTransportFactory('acme', OtlpHttpTransportFactory::class, true);
+        $this->assertSame(OtlpHttpTransportFactory::class, Registry::transportFactory('Acme')::class);
+    }
+
+    public function test_span_exporter_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerSpanExporterFactory('Acme', ConsoleSpanExporterFactory::class, true);
+        Registry::registerSpanExporterFactory('acme', InMemorySpanExporterFactory::class);
+
+        $this->assertSame(ConsoleSpanExporterFactory::class, Registry::spanExporterFactory('acme')::class);
+        $this->assertSame(ConsoleSpanExporterFactory::class, Registry::spanExporterFactory('Acme')::class);
+
+        Registry::registerSpanExporterFactory('acme', InMemorySpanExporterFactory::class, true);
+        $this->assertSame(InMemorySpanExporterFactory::class, Registry::spanExporterFactory('Acme')::class);
+    }
+
+    public function test_metric_exporter_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerMetricExporterFactory('Acme', ConsoleMetricExporterFactory::class, true);
+        Registry::registerMetricExporterFactory('acme', InMemoryMetricExporterFactory::class);
+
+        $this->assertSame(ConsoleMetricExporterFactory::class, Registry::metricExporterFactory('acme')::class);
+        $this->assertSame(ConsoleMetricExporterFactory::class, Registry::metricExporterFactory('Acme')::class);
+
+        Registry::registerMetricExporterFactory('acme', InMemoryMetricExporterFactory::class, true);
+        $this->assertSame(InMemoryMetricExporterFactory::class, Registry::metricExporterFactory('Acme')::class);
+    }
+
+    public function test_log_record_exporter_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerLogRecordExporterFactory('Acme', ConsoleExporterFactory::class, true);
+        Registry::registerLogRecordExporterFactory('acme', InMemoryExporterFactory::class);
+
+        $this->assertSame(ConsoleExporterFactory::class, Registry::logRecordExporterFactory('acme')::class);
+        $this->assertSame(ConsoleExporterFactory::class, Registry::logRecordExporterFactory('Acme')::class);
+
+        Registry::registerLogRecordExporterFactory('acme', InMemoryExporterFactory::class, true);
+        $this->assertSame(InMemoryExporterFactory::class, Registry::logRecordExporterFactory('Acme')::class);
+    }
+
     #[DataProvider('transportProtocolsProvider')]
     public function test_default_transport_factories(string $name): void
     {

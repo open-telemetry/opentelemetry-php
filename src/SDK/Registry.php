@@ -49,6 +49,7 @@ class Registry
      */
     public static function registerTransportFactory(string $protocol, TransportFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $protocol = strtolower($protocol);
         if (!$clobber && array_key_exists($protocol, self::$transportFactories)) {
             return;
         }
@@ -70,6 +71,7 @@ class Registry
      */
     public static function registerSpanExporterFactory(string $exporter, SpanExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $exporter = strtolower($exporter);
         if (!$clobber && array_key_exists($exporter, self::$spanExporterFactories)) {
             return;
         }
@@ -91,6 +93,7 @@ class Registry
      */
     public static function registerMetricExporterFactory(string $exporter, MetricExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $exporter = strtolower($exporter);
         if (!$clobber && array_key_exists($exporter, self::$metricExporterFactories)) {
             return;
         }
@@ -112,6 +115,7 @@ class Registry
      */
     public static function registerLogRecordExporterFactory(string $exporter, LogRecordExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $exporter = strtolower($exporter);
         if (!$clobber && array_key_exists($exporter, self::$logRecordExporterFactories)) {
             return;
         }
@@ -150,10 +154,11 @@ class Registry
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
-        if (!self::isRegistered(self::$spanExporterFactories, $exporter)) {
+        $key = strtolower($exporter);
+        if (!self::isRegistered(self::$spanExporterFactories, $key)) {
             throw self::notRegistered('Span exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$spanExporterFactories[$exporter];
+        $class = self::$spanExporterFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof SpanExporterFactoryInterface);
 
@@ -162,10 +167,11 @@ class Registry
 
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
-        if (!self::isRegistered(self::$logRecordExporterFactories, $exporter)) {
+        $key = strtolower($exporter);
+        if (!self::isRegistered(self::$logRecordExporterFactories, $key)) {
             throw self::notRegistered('LogRecord exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$logRecordExporterFactories[$exporter];
+        $class = self::$logRecordExporterFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof LogRecordExporterFactoryInterface);
 
@@ -179,10 +185,11 @@ class Registry
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
         $protocol = explode('/', $protocol)[0];
-        if (!self::isRegistered(self::$transportFactories, $protocol)) {
+        $key = strtolower($protocol);
+        if (!self::isRegistered(self::$transportFactories, $key)) {
             throw self::notRegistered('Transport factory not defined for protocol: ' . $protocol);
         }
-        $class = self::$transportFactories[$protocol];
+        $class = self::$transportFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof TransportFactoryInterface);
 
@@ -191,10 +198,11 @@ class Registry
 
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
-        if (!self::isRegistered(self::$metricExporterFactories, $exporter)) {
+        $key = strtolower($exporter);
+        if (!self::isRegistered(self::$metricExporterFactories, $key)) {
             throw self::notRegistered('Metric exporter factory not registered for protocol: ' . $exporter);
         }
-        $class = self::$metricExporterFactories[$exporter];
+        $class = self::$metricExporterFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof MetricExporterFactoryInterface);
 

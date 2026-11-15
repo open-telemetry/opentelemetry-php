@@ -55,7 +55,7 @@ class MeterProviderFactoryTest extends TestCase
         Logging::setLogLevel('warning');
 
         $provider = (new MeterProviderFactory())->create();
-        $this->assertInstanceOf(MeterInterface::class, $provider->getMeter('test'));
+        $this->assertInstanceOf(MeterProvider::class, $provider);
     }
 
     public static function exporterProvider(): array
