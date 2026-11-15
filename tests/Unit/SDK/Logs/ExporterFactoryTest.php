@@ -19,6 +19,7 @@ class ExporterFactoryTest extends TestCase
 
     /**
      * @param class-string $expected
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      */
     #[DataProvider('exporterProvider')]
     public function test_create(string $name, string $expected): void
@@ -33,7 +34,9 @@ class ExporterFactoryTest extends TestCase
     {
         return [
             ['console', ConsoleExporter::class],
+            ['Console', ConsoleExporter::class],
             ['none', NoopExporter::class],
+            ['NONE', NoopExporter::class],
         ];
     }
 

@@ -43,6 +43,7 @@ upgraders can check them in one place.
 
 ### Fixed
 
+- Enum configuration values and trace, metric and log exporter names are now interpreted case-insensitively.
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
   `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
   them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`

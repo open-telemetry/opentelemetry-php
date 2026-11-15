@@ -37,6 +37,7 @@ class ExporterFactoryTest extends TestCase
 
     /**
      * @param class-string $expected
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      */
     #[DataProvider('envProvider')]
     #[Group('trace-compliance')]
@@ -80,6 +81,9 @@ class ExporterFactoryTest extends TestCase
             ],
             'console' => [
                 'console', [], ConsoleSpanExporter::class,
+            ],
+            'mixed case console' => [
+                'Console', [], ConsoleSpanExporter::class,
             ],
         ];
     }

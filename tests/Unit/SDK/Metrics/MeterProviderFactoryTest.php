@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -41,6 +42,22 @@ class MeterProviderFactoryTest extends TestCase
         $this->assertInstanceOf(MeterInterface::class, $provider->getMeter('test'));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_mixed_case_configuration_does_not_log_warnings(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXPORTER, 'Console');
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXEMPLAR_FILTER, 'always_On');
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+        Logging::setLogLevel('warning');
+
+        $provider = (new MeterProviderFactory())->create();
+        $this->assertInstanceOf(MeterInterface::class, $provider->getMeter('test'));
+    }
+
     public static function exporterProvider(): array
     {
         return [
@@ -52,6 +69,7 @@ class MeterProviderFactoryTest extends TestCase
 
     /**
      * @param class-string<ExemplarFilterInterface> $expectedFilter
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      */
     #[DataProvider('exemplarFilterProvider')]
     public function test_exemplar_filter(?string $filter, string $expectedFilter): void
@@ -72,6 +90,7 @@ class MeterProviderFactoryTest extends TestCase
     {
         yield 'default' => [null, WithSampledTraceExemplarFilter::class];
         yield 'always_on' => [KnownValues::VALUE_ALWAYS_ON, AllExemplarFilter::class];
+        yield 'mixed case always_on' => ['always_On', AllExemplarFilter::class];
         yield 'always_off' => [KnownValues::VALUE_ALWAYS_OFF, NoneExemplarFilter::class];
         yield 'trace_based' => [KnownValues::VALUE_TRACE_BASED, WithSampledTraceExemplarFilter::class];
         yield 'legacy_all' => [KnownValues::VALUE_ALL, AllExemplarFilter::class];

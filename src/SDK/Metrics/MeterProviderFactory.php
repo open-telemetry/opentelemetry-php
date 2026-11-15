@@ -25,6 +25,7 @@ class MeterProviderFactory
     use LogsMessagesTrait;
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      * @todo https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk_exporters/otlp.md#general
      *       - "The exporter MUST configure the default aggregation on the basis of instrument kind using the
      *         OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION variable as described below if it is implemented."
@@ -34,7 +35,7 @@ class MeterProviderFactory
         if (Sdk::isDisabled()) {
             return new NoopMeterProvider();
         }
-        $exporters = Configuration::getList(Variables::OTEL_METRICS_EXPORTER);
+        $exporters = array_map('strtolower', Configuration::getList(Variables::OTEL_METRICS_EXPORTER));
         //TODO "The SDK MAY accept a comma-separated list to enable setting multiple exporters"
         if (count($exporters) !== 1) {
             throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_METRICS_EXPORTER));

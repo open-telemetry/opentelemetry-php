@@ -12,9 +12,12 @@ use OpenTelemetry\SDK\Registry;
 
 class ExporterFactory
 {
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public function create(): LogRecordExporterInterface
     {
-        $exporters = Configuration::getList(Variables::OTEL_LOGS_EXPORTER);
+        $exporters = array_map('strtolower', Configuration::getList(Variables::OTEL_LOGS_EXPORTER));
         if (1 !== count($exporters)) {
             throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_LOGS_EXPORTER));
         }

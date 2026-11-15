@@ -101,14 +101,17 @@ class Configuration
         );
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function getEnum(string $key, ?string $default = null): string
     {
-        return (string) self::validateVariableValue(
+        return strtolower((string) self::validateVariableValue(
             CompositeResolver::instance()->resolve(
                 self::validateVariableType($key, VariableTypes::ENUM),
                 $default
             )
-        );
+        ));
     }
 
     public static function getFloat(string $key, ?float $default = null): float
