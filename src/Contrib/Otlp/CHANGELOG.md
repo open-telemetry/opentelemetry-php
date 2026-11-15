@@ -12,10 +12,20 @@ upgraders can check them in one place.
   SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are registered when the
   package's autoload file loads, as before ([#2120]).
 
+### Deprecated
+
+- Passing a `Temporality` or a string as the temporality of `MetricExporter`. Pass a selector such as
+  `TemporalityPreference::cumulative()` or `TemporalityPreference::delta()`. The delta preference keeps
+  UpDownCounters cumulative, as the specification requires, where `Temporality::DELTA` made them delta. An exporter
+  built without a temporality is not deprecated. It uses each stream's temporality until 2.0, and cumulative from
+  2.0. Pass `TemporalityPreference::cumulative()` to get that now ([#2129]).
+
 ### Fixed
 
 - With the `tbachert/spi` plugin running, the `otlp` exporters and the `http` transport are available while the SDK
   autoloads, whatever the order in which Composer includes the packages ([#2120]).
+- The `otlp/stdout` metrics exporter reads `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`, as the `otlp`
+  exporter does. It used each stream's temporality, so synchronous instruments were exported as delta ([#2129]).
 
 ## 1.5.0 - 2026-11-06
 
@@ -72,3 +82,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129

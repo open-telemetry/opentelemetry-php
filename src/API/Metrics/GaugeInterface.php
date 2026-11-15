@@ -10,8 +10,6 @@ use OpenTelemetry\Context\ContextInterface;
  * A synchronous instrument which can be used to record non-additive values.
  *
  * @see https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge
- *
- * @experimental
  */
 interface GaugeInterface extends SynchronousInstrument
 {
