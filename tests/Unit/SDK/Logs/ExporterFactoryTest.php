@@ -40,6 +40,15 @@ class ExporterFactoryTest extends TestCase
         ];
     }
 
+    public function test_unknown_exporter_message_preserves_case(): void
+    {
+        $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', 'Console2');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Console2');
+
+        (new ExporterFactory())->create();
+    }
+
     public function test_rejects_multiple(): void
     {
         $this->setEnvironmentVariable('OTEL_LOGS_EXPORTER', 'one,two');

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
@@ -74,6 +76,42 @@ class FactoryRegistryTest extends TestCase
 
         Registry::registerLogRecordExporterFactory('acme', InMemoryExporterFactory::class, true);
         $this->assertSame(InMemoryExporterFactory::class, Registry::logRecordExporterFactory('Acme')::class);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_text_map_propagator_names_are_case_insensitive(): void
+    {
+        $propagator = BaggagePropagator::getInstance();
+        $replacement = TraceContextPropagator::getInstance();
+        Registry::registerTextMapPropagator('Acme', $propagator, true);
+        Registry::registerTextMapPropagator('acme', $replacement);
+
+        $this->assertSame($propagator, Registry::textMapPropagator('acme'));
+        $this->assertSame($propagator, Registry::textMapPropagator('Acme'));
+
+        Registry::registerTextMapPropagator('acme', $replacement, true);
+        $this->assertSame($replacement, Registry::textMapPropagator('Acme'));
+    }
+
+    #[DataProvider('unregisteredComponentProvider')]
+    public function test_unregistered_component_message_preserves_case(string $lookup): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Console2');
+
+        Registry::$lookup('Console2');
+    }
+
+    public static function unregisteredComponentProvider(): array
+    {
+        return [
+            ['spanExporterFactory'],
+            ['metricExporterFactory'],
+            ['logRecordExporterFactory'],
+            ['textMapPropagator'],
+        ];
     }
 
     #[DataProvider('transportProtocolsProvider')]

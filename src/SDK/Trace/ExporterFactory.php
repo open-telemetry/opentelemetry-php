@@ -18,12 +18,12 @@ class ExporterFactory
      */
     public function create(): ?SpanExporterInterface
     {
-        $exporters = array_map('strtolower', Configuration::getList(Variables::OTEL_TRACES_EXPORTER));
+        $exporters = Configuration::getList(Variables::OTEL_TRACES_EXPORTER);
         if (1 !== count($exporters)) {
             throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_TRACES_EXPORTER));
         }
         $exporter = $exporters[0];
-        if ($exporter === 'none') {
+        if (strtolower($exporter) === 'none') {
             return null;
         }
         $factory = Registry::spanExporterFactory($exporter);

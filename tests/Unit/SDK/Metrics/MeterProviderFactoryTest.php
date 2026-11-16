@@ -37,7 +37,7 @@ class MeterProviderFactoryTest extends TestCase
     #[DataProvider('exporterProvider')]
     public function test_create(string $exporter): void
     {
-        $_SERVER[Variables::OTEL_METRICS_EXPORTER] = $exporter;
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXPORTER, $exporter);
         $provider = (new MeterProviderFactory())->create();
         $this->assertInstanceOf(MeterInterface::class, $provider->getMeter('test'));
     }
@@ -56,6 +56,35 @@ class MeterProviderFactoryTest extends TestCase
 
         $provider = (new MeterProviderFactory())->create();
         $this->assertInstanceOf(MeterProvider::class, $provider);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_uppercase_none_exporter_does_not_log_warnings(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXPORTER, 'NONE');
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+        Logging::setLogLevel('warning');
+
+        $this->assertInstanceOf(MeterProvider::class, (new MeterProviderFactory())->create());
+    }
+
+    public function test_unknown_exporter_warning_preserves_case(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_METRICS_EXPORTER, 'Console2');
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            'warning',
+            $this->stringContains('Metric exporter factory not registered for protocol: Console2'),
+            $this->anything()
+        );
+        Logging::setLogWriter($logWriter);
+        Logging::setLogLevel('warning');
+
+        $this->assertInstanceOf(MeterProvider::class, (new MeterProviderFactory())->create());
     }
 
     public static function exporterProvider(): array

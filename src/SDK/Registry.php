@@ -131,8 +131,12 @@ class Registry
         self::$logRecordExporterFactories[$exporter] = $factory;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
     {
+        $name = strtolower($name);
         if (!$clobber && array_key_exists($name, self::$textMapPropagators)) {
             return;
         }
@@ -209,13 +213,17 @@ class Registry
         return $factory;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
-        if (!self::isRegistered(self::$textMapPropagators, $name)) {
+        $key = strtolower($name);
+        if (!self::isRegistered(self::$textMapPropagators, $key)) {
             throw self::notRegistered('Text map propagator not registered for: ' . $name);
         }
 
-        return self::$textMapPropagators[$name];
+        return self::$textMapPropagators[$key];
     }
 
     public static function resourceDetector(string $name): ResourceDetectorInterface

@@ -8,6 +8,8 @@ upgraders can check them in one place.
 
 ### Breaking changes
 
+- `Configuration::getEnum()` now returns lowercase values. Callers outside the SDK that compare its result with
+  uppercase or mixed-case strings must update their comparisons to use lowercase ([#2142]).
 - `Registry` now gets its built-in and package components from `RegistrarInterface` providers (SPI) when it is first
   asked for one, no longer from `_register.php` files that Composer includes. A component registered with
   `Registry::register*()` before that first lookup wins over a provider's, one registered with `$clobber` always wins,
@@ -43,8 +45,9 @@ upgraders can check them in one place.
 
 ### Fixed
 
-- Enum configuration values and trace, metric and log exporter names are now interpreted case-insensitively.
-  Exporter and transport factory names are also case-insensitive when registering and looking up factories ([#2142]).
+- Enum configuration values, including sampler names, and trace, metric and log exporter names are now interpreted
+  case-insensitively. Exporter and transport factory names and text map propagator names are also case-insensitive
+  when registering and looking up components ([#2142]).
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
   `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
   them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`
