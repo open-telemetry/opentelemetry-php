@@ -143,13 +143,21 @@ class Registry
         self::$textMapPropagators[$name] = $propagator;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function registerResourceDetector(string $name, ResourceDetectorInterface $detector): void
     {
+        $name = strtolower($name);
         self::$resourceDetectors[$name] = $detector;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function registerResponsePropagator(string $name, ResponsePropagatorInterface $responsePropagator, bool $clobber = false): void
     {
+        $name = strtolower($name);
         if (!$clobber && array_key_exists($name, self::$responsePropagators)) {
             return;
         }
@@ -226,22 +234,30 @@ class Registry
         return self::$textMapPropagators[$key];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function resourceDetector(string $name): ResourceDetectorInterface
     {
-        if (!self::isRegistered(self::$resourceDetectors, $name)) {
+        $key = strtolower($name);
+        if (!self::isRegistered(self::$resourceDetectors, $key)) {
             throw self::notRegistered('Resource detector not registered for: ' . $name);
         }
 
-        return self::$resourceDetectors[$name];
+        return self::$resourceDetectors[$key];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function responsePropagator(string $name): ResponsePropagatorInterface
     {
-        if (!self::isRegistered(self::$responsePropagators, $name)) {
+        $key = strtolower($name);
+        if (!self::isRegistered(self::$responsePropagators, $key)) {
             throw self::notRegistered('Response propagator not registered for: ' . $name);
         }
 
-        return self::$responsePropagators[$name];
+        return self::$responsePropagators[$key];
     }
 
     /**

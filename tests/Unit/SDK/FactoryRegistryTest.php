@@ -6,6 +6,7 @@ namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
@@ -18,6 +19,8 @@ use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory as InMemoryMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\Detectors\Constant;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
@@ -95,6 +98,39 @@ class FactoryRegistryTest extends TestCase
         $this->assertSame($replacement, Registry::textMapPropagator('Acme'));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_resource_detector_names_are_case_insensitive(): void
+    {
+        $detector = new Constant(ResourceInfoFactory::emptyResource());
+        $replacement = new Constant(ResourceInfoFactory::emptyResource());
+        Registry::registerResourceDetector('Acme', $detector);
+
+        $this->assertSame($detector, Registry::resourceDetector('acme'));
+        $this->assertSame($detector, Registry::resourceDetector('Acme'));
+
+        Registry::registerResourceDetector('acme', $replacement);
+        $this->assertSame($replacement, Registry::resourceDetector('Acme'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_response_propagator_names_are_case_insensitive(): void
+    {
+        $propagator = NoopResponsePropagator::getInstance();
+        $replacement = new NoopResponsePropagator();
+        Registry::registerResponsePropagator('Acme', $propagator, true);
+        Registry::registerResponsePropagator('acme', $replacement);
+
+        $this->assertSame($propagator, Registry::responsePropagator('acme'));
+        $this->assertSame($propagator, Registry::responsePropagator('Acme'));
+
+        Registry::registerResponsePropagator('acme', $replacement, true);
+        $this->assertSame($replacement, Registry::responsePropagator('Acme'));
+    }
+
     #[DataProvider('unregisteredComponentProvider')]
     public function test_unregistered_component_message_preserves_case(string $lookup): void
     {
@@ -111,6 +147,8 @@ class FactoryRegistryTest extends TestCase
             ['metricExporterFactory'],
             ['logRecordExporterFactory'],
             ['textMapPropagator'],
+            ['resourceDetector'],
+            ['responsePropagator'],
         ];
     }
 
