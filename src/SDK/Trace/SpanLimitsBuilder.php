@@ -91,14 +91,9 @@ class SpanLimitsBuilder
 
     private static function resolveAttributeLimit(string $specific, string $general, int $default): int
     {
-        if (Configuration::has($specific)) {
-            return Configuration::getInt($specific);
-        }
-        if (Configuration::has($general)) {
-            return Configuration::getInt($general);
-        }
+        $fallback = Configuration::has($general) ? Configuration::getInt($general) : $default;
 
-        return $default;
+        return Configuration::has($specific) ? Configuration::getInt($specific, $fallback) : $fallback;
     }
 
     /**

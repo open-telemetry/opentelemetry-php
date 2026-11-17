@@ -39,6 +39,18 @@ class LogRecordLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(222, 17), $limits->getAttributeFactory());
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_builder_uses_global_attribute_limit_when_log_record_limit_is_invalid(): void
+    {
+        $this->setEnvironmentVariable('OTEL_LOGRECORD_ATTRIBUTE_COUNT_LIMIT', 'fruit');
+        $this->setEnvironmentVariable('OTEL_ATTRIBUTE_COUNT_LIMIT', 111);
+        $limits = (new LogRecordLimitsBuilder())->build();
+
+        $this->assertEquals(Attributes::factory(111), $limits->getAttributeFactory());
+    }
+
     public function test_builder(): void
     {
         $limits = (new LogRecordLimitsBuilder())
