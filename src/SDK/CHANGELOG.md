@@ -25,6 +25,8 @@ upgraders can check them in one place.
   and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
 - `InMemoryExporter` accepts an `AggregationTemporalitySelectorInterface`, such as `TemporalityPreference`, as its
   temporality, like the console and OTLP metric exporters ([#2129]).
+- `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
+  messages. Without one, messages still go to the global internal logger and its level ([#2145]).
 - An asynchronous instrument callback that returns a value logs a warning, once per callback. The value is ignored,
   as it always was. Report measurements through the observer instead ([#2129]).
 
@@ -212,4 +214,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
+[#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

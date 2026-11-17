@@ -8,7 +8,7 @@ use function array_unshift;
 use ArrayAccess;
 use function assert;
 use function is_callable;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\AsynchronousInstrument;
 use OpenTelemetry\API\Metrics\CounterInterface;
@@ -25,6 +25,7 @@ use OpenTelemetry\SDK\Common\InstrumentationScope\Config;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurable;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
 use function OpenTelemetry\SDK\Common\Util\closure;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Metrics\Exemplar\ExemplarFilterInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\MultiRegistryRegistration;
 use OpenTelemetry\SDK\Metrics\MetricRegistration\RegistryRegistration;
@@ -32,6 +33,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\MultiReferenceCounter;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use Psr\Log\LoggerInterface;
 use function serialize;
 
 /**
@@ -39,7 +41,7 @@ use function serialize;
  */
 final class Meter implements MeterInterface, Configurable
 {
-    use LogsMessagesTrait;
+    use LogsToLoggerTrait;
 
     private ?string $instrumentationScopeId = null;
     private Config $config;
@@ -62,6 +64,7 @@ final class Meter implements MeterInterface, Configurable
         private readonly MetricWriterInterface $writer,
         private readonly ArrayAccess $destructors,
         ?Configurator $configurator = null,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
         $this->config = $configurator?->resolve($this->instrumentationScope) ?? MeterConfig::default();
     }
@@ -128,7 +131,7 @@ final class Meter implements MeterInterface, Configurable
         array_unshift($instruments, $instrument);
         foreach ($instruments as $instrument) {
             if (!$instrument instanceof InstrumentHandle) {
-                self::logWarning('Ignoring invalid instrument provided to batchObserve, instrument not created by this SDK', ['instrument' => $instrument]);
+                $this->logWarning('Ignoring invalid instrument provided to batchObserve, instrument not created by this SDK', ['instrument' => $instrument]);
                 $handles[] = self::dummyInstrument();
 
                 continue;
@@ -136,7 +139,7 @@ final class Meter implements MeterInterface, Configurable
 
             $asynchronousInstrument = $this->getAsynchronousInstrument($instrument->getHandle(), $this->instrumentationScope);
             if (!$asynchronousInstrument) {
-                self::logWarning('Ignoring invalid instrument provided to batchObserve, instrument not created by this meter', ['instrument' => $instrument]);
+                $this->logWarning('Ignoring invalid instrument provided to batchObserve, instrument not created by this meter', ['instrument' => $instrument]);
                 $handles[] = self::dummyInstrument();
 
                 continue;
@@ -454,5 +457,11 @@ final class Meter implements MeterInterface, Configurable
             $instrument->unit,
             $instrument->description,
         ]);
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }
