@@ -31,13 +31,7 @@ class Configuration
 
     public static function getInt(string $key, ?int $default = null): int
     {
-        return (int) self::validateVariableValue(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::INTEGER),
-                $default
-            ),
-            FILTER_VALIDATE_INT
-        );
+        return (int) self::resolveNumeric($key, VariableTypes::INTEGER, $default, FILTER_VALIDATE_INT);
     }
 
     public static function getString(string $key, ?string $default = null): string
@@ -113,13 +107,7 @@ class Configuration
 
     public static function getFloat(string $key, ?float $default = null): float
     {
-        return (float) self::validateVariableValue(
-            CompositeResolver::instance()->resolve(
-                self::validateVariableType($key, VariableTypes::FLOAT),
-                $default
-            ),
-            FILTER_VALIDATE_FLOAT
-        );
+        return (float) self::resolveNumeric($key, VariableTypes::FLOAT, $default, FILTER_VALIDATE_FLOAT);
     }
 
     public static function getRatio(string $key, ?float $default = null): float
@@ -166,6 +154,29 @@ class Configuration
         }
 
         return $variableName;
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    private static function resolveNumeric(string $key, string $type, int|float|null $default, int $filterType): mixed
+    {
+        $value = CompositeResolver::instance()->resolve(
+            self::validateVariableType($key, $type),
+            $default
+        );
+
+        if (!self::isEmpty($value) && filter_var($value, $filterType) === false) {
+            self::logWarning(sprintf(
+                'Invalid %s value "%s" for %s, using the default value instead',
+                $type,
+                is_string($value) ? $value : get_debug_type($value),
+                $key,
+            ));
+            $value = self::isEmpty($default) ? self::getDefault($key) : $default;
+        }
+
+        return self::validateVariableValue($value, $filterType);
     }
 
     private static function validateVariableValue($value, ?int $filterType = null)
