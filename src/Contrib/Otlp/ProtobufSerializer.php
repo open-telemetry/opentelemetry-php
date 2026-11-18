@@ -91,7 +91,6 @@ final class ProtobufSerializer
     }
 
     /**
-     * @phan-suppress PhanParamTooManyInternal (@see https://github.com/phan/phan/pull/4840)
      * @throws Exception
      */
     public function hydrate(Message $message, string $payload): void

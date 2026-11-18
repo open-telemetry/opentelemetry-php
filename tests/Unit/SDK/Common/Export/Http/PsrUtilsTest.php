@@ -237,16 +237,22 @@ final class PsrUtilsTest extends TestCase
     public function test_read_body_concatenated_gzip_members_throw(): void
     {
         // the second member would be dropped, and would not count against the limit
-        $body = (string) gzencode('abc') . (string) gzencode(str_repeat('a', 100_000));
+        $first = gzencode('abc');
+        $second = gzencode(str_repeat('a', 100_000));
+        $this->assertIsString($first);
+        $this->assertIsString($second);
 
         $this->expectException(UnexpectedValueException::class);
-        PsrUtils::readBody(new Response(200, [], $body), ['gzip'], 1_000);
+        PsrUtils::readBody(new Response(200, [], $first . $second), ['gzip'], 1_000);
     }
 
     public function test_read_body_trailing_data_after_gzip_throws(): void
     {
+        $body = gzencode('abc');
+        $this->assertIsString($body);
+
         $this->expectException(UnexpectedValueException::class);
-        PsrUtils::readBody(new Response(200, [], (string) gzencode('abc') . 'garbage'), ['gzip'], 1_000);
+        PsrUtils::readBody(new Response(200, [], $body . 'garbage'), ['gzip'], 1_000);
     }
 
     public function test_read_body_applies_limit_to_every_encoding_step(): void
