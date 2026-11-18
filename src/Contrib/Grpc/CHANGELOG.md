@@ -12,10 +12,6 @@ upgraders can check them in one place.
   the `tbachert/spi` Composer plugin for the early registration, without it the factory is registered when the
   package's autoload file loads, as before ([#2120]).
 
-### Changed
-
-- Fixes for errors reported by Phan and Psalm. No change in behavior ([#2146]).
-
 ## 1.3.0 - 2026-11-06
 
 ### Breaking changes
@@ -34,4 +30,3 @@ See the [GitHub releases](https://github.com/opentelemetry-php/transport-grpc/re
 [#2091]: https://github.com/open-telemetry/opentelemetry-php/pull/2091
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
-[#2146]: https://github.com/open-telemetry/opentelemetry-php/pull/2146

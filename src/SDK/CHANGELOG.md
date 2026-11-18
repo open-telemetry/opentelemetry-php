@@ -43,10 +43,6 @@ upgraders can check them in one place.
 - `MetricMetadataInterface::temporality()` and `MetricStreamInterface::temporality()`. Choose temporality by
   instrument type instead. They will be removed in 2.0 ([#2129]).
 
-### Changed
-
-- Fixes for errors reported by Phan and Psalm. No change in behavior ([#2146]).
-
 ### Fixed
 
 - Enum configuration values, including sampler names, and trace, metric and log exporter names are now interpreted
@@ -217,4 +213,3 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
-[#2146]: https://github.com/open-telemetry/opentelemetry-php/pull/2146

@@ -12,10 +12,6 @@ upgraders can check them in one place.
   SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are registered when the
   package's autoload file loads, as before ([#2120]).
 
-### Changed
-
-- Fixes for errors reported by Phan and Psalm. No change in behavior ([#2146]).
-
 ### Deprecated
 
 - Passing a `Temporality` or a string as the temporality of `MetricExporter`. Pass a selector such as
@@ -87,4 +83,3 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
-[#2146]: https://github.com/open-telemetry/opentelemetry-php/pull/2146
