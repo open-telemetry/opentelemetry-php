@@ -14,7 +14,7 @@ upgraders can check them in one place.
 
 ### Changed
 
-- Fixes for errors reported by Phan and Psalm. No change in behavior ([#NNNN]).
+- Fixes for errors reported by Phan and Psalm. No change in behavior ([#2146]).
 
 ## 1.3.0 - 2026-11-06
 
@@ -36,4 +36,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/extension-propaga
 [#2091]: https://github.com/open-telemetry/opentelemetry-php/pull/2091
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
-[#NNNN]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN
+[#2146]: https://github.com/open-telemetry/opentelemetry-php/pull/2146

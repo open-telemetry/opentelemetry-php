@@ -24,7 +24,7 @@ upgraders can check them in one place.
 
 ### Changed
 
-- Fixes for errors reported by Phan and Psalm. No change in behavior ([#NNNN]).
+- Fixes for errors reported by Phan and Psalm. No change in behavior ([#2146]).
 
 ### Fixed
 
@@ -190,4 +190,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
-[#NNNN]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN
+[#2146]: https://github.com/open-telemetry/opentelemetry-php/pull/2146

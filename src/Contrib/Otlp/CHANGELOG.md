@@ -14,7 +14,7 @@ upgraders can check them in one place.
 
 ### Changed
 
-- Fixes for errors reported by Phan and Psalm. No change in behavior ([#NNNN]).
+- Fixes for errors reported by Phan and Psalm. No change in behavior ([#2146]).
 
 ### Fixed
 
@@ -76,4 +76,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
-[#NNNN]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN
+[#2146]: https://github.com/open-telemetry/opentelemetry-php/pull/2146
