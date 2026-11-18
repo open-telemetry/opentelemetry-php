@@ -311,6 +311,7 @@ return [
     // files that can't be removed for whatever reason.
     'exclude_file_list' => [
         'vendor/composer/composer/src/Composer/InstalledVersions.php',
+        'vendor/tbachert/spi/src/ServiceLoader.php',
     ],
 
     // A directory list that defines files that will be excluded
@@ -328,6 +329,7 @@ return [
         'vendor/',
         'proto/',
         'src/Config/SDK',
+        '.phan/stubs',
     ],
 
     // Enable this to enable checks of require/include statements referring to valid paths.
@@ -376,6 +378,7 @@ return [
     // your application should be included in this list.
     'directory_list' => [
         'src',
+        '.phan/stubs',
         'proto/otel/GPBMetadata',
         'proto/otel/Opentelemetry',
         'vendor/composer',
