@@ -80,8 +80,10 @@ packages, the description has a Breaking changes section with a box:
 - [ ] I have read the breaking changes
 ```
 
-Read the warnings, then tick it. In core, the Release approval check fails until you do. A rebuild
-keeps the tick while the warnings are the same, and clears it when they change.
+Read the warnings, then tick it. In core, the Release approval check fails until you do. Deleting
+the box or the comment under it doesn't pass the check, as the release commit records that the
+warnings need a tick. A rebuild keeps the tick while the warnings are the same, and clears it when
+they change.
 
 ## Rebuild after main moves
 
@@ -91,8 +93,8 @@ note to the top of the description instead, on each push to core's `main` and da
 In core, the Release approval check then fails.
 
 To rebuild, tick Open a release PR on the dashboard issue again, or run the Release PR workflow.
-Don't use Update branch. It merges `main` into the release without dating the new entries, and
-the Release approval check fails on it.
+Don't use Update branch or rebase the branch. Either brings in `main` without dating the new
+entries, and the Release approval check fails on it.
 
 ## Merge and tag
 

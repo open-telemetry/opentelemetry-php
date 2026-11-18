@@ -1,9 +1,11 @@
 name: Release approval
 
-# Fails on a release pull request whose breaking changes box is unticked, or that is not built on
-# the tip of main. The Release PR workflow adds the box when release:prep warns, and unticks it when
-# the warnings change. Its stale job edits the description when main moves, so this runs again.
-# Skipped on other pull requests, which a required check counts as passing.
+# Fails on a release pull request that is not built on the tip of main, or whose breaking changes
+# box is unticked. Both are read from the head commit's trailers, which release:pr writes: Built-On
+# names the commit of main it was built on, and Breaking-Changes the hash of the warnings the box is
+# for. The description is read when the check runs, not from the event, which a re-run repeats.
+# The stale job of the Release PR workflow edits the description when main moves, so this runs
+# again. Skipped on other pull requests, which a required check counts as passing.
 
 on:
   pull_request:
@@ -20,32 +22,53 @@ jobs:
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.head.ref == 'otelbot/release' &&
       github.event.pull_request.user.login == 'otelbot-php[bot]'
+    # Each run reads the description as it is, so the latest edit's run is the one that counts
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
     permissions:
       contents: read
+      pull-requests: read
     steps:
-      # Keyed on the marker, not the unticked box, so a box deleted or edited by hand still fails.
-      # The ticked pattern accepts what GitHub renders as ticked, as release:pr does.
-      - name: Check the breaking changes box
-        env:
-          BODY: ${{ github.event.pull_request.body }}
-        run: |
-          body=$(tr -d '\r' <<<"$BODY")
-          if grep -q '^<!-- breaking: [0-9a-f]* -->$' <<<"$body" \
-            && ! grep -Eq '^ *[-*+] +\[[xX]\] +I have read the breaking changes *$' <<<"$body"; then
-            echo "::error::Read the breaking changes in the description, then tick the box"
-            exit 1
-          fi
-
-      # Update branch merges main in, which leaves main's new changelog entries unreleased
+      # A rebase or Update branch keeps the message, and so Built-On, but changes the parent
       - name: Check the pull request is built on main
-        if: ${{ !cancelled() }}
+        shell: bash # with pipefail, so a failed request fails the step
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          parents=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA" --jq '[.parents[].sha] | join(" ")')
+          commit=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA")
+          parents=$(jq -r '[.parents[].sha] | join(" ")' <<<"$commit")
+          built=$(jq -r .commit.message <<<"$commit" | tr -d '\r' \
+            | awk -v RS= '{ last = $0 } END { print last }' | sed -n 's/^Built-On: //p')
           main=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
-          if [ "$parents" != "$main" ]; then
-            echo "::error::main has moved since this pull request was built. Rebuild it: tick Open a release PR on the release dashboard issue, or run the Release PR workflow."
+          if [ "$parents" != "$main" ] || [ "$built" != "$main" ]; then
+            echo "::error::This pull request is not built on the tip of main. Rebuild it: tick Open a release PR on the release dashboard issue, or run the Release PR workflow."
+            exit 1
+          fi
+
+      # The ticked pattern accepts what GitHub renders as ticked, as release:pr does
+      - name: Check the breaking changes box
+        if: ${{ !cancelled() }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          breaking=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA" --jq .commit.message \
+            | tr -d '\r' | awk -v RS= '{ last = $0 } END { print last }' | sed -n 's/^Breaking-Changes: //p')
+          if [ -z "$breaking" ]; then
+            exit 0
+          fi
+          # Two trailers would be two lines, which this rejects
+          if ! [[ $breaking =~ ^[0-9a-f]{16}$ ]]; then
+            echo "::error::The head commit has a malformed Breaking-Changes trailer. Rebuild the pull request."
+            exit 1
+          fi
+          body=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER" --jq '.body // ""' | tr -d '\r')
+          if ! grep -Fqx "<!-- breaking: $breaking -->" <<<"$body" \
+            || ! grep -Eq '^ *[-*+] +\[[xX]\] +I have read the breaking changes *$' <<<"$body"; then
+            echo "::error::Read the breaking changes in the description, then tick the box"
             exit 1
           fi
