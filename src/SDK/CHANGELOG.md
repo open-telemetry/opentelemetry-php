@@ -8,6 +8,8 @@ upgraders can check them in one place.
 
 ### Breaking changes
 
+- `Configuration::getEnum()` now returns lowercase values. Callers outside the SDK that compare its result with
+  uppercase or mixed-case strings must update their comparisons to use lowercase ([#2142]).
 - `Registry` now gets its built-in and package components from `RegistrarInterface` providers (SPI) when it is first
   asked for one, no longer from `_register.php` files that Composer includes. A component registered with
   `Registry::register*()` before that first lookup wins over a provider's, one registered with `$clobber` always wins,
@@ -43,6 +45,9 @@ upgraders can check them in one place.
 
 ### Fixed
 
+- Enum configuration values, including sampler names, and trace, metric and log exporter names are now interpreted
+  case-insensitively. Exporter and transport factory names, text map propagator names, resource detector and response
+  propagator names are also case-insensitive when registering and looking up components ([#2142]).
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
   `sdk/_autoload.php` builds its providers. It used to build them before `exporter-otlp/_register.php` could register
   them, and the providers then stayed noop for the whole process, with `Span exporter factory not defined for: otlp`
@@ -206,4 +211,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
+[#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

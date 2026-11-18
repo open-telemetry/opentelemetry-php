@@ -4,12 +4,25 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\API\Baggage\Propagation\BaggagePropagator;
+use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
+use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
+use OpenTelemetry\Contrib\Otlp\OtlpHttpTransportFactory;
+use OpenTelemetry\SDK\Common\Export\Stream\StreamTransportFactory;
 use OpenTelemetry\SDK\Common\Export\TransportFactoryInterface;
+use OpenTelemetry\SDK\Logs\Exporter\ConsoleExporterFactory;
+use OpenTelemetry\SDK\Logs\Exporter\InMemoryExporterFactory;
 use OpenTelemetry\SDK\Logs\LogRecordExporterFactoryInterface;
+use OpenTelemetry\SDK\Metrics\MetricExporter\ConsoleMetricExporterFactory;
+use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporterFactory as InMemoryMetricExporterFactory;
 use OpenTelemetry\SDK\Metrics\MetricExporterFactoryInterface;
 use OpenTelemetry\SDK\Registry;
+use OpenTelemetry\SDK\Resource\Detectors\Constant;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use OpenTelemetry\SDK\Trace\SpanExporter\ConsoleSpanExporterFactory;
+use OpenTelemetry\SDK\Trace\SpanExporter\InMemorySpanExporterFactory;
 use OpenTelemetry\SDK\Trace\SpanExporter\SpanExporterFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -19,6 +32,126 @@ use TypeError;
 #[CoversClass(Registry::class)]
 class FactoryRegistryTest extends TestCase
 {
+    public function test_transport_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerTransportFactory('Acme', StreamTransportFactory::class, true);
+        Registry::registerTransportFactory('acme', OtlpHttpTransportFactory::class);
+
+        $this->assertSame(StreamTransportFactory::class, Registry::transportFactory('acme')::class);
+        $this->assertSame(StreamTransportFactory::class, Registry::transportFactory('Acme')::class);
+        $this->assertSame(StreamTransportFactory::class, Registry::transportFactory('ACME/protobuf')::class);
+
+        Registry::registerTransportFactory('acme', OtlpHttpTransportFactory::class, true);
+        $this->assertSame(OtlpHttpTransportFactory::class, Registry::transportFactory('Acme')::class);
+    }
+
+    public function test_span_exporter_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerSpanExporterFactory('Acme', ConsoleSpanExporterFactory::class, true);
+        Registry::registerSpanExporterFactory('acme', InMemorySpanExporterFactory::class);
+
+        $this->assertSame(ConsoleSpanExporterFactory::class, Registry::spanExporterFactory('acme')::class);
+        $this->assertSame(ConsoleSpanExporterFactory::class, Registry::spanExporterFactory('Acme')::class);
+
+        Registry::registerSpanExporterFactory('acme', InMemorySpanExporterFactory::class, true);
+        $this->assertSame(InMemorySpanExporterFactory::class, Registry::spanExporterFactory('Acme')::class);
+    }
+
+    public function test_metric_exporter_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerMetricExporterFactory('Acme', ConsoleMetricExporterFactory::class, true);
+        Registry::registerMetricExporterFactory('acme', InMemoryMetricExporterFactory::class);
+
+        $this->assertSame(ConsoleMetricExporterFactory::class, Registry::metricExporterFactory('acme')::class);
+        $this->assertSame(ConsoleMetricExporterFactory::class, Registry::metricExporterFactory('Acme')::class);
+
+        Registry::registerMetricExporterFactory('acme', InMemoryMetricExporterFactory::class, true);
+        $this->assertSame(InMemoryMetricExporterFactory::class, Registry::metricExporterFactory('Acme')::class);
+    }
+
+    public function test_log_record_exporter_factory_names_are_case_insensitive(): void
+    {
+        Registry::registerLogRecordExporterFactory('Acme', ConsoleExporterFactory::class, true);
+        Registry::registerLogRecordExporterFactory('acme', InMemoryExporterFactory::class);
+
+        $this->assertSame(ConsoleExporterFactory::class, Registry::logRecordExporterFactory('acme')::class);
+        $this->assertSame(ConsoleExporterFactory::class, Registry::logRecordExporterFactory('Acme')::class);
+
+        Registry::registerLogRecordExporterFactory('acme', InMemoryExporterFactory::class, true);
+        $this->assertSame(InMemoryExporterFactory::class, Registry::logRecordExporterFactory('Acme')::class);
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_text_map_propagator_names_are_case_insensitive(): void
+    {
+        $propagator = BaggagePropagator::getInstance();
+        $replacement = TraceContextPropagator::getInstance();
+        Registry::registerTextMapPropagator('Acme', $propagator, true);
+        Registry::registerTextMapPropagator('acme', $replacement);
+
+        $this->assertSame($propagator, Registry::textMapPropagator('acme'));
+        $this->assertSame($propagator, Registry::textMapPropagator('Acme'));
+
+        Registry::registerTextMapPropagator('acme', $replacement, true);
+        $this->assertSame($replacement, Registry::textMapPropagator('Acme'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_resource_detector_names_are_case_insensitive(): void
+    {
+        $detector = new Constant(ResourceInfoFactory::emptyResource());
+        $replacement = new Constant(ResourceInfoFactory::emptyResource());
+        Registry::registerResourceDetector('Acme', $detector);
+
+        $this->assertSame($detector, Registry::resourceDetector('acme'));
+        $this->assertSame($detector, Registry::resourceDetector('Acme'));
+
+        Registry::registerResourceDetector('acme', $replacement);
+        $this->assertSame($replacement, Registry::resourceDetector('Acme'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_response_propagator_names_are_case_insensitive(): void
+    {
+        $propagator = NoopResponsePropagator::getInstance();
+        $replacement = new NoopResponsePropagator();
+        Registry::registerResponsePropagator('Acme', $propagator, true);
+        Registry::registerResponsePropagator('acme', $replacement);
+
+        $this->assertSame($propagator, Registry::responsePropagator('acme'));
+        $this->assertSame($propagator, Registry::responsePropagator('Acme'));
+
+        Registry::registerResponsePropagator('acme', $replacement, true);
+        $this->assertSame($replacement, Registry::responsePropagator('Acme'));
+    }
+
+    #[DataProvider('unregisteredComponentProvider')]
+    public function test_unregistered_component_message_preserves_case(string $lookup): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Console2');
+
+        Registry::$lookup('Console2');
+    }
+
+    public static function unregisteredComponentProvider(): array
+    {
+        return [
+            ['spanExporterFactory'],
+            ['metricExporterFactory'],
+            ['logRecordExporterFactory'],
+            ['textMapPropagator'],
+            ['resourceDetector'],
+            ['responsePropagator'],
+        ];
+    }
+
     #[DataProvider('transportProtocolsProvider')]
     public function test_default_transport_factories(string $name): void
     {
