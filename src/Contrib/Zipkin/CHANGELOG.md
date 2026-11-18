@@ -12,6 +12,10 @@ upgraders can check them in one place.
   the `tbachert/spi` Composer plugin for the early registration, without it the factory is registered when the
   package's autoload file loads, as before ([#2120]).
 
+### Changed
+
+- Fixes for errors reported by Phan and Psalm. No change in behavior ([#NNNN]).
+
 ## 1.4.0 - 2026-11-06
 
 ### Breaking changes
@@ -31,3 +35,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-zipkin/r
 [#2091]: https://github.com/open-telemetry/opentelemetry-php/pull/2091
 [#2092]: https://github.com/open-telemetry/opentelemetry-php/pull/2092
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#NNNN]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN

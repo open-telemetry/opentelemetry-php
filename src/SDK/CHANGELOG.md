@@ -22,6 +22,10 @@ upgraders can check them in one place.
   `Registry` through SPI. Declare it with `extra.spi-config.autoload-files` or `extra.spi`. It is a bridge for SDK 1.x
   and will be removed in SDK 2.0, together with the `Registry` ([#2120]).
 
+### Changed
+
+- Fixes for errors reported by Phan and Psalm. No change in behavior ([#NNNN]).
+
 ### Fixed
 
 - With the root span enabled and the `tbachert/spi` plugin running, the SDK finds the OTLP factories while
@@ -186,3 +190,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
+[#NNNN]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN

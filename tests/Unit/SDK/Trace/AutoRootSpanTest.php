@@ -500,8 +500,10 @@ class AutoRootSpanTest extends TestCase
     private function runQueuedShutdownHandler(): void
     {
         $handlers = (new \ReflectionProperty(ShutdownHandler::class, 'handlers'))->getValue();
+        $this->assertIsArray($handlers);
         $this->assertNotEmpty($handlers);
-        $handler = $handlers[array_key_last($handlers)];
+        $handler = end($handlers);
+        $this->assertIsCallable($handler);
         $handler();
     }
 
@@ -803,6 +805,14 @@ class AutoRootSpanTest extends TestCase
         $span->method('setAttribute')->willThrowException(new \Error('boom'));
         $span->expects($this->once())->method('end');
         $this->tracer->method('spanBuilder')->willReturn($this->spanBuilderReturning($span));
+
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            'warning',
+            $this->stringContains('Unable to record the request body'),
+            $this->anything(),
+        );
+        Logging::setLogWriter($logWriter);
 
         AutoRootSpan::create($request);
         AutoRootSpan::shutdownHandler();

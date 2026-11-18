@@ -52,6 +52,9 @@ final class PsrTransport implements TransportInterface
     /** @var array<string, true> */
     private array $reportedBodyErrors = [];
 
+    /** @var positive-int */
+    private readonly int $maxResponseBodySize;
+
     /**
      * @param CONTENT_TYPE $contentType
      */
@@ -65,11 +68,12 @@ final class PsrTransport implements TransportInterface
         private readonly array $compression,
         private readonly int $retryDelay,
         private readonly int $maxRetries,
-        private readonly int $maxResponseBodySize = self::DEFAULT_MAX_RESPONSE_BODY_SIZE,
+        int $maxResponseBodySize = self::DEFAULT_MAX_RESPONSE_BODY_SIZE,
     ) {
         if ($maxResponseBodySize < 1) {
             throw new InvalidArgumentException('The maximum response body size must be positive');
         }
+        $this->maxResponseBodySize = $maxResponseBodySize;
     }
 
     #[\Override]

@@ -6,6 +6,7 @@ namespace OpenTelemetry\SDK\Common\Export\Http;
 
 use function array_filter;
 use function array_map;
+use function array_reverse;
 use function count;
 use ErrorException;
 use function function_exists;
@@ -149,12 +150,12 @@ final class PsrUtils
             return $value;
         }
 
-        for ($i = count($encodings); --$i >= 0;) {
-            if ($encodings[$i] === 'identity') {
+        foreach (array_reverse($encodings) as $encoding) {
+            if ($encoding === 'identity') {
                 continue;
             }
 
-            $value = self::decodeWithLimit($value, $encodings[$i], $maxSize);
+            $value = self::decodeWithLimit($value, $encoding, $maxSize);
         }
 
         return $value;

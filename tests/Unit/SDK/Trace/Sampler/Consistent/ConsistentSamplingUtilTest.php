@@ -171,12 +171,12 @@ class ConsistentSamplingUtilTest extends TestCase
         yield ['ffffffffffffff', (1.25 * 2 ** -57) + 2 ** -109];
         yield ['ffffffffffffff', (1.25 * 2 ** -57) - 2 ** -109];
         yield ['fffffffffffffe', 1.75 * 2 ** -56];
-        yield ['ffffffffff8', 65537 * 2 ** -57];
-        yield ['fffffffff8', 65537 * 2 ** -53];
+        yield ['ffffffffff8', 65537.0 * 2 ** -57];
+        yield ['fffffffff8', 65537.0 * 2 ** -53];
 
-        yield ['fffffffffbffc', 4097 * 2 ** -50];
-        yield ['fffffffffffbc', 17 * 2 ** -50];
-        yield ['ffffffffbfff',  65539 * 2 ** -50];
+        yield ['fffffffffbffc', 4097.0 * 2 ** -50];
+        yield ['fffffffffffbc', 17.0 * 2 ** -50];
+        yield ['ffffffffbfff',  65539.0 * 2 ** -50];
 
         yield ['0',  0.0];
         yield ['0',  -0.0];

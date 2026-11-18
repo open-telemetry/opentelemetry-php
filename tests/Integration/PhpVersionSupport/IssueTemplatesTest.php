@@ -103,6 +103,7 @@ final class IssueTemplatesTest extends TestCase
             {
             }
 
+            #[\Override]
             public function sendRequest(RequestInterface $request): ResponseInterface
             {
                 return new Response(200, [], $this->body);

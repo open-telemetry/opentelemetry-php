@@ -12,6 +12,10 @@ upgraders can check them in one place.
   SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are registered when the
   package's autoload file loads, as before ([#2120]).
 
+### Changed
+
+- Fixes for errors reported by Phan and Psalm. No change in behavior ([#NNNN]).
+
 ### Fixed
 
 - With the `tbachert/spi` plugin running, the `otlp` exporters and the `http` transport are available while the SDK
@@ -72,3 +76,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2095]: https://github.com/open-telemetry/opentelemetry-php/pull/2095
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#NNNN]: https://github.com/open-telemetry/opentelemetry-php/pull/NNNN
