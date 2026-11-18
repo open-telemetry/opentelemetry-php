@@ -27,16 +27,35 @@ class ExporterFactoryTest extends TestCase
         Psr18ClientDiscovery::prependStrategy(MockClientStrategy::class);
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    #[DataProvider('noneExporterProvider')]
     #[Group('trace-compliance')]
-    public function test_accepts_none_exporter_env_var(): void
+    public function test_accepts_none_exporter_env_var(string $exporter): void
     {
-        $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'none');
+        $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', $exporter);
         $factory = new ExporterFactory();
         $this->assertNull($factory->create());
     }
 
+    public static function noneExporterProvider(): array
+    {
+        return [['none'], ['None'], ['NONE']];
+    }
+
+    public function test_unknown_exporter_message_preserves_case(): void
+    {
+        $this->setEnvironmentVariable('OTEL_TRACES_EXPORTER', 'Console2');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Console2');
+
+        (new ExporterFactory())->create();
+    }
+
     /**
      * @param class-string $expected
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      */
     #[DataProvider('envProvider')]
     #[Group('trace-compliance')]
@@ -80,6 +99,9 @@ class ExporterFactoryTest extends TestCase
             ],
             'console' => [
                 'console', [], ConsoleSpanExporter::class,
+            ],
+            'mixed case console' => [
+                'Console', [], ConsoleSpanExporter::class,
             ],
         ];
     }

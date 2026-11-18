@@ -49,6 +49,7 @@ class Registry
      */
     public static function registerTransportFactory(string $protocol, TransportFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $protocol = strtolower($protocol);
         if (!$clobber && array_key_exists($protocol, self::$transportFactories)) {
             return;
         }
@@ -70,6 +71,7 @@ class Registry
      */
     public static function registerSpanExporterFactory(string $exporter, SpanExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $exporter = strtolower($exporter);
         if (!$clobber && array_key_exists($exporter, self::$spanExporterFactories)) {
             return;
         }
@@ -91,6 +93,7 @@ class Registry
      */
     public static function registerMetricExporterFactory(string $exporter, MetricExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $exporter = strtolower($exporter);
         if (!$clobber && array_key_exists($exporter, self::$metricExporterFactories)) {
             return;
         }
@@ -112,6 +115,7 @@ class Registry
      */
     public static function registerLogRecordExporterFactory(string $exporter, LogRecordExporterFactoryInterface|string $factory, bool $clobber = false): void
     {
+        $exporter = strtolower($exporter);
         if (!$clobber && array_key_exists($exporter, self::$logRecordExporterFactories)) {
             return;
         }
@@ -127,21 +131,33 @@ class Registry
         self::$logRecordExporterFactories[$exporter] = $factory;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function registerTextMapPropagator(string $name, TextMapPropagatorInterface $propagator, bool $clobber = false): void
     {
+        $name = strtolower($name);
         if (!$clobber && array_key_exists($name, self::$textMapPropagators)) {
             return;
         }
         self::$textMapPropagators[$name] = $propagator;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function registerResourceDetector(string $name, ResourceDetectorInterface $detector): void
     {
+        $name = strtolower($name);
         self::$resourceDetectors[$name] = $detector;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function registerResponsePropagator(string $name, ResponsePropagatorInterface $responsePropagator, bool $clobber = false): void
     {
+        $name = strtolower($name);
         if (!$clobber && array_key_exists($name, self::$responsePropagators)) {
             return;
         }
@@ -150,10 +166,11 @@ class Registry
 
     public static function spanExporterFactory(string $exporter): SpanExporterFactoryInterface
     {
-        if (!self::isRegistered(self::$spanExporterFactories, $exporter)) {
+        $key = strtolower($exporter);
+        if (!self::isRegistered(self::$spanExporterFactories, $key)) {
             throw self::notRegistered('Span exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$spanExporterFactories[$exporter];
+        $class = self::$spanExporterFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof SpanExporterFactoryInterface);
 
@@ -162,10 +179,11 @@ class Registry
 
     public static function logRecordExporterFactory(string $exporter): LogRecordExporterFactoryInterface
     {
-        if (!self::isRegistered(self::$logRecordExporterFactories, $exporter)) {
+        $key = strtolower($exporter);
+        if (!self::isRegistered(self::$logRecordExporterFactories, $key)) {
             throw self::notRegistered('LogRecord exporter factory not defined for: ' . $exporter);
         }
-        $class = self::$logRecordExporterFactories[$exporter];
+        $class = self::$logRecordExporterFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof LogRecordExporterFactoryInterface);
 
@@ -179,10 +197,11 @@ class Registry
     public static function transportFactory(string $protocol): TransportFactoryInterface
     {
         $protocol = explode('/', $protocol)[0];
-        if (!self::isRegistered(self::$transportFactories, $protocol)) {
+        $key = strtolower($protocol);
+        if (!self::isRegistered(self::$transportFactories, $key)) {
             throw self::notRegistered('Transport factory not defined for protocol: ' . $protocol);
         }
-        $class = self::$transportFactories[$protocol];
+        $class = self::$transportFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof TransportFactoryInterface);
 
@@ -191,41 +210,54 @@ class Registry
 
     public static function metricExporterFactory(string $exporter): MetricExporterFactoryInterface
     {
-        if (!self::isRegistered(self::$metricExporterFactories, $exporter)) {
+        $key = strtolower($exporter);
+        if (!self::isRegistered(self::$metricExporterFactories, $key)) {
             throw self::notRegistered('Metric exporter factory not registered for protocol: ' . $exporter);
         }
-        $class = self::$metricExporterFactories[$exporter];
+        $class = self::$metricExporterFactories[$key];
         $factory = (is_callable($class)) ? $class : new $class();
         assert($factory instanceof MetricExporterFactoryInterface);
 
         return $factory;
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function textMapPropagator(string $name): TextMapPropagatorInterface
     {
-        if (!self::isRegistered(self::$textMapPropagators, $name)) {
+        $key = strtolower($name);
+        if (!self::isRegistered(self::$textMapPropagators, $key)) {
             throw self::notRegistered('Text map propagator not registered for: ' . $name);
         }
 
-        return self::$textMapPropagators[$name];
+        return self::$textMapPropagators[$key];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function resourceDetector(string $name): ResourceDetectorInterface
     {
-        if (!self::isRegistered(self::$resourceDetectors, $name)) {
+        $key = strtolower($name);
+        if (!self::isRegistered(self::$resourceDetectors, $key)) {
             throw self::notRegistered('Resource detector not registered for: ' . $name);
         }
 
-        return self::$resourceDetectors[$name];
+        return self::$resourceDetectors[$key];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public static function responsePropagator(string $name): ResponsePropagatorInterface
     {
-        if (!self::isRegistered(self::$responsePropagators, $name)) {
+        $key = strtolower($name);
+        if (!self::isRegistered(self::$responsePropagators, $key)) {
             throw self::notRegistered('Response propagator not registered for: ' . $name);
         }
 
-        return self::$responsePropagators[$name];
+        return self::$responsePropagators[$key];
     }
 
     /**

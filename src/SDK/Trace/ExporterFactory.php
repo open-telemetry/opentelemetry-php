@@ -14,6 +14,7 @@ class ExporterFactory
 {
     /**
      * @throws RuntimeException
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      */
     public function create(): ?SpanExporterInterface
     {
@@ -22,7 +23,7 @@ class ExporterFactory
             throw new InvalidArgumentException(sprintf('Configuration %s requires exactly 1 exporter', Variables::OTEL_TRACES_EXPORTER));
         }
         $exporter = $exporters[0];
-        if ($exporter === 'none') {
+        if (strtolower($exporter) === 'none') {
             return null;
         }
         $factory = Registry::spanExporterFactory($exporter);
