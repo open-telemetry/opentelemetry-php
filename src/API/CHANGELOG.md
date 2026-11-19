@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.12.0 - 2026-11-19
+
 ### Changed
 
 - `MeterInterface::createGauge()` and `GaugeInterface` are no longer experimental. The synchronous Gauge is stable

@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.17.0 - 2026-11-19
+
 ### Breaking changes
 
 - `Configuration::getEnum()` now returns lowercase values. Callers outside the SDK that compare its result with
