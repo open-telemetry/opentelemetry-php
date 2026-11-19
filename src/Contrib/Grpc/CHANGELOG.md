@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.4.0 - 2026-11-19
+
 ### Breaking changes
 
 - Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The `grpc` transport factory is registered through SPI. Allow

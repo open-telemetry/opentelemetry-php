@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.4.0 - 2026-11-19
+
 ### Breaking changes
 
 - Conflicts with `open-telemetry/sdk` below 1.17. The `b3` and `b3multi` propagators are registered with the SDK
