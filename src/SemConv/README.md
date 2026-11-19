@@ -20,8 +20,10 @@ Semantic conventions are separated into `stable` and `incubating`. Both are gene
 
 Instrumentation authors should use stable conventions where possible, but may use incubating conventions.
 
-Deprecated conventions will be removed immediately from the next release after their deprecation, and there is no
-backwards compatibility guarantee for deprecated conventions.
+Deprecated conventions are kept and marked `@deprecated`, with their replacement where upstream names one. They are
+not removed in a minor or patch release, following the
+[semantic conventions guidance for code generation](https://github.com/open-telemetry/semantic-conventions/blob/v1.45.0/docs/non-normative/code-generation.md#deprecated-conventions).
+Move to the replacement when you can.
 
 ## Stable
 

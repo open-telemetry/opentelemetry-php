@@ -10,6 +10,12 @@ edit them by hand, even to fix a typo or restore a removed constant. A hand edit
 To change the output, change the script or its templates in `script/semantic-conventions/templates/`, then
 regenerate. `script/semantic-conventions/README.md` lists the steps for a new semantic conventions version.
 
+## Keep deprecated conventions
+
+Removing a constant breaks users, even in the incubating classes. The templates generate deprecated conventions with a
+`@deprecated` tag, so don't filter them out. `semconv.sh` fails if generation removes a public constant. Fix the
+cause rather than accept the removal.
+
 ## Write one changelog entry per release
 
 The package version matches the semantic conventions version it was generated from. Each release has a single

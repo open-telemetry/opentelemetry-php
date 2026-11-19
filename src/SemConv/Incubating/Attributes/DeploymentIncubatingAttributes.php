@@ -14,6 +14,14 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface DeploymentIncubatingAttributes
 {
     /**
+     * Deprecated, use `deployment.environment.name` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `deployment.environment.name`.
+     */
+    public const DEPLOYMENT_ENVIRONMENT = 'deployment.environment';
+
+    /**
      * Name of the [deployment environment](https://wikipedia.org/wiki/Deployment_environment) (aka deployment tier).
      *
      * `deployment.environment.name` does not affect the uniqueness constraints defined through

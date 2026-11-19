@@ -28,6 +28,85 @@ interface FeatureFlagIncubatingAttributes
     public const FEATURE_FLAG_ERROR_MESSAGE = 'feature_flag.error.message';
 
     /**
+     * Deprecated, use `feature_flag.error.message` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `feature_flag.error.message`.
+     */
+    public const FEATURE_FLAG_EVALUATION_ERROR_MESSAGE = 'feature_flag.evaluation.error.message';
+
+    /**
+     * Deprecated, use `feature_flag.result.reason` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON = 'feature_flag.evaluation.reason';
+
+    /**
+     * The resolved value is static (no dynamic evaluation).
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_STATIC = 'static';
+
+    /**
+     * The resolved value fell back to a pre-configured value (no dynamic evaluation occurred or dynamic evaluation yielded no result).
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_DEFAULT = 'default';
+
+    /**
+     * The resolved value was the result of a dynamic evaluation, such as a rule or specific user-targeting.
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_TARGETING_MATCH = 'targeting_match';
+
+    /**
+     * The resolved value was the result of pseudorandom assignment.
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_SPLIT = 'split';
+
+    /**
+     * The resolved value was retrieved from cache.
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_CACHED = 'cached';
+
+    /**
+     * The resolved value was the result of the flag being disabled in the management system.
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_DISABLED = 'disabled';
+
+    /**
+     * The reason for the resolved value could not be determined.
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_UNKNOWN = 'unknown';
+
+    /**
+     * The resolved value is non-authoritative or possibly out of date
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_STALE = 'stale';
+
+    /**
+     * The resolved value was the result of an error.
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.reason`.
+     */
+    public const FEATURE_FLAG_EVALUATION_REASON_VALUE_ERROR = 'error';
+
+    /**
      * The lookup key of the feature flag.
      *
      * @experimental
@@ -131,6 +210,14 @@ interface FeatureFlagIncubatingAttributes
      * @experimental
      */
     public const FEATURE_FLAG_SET_ID = 'feature_flag.set.id';
+
+    /**
+     * Deprecated, use `feature_flag.result.variant` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `feature_flag.result.variant`.
+     */
+    public const FEATURE_FLAG_VARIANT = 'feature_flag.variant';
 
     /**
      * The version of the ruleset used during the evaluation. This may be any stable value which uniquely identifies the ruleset.
