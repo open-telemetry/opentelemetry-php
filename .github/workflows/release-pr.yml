@@ -154,6 +154,15 @@ jobs:
       cancel-in-progress: true
     permissions: {}
     steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dev-tools
+        run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
+
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         id: otelbot-token
         with:
@@ -163,15 +172,6 @@ jobs:
           repositories: ${{ matrix.monorepo }}
           permission-contents: read
           permission-pull-requests: write
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
-        with:
-          php-version: '8.4'
-          coverage: none
-
-      - name: Install dev-tools
-        run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
 
       # The edit is made with the app token so that it starts the Release approval check, which
       # GITHUB_TOKEN's edits would not
