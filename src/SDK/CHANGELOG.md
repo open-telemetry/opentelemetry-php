@@ -61,6 +61,8 @@ upgraders can check them in one place.
   specification. Sampling thresholds computed from ratios that aren't a sum of 56-bit fractions used to differ from the
   spec test vectors: `1/3` was `th:aaaaaaaaaaaaac` instead of `th:aaab`, `0.1` was `th:e6666666666666` instead of
   `th:e666` ([#2140]).
+- An invalid numeric `OTEL_*` value, such as `OTEL_ATTRIBUTE_COUNT_LIMIT=abc`, logs a warning and is ignored, so the
+  default is used. It used to abort SDK initialization with `Value has invalid type "string"` ([#2144]).
 
 ## 1.16.1 - 2026-11-06
 
@@ -211,6 +213,7 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
+[#2144]: https://github.com/open-telemetry/opentelemetry-php/pull/2144
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142

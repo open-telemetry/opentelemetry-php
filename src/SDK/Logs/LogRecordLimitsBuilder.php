@@ -39,14 +39,9 @@ class LogRecordLimitsBuilder
 
     private static function resolveAttributeLimit(string $specific, string $general): int
     {
-        if (Configuration::has($specific)) {
-            return Configuration::getInt($specific);
-        }
-        if (Configuration::has($general)) {
-            return Configuration::getInt($general);
-        }
+        $fallback = Configuration::has($general) ? Configuration::getInt($general) : null;
 
-        return Configuration::getInt($specific);
+        return Configuration::getInt($specific, $fallback);
     }
 
     /**

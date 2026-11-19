@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Common\Configuration;
 
 use function in_array;
+use UnexpectedValueException;
 
 /**
  * @internal
@@ -53,7 +54,11 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
             return null;
         }
 
-        $value = Configuration::getInt($name);
+        try {
+            $value = Configuration::getInt($name);
+        } catch (UnexpectedValueException) {
+            return null;
+        }
         if ($value < $min || $value > $max) {
             return null;
         }
@@ -68,7 +73,11 @@ final class EnvResolver implements \OpenTelemetry\API\Configuration\ConfigEnv\En
             return null;
         }
 
-        $value = Configuration::getFloat($name);
+        try {
+            $value = Configuration::getFloat($name);
+        } catch (UnexpectedValueException) {
+            return null;
+        }
         if ($value < $min || $value > $max) {
             return null;
         }
