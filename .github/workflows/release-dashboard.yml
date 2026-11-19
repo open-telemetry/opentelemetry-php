@@ -80,7 +80,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           "$RUNNER_TEMP/dev-tools/bin/otel" release:prep --no-interaction --dry-run --format=dashboard --tracker="$GITHUB_REPOSITORY" > "$RUNNER_TEMP/dashboard.md"
-          printf '\n- [ ] Refresh now\n- [ ] Open a release PR\n' >> "$RUNNER_TEMP/dashboard.md"
+          printf '\n- [ ] Refresh now\n- [ ] Open a release PR\n\n[RELEASING.md](%s/%s/blob/main/RELEASING.md) explains this issue and its boxes.\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" >> "$RUNNER_TEMP/dashboard.md"
 
       - name: Update the issue
         env:

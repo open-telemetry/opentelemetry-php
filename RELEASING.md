@@ -12,6 +12,8 @@ command in detail.
 ## Contents
 
 - [See what is ready to release](#see-what-is-ready-to-release)
+- [Fix what the dashboard shows](#fix-what-the-dashboard-shows)
+- [Use the dashboard boxes](#use-the-dashboard-boxes)
 - [Open a release pull request](#open-a-release-pull-request)
 - [Change a version or skip a package](#change-a-version-or-skip-a-package)
 - [Approve breaking changes](#approve-breaking-changes)
@@ -27,14 +29,61 @@ Each monorepo has a release dashboard issue in this repository:
 - [core](https://github.com/open-telemetry/opentelemetry-php/issues?q=is%3Aissue+is%3Aopen+label%3Arelease-dashboard%3Acore)
 - [contrib](https://github.com/open-telemetry/opentelemetry-php/issues?q=is%3Aissue+is%3Aopen+label%3Arelease-dashboard%3Acontrib)
 
-It lists the packages with unreleased changes, the version each would get, the order to tag them in,
-and any warnings. The version comes from the sections under `Unreleased` in each package's
-`CHANGELOG.md`, as described in
+It shows what a release from `main` would hold now:
+
+- the packages with unreleased changes, the version each would get, and a count of entries per
+  section
+- the order to tag them in
+- under Check before releasing, each breaking entry, cut to its first sentence
+- under Check the constraints between packages, each package whose `composer.json` or
+  `#[PackageDependency]` excludes another package's new version
+- under No version suggested, each package with changes whose latest tag is a pre-release or can't
+  be parsed
+- each package's entries, collapsed
+
+The version comes from the sections under `Unreleased` in each package's `CHANGELOG.md`, as
+described in
 [Write changelog entries](https://github.com/opentelemetry-php/dev-tools#write-changelog-entries).
 
-The dashboard is rewritten on each push to core's `main` and once a day. Contrib merges don't
-trigger it, so tick Refresh now at the foot of contrib's issue to see a merge straight away. Edits
-to a dashboard issue are lost at the next rewrite.
+The dashboard is rewritten on each push to core's `main` and once a day. Contrib merges and new
+releases don't trigger it, so after one the issue is behind until the next rewrite. Edits to the
+issue are lost at the next rewrite. Only the boxes at its foot do anything.
+
+## Fix what the dashboard shows
+
+When a version is wrong because of the changelog, such as an entry under the wrong section or a
+missing entry, fix the changelog in a pull request to `main`. The dashboard then shows the fix, and
+so does every later release pull request.
+
+Use an override in the release pull request for a version the changelog can't give, such as a major
+with no breaking entries, or to hold a package back. See
+[Change a version or skip a package](#change-a-version-or-skip-a-package). An override lasts only as
+long as that pull request.
+
+A package under No version suggested is not released until an override gives it a version. The
+dashboard's `--set` hint is the command-line form of the same thing.
+
+Read each warning before opening the release pull request:
+
+- A constraint warning usually means a dependent's constraint must be widened on `main` first.
+- Any warning puts a box in the release pull request. In core, the Release approval check fails
+  until it is ticked. See [Approve breaking changes](#approve-breaking-changes).
+
+## Use the dashboard boxes
+
+The foot of each dashboard issue has two boxes. Ticking one starts a workflow, which unticks it.
+
+| Box | What it does | When to tick it |
+|---|---|---|
+| Refresh now | Rewrites the issue | After a contrib merge or a release, to see the result before the daily rewrite |
+| Open a release PR | Opens the release pull request, or rebuilds the open one from the tip of `main` | To start a release, and to rebuild one after `main` moves |
+
+If a box is still ticked a few minutes later, its run failed, or gave way to another queued run.
+Check the latest run of
+[Release dashboard](https://github.com/open-telemetry/opentelemetry-php/actions/workflows/release-dashboard.yml)
+or [Release PR](https://github.com/open-telemetry/opentelemetry-php/actions/workflows/release-pr.yml),
+then untick it and tick it again. A tick that has nothing to do changes nothing. The next rewrite
+unticks every box, so after that only the run shows the failure.
 
 ## Open a release pull request
 
@@ -133,6 +182,11 @@ follow
 | `release-dashboard.yml` | Rewrites the dashboard issues |
 | `release-pr.yml` | Opens and rebuilds the release pull requests, and adds the note when `main` moves |
 | `release-approval.yml` | The Release approval check on core's release pull request |
+
+The dashboard workflow fails unless exactly one open issue has the dashboard's label. To replace
+one that was closed or deleted, open an issue titled `Release dashboard: core` or
+`Release dashboard: contrib`, label it `release-dashboard:core` or `release-dashboard:contrib`, then
+run the Release dashboard workflow to write it.
 
 The release pull requests are opened by the `otelbot-php` GitHub App, so their checks run like any
 other pull request's. This repository needs the `OTELBOT_PHP_CLIENT_ID` variable and the
