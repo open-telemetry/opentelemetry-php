@@ -17,9 +17,12 @@ class SamplerFactory
 {
     private const TRACEIDRATIO_PREFIX = 'traceidratio';
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public function create(): SamplerInterface
     {
-        $name = Configuration::getString(Env::OTEL_TRACES_SAMPLER);
+        $name = Configuration::getEnum(Env::OTEL_TRACES_SAMPLER);
 
         if (str_contains($name, self::TRACEIDRATIO_PREFIX)) {
             $arg = Configuration::getRatio(Env::OTEL_TRACES_SAMPLER_ARG);

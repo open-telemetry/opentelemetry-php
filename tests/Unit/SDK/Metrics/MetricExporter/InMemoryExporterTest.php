@@ -7,7 +7,11 @@ namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricExporter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
+use OpenTelemetry\SDK\Metrics\Data\Temporality;
+use OpenTelemetry\SDK\Metrics\InstrumentType;
 use OpenTelemetry\SDK\Metrics\MetricExporter\InMemoryExporter;
+use OpenTelemetry\SDK\Metrics\MetricMetadataInterface;
+use OpenTelemetry\SDK\Metrics\TemporalityPreference;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -60,6 +64,30 @@ final class InMemoryExporterTest extends TestCase
         $exporter->export([$metrics[0], $metrics[1]]);
         $exporter->export([$metrics[2], $metrics[3]]);
         $this->assertSame($metrics, $exporter->collect());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/metrics/sdk_exporters/otlp.md#additional-environment-variable-configuration
+     */
+    public function test_temporality_preference_selects_by_instrument_type(): void
+    {
+        $exporter = new InMemoryExporter(temporality: TemporalityPreference::delta());
+        $counter = $this->createStub(MetricMetadataInterface::class);
+        $counter->method('instrumentType')->willReturn(InstrumentType::COUNTER);
+        $upDownCounter = $this->createStub(MetricMetadataInterface::class);
+        $upDownCounter->method('instrumentType')->willReturn(InstrumentType::UP_DOWN_COUNTER);
+
+        $this->assertSame(Temporality::DELTA, $exporter->temporality($counter));
+        $this->assertSame(Temporality::CUMULATIVE, $exporter->temporality($upDownCounter));
+    }
+
+    public function test_without_temporality_uses_the_stream_temporality(): void
+    {
+        $exporter = new InMemoryExporter();
+        $metric = $this->createStub(MetricMetadataInterface::class);
+        $metric->method('temporality')->willReturn(Temporality::DELTA);
+
+        $this->assertSame(Temporality::DELTA, $exporter->temporality($metric));
     }
 
     /**

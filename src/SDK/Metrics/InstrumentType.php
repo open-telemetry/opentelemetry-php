@@ -14,7 +14,6 @@ final class InstrumentType
     public const COUNTER = 'Counter';
     public const UP_DOWN_COUNTER = 'UpDownCounter';
     public const HISTOGRAM = 'Histogram';
-    /** @experimental */
     public const GAUGE = 'Gauge';
 
     public const ASYNCHRONOUS_COUNTER = 'AsynchronousCounter';

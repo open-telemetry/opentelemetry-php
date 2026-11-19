@@ -25,6 +25,10 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
 
     /**
      * @param TransportInterface<ContentTypes::*> $transport
+     * @param string|Temporality|AggregationTemporalitySelectorInterface|null $temporality
+     *        a selector such as {@see \OpenTelemetry\SDK\Metrics\TemporalityPreference}. Passing a
+     *        Temporality or a string is deprecated. Null uses each stream's temporality until 2.0,
+     *        and cumulative from 2.0.
      */
     public function __construct(
         private readonly TransportInterface $transport,
@@ -36,6 +40,9 @@ final class MetricExporter implements PushMetricExporterInterface, AggregationTe
         $this->serializer = ProtobufSerializer::forTransport($this->transport);
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedFunction
+     */
     #[\Override]
     public function temporality(MetricMetadataInterface $metric): Temporality|string|null
     {

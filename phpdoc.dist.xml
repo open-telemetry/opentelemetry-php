@@ -8,4 +8,11 @@
     <paths>
         <output>docs/build</output>
     </paths>
+    <version number="latest">
+        <api>
+            <source dsn=".">
+                <path>src</path>
+            </source>
+        </api>
+    </version>
 </phpdocumentor>
