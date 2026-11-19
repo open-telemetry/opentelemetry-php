@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Metrics;
 
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
@@ -15,6 +16,7 @@ use OpenTelemetry\SDK\Metrics\StalenessHandler\NoopStalenessHandlerFactory;
 use OpenTelemetry\SDK\Metrics\View\CriteriaViewRegistry;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
+use Psr\Log\LoggerInterface;
 
 class MeterProviderBuilder
 {
@@ -24,6 +26,7 @@ class MeterProviderBuilder
     private ?ExemplarFilterInterface $exemplarFilter = null;
     private ?Configurator $configurator = null;
     private ?ClockInterface $clock = null;
+    private ?LoggerInterface $logger = null;
 
     public function setResource(ResourceInfo $resource): self
     {
@@ -61,6 +64,17 @@ class MeterProviderBuilder
     }
 
     /**
+     * Set the logger for the provider's internal messages. Without one, they go to the global internal
+     * logger, filtered by its global level.
+     */
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
      * @psalm-suppress PossiblyInvalidArgument
      */
     public function build(): MeterProviderInterface
@@ -76,6 +90,7 @@ class MeterProviderBuilder
             $this->exemplarFilter ?? new WithSampledTraceExemplarFilter(),
             new NoopStalenessHandlerFactory(),
             configurator: $this->configurator ?? Configurator::meter(),
+            logger: $this->logger ?? new ConfiguredLogger(),
         );
     }
 }

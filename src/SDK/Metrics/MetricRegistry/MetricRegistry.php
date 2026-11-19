@@ -6,15 +6,17 @@ namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
 use function array_key_last;
 use Closure;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactoryInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
+use Psr\Log\LoggerInterface;
 use function spl_object_id;
 
 /**
@@ -22,7 +24,7 @@ use function spl_object_id;
  */
 final class MetricRegistry implements MetricRegistryInterface, MetricWriterInterface
 {
-    use LogsMessagesTrait;
+    use LogsToLoggerTrait;
 
     /** @var array<int, MetricStreamInterface> */
     private array $streams = [];
@@ -48,6 +50,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         private readonly ?ContextStorageInterface $contextStorage,
         private readonly AttributesFactoryInterface $attributesFactory,
         private readonly ClockInterface $clock,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
     }
 
@@ -184,7 +187,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
                 && isset($this->asynchronousCallbacks[$callbackId])
                 && !isset($this->callbacksReturningValue[$callbackId])) {
                 $this->callbacksReturningValue[$callbackId] = true;
-                self::logWarning('Asynchronous instrument callback should not return a value, it is ignored');
+                $this->logWarning('Asynchronous instrument callback should not return a value, it is ignored');
             }
         }
 
@@ -200,5 +203,11 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     public function enabled(Instrument $instrument): bool
     {
         return isset($this->instrumentToStreams[spl_object_id($instrument)]);
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }
