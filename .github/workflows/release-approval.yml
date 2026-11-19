@@ -47,7 +47,8 @@ jobs:
             exit 1
           fi
 
-      # The ticked pattern accepts what GitHub renders as ticked, as release:pr does
+      # The ticked pattern accepts what GitHub renders as ticked, as release:pr does. A commit
+      # without Built-On fails here too, so this step doesn't rely on the one above failing.
       - name: Check the breaking changes box
         if: ${{ !cancelled() }}
         shell: bash
@@ -56,8 +57,13 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          breaking=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA" --jq .commit.message \
-            | tr -d '\r' | awk -v RS= '{ last = $0 } END { print last }' | sed -n 's/^Breaking-Changes: //p')
+          trailers=$(gh api "repos/$GITHUB_REPOSITORY/commits/$HEAD_SHA" --jq .commit.message \
+            | tr -d '\r' | awk -v RS= '{ last = $0 } END { print last }')
+          if ! grep -q '^Built-On: ' <<<"$trailers"; then
+            echo "::error::The head commit was not built by release:pr. Rebuild the pull request."
+            exit 1
+          fi
+          breaking=$(sed -n 's/^Breaking-Changes: //p' <<<"$trailers")
           if [ -z "$breaking" ]; then
             exit 0
           fi
