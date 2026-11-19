@@ -63,6 +63,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {connection}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.limit`.
      */
     public const DB_CLIENT_CONNECTION_MAX = 'db.client.connection.max';
 
@@ -108,6 +109,7 @@ interface DbIncubatingMetrics
      * Instrument: histogram
      * Unit: ms
      * @experimental
+     * @deprecated Replaced by `db.client.connection.create_time` with unit `s`.
      */
     public const DB_CLIENT_CONNECTIONS_CREATE_TIME = 'db.client.connections.create_time';
 
@@ -117,6 +119,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {connection}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.idle.max`.
      */
     public const DB_CLIENT_CONNECTIONS_IDLE_MAX = 'db.client.connections.idle.max';
 
@@ -126,6 +129,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {connection}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.idle.min`.
      */
     public const DB_CLIENT_CONNECTIONS_IDLE_MIN = 'db.client.connections.idle.min';
 
@@ -135,6 +139,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {connection}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.limit`.
      */
     public const DB_CLIENT_CONNECTIONS_MAX = 'db.client.connections.max';
 
@@ -144,6 +149,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {request}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.pending_requests`.
      */
     public const DB_CLIENT_CONNECTIONS_PENDING_REQUESTS = 'db.client.connections.pending_requests';
 
@@ -153,6 +159,7 @@ interface DbIncubatingMetrics
      * Instrument: counter
      * Unit: {timeout}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.timeouts`.
      */
     public const DB_CLIENT_CONNECTIONS_TIMEOUTS = 'db.client.connections.timeouts';
 
@@ -162,6 +169,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {connection}
      * @experimental
+     * @deprecated Replaced by `db.client.connection.count`.
      */
     public const DB_CLIENT_CONNECTIONS_USAGE = 'db.client.connections.usage';
 
@@ -171,6 +179,7 @@ interface DbIncubatingMetrics
      * Instrument: histogram
      * Unit: ms
      * @experimental
+     * @deprecated Replaced by `db.client.connection.use_time` with unit `s`.
      */
     public const DB_CLIENT_CONNECTIONS_USE_TIME = 'db.client.connections.use_time';
 
@@ -180,6 +189,7 @@ interface DbIncubatingMetrics
      * Instrument: histogram
      * Unit: ms
      * @experimental
+     * @deprecated Replaced by `db.client.connection.wait_time` with unit `s`.
      */
     public const DB_CLIENT_CONNECTIONS_WAIT_TIME = 'db.client.connections.wait_time';
 
@@ -189,6 +199,7 @@ interface DbIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {instance}
      * @experimental
+     * @deprecated Replaced by `azure.cosmosdb.client.active_instance.count`.
      */
     public const DB_CLIENT_COSMOSDB_ACTIVE_INSTANCE_COUNT = 'db.client.cosmosdb.active_instance.count';
 
@@ -198,6 +209,7 @@ interface DbIncubatingMetrics
      * Instrument: histogram
      * Unit: {request_unit}
      * @experimental
+     * @deprecated Replaced by `azure.cosmosdb.client.operation.request_charge`.
      */
     public const DB_CLIENT_COSMOSDB_OPERATION_REQUEST_CHARGE = 'db.client.cosmosdb.operation.request_charge';
 

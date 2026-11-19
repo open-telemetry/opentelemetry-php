@@ -17,14 +17,14 @@ namespace {{ ctx.namespace }};
  */
 interface {{ my_class_name }}
 {
-{% for attribute in ctx.attributes | rejectattr("name", "in", ctx.excluded_attributes) if not (attribute is deprecated) %}
+{% for attribute in ctx.attributes | rejectattr("name", "in", ctx.excluded_attributes) %}
 {%- set stability_phpdoc = c.stability(attribute) -%}
-{{ [attribute.brief, concat_if(attribute.note), stability_phpdoc] | comment(indent=4)  | replace(' \n', '\n') }}
+{{ [attribute.brief, concat_if(attribute.note), stability_phpdoc, c.deprecation(attribute)] | comment(indent=4)  | replace(' \n', '\n') }}
     public const {{ c.attribute_name(attribute) }} = '{{ attribute.name }}';
 
-    {% if attribute is enum %}{% for member in attribute.type.members if not (member is deprecated) %}
+    {% if attribute is enum %}{% for member in attribute.type.members %}
         {%- set stability_phpdoc = c.stability(attribute) -%}
-{{ [member.brief, stability_phpdoc] | comment(indent=4)}}
+{{ [member.brief, stability_phpdoc, c.deprecation(member if member is deprecated else attribute)] | comment(indent=4)}}
     public const {{ c.attribute_value_name(attribute, member) }} = {{ member.value | print_member_value | replace('"', "'") }};
 
     {% endfor %}{% endif %}

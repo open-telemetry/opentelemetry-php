@@ -86,6 +86,14 @@ interface TlsIncubatingAttributes
     public const TLS_CLIENT_NOT_BEFORE = 'tls.client.not_before';
 
     /**
+     * Deprecated, use `server.address` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `server.address`.
+     */
+    public const TLS_CLIENT_SERVER_NAME = 'tls.client.server_name';
+
+    /**
      * Distinguished name of subject of the x.509 certificate presented by the client.
      *
      * @experimental

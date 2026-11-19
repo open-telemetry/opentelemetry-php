@@ -18,6 +18,7 @@ interface McpIncubatingMetrics
      * Instrument: histogram
      * Unit: s
      * @experimental
+     * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
      */
     public const MCP_CLIENT_OPERATION_DURATION = 'mcp.client.operation.duration';
 
@@ -27,6 +28,7 @@ interface McpIncubatingMetrics
      * Instrument: histogram
      * Unit: s
      * @experimental
+     * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
      */
     public const MCP_CLIENT_SESSION_DURATION = 'mcp.client.session.duration';
 
@@ -36,6 +38,7 @@ interface McpIncubatingMetrics
      * Instrument: histogram
      * Unit: s
      * @experimental
+     * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
      */
     public const MCP_SERVER_OPERATION_DURATION = 'mcp.server.operation.duration';
 
@@ -45,6 +48,7 @@ interface McpIncubatingMetrics
      * Instrument: histogram
      * Unit: s
      * @experimental
+     * @deprecated Moved to the [OpenTelemetry GenAI semantic conventions repository](https://github.com/open-telemetry/semantic-conventions-genai).
      */
     public const MCP_SERVER_SESSION_DURATION = 'mcp.server.session.duration';
 
