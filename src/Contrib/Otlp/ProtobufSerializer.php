@@ -91,7 +91,6 @@ final class ProtobufSerializer
     }
 
     /**
-     * @phan-suppress PhanParamTooManyInternal (@see https://github.com/phan/phan/pull/4840)
      * @throws Exception
      */
     public function hydrate(Message $message, string $payload): void
@@ -107,6 +106,7 @@ final class ProtobufSerializer
      * Enum values are encoded as integers, not names.
      *
      * @see https://github.com/open-telemetry/opentelemetry-proto/blob/v1.11.1/docs/specification.md#json-protobuf-encoding
+     * @phan-suppress PhanParamTooManyInternal phan's signature map predates the $options parameter
      */
     private static function serializeToJsonString(Message $message): string
     {

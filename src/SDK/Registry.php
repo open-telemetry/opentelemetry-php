@@ -302,7 +302,7 @@ class Registry
         for (; $registrars->valid(); $registrars->next()) {
             try {
                 $registrar = $registrars->current();
-                if ($registrar === null || isset(self::$registrarsRun[$registrar::class])) {
+                if (!$registrar instanceof RegistrarInterface || isset(self::$registrarsRun[$registrar::class])) {
                     continue;
                 }
                 self::$registrarsRun[$registrar::class] = true;
