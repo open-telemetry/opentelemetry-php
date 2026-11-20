@@ -4,7 +4,7 @@ services:
     volumes:
       - ./:/data
   preview:
-    image: nginx:alpine@sha256:54f2a904c251d5a34adf545a72d32515a15e08418dae0266e23be2e18c66fefa
+    image: nginx:alpine@sha256:fb4658584bd9a916ffb6f6e365f97c25cfdb2923801f551ea08356e695f14ff7
     ports:
       - 8080:80
     volumes:
