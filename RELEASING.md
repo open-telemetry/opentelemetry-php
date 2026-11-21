@@ -118,7 +118,13 @@ open-telemetry/exporter-zipkin=skip
 In core, saving the description rebuilds the pull request with the overrides. Edits to contrib's
 pull request start no workflow, so save, then rebuild. A rebuild keeps the overrides.
 
-An invalid line fails the rebuild, and the run names it.
+An invalid line fails the rebuild, and the run names it. In core, the Release approval check fails
+while the overrides in the description are not the ones the pull request was built with, so it
+stays failed until a rebuild succeeds.
+
+If the pull request has conflicts, saving the description doesn't rebuild it, as GitHub starts no
+pull request workflow then. Tick Open a release PR on the dashboard issue, or run the Release PR
+workflow.
 
 ## Approve breaking changes
 
