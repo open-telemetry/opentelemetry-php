@@ -158,7 +158,7 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * @param class-string $replacement loaded first, because it used to declare the old name as an alias
+     * @param class-string $replacement loaded first, so that an alias it declares for $removed would exist
      */
     #[DataProvider('removedTypeProvider')]
     public function test_removed_type_does_not_resolve(string $removed, string $replacement): void
@@ -1722,7 +1722,11 @@ final class ConfigurationTest extends TestCase
         Logging::setLogWriter($logWriter);
 
         try {
-            $factory = new ConfigurationFactory(self::spiComponentProviders(), new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $factory = new ConfigurationFactory(
+                self::spiComponentProviders(),
+                new OpenTelemetrySdk(),
+                new EnvSourceReader([]),
+            );
             $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
                 file_format: "1.0"
                 response_propagator/development:
@@ -1743,7 +1747,12 @@ final class ConfigurationTest extends TestCase
 
         try {
             $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
-            $factory->process([Yaml::parse("file_format: \"1.0\"\nlog_level: error\nresponse_propagator/development:\n  composite_list: servertiming")])->create(new Context());
+            $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: error
+                response_propagator/development:
+                  composite_list: servertiming
+                YAML)])->create(new Context());
         } finally {
             Logging::reset();
         }

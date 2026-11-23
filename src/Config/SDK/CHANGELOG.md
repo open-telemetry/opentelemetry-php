@@ -14,11 +14,13 @@ error straight away, with no deprecation step.
 - The top-level `response_propagator/development` key is ignored, with a warning. Move it under
   `distribution.opentelemetry_php/development` ([#2151]).
 - Providers registered under the `OpenTelemetry\Config\SDK\Configuration\ComponentProvider` SPI
-  key are not loaded. Register them under `OpenTelemetry\API\Configuration\Config\ComponentProvider`
-  ([#2151]).
+  key are not loaded, and a file naming one fails with `unknown provider`. Register them under
+  `OpenTelemetry\API\Configuration\Config\ComponentProvider` ([#2151]).
 - `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
   `ComponentProviderRegistry` and `Context` are removed. Use their equivalents in
   `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
+- Requires `open-telemetry/api` 1.13, which no longer declares the old names above as aliases
+  ([#2151]).
 - `OpenTelemetry\Config\SDK\Instrumentation` is removed. Use `Configuration::parseFile()` and
   `getInstrumentationConfig()` ([#2151]).
 

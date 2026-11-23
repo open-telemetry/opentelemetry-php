@@ -11,6 +11,8 @@ upgraders can check them in one place.
 - The `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
   `ComponentProviderRegistry` and `Context` aliases are no longer declared. Use the classes in
   `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
+- Conflicts with `open-telemetry/sdk-configuration` below 0.11, whose stubs for those names rely on
+  the aliases. Upgrade it with this package ([#2151]).
 
 ## 1.12.0 - 2026-11-19
 

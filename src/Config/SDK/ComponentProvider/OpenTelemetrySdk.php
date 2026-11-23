@@ -513,7 +513,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
-                // Removed in favor of the `distribution` key. Declared only so that it is warned about.
+                // Accepted only so that a top-level key is warned about rather than silently dropped.
                 ->variableNode('response_propagator/development')->end()
                 // Deliberately laxer than `$defs.Distribution`, which sets `minProperties: 1`: an
                 // empty map is accepted, which is also what a map of nothing but foreign keys
