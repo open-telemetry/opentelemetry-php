@@ -9,7 +9,7 @@ upgraders can check them in one place.
 ### Added
 
 - The SDK autoloader stores the instrumentation configuration it passes to `Instrumentation::register()` in
-  `Globals`, where `Globals::configProperties()` returns it ([#TODO]).
+  `Globals`, where `Globals::configProperties()` returns it ([#2152]).
 
 ## 1.17.0 - 2026-11-19
 
@@ -219,4 +219,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
+[#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

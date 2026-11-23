@@ -10,7 +10,7 @@ upgraders can check them in one place.
 
 - `Globals::configProperties()`, experimental, returns the instrumentation configuration. Instrumentations that
   register from their own autoload file, not through the `Instrumentation` SPI, can now read it. It is noop until the
-  SDK autoloader has run ([#TODO]).
+  SDK autoloader has run ([#2152]).
 
 ## 1.12.0 - 2026-11-19
 
@@ -81,3 +81,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2119]: https://github.com/open-telemetry/opentelemetry-php/pull/2119
 [#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
+[#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152
