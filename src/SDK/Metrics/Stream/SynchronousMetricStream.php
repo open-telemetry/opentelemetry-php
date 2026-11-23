@@ -9,12 +9,14 @@ use function extension_loaded;
 use GMP;
 use function gmp_init;
 use function is_int;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
 use OpenTelemetry\SDK\Metrics\Data\Exemplar;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use const PHP_INT_SIZE;
+use Psr\Log\LoggerInterface;
 use function sprintf;
 
 /**
@@ -23,7 +25,7 @@ use function sprintf;
  */
 final class SynchronousMetricStream implements MetricStreamInterface
 {
-    use LogsMessagesTrait;
+    use LogsToLoggerTrait;
 
     private readonly DeltaStorage $delta;
     private int|GMP $readers = 0;
@@ -35,6 +37,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
     public function __construct(
         private readonly AggregationInterface $aggregation,
         private int $timestamp,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
         $this->delta = new DeltaStorage($this->aggregation);
     }
@@ -67,7 +70,7 @@ final class SynchronousMetricStream implements MetricStreamInterface
 
         if ($reader === (PHP_INT_SIZE << 3) - 1 && is_int($this->readers)) {
             if (!extension_loaded('gmp')) {
-                self::logWarning(sprintf('GMP extension required to register over %d readers', (PHP_INT_SIZE << 3) - 1));
+                $this->logWarning(sprintf('GMP extension required to register over %d readers', (PHP_INT_SIZE << 3) - 1));
                 $reader = PHP_INT_SIZE << 3;
             } else {
                 assert(is_int($this->cumulative));
@@ -119,5 +122,11 @@ final class SynchronousMetricStream implements MetricStreamInterface
             $this->timestamp,
             $temporality,
         );
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }

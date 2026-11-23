@@ -14,6 +14,12 @@ error straight away, with no deprecation step.
 - `ConfigProvider` takes the instrumentation configuration in its constructor and returns it, instead of parsing
   `OTEL_CONFIG_FILE` on each call. It is no longer registered through SPI under `ConfigProviderInterface`. Use
   `Globals::configProvider()` to read the configuration the SDK was built from ([#2152]).
+- Requires `open-telemetry/sdk` 1.18, for the meter provider's logger ([#2145]).
+
+### Changed
+
+- The meter provider's internal messages honour the configured `log_level`. They used to follow
+  the global log level ([#2145]).
 
 ## 0.10.0 - 2026-11-06
 
@@ -193,4 +199,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
+[#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152

@@ -13,6 +13,8 @@ upgraders can check them in one place.
 - When configured from `OTEL_CONFIG_FILE`, the SDK autoloader registers a `ConfigProvider` holding the same
   instrumentation configuration it passes to `Instrumentation::register()`. Configured from environment variables,
   `Globals::configProvider()` stays noop ([#2152]).
+- `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
+  messages. Without one, messages still go to the global internal logger and its level ([#2145]).
 
 ## 1.17.0 - 2026-11-19
 
@@ -222,5 +224,6 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
+[#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w
