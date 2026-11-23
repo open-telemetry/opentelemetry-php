@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics\MetricFactory;
 
 use function array_keys;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation\DropAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
@@ -29,6 +30,7 @@ use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
 use OpenTelemetry\SDK\Metrics\Stream\SynchronousMetricStream;
 use OpenTelemetry\SDK\Metrics\ViewProjection;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use Psr\Log\LoggerInterface;
 use function serialize;
 use function spl_object_id;
 use Throwable;
@@ -38,6 +40,11 @@ use Throwable;
  */
 final class StreamFactory implements MetricFactoryInterface
 {
+    public function __construct(
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
+    ) {
+    }
+
     #[\Override]
     public function createAsynchronousObserver(
         MetricRegistryInterface $registry,
@@ -100,7 +107,7 @@ final class StreamFactory implements MetricFactoryInterface
 
             $dedupId = $this->streamId($view->aggregation, $view);
             if (($streamId = $dedup[$dedupId] ?? null) === null) {
-                $stream = new SynchronousMetricStream($view->aggregation, $timestamp);
+                $stream = new SynchronousMetricStream($view->aggregation, $timestamp, $this->logger);
                 $streamId = $registry->registerSynchronousStream($instrument, $stream, new MetricAggregator(
                     $this->attributeProcessor($view),
                     $view->aggregation,

@@ -384,6 +384,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 exemplarFilter: null,
                 stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
                 configurator: $configurator,
+                logger: $context->logger,
             );
 
             // </editor-fold>
