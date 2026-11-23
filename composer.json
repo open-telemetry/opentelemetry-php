@@ -40,7 +40,7 @@
         }
     ],
     "replace": {
-        "open-telemetry/api": "1.11.x-dev",
+        "open-telemetry/api": "1.12.x-dev",
         "open-telemetry/context": "1.6.x-dev",
         "open-telemetry/exporter-otlp": "1.6.x-dev",
         "open-telemetry/exporter-zipkin": "1.5.x-dev",

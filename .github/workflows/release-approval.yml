@@ -1,0 +1,48 @@
+name: Release approval
+
+# Fails on a release pull request that is not built on the tip of main, whose overrides are not the
+# ones it was built with, or whose breaking changes box is unticked. dev-tools release:pr:check reads
+# the head commit's trailers and the description as it is when the check runs, not from the event,
+# which a re-run repeats. The stale job of the Release PR workflow edits the description when main
+# moves, so this runs again. Skipped on other pull requests, which a required check counts as
+# passing.
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened, edited ]
+
+permissions: {}
+
+jobs:
+  approval:
+    name: Release approval
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.ref == 'otelbot/release' &&
+      github.event.pull_request.user.login == 'otelbot-php[bot]'
+    # Each run reads the description as it is, so the latest edit's run is the one that counts
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dev-tools
+        run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
+
+      - name: Check the release pull request
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          "$RUNNER_TEMP/dev-tools/bin/otel" release:pr:check --no-interaction "--repository=$GITHUB_REPOSITORY" "--number=$NUMBER" "--head=$HEAD_SHA"

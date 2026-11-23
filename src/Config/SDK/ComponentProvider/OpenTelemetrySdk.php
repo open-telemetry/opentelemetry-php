@@ -15,11 +15,9 @@ use OpenTelemetry\API\Metrics\Noop\NoopMeterProvider;
 use OpenTelemetry\Config\SDK\Configuration\IgnoresUnknownProviders;
 use OpenTelemetry\Config\SDK\Configuration\Validation;
 use OpenTelemetry\Config\SDK\Parser\AttributesParser;
-use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
 use OpenTelemetry\Context\Propagation\MultiTextMapPropagator;
 use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
-use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Distribution\DistributionConfiguration;
@@ -126,10 +124,6 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         composite_list: ?string,
      *         composite: list<ComponentPlugin<TextMapPropagatorInterface>>,
      *     },
-     *     "response_propagator/development"?: array{
-     *         composite_list: ?string,
-     *         composite: list<ComponentPlugin<ResponsePropagatorInterface>>,
-     *     },
      *     tracer_provider?: array{
      *         limits: array{
      *             attribute_value_length_limit: ?int<0, max>,
@@ -211,6 +205,7 @@ final class OpenTelemetrySdk implements ComponentProvider
      *         },
      *     },
      *     distribution: list<ComponentPlugin<?DistributionConfiguration>>,
+     *     "response_propagator/development"?: mixed,
      * } $properties
      */
     #[\Override]
@@ -237,6 +232,9 @@ final class OpenTelemetrySdk implements ComponentProvider
                 self::FILE_FORMAT_MINOR,
             ));
         }
+        if (array_key_exists('response_propagator/development', $properties)) {
+            $context->logger->log(LogLevel::WARNING, '"response_propagator/development" at the top level is ignored, move it under "distribution.opentelemetry_php/development"');
+        }
 
         $propagators = [];
         foreach ($properties['propagator']['composite'] as $plugin) {
@@ -254,20 +252,7 @@ final class OpenTelemetrySdk implements ComponentProvider
 
         $distributionConfiguration = $distributionProperties->getDistributionConfiguration(SdkDistribution::class) ?? new SdkDistribution();
 
-        $responsePropagator = $distributionConfiguration->responsePropagator;
-        // TODO remove the deprecated top-level response_propagator/development before 1.0
-        if (isset($properties['response_propagator/development'])) {
-            $context->logger->log(LogLevel::WARNING, '"response_propagator/development" is deprecated, move it under "distribution.opentelemetry_php/development"');
-
-            $responsePropagators = [];
-            foreach ($properties['response_propagator/development']['composite'] as $plugin) {
-                $responsePropagators[] = $plugin->create($context);
-            }
-            if ($responsePropagator === null && $responsePropagators !== []) {
-                $responsePropagator = new MultiResponsePropagator($responsePropagators);
-            }
-        }
-        $sdkBuilder->setResponsePropagator($responsePropagator ?? NoopResponsePropagator::getInstance());
+        $sdkBuilder->setResponsePropagator($distributionConfiguration->responsePropagator ?? NoopResponsePropagator::getInstance());
 
         if ($properties['disabled']) {
             return $sdkBuilder;
@@ -399,6 +384,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 exemplarFilter: null,
                 stalenessHandlerFactory: new NoopStalenessHandlerFactory(),
                 configurator: $configurator,
+                logger: $context->logger,
             );
 
             // </editor-fold>
@@ -528,7 +514,8 @@ final class OpenTelemetrySdk implements ComponentProvider
                 ->append($this->getTracerProviderConfig($registry, $builder))
                 ->append($this->getMeterProviderConfig($registry, $builder))
                 ->append($this->getLoggerProviderConfig($registry, $builder))
-                ->append($this->getExperimentalResponsePropagatorConfig($registry, $builder))
+                // Accepted only so that a top-level key is warned about rather than silently dropped.
+                ->variableNode('response_propagator/development')->end()
                 // Deliberately laxer than `$defs.Distribution`, which sets `minProperties: 1`: an
                 // empty map is accepted, which is also what a map of nothing but foreign keys
                 // normalizes to.
@@ -894,51 +881,6 @@ final class OpenTelemetrySdk implements ComponentProvider
             ->children()
                 ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
                 ->append($registry->componentList('composite', TextMapPropagatorInterface::class)->requiresAtLeastOneElement())
-            ->end()
-        ;
-
-        return $node;
-    }
-
-    /**
-     * Deprecated in favor of `distribution.opentelemetry_php/development.response_propagator/development`.
-     * It has no defaults, so it is absent unless the file sets it.
-     */
-    private function getExperimentalResponsePropagatorConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition
-    {
-        $node = $builder->arrayNode('response_propagator/development');
-        $node
-            ->beforeNormalization()
-            ->ifArray()
-            ->then(static function (array $value): array {
-                // Left for type validation to reject.
-                if (!is_array($value['composite'] ?? []) || !is_string($value['composite_list'] ?? '')) {
-                    return $value;
-                }
-                $existing = [];
-                foreach ($value['composite'] ?? [] as $item) {
-                    if (is_array($item)) {
-                        $existing[] = key($item);
-                    }
-                }
-                foreach (explode(',', $value['composite_list'] ?? '') as $name) {
-                    $name = trim($name);
-                    if ($name !== '' && $name !== 'none' && !in_array($name, $existing)) {
-                        $value['composite'][][$name] = null;
-                        $existing[] = $name;
-                    }
-                }
-
-                unset($value['composite_list']);
-
-                return $value;
-            })
-            ->end();
-
-        $node
-            ->children()
-            ->scalarNode('composite_list')->defaultNull()->validate()->always(Validation::ensureString())->end()->end()
-            ->append($registry->componentList('composite', ResponsePropagatorInterface::class))
             ->end()
         ;
 

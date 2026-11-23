@@ -32,6 +32,7 @@ class PropagatorFactoryTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
      * @psalm-suppress ArgumentTypeCoercion
      */
     #[DataProvider('propagatorsProvider')]
@@ -46,6 +47,9 @@ class PropagatorFactoryTest extends TestCase
     {
         return [
             [KnownValues::VALUE_BAGGAGE, BaggagePropagator::class],
+            ['Baggage', BaggagePropagator::class],
+            ['TraceContext', TraceContextPropagator::class],
+            ['NONE', NoopTextMapPropagator::class],
             [KnownValues::VALUE_TRACECONTEXT, TraceContextPropagator::class],
             [KnownValues::VALUE_B3, B3Propagator::class],
             [KnownValues::VALUE_B3_MULTI, B3Propagator::class],
@@ -53,6 +57,17 @@ class PropagatorFactoryTest extends TestCase
             [sprintf('%s,%s', KnownValues::VALUE_B3, KnownValues::VALUE_BAGGAGE), MultiTextMapPropagator::class],
             ['unknown', NoopTextMapPropagator::class],
         ];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public function test_mixed_case_composite_propagator(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PROPAGATORS, 'TraceContext,Baggage');
+        $propagator = (new PropagatorFactory())->create();
+
+        $this->assertSame(['traceparent', 'tracestate', 'baggage'], $propagator->fields());
     }
 
     #[DataProvider('unimplementedPropagatorProvider')]

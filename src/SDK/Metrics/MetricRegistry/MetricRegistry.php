@@ -6,14 +6,17 @@ namespace OpenTelemetry\SDK\Metrics\MetricRegistry;
 
 use function array_key_last;
 use Closure;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextStorageInterface;
 use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Metrics\Instrument;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorFactoryInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricAggregatorInterface;
 use OpenTelemetry\SDK\Metrics\Stream\MetricStreamInterface;
+use Psr\Log\LoggerInterface;
 use function spl_object_id;
 
 /**
@@ -21,6 +24,8 @@ use function spl_object_id;
  */
 final class MetricRegistry implements MetricRegistryInterface, MetricWriterInterface
 {
+    use LogsToLoggerTrait;
+
     /** @var array<int, MetricStreamInterface> */
     private array $streams = [];
     /** @var array<int, MetricAggregatorInterface> */
@@ -38,11 +43,14 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     private array $asynchronousCallbacks = [];
     /** @var array<int, list<int>> */
     private array $asynchronousCallbackArguments = [];
+    /** @var array<int, true> */
+    private array $callbacksReturningValue = [];
 
     public function __construct(
         private readonly ?ContextStorageInterface $contextStorage,
         private readonly AttributesFactoryInterface $attributesFactory,
         private readonly ClockInterface $clock,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
     }
 
@@ -110,8 +118,8 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     #[\Override]
     public function registerCallback(Closure $callback, Instrument $instrument, Instrument ...$instruments): int
     {
-        $callbackId = array_key_last($this->asynchronousCallbacks) + 1;
-        $this->asynchronousCallbacks[$callbackId] = $callback;
+        $this->asynchronousCallbacks[] = $callback;
+        $callbackId = array_key_last($this->asynchronousCallbacks);
 
         $instrumentId = spl_object_id($instrument);
         $this->asynchronousCallbackArguments[$callbackId] = [$instrumentId];
@@ -132,6 +140,7 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
         unset(
             $this->asynchronousCallbacks[$callbackId],
             $this->asynchronousCallbackArguments[$callbackId],
+            $this->callbacksReturningValue[$callbackId],
         );
         foreach ($instrumentIds as $instrumentId) {
             unset($this->instrumentToCallbacks[$instrumentId][$callbackId]);
@@ -171,10 +180,15 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
                 $args[] = $observers[$instrumentId] ?? $noopObserver;
             }
             $callback = $this->asynchronousCallbacks[$callbackId];
-            $callbacks[] = static fn () => $callback(...$args);
+            $callbacks[$callbackId] = static fn () => $callback(...$args);
         }
-        foreach ($callbacks as $callback) {
-            $callback();
+        foreach ($callbacks as $callbackId => $callback) {
+            if ($callback() !== null
+                && isset($this->asynchronousCallbacks[$callbackId])
+                && !isset($this->callbacksReturningValue[$callbackId])) {
+                $this->callbacksReturningValue[$callbackId] = true;
+                $this->logWarning('Asynchronous instrument callback should not return a value, it is ignored');
+            }
         }
 
         $timestamp = $this->clock->now();
@@ -189,5 +203,11 @@ final class MetricRegistry implements MetricRegistryInterface, MetricWriterInter
     public function enabled(Instrument $instrument): bool
     {
         return isset($this->instrumentToStreams[spl_object_id($instrument)]);
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }

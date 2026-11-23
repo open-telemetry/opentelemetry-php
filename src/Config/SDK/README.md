@@ -85,9 +85,6 @@ provider, so each name needs one registered by another package. The contrib `ser
 `traceresponse` propagators register for `OTEL_EXPERIMENTAL_RESPONSE_PROPAGATORS` only, and can't
 be named here yet.
 
-The top-level `response_propagator/development` key is deprecated. It still works and logs a
-warning, and the `distribution` one wins when both are set.
-
 Any distribution may claim a key there, so one file can carry the settings of several. Keys this SDK
 has no provider for are logged at warning level and ignored, rather than failing the parse. That
 covers another distribution's keys, and ours when the package providing them is not installed. A

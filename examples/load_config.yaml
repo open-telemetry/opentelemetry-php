@@ -11,8 +11,10 @@ propagator:
     - tracecontext:
     - baggage:
 
-response_propagator/development:
-  composite_list: "servertiming,traceresponse"
+distribution:
+  opentelemetry_php/development:
+    response_propagator/development:
+      composite_list: "servertiming,traceresponse"
 
 # shared OTLP/HTTP exporter settings, expanded below with a signal-specific endpoint
 exporter_defaults: &otlp-exporter

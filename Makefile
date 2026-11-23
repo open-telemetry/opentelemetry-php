@@ -58,6 +58,8 @@ phpmetrics: ## Run php metrics
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor-bin/phpmetrics/vendor/bin/phpmetrics --config=./phpmetrics.json --junit=junit.xml
 spi: ## Validate SPI package dependencies
 	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel packages:spi:check
+php-support: ## Update the supported PHP versions in the README and docs
+	$(DC_RUN_PHP) env XDEBUG_MODE=off vendor/bin/otel php:support --write --file README.md --file docs/versioning.md
 smoke-test-examples: smoke-test-isolated-examples smoke-test-exporter-examples smoke-test-collector-integration smoke-test-prometheus-example ## Run smoke test examples
 smoke-test-isolated-examples: ## Run smoke test isolated examples
 	$(DC_RUN_PHP) php ./examples/traces/getting_started.php

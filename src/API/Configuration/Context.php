@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Configuration;
 
-use function class_alias;
 use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopLoggerProvider;
@@ -71,6 +70,3 @@ final class Context
         return $this->extensions[$type] ?? null;
     }
 }
-
-/** @phpstan-ignore-next-line @phan-suppress-next-line PhanUndeclaredClassReference */
-class_alias(Context::class, \OpenTelemetry\Config\SDK\Configuration\Context::class);

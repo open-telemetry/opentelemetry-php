@@ -196,10 +196,13 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['a'=>'b', 'c'=>'d'], Configuration::getMap('OTEL_MAP'));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     public function test_enum_get(): void
     {
-        $this->setEnvironmentVariable('OTEL_ENUM', 'foo');
-        $this->assertSame('foo', Configuration::getEnum('OTEL_ENUM'));
+        $this->setEnvironmentVariable('OTEL_ENUM', 'Foo_BAR');
+        $this->assertSame('foo_bar', Configuration::getEnum('OTEL_ENUM'));
     }
 
     public function test_ratio_get(): void

@@ -6,10 +6,23 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- The `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
+  `ComponentProviderRegistry` and `Context` aliases are no longer declared. Use the classes in
+  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
+
 ### Changed
 
 - The `LoggerInterface::isEnabled()` docblock says that calling it is optional, when it is worth calling, and that
   its result can change over time ([#2131]).
+
+## 1.12.0 - 2026-11-19
+
+### Changed
+
+- `MeterInterface::createGauge()` and `GaugeInterface` are no longer experimental. The synchronous Gauge is stable
+  in the specification ([#2129]).
 
 ### Fixed
 
@@ -73,3 +86,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2119]: https://github.com/open-telemetry/opentelemetry-php/pull/2119
 [#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
 [#2131]: https://github.com/open-telemetry/opentelemetry-php/pull/2131
+[#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
+[#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Metrics;
 
 use ArrayAccess;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\MeterInterface;
 use OpenTelemetry\API\Metrics\Noop\NoopMeter;
@@ -19,6 +20,7 @@ use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricRegistryInterface;
 use OpenTelemetry\SDK\Metrics\MetricRegistry\MetricWriterInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Sdk;
+use Psr\Log\LoggerInterface;
 use WeakMap;
 
 final class MeterProvider implements MeterProviderInterface
@@ -30,6 +32,7 @@ final class MeterProvider implements MeterProviderInterface
 
     private bool $closed = false;
     private readonly WeakMap $meters;
+    private readonly MetricFactoryInterface $metricFactory;
 
     /**
      * @param iterable<MetricReaderInterface&MetricSourceRegistryInterface&DefaultAggregationProviderInterface> $metricReaders
@@ -44,12 +47,14 @@ final class MeterProvider implements MeterProviderInterface
         private readonly ViewRegistryInterface $viewRegistry,
         private readonly ?ExemplarFilterInterface $exemplarFilter,
         private readonly StalenessHandlerFactoryInterface $stalenessHandlerFactory,
-        private readonly MetricFactoryInterface $metricFactory = new StreamFactory(),
+        ?MetricFactoryInterface $metricFactory = null,
         private ?Configurator $configurator = null,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
         $this->instruments = new MeterInstruments();
+        $this->metricFactory = $metricFactory ?? new StreamFactory($this->logger);
 
-        $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock);
+        $registry = new MetricRegistry($contextStorage, $attributesFactory, $clock, $this->logger);
         $this->registry = $registry;
         $this->writer = $registry;
         $this->destructors = new WeakMap();
@@ -81,6 +86,7 @@ final class MeterProvider implements MeterProviderInterface
             $this->writer,
             $this->destructors,
             $this->configurator,
+            $this->logger,
         );
         $this->meters->offsetSet($meter, null);
 

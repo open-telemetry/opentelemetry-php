@@ -18,7 +18,10 @@ interface ValueTypes
     public const OTEL_SERVICE_NAME = VariableTypes::STRING;
     public const OTEL_LOG_LEVEL = VariableTypes::ENUM;
     public const OTEL_PROPAGATORS = VariableTypes::LIST;
-    public const OTEL_TRACES_SAMPLER = VariableTypes::STRING;
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
+    public const OTEL_TRACES_SAMPLER = VariableTypes::ENUM;
     public const OTEL_TRACES_SAMPLER_ARG = VariableTypes::MIXED;
     /**
      * Batch Span Processor

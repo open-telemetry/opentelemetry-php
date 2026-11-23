@@ -106,6 +106,3 @@ The application must allow the plugin:
 ```shell
 composer config allow-plugins.tbachert/spi true
 ```
-
-Providers registered under the old `OpenTelemetry\Config\SDK\Configuration\ComponentProvider` key
-still load, and log a deprecation warning.

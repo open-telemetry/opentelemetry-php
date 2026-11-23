@@ -3,9 +3,6 @@ file_format: '1.0'
 propagator:
   composite: ~
 
-response_propagator/development:
-  composite: []
-
 tracer_provider:
   processors:
   - simple:

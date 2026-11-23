@@ -111,8 +111,6 @@ interface MeterInterface
      * @return GaugeInterface created instrument
      *
      * @see https://opentelemetry.io/docs/specs/otel/metrics/api/#gauge-creation
-     *
-     * @experimental
      */
     public function createGauge(
         string $name,

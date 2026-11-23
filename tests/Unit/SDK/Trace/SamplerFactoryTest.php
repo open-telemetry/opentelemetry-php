@@ -16,6 +16,9 @@ class SamplerFactoryTest extends TestCase
 {
     use TestState;
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#enum
+     */
     #[DataProvider('samplerProvider')]
     public function test_create_sampler_from_environment(string $samplerName, string $expected, ?string $arg = null): void
     {
@@ -31,6 +34,8 @@ class SamplerFactoryTest extends TestCase
         return [
             'default sampler' => ['', 'ParentBased+AlwaysOn'],
             'always on' => ['always_on', 'AlwaysOn'],
+            'mixed case always on' => ['Always_On', 'AlwaysOn'],
+            'mixed case parent based trace id ratio' => ['ParentBased_TraceIdRatio', 'ParentBased+TraceIdRatio', '0.95'],
             'always off' => ['always_off', 'AlwaysOff'],
             'trace id ratio' => ['traceidratio', 'TraceIdRatio', '0.95'],
             'parent based always on' => ['parentbased_always_on', 'ParentBased+AlwaysOn'],

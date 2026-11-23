@@ -1,0 +1,56 @@
+name: PHP version support
+
+# Opens an issue to drop the minimum PHP version when its support is about to end, and to add a
+# released PHP version to CI. The issues are the templates in .github/php-version-support, and an
+# issue that exists, open or closed, is not opened again.
+
+on:
+  schedule:
+    - cron: '0 6 1 * *' # monthly
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Print the issues instead of opening them
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Two runs at once could both find an issue missing, and open it twice
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check PHP version support
+    runs-on: ubuntu-latest
+    if: github.repository == 'open-telemetry/opentelemetry-php'
+    permissions:
+      contents: read
+      issues: write # to open the issues, and the label they carry
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dev-tools
+        run: composer create-project --no-dev --prefer-dist --no-progress open-telemetry/dev-tools "$RUNNER_TEMP/dev-tools" dev-main
+
+      - name: Open the issues
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          args=()
+          if [ "$DRY_RUN" = "true" ]; then
+            args+=(--dry-run)
+          fi
+          "$RUNNER_TEMP/dev-tools/bin/otel" php:support:issues "${args[@]}"

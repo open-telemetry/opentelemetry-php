@@ -60,6 +60,9 @@ final class StreamMetricSourceProvider implements MetricSourceProviderInterface,
         return $this->view->description;
     }
 
+    /**
+     * @phan-suppress PhanDeprecatedFunction
+     */
     #[\Override]
     public function temporality()
     {
