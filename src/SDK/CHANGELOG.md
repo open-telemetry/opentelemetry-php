@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
+  messages. Without one, messages still go to the global internal logger and its level ([#2145]).
+
 ## 1.17.0 - 2026-11-19
 
 ### Breaking changes
@@ -214,4 +219,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
+[#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

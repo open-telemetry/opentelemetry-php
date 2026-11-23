@@ -9,6 +9,15 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.18, for the meter provider's logger ([#2145]).
+
+### Changed
+
+- The meter provider's internal messages honour the configured `log_level`. They used to follow
+  the global log level ([#2145]).
+
 ## 0.10.0 - 2026-11-06
 
 ### Breaking changes
@@ -187,3 +196,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
+[#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145

@@ -15,6 +15,7 @@ use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
 use OpenTelemetry\API\Metrics\Noop\NoopCounter;
+use OpenTelemetry\API\Metrics\ObservableCounterInterface;
 use OpenTelemetry\API\Trace\Propagation\Config\TextMapPropagatorTraceContext;
 use OpenTelemetry\API\Trace\Propagation\TraceContextPropagator;
 use OpenTelemetry\Config\SDK\ComponentProvider\InstrumentationConfigurationRegistry;
@@ -484,6 +485,39 @@ final class ConfigurationTest extends TestCase
             YAML)])->create((new Context())->withLogger($logger));
 
         $this->assertNull($registry->get(HttpConfig::class));
+    }
+
+    /**
+     * The meter provider logs through the configuration context's logger, so a warning it emits after
+     * creation honours the file's `log_level` rather than the global level.
+     */
+    public function test_meter_provider_honours_log_level(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write')->with(
+            LogLevel::WARNING,
+            $this->stringContains('instrument not created by this SDK'),
+            $this->anything(),
+        );
+
+        try {
+            $factory = new ConfigurationFactory([new MetricReaderPeriodic(), new MetricExporterConsole()], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(<<<'YAML'
+                file_format: "1.0"
+                log_level: warn
+                meter_provider:
+                  readers:
+                  - periodic:
+                      exporter:
+                        console:
+                YAML)])->create(new Context())->build();
+
+            Logging::setLogWriter($logWriter);
+            Logging::setLogLevel(LogLevel::ERROR);
+            $sdk->getMeterProvider()->getMeter('test')->batchObserve(static fn () => null, $this->createStub(ObservableCounterInterface::class));
+        } finally {
+            Logging::reset();
+        }
     }
 
     private static function instrumentationFactory(): ConfigurationFactory
