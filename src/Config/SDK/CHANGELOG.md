@@ -12,15 +12,15 @@ error straight away, with no deprecation step.
 ### Breaking changes
 
 - The top-level `response_propagator/development` key is ignored, with a warning. Move it under
-  `distribution.opentelemetry_php/development` ([#TBD]).
+  `distribution.opentelemetry_php/development` ([#2151]).
 - Providers registered under the `OpenTelemetry\Config\SDK\Configuration\ComponentProvider` SPI
   key are not loaded. Register them under `OpenTelemetry\API\Configuration\Config\ComponentProvider`
-  ([#TBD]).
+  ([#2151]).
 - `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
   `ComponentProviderRegistry` and `Context` are removed. Use their equivalents in
-  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#TBD]).
+  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
 - `OpenTelemetry\Config\SDK\Instrumentation` is removed. Use `Configuration::parseFile()` and
-  `getInstrumentationConfig()` ([#TBD]).
+  `getInstrumentationConfig()` ([#2151]).
 
 ## 0.10.0 - 2026-11-06
 
@@ -200,3 +200,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2105]: https://github.com/open-telemetry/opentelemetry-php/pull/2105
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
+[#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151

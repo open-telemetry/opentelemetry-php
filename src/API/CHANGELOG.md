@@ -10,7 +10,7 @@ upgraders can check them in one place.
 
 - The `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
   `ComponentProviderRegistry` and `Context` aliases are no longer declared. Use the classes in
-  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#TBD]).
+  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
 
 ## 1.12.0 - 2026-11-19
 
@@ -81,3 +81,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2119]: https://github.com/open-telemetry/opentelemetry-php/pull/2119
 [#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
+[#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151
