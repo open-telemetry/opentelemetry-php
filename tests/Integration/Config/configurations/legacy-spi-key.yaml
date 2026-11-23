@@ -1,0 +1,4 @@
+file_format: '1.0'
+propagator:
+  composite:
+    - legacy_spi_key:

@@ -6,6 +6,12 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- The `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
+  `ComponentProviderRegistry` and `Context` aliases are no longer declared. Use the classes in
+  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#TBD]).
+
 ## 1.12.0 - 2026-11-19
 
 ### Changed

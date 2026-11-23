@@ -9,6 +9,19 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+### Breaking changes
+
+- The top-level `response_propagator/development` key is ignored, with a warning. Move it under
+  `distribution.opentelemetry_php/development` ([#TBD]).
+- Providers registered under the `OpenTelemetry\Config\SDK\Configuration\ComponentProvider` SPI
+  key are not loaded. Register them under `OpenTelemetry\API\Configuration\Config\ComponentProvider`
+  ([#TBD]).
+- `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
+  `ComponentProviderRegistry` and `Context` are removed. Use their equivalents in
+  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#TBD]).
+- `OpenTelemetry\Config\SDK\Instrumentation` is removed. Use `Configuration::parseFile()` and
+  `getInstrumentationConfig()` ([#TBD]).
+
 ## 0.10.0 - 2026-11-06
 
 ### Breaking changes
