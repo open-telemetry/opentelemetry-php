@@ -6,6 +6,12 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- `Globals::configProperties()`, experimental, returns the instrumentation configuration. Instrumentations that
+  register from their own autoload file, not through the `Instrumentation` SPI, can now read it. It is noop until the
+  SDK autoloader has run ([#TODO]).
+
 ## 1.12.0 - 2026-11-19
 
 ### Changed

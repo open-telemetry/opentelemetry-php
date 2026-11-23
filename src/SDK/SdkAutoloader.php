@@ -192,6 +192,7 @@ class SdkAutoloader
                 $configuration = new NoopConfigProperties();
             }
         }
+        Globals::setConfigProperties($configuration);
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();

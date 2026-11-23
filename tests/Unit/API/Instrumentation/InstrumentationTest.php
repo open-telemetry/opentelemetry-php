@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Configuration\ConfigProperties;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -166,5 +168,29 @@ final class InstrumentationTest extends TestCase
             $this->anything(),
         );
         Globals::propagator();
+    }
+
+    public function test_config_properties_not_set_returns_noop(): void
+    {
+        $this->assertInstanceOf(NoopConfigProperties::class, Globals::configProperties());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider
+     */
+    public function test_config_properties_returns_set_instance(): void
+    {
+        $configProperties = $this->createStub(ConfigProperties::class);
+        Globals::setConfigProperties($configProperties);
+
+        $this->assertSame($configProperties, Globals::configProperties());
+    }
+
+    public function test_reset_clears_config_properties(): void
+    {
+        Globals::setConfigProperties($this->createStub(ConfigProperties::class));
+        Globals::reset();
+
+        $this->assertInstanceOf(NoopConfigProperties::class, Globals::configProperties());
     }
 }

@@ -7,6 +7,8 @@ namespace OpenTelemetry\API;
 use function assert;
 use Closure;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Configuration\ConfigProperties;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
@@ -29,6 +31,7 @@ final class Globals
     /** @var Closure[] */
     private static array $initializers = [];
     private static ?self $globals = null;
+    private static ?ConfigProperties $configProperties = null;
 
     public function __construct(
         private readonly TracerProviderInterface $tracerProvider,
@@ -75,6 +78,30 @@ final class Globals
     public static function eventLoggerProvider(): EventLoggerProviderInterface
     {
         return Context::getCurrent()->get(ContextKeys::eventLoggerProvider()) ?? self::globals()->eventLoggerProvider;
+    }
+
+    /**
+     * Instrumentation configuration, set by the SDK autoloader. Noop until then, so an
+     * instrumentation that registers from its own autoload file may run too early to see it.
+     *
+     * Kept apart from the initializers, which build the SDK, because instrumentation config is
+     * needed at autoload time and the SDK is built later.
+     *
+     * @experimental
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider
+     */
+    public static function configProperties(): ConfigProperties
+    {
+        return self::$configProperties ?? new NoopConfigProperties();
+    }
+
+    /**
+     * @internal
+     * @psalm-internal OpenTelemetry
+     */
+    public static function setConfigProperties(ConfigProperties $configProperties): void
+    {
+        self::$configProperties = $configProperties;
     }
 
     /**
@@ -133,5 +160,6 @@ final class Globals
     {
         self::$globals = null;
         self::$initializers = [];
+        self::$configProperties = null;
     }
 }

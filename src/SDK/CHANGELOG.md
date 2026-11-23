@@ -6,6 +6,11 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- The SDK autoloader stores the instrumentation configuration it passes to `Instrumentation::register()` in
+  `Globals`, where `Globals::configProperties()` returns it ([#TODO]).
+
 ## 1.17.0 - 2026-11-19
 
 ### Breaking changes
