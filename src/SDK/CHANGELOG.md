@@ -8,8 +8,11 @@ upgraders can check them in one place.
 
 ### Added
 
-- The SDK autoloader stores the instrumentation configuration it passes to `Instrumentation::register()` in
-  `Globals`, where `Globals::configProperties()` returns it ([#2152]).
+- `SdkBuilder::setConfigProvider()` and `Sdk::getConfigProvider()`, experimental. `buildAndRegisterGlobal()`
+  registers the provider, so `Globals::configProvider()` returns it ([#2152]).
+- When configured from `OTEL_CONFIG_FILE`, the SDK autoloader registers a `ConfigProvider` holding the same
+  instrumentation configuration it passes to `Instrumentation::register()`. Configured from environment variables,
+  `Globals::configProvider()` stays noop ([#2152]).
 
 ## 1.17.0 - 2026-11-19
 

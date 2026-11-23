@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Instrumentation;
 
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\LoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -34,6 +36,7 @@ final class Configurator implements ImplicitContextKeyedInterface
     private ?LoggerProviderInterface $loggerProvider = null;
     private ?EventLoggerProviderInterface $eventLoggerProvider = null;
     private ?ResponsePropagatorInterface $responsePropagator = null;
+    private ?ConfigProviderInterface $configProvider = null;
 
     private function __construct()
     {
@@ -61,6 +64,7 @@ final class Configurator implements ImplicitContextKeyedInterface
             ->withLoggerProvider(NoopLoggerProvider::getInstance())
             ->withEventLoggerProvider(new NoopEventLoggerProvider())
             ->withResponsePropagator(new NoopResponsePropagator())
+            ->withConfigProvider(new NoopConfigProvider())
         ;
     }
 
@@ -95,6 +99,9 @@ final class Configurator implements ImplicitContextKeyedInterface
         }
         if ($this->responsePropagator !== null) {
             $context = $context->with(ContextKeys::responsePropagator(), $this->responsePropagator);
+        }
+        if ($this->configProvider !== null) {
+            $context = $context->with(ContextKeys::configProvider(), $this->configProvider);
         }
 
         return $context;
@@ -147,6 +154,17 @@ final class Configurator implements ImplicitContextKeyedInterface
     {
         $self = clone $this;
         $self->responsePropagator = $responsePropagator;
+
+        return $self;
+    }
+
+    /**
+     * @experimental
+     */
+    public function withConfigProvider(?ConfigProviderInterface $configProvider): Configurator
+    {
+        $self = clone $this;
+        $self->configProvider = $configProvider;
 
         return $self;
     }

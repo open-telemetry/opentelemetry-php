@@ -93,9 +93,6 @@
 
                 "OpenTelemetry\\Config\\SDK\\ComponentProvider\\Distribution\\DistributionConfigurationSdk"
             ],
-            "OpenTelemetry\\API\\Configuration\\ConfigProviderInterface": [
-                "OpenTelemetry\\Config\\SDK\\ConfigProvider"
-            ],
             "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\EnvSourceProvider": [
                 "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\SymfonyDotenvProvider",
                 "OpenTelemetry\\Config\\SDK\\Configuration\\Environment\\Adapter\\VlucasPhpdotenvProvider"

@@ -29,9 +29,8 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  * `ignoreExtraKeys()` and {@see IgnoresUnknownProviders} tolerate unknown keys and unregistered
  * providers, not a known node that fails type validation.
  *
- * The reverse holds only for {@see \OpenTelemetry\Config\SDK\ConfigProvider}.
- * {@see \OpenTelemetry\Config\SDK\Configuration::parseFile()} processes the SDK root first, so an
- * invalid SDK root costs its callers both.
+ * The reverse does not hold. {@see \OpenTelemetry\Config\SDK\Configuration::parseFile()} processes
+ * the SDK root first, so an invalid SDK root costs both.
  *
  * @internal
  * @todo Append `instrumentation/development` to {@see OpenTelemetrySdk} and remove this provider

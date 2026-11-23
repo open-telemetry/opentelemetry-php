@@ -10,6 +10,7 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
@@ -219,26 +220,27 @@ class SdkAutoloaderTest extends TestCase
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
     }
 
-    public function test_autoload_from_config_file_sets_global_config_properties(): void
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    public function test_autoload_from_config_file_sets_global_config_provider(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
 
         $this->assertTrue(SdkAutoloader::autoload());
-        $http = Globals::configProperties()->get(HttpConfig::class);
+        $http = Globals::configProvider()->getInstrumentationConfig()->get(HttpConfig::class);
         $this->assertInstanceOf(HttpConfig::class, $http);
         $this->assertSame(['GET', 'POST'], $http->config['server']['known_methods']);
     }
 
-    public function test_autoload_from_environment_sets_global_config_properties(): void
+    public function test_autoload_from_environment_leaves_global_config_provider_noop(): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
         $this->setEnvironmentVariable('OTEL_PHP_INSTRUMENTATION_HTTP_REQUEST_HEADERS', 'Accept');
 
         $this->assertTrue(SdkAutoloader::autoload());
-        $http = Globals::configProperties()->get(HttpConfig::class);
-        $this->assertInstanceOf(HttpConfig::class, $http);
-        $this->assertSame(['Accept'], $http->config['client']['request_captured_headers']);
+        $this->assertInstanceOf(NoopConfigProvider::class, Globals::configProvider());
     }
 
     /**

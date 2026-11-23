@@ -26,6 +26,7 @@ use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
+use OpenTelemetry\Config\SDK\ConfigProvider;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -67,7 +68,7 @@ class SdkAutoloader
         if (!self::isEnabled() || self::isExcludedUrl() || self::isExcludedRequestHeader()) {
             return false;
         }
-        $config = null;
+        $configuration = null;
         if (Configuration::has(Variables::OTEL_CONFIG_FILE)) {
             if (!class_exists(SdkConfiguration::class)) {
                 self::logWarning('Error during opentelemetry initialization: file-based configuration requires open-telemetry/sdk-configuration');
@@ -76,15 +77,17 @@ class SdkAutoloader
                     // One parse serves both configuration roots. Registering no initializer on
                     // failure leaves Globals to fall back to its noop configurator.
                     $config = SdkConfiguration::parseFile(Configuration::getString(Variables::OTEL_CONFIG_FILE));
-                    Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator, $config));
+                    $configuration = self::loadConfigPropertiesFromFile($config);
+                    Globals::registerInitializer(fn ($configurator) => self::fileBasedInitializer($configurator, $config, $configuration));
                 } catch (Throwable $t) {
                     self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
                 }
             }
         } else {
             Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
+            $configuration = self::loadConfigPropertiesFromEnv();
         }
-        self::registerInstrumentations($config);
+        self::registerInstrumentations($configuration ?? new NoopConfigProperties());
 
         AutoRootSpan::start();
 
@@ -140,7 +143,7 @@ class SdkAutoloader
     /**
      * @phan-suppress PhanPossiblyUndeclaredVariable,PhanDeprecatedFunction
      */
-    private static function fileBasedInitializer(Configurator $configurator, SdkConfiguration $config): Configurator
+    private static function fileBasedInitializer(Configurator $configurator, SdkConfiguration $config, ConfigProperties $configuration): Configurator
     {
         //disable hook manager during SDK to avoid autoinstrumenting SDK exporters.
         $scope = HookManager::disable(Context::getCurrent())->activate();
@@ -148,6 +151,7 @@ class SdkAutoloader
         try {
             $sdk = $config
                 ->create()
+                ->setConfigProvider(new ConfigProvider($configuration))
                 ->setAutoShutdown(true)
                 ->build();
         } finally {
@@ -161,38 +165,20 @@ class SdkAutoloader
             ->withPropagator($sdk->getPropagator())
             ->withEventLoggerProvider($sdk->getEventLoggerProvider())
             ->withResponsePropagator($sdk->getResponsePropagator())
+            ->withConfigProvider($sdk->getConfigProvider())
         ;
     }
 
     /**
      * Register all {@link Instrumentation} configured through SPI
      *
-     * Instrumentation config is resolved here, during autoload, because hooks must be installed
-     * before the instrumented function is first called, whereas building the SDK is deferred to a
+     * Instrumentation config is resolved during autoload, because hooks must be installed before
+     * the instrumented function is first called, whereas building the SDK is deferred to a
      * Globals initializer. (With {@see AutoRootSpan} enabled the initializer runs before autoload
-     * returns, so the deferral is conditional.) Both are served by the one document `$config`
-     * already holds.
+     * returns, so the deferral is conditional.)
      */
-    private static function registerInstrumentations(?SdkConfiguration $config): void
+    private static function registerInstrumentations(ConfigProperties $configuration): void
     {
-        if (!Configuration::has(Variables::OTEL_CONFIG_FILE)) {
-            $configuration = self::loadConfigPropertiesFromEnv();
-        } else {
-            try {
-                // Catching here, rather than letting this join the parse above, is what keeps an
-                // unparseable instrumentation node from also costing us the already-registered SDK.
-                $configuration = $config?->getInstrumentationConfig() ?? new NoopConfigProperties();
-            } catch (Throwable $t) {
-                // Reported verbatim, including the Error raised when an older sdk-configuration
-                // lacks getInstrumentationConfig(). PHP's own message names the missing method, and
-                // `sdk` can only suggest that package, so its version cannot be constrained from
-                // here. Singling Error out to blame the version instead would also catch faults
-                // raised *by* the configuration, such as a TypeError from a plugin's create().
-                self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
-                $configuration = new NoopConfigProperties();
-            }
-        }
-        Globals::setConfigProperties($configuration);
         $hookManager = self::getHookManager();
         $tracerProvider = self::createLateBindingTracerProvider();
         $meterProvider = self::createLateBindingMeterProvider();
@@ -227,6 +213,19 @@ class SdkAutoloader
         }
 
         return $configuration;
+    }
+
+    private static function loadConfigPropertiesFromFile(SdkConfiguration $config): ConfigProperties
+    {
+        try {
+            // Catching here, rather than letting this join the parse, is what keeps an
+            // unparseable instrumentation node from also costing us the SDK.
+            return $config->getInstrumentationConfig();
+        } catch (Throwable $t) {
+            self::logWarning(sprintf('Error during opentelemetry initialization: %s', $t->getMessage()), ['exception' => $t]);
+
+            return new NoopConfigProperties();
+        }
     }
 
     private static function loadConfigPropertiesFromEnv(): ConfigProperties

@@ -170,6 +170,15 @@ and sequences. Here it is a registry of instrumentation configuration objects ke
 $http = $configuration->getInstrumentationConfig()->get(HttpConfig::class);
 ```
 
+When the SDK autoloader builds the SDK from `OTEL_CONFIG_FILE`, the same configuration is available
+through `Globals`, for instrumentations that don't register through the `Instrumentation` SPI:
+
+```php
+$http = Globals::configProvider()->getInstrumentationConfig()->get(HttpConfig::class);
+```
+
+It is noop until the SDK is built, so read it inside a hook rather than when registering.
+
 `ConfigProperties` is marked experimental. The spec's accessors will be added alongside `get()`,
 which stays.
 

@@ -8,9 +8,15 @@ upgraders can check them in one place.
 
 ### Added
 
-- `Globals::configProperties()`, experimental, returns the instrumentation configuration. Instrumentations that
-  register from their own autoload file, not through the `Instrumentation` SPI, can now read it. It is noop until the
-  SDK autoloader has run ([#2152]).
+- `Globals::configProvider()` and `Configurator::withConfigProvider()`, experimental. An instrumentation that registers
+  from its own autoload file, not through the `Instrumentation` SPI, can read its configuration with
+  `Globals::configProvider()->getInstrumentationConfig()`. It is noop unless the SDK was configured from
+  `OTEL_CONFIG_FILE`, and until the SDK is built, so read it inside a hook, not when registering ([#2152]).
+
+### Changed
+
+- `ConfigProviderInterface::getInstrumentationConfig()` no longer takes a `Context`. The interface is experimental
+  ([#2152]).
 
 ## 1.12.0 - 2026-11-19
 

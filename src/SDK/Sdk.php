@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK;
 
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
@@ -24,6 +26,7 @@ class Sdk
         private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly ResponsePropagatorInterface $responsePropagator,
+        private readonly ConfigProviderInterface $configProvider = new NoopConfigProvider(),
     ) {
     }
 
@@ -78,5 +81,13 @@ class Sdk
     public function getResponsePropagator(): ResponsePropagatorInterface
     {
         return $this->responsePropagator;
+    }
+
+    /**
+     * @experimental
+     */
+    public function getConfigProvider(): ConfigProviderInterface
+    {
+        return $this->configProvider;
     }
 }

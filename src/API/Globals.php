@@ -7,8 +7,8 @@ namespace OpenTelemetry\API;
 use function assert;
 use Closure;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
-use OpenTelemetry\API\Configuration\ConfigProperties;
-use OpenTelemetry\API\Configuration\Noop\NoopConfigProperties;
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
@@ -31,7 +31,6 @@ final class Globals
     /** @var Closure[] */
     private static array $initializers = [];
     private static ?self $globals = null;
-    private static ?ConfigProperties $configProperties = null;
 
     public function __construct(
         private readonly TracerProviderInterface $tracerProvider,
@@ -40,6 +39,7 @@ final class Globals
         private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly ResponsePropagatorInterface $responsePropagator,
+        private readonly ConfigProviderInterface $configProvider = new NoopConfigProvider(),
     ) {
     }
 
@@ -81,27 +81,15 @@ final class Globals
     }
 
     /**
-     * Instrumentation configuration, set by the SDK autoloader. Noop until then, so an
-     * instrumentation that registers from its own autoload file may run too early to see it.
-     *
-     * Kept apart from the initializers, which build the SDK, because instrumentation config is
-     * needed at autoload time and the SDK is built later.
+     * Noop unless an SDK registered one. The SDK autoloader does so only for a declarative
+     * configuration file.
      *
      * @experimental
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider
      */
-    public static function configProperties(): ConfigProperties
+    public static function configProvider(): ConfigProviderInterface
     {
-        return self::$configProperties ?? new NoopConfigProperties();
-    }
-
-    /**
-     * @internal
-     * @psalm-internal OpenTelemetry
-     */
-    public static function setConfigProperties(ConfigProperties $configProperties): void
-    {
-        self::$configProperties = $configProperties;
+        return Context::getCurrent()->get(ContextKeys::configProvider()) ?? self::globals()->configProvider;
     }
 
     /**
@@ -147,10 +135,11 @@ final class Globals
         $responsePropagator = $context->get(ContextKeys::responsePropagator());
         $loggerProvider = $context->get(ContextKeys::loggerProvider());
         $eventLoggerProvider = $context->get(ContextKeys::eventLoggerProvider());
+        $configProvider = $context->get(ContextKeys::configProvider());
 
-        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator));
+        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator, $configProvider));
 
-        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator);
+        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator, $configProvider);
     }
 
     /**
@@ -160,6 +149,5 @@ final class Globals
     {
         self::$globals = null;
         self::$initializers = [];
-        self::$configProperties = null;
     }
 }

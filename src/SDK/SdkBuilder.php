@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -32,6 +34,7 @@ class SdkBuilder
     private ?EventLoggerProviderInterface $eventLoggerProvider = null;
     private ?TextMapPropagatorInterface $propagator = null;
     private ?ResponsePropagatorInterface $responsePropagator = null;
+    private ?ConfigProviderInterface $configProvider = null;
     private bool $autoShutdown = false;
     /** @var 'debug'|'info'|'notice'|'warning'|'error'|'critical'|'alert'|'emergency'|'none'|null */
     private ?string $logLevel = null;
@@ -93,6 +96,16 @@ class SdkBuilder
     }
 
     /**
+     * @experimental
+     */
+    public function setConfigProvider(ConfigProviderInterface $configProvider): self
+    {
+        $this->configProvider = $configProvider;
+
+        return $this;
+    }
+
+    /**
      * Set the minimum level for the SDK's internal logger, as a PSR-3 level name or 'none'; null
      * leaves it to OTEL_LOG_LEVEL. Not an OpenTelemetry severity name, which has to be mapped
      * first ({@see \OpenTelemetry\API\Logs\Severity::toPsr3()}).
@@ -132,6 +145,7 @@ class SdkBuilder
             $eventLoggerProvider,
             $this->propagator ?? NoopTextMapPropagator::getInstance(),
             $this->responsePropagator ?? NoopResponsePropagator::getInstance(),
+            $this->configProvider ?? new NoopConfigProvider(),
         );
     }
 
@@ -155,6 +169,7 @@ class SdkBuilder
                 ->withLoggerProvider($sdk->getLoggerProvider())
                 ->withEventLoggerProvider($sdk->getEventLoggerProvider())
                 ->withResponsePropagator($sdk->getResponsePropagator())
+                ->withConfigProvider($sdk->getConfigProvider())
                 ->storeInContext();
 
             $scope = Context::storage()->attach($context);

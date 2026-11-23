@@ -11,5 +11,5 @@ namespace OpenTelemetry\API\Configuration;
  */
 interface ConfigProviderInterface
 {
-    public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties;
+    public function getInstrumentationConfig(): ConfigProperties;
 }
