@@ -19,7 +19,7 @@
     "require": {
         "php": "^8.2",
         "composer-runtime-api": "^2.0",
-        "open-telemetry/api": "^1.13",
+        "open-telemetry/api": "^1.11",
         "open-telemetry/context": "^1.4",
         "open-telemetry/sdk": "^1.16",
         "psr/log": "^1.1|^2.0|^3.0",

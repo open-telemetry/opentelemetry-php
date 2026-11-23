@@ -23,7 +23,7 @@
     },
     "conflict": {
         "open-telemetry/sdk": "<=1.11",
-        "open-telemetry/sdk-configuration": "<0.11"
+        "open-telemetry/sdk-configuration": "<0.10"
     },
     "suggest": {
         "symfony/config": "To implement a ComponentProvider for declarative configuration"

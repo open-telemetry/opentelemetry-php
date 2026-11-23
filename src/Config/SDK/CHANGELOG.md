@@ -19,8 +19,6 @@ error straight away, with no deprecation step.
 - `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
   `ComponentProviderRegistry` and `Context` are removed. Use their equivalents in
   `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
-- Requires `open-telemetry/api` 1.13, which no longer declares the old names above as aliases
-  ([#2151]).
 - `OpenTelemetry\Config\SDK\Instrumentation` is removed. Use `Configuration::parseFile()` and
   `getInstrumentationConfig()` ([#2151]).
 
