@@ -176,6 +176,41 @@ class ConfigurationTest extends TestCase
         }
     }
 
+    public function test_nullable_int(): void
+    {
+        $this->setEnvironmentVariable('OTEL_FOO', '42');
+
+        $this->assertSame(42, Configuration::getNullableInt('OTEL_FOO'));
+    }
+
+    public function test_nullable_int_ignores_library_default(): void
+    {
+        $this->assertNull(Configuration::getNullableInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
+    }
+
+    public function test_invalid_nullable_int_returns_null(): void
+    {
+        $this->expectWarning('Invalid integer value "abc" for OTEL_ATTRIBUTE_COUNT_LIMIT');
+        $this->setEnvironmentVariable(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT, 'abc');
+
+        $this->assertNull(Configuration::getNullableInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
+    }
+
+    public function test_nullable_float(): void
+    {
+        $this->setEnvironmentVariable('OTEL_FOO', '1.5');
+
+        $this->assertSame(1.5, Configuration::getNullableFloat('OTEL_FOO'));
+    }
+
+    public function test_invalid_nullable_float_returns_null(): void
+    {
+        $this->expectWarning('Invalid float value "foo" for OTEL_FOO');
+        $this->setEnvironmentVariable('OTEL_FOO', 'foo');
+
+        $this->assertNull(Configuration::getNullableFloat('OTEL_FOO'));
+    }
+
     private function expectWarning(string $message): void
     {
         $logWriter = $this->createMock(LogWriterInterface::class);

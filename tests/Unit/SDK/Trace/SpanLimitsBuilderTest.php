@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
@@ -98,5 +100,19 @@ class SpanLimitsBuilderTest extends TestCase
         $spanLimits = (new SpanLimitsBuilder())->build();
 
         $this->assertEquals(Attributes::factory(111), $spanLimits->getAttributesFactory());
+    }
+
+    public function test_span_limits_builder_does_not_read_global_attribute_limit_when_span_limit_is_valid(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+        $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 5);
+        $this->setEnvironmentVariable('OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT', 6);
+        $this->setEnvironmentVariable('OTEL_LINK_ATTRIBUTE_COUNT_LIMIT', 7);
+        $this->setEnvironmentVariable('OTEL_ATTRIBUTE_COUNT_LIMIT', 'fruit');
+        $spanLimits = (new SpanLimitsBuilder())->build();
+
+        $this->assertEquals(Attributes::factory(5), $spanLimits->getAttributesFactory());
     }
 }

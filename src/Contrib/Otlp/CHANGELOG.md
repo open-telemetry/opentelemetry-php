@@ -28,6 +28,8 @@ upgraders can check them in one place.
   autoloads, whatever the order in which Composer includes the packages ([#2120]).
 - The `otlp/stdout` metrics exporter reads `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`, as the `otlp`
   exporter does. It used each stream's temporality, so synchronous instruments were exported as delta ([#2129]).
+- An invalid signal-specific timeout, such as `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=abc`, falls back to
+  `OTEL_EXPORTER_OTLP_TIMEOUT`, as an unset one does. It used the library default ([#2144]).
 
 ## 1.5.0 - 2026-11-06
 
@@ -85,3 +87,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
+[#2144]: https://github.com/open-telemetry/opentelemetry-php/pull/2144

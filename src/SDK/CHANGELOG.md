@@ -43,6 +43,8 @@ upgraders can check them in one place.
   temporality, like the console and OTLP metric exporters ([#2129]).
 - An asynchronous instrument callback that returns a value logs a warning, once per callback. The value is ignored,
   as it always was. Report measurements through the observer instead ([#2129]).
+- `Configuration::getNullableInt()` and `getNullableFloat()`, which return `null` for a variable that is not set or
+  is invalid, instead of the library default ([#2144]).
 
 ### Changed
 
@@ -77,6 +79,8 @@ upgraders can check them in one place.
   `th:e666` ([#2140]).
 - An invalid numeric `OTEL_*` value, such as `OTEL_ATTRIBUTE_COUNT_LIMIT=abc`, logs a warning and is ignored, so the
   default is used. It used to abort SDK initialization with `Value has invalid type "string"` ([#2144]).
+- `EnvResolver::int()` and `numeric()` return `null` for an invalid value, as documented, instead of the library
+  default ([#2144]).
 
 ## 1.16.1 - 2026-11-06
 
