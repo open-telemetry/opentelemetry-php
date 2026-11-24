@@ -422,9 +422,6 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
             [
                 'otel.sdk.processor.log.queue.capacity',
                 'otel.sdk.processor.log.queue.size',
-                'otel.sdk.processor.log.processed',
-                'otel.sdk.exporter.log.inflight',
-                'otel.sdk.exporter.log.exported',
             ],
             array_column($metrics->collect(), 'name'),
         );

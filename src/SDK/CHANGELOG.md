@@ -11,6 +11,11 @@ upgraders can check them in one place.
 - `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
   messages. Without one, messages still go to the global internal logger and its level ([#2145]).
 
+### Fixed
+
+- A metric with no data points in a collection, such as an asynchronous instrument whose callback observed nothing,
+  is no longer exported. Receivers like Prometheus rejected the whole batch because of it.
+
 ## 1.17.0 - 2026-11-19
 
 ### Breaking changes
