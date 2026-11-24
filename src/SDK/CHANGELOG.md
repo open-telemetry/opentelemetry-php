@@ -20,7 +20,8 @@ upgraders can check them in one place.
 ### Fixed
 
 - `Logger::isEnabled()` returns false when the provider has no processors. It used to return true ([#2131]).
-- The console log exporter writes the event name of a record, as `event_name` ([#2131]).
+- The console log exporter writes the event name of a record, as `event_name`. Every record has the key, and it is
+  null when the record has no event name ([#2131]).
 - The deprecated `EventLogger` sets the event name of the record, as well as the `event.name` attribute ([#2131]).
 
 ## 1.17.0 - 2026-11-19

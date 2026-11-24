@@ -18,7 +18,7 @@ class ReadWriteLogRecord extends ReadableLogRecord
     public function setAttribute(string $name, mixed $value): self
     {
         $this->attributesBuilder[$name] = $value;
-        $this->convertedAttributes = $this->attributesBuilder->build();
+        $this->convertedAttributes = null;
 
         return $this;
     }
@@ -26,7 +26,7 @@ class ReadWriteLogRecord extends ReadableLogRecord
     public function removeAttribute(string $name): self
     {
         unset($this->attributesBuilder[$name]);
-        $this->convertedAttributes = $this->attributesBuilder->build();
+        $this->convertedAttributes = null;
 
         return $this;
     }

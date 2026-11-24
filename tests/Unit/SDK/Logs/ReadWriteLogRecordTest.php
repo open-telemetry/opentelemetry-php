@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Logs;
 
 use OpenTelemetry\API\Logs\LogRecord;
+use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesFactoryInterface;
+use OpenTelemetry\SDK\Common\Attribute\AttributesInterface;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
+use OpenTelemetry\SDK\Logs\LogRecordLimits;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadableLogRecord;
@@ -110,6 +114,41 @@ class ReadWriteLogRecordTest extends TestCase
         $this->assertSame(1, $record->getAttributes()->getDroppedAttributesCount());
     }
 
+    public function test_non_scalar_value_replaces_existing_attribute(): void
+    {
+        $record = $this->createRecord((new LogRecord())->setAttribute('one', 'one'));
+        $value = new \stdClass();
+
+        $record->setAttribute('one', $value);
+
+        $this->assertSame(['one' => $value], $record->getAttributes()->toArray());
+        $this->assertSame(0, $record->getAttributes()->getDroppedAttributesCount());
+    }
+
+    public function test_existing_attribute_can_be_replaced_at_count_limit(): void
+    {
+        $record = $this->createRecord((new LogRecord())->setAttribute('one', 'one'), attributeCountLimit: 1);
+
+        $record->setAttribute('one', 'updated');
+
+        $this->assertSame(['one' => 'updated'], $record->getAttributes()->toArray());
+        $this->assertSame(0, $record->getAttributes()->getDroppedAttributesCount());
+    }
+
+    public function test_attributes_are_built_once_after_changes(): void
+    {
+        $builder = $this->createMock(AttributesBuilderInterface::class);
+        $builder->expects($this->once())->method('build')->willReturn($this->createStub(AttributesInterface::class));
+        $factory = $this->createStub(AttributesFactoryInterface::class);
+        $factory->method('builder')->willReturn($builder);
+        $record = $this->createRecordWithLimits(new LogRecord(), new LogRecordLimits($factory));
+
+        $record->setAttributes(['one' => 'one', 'two' => 'two']);
+        $record->removeAttribute('one');
+        $record->getAttributes();
+        $record->getAttributes();
+    }
+
     private function createRecord(LogRecord $logRecord, ?int $attributeCountLimit = null): ReadWriteLogRecord
     {
         $limits = new LogRecordLimitsBuilder();
@@ -117,11 +156,16 @@ class ReadWriteLogRecordTest extends TestCase
             $limits->setAttributeCountLimit($attributeCountLimit);
         }
 
+        return $this->createRecordWithLimits($logRecord, $limits->build());
+    }
+
+    private function createRecordWithLimits(LogRecord $logRecord, LogRecordLimits $limits): ReadWriteLogRecord
+    {
         return new ReadWriteLogRecord(
             $this->createStub(InstrumentationScopeInterface::class),
             new LoggerSharedState(
                 ResourceInfoFactory::emptyResource(),
-                $limits->build(),
+                $limits,
                 $this->createStub(LogRecordProcessorInterface::class),
             ),
             $logRecord,

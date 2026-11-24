@@ -21,7 +21,7 @@ use OpenTelemetry\SDK\Resource\ResourceInfo;
  */
 class ReadableLogRecord extends LogRecord
 {
-    protected AttributesInterface $convertedAttributes;
+    protected ?AttributesInterface $convertedAttributes = null;
     protected AttributesBuilderInterface $attributesBuilder;
     protected SpanContextInterface $spanContext;
 
@@ -46,7 +46,6 @@ class ReadableLogRecord extends LogRecord
             ->getLogRecordLimits()
             ->getAttributeFactory()
             ->builder($logRecord->attributes, new LogRecordAttributeValidator());
-        $this->convertedAttributes = $this->attributesBuilder->build();
     }
 
     public function getInstrumentationScope(): InstrumentationScopeInterface
@@ -104,6 +103,6 @@ class ReadableLogRecord extends LogRecord
 
     public function getAttributes(): AttributesInterface
     {
-        return $this->convertedAttributes;
+        return $this->convertedAttributes ??= $this->attributesBuilder->build();
     }
 }
