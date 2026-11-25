@@ -21,7 +21,8 @@ jobs:
         include:
           - php-version: '8.6'
             experimental: true
-            composer_args: "--ignore-platform-reqs"
+            # phpspec/prophecy caps PHP at 8.5.
+            composer_args: "--ignore-platform-req=php+"
     env:
       extensions: ast, grpc, opentelemetry, protobuf, yaml
       # ext-grpc threads outlive grpc_shutdown(), so PHP 8.5 on ubuntu-26.04

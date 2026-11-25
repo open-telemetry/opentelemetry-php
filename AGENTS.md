@@ -40,7 +40,8 @@ cp .env.dist .env   # Required before first use
 make install        # Install dependencies
 ```
 
-Set `PHP_VERSION` (8.2, 8.3, 8.4, 8.5) to test against specific PHP versions: `PHP_VERSION=8.2 make all`
+Set `PHP_VERSION` (8.2, 8.3, 8.4, 8.5, 8.6) to test against specific PHP versions: `PHP_VERSION=8.2 make all`.
+PHP 8.6 is experimental in CI, so its job doesn't block.
 
 PHP 8.2 is the minimum supported version and the Makefile default, so code must not use newer syntax or functions.
 Polyfills for 8.3 and 8.4 are available.

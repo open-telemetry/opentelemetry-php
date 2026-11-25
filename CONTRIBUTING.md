@@ -14,8 +14,8 @@ To contribute effectively, ensure you have the following tools installed:
 
 A PHP version is supported until 12 months after its security support ends, see
 [PHP version support](docs/versioning.md#php-version-support). The
-developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.2`, `8.3`, `8.4`
-and `8.5` respectively, with `8.2` being the default. You can execute the test suite against other PHP versions
+developer image `ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base` is tagged as `8.2`, `8.3`, `8.4`,
+`8.5` and `8.6` respectively, with `8.2` being the default. You can execute the test suite against other PHP versions
 by running the following command:
 
 ```bash
