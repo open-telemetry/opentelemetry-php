@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\API\Trace as API;
@@ -14,15 +14,17 @@ use OpenTelemetry\SDK\Common\Attribute\AttributesBuilderInterface;
 use OpenTelemetry\SDK\Common\Dev\Compatibility\Util as BcUtil;
 use OpenTelemetry\SDK\Common\Exception\StackTraceFormatter;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
 use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppression;
 use OpenTelemetry\SDK\Trace\SpanSuppression\SpanSuppression;
 use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
+use Psr\Log\LoggerInterface;
 use Throwable;
 
 final class Span extends API\Span implements ReadWriteSpanInterface
 {
-    use LogsMessagesTrait;
+    use LogsToLoggerTrait;
 
     /** @var list<EventInterface> */
     private array $events = [];
@@ -51,6 +53,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         private readonly int $startEpochNanos,
         private readonly SpanSuppression $spanSuppression,
         ?UpDownCounterInterface $spanLiveCounter = null,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
         $this->status = StatusData::unset();
         $this->spanLiveCounter = $spanLiveCounter;
@@ -83,6 +86,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
         int $startEpochNanos,
         SpanSuppression $spanSuppression = new NoopSuppression(),
         ?UpDownCounterInterface $spanLiveCounter = null,
+        LoggerInterface $logger = new ConfiguredLogger(),
     ): self {
         $span = new self(
             $name,
@@ -99,6 +103,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $startEpochNanos !== 0 ? $startEpochNanos : Clock::getDefault()->now(),
             $spanSuppression,
             $spanLiveCounter,
+            $logger,
         );
 
         $samplingResultAttr = $context->isSampled() ? OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_AND_SAMPLE : OtelIncubatingAttributes::OTEL_SPAN_SAMPLING_RESULT_VALUE_RECORD_ONLY;
@@ -402,7 +407,7 @@ final class Span extends API\Span implements ReadWriteSpanInterface
             $droppedEventAttributes ||
             $droppedLinkAttributes
         ) {
-            self::logWarning('Dropped span attributes, links or events', [
+            $this->logWarning('Dropped span attributes, links or events', [
                 'trace_id' => $spanData->getTraceId(),
                 'span_id' => $spanData->getSpanId(),
                 'attributes' => $spanData->getAttributes()->getDroppedAttributesCount(),
@@ -412,5 +417,11 @@ final class Span extends API\Span implements ReadWriteSpanInterface
                 'event_attributes' => $droppedEventAttributes,
             ]);
         }
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }

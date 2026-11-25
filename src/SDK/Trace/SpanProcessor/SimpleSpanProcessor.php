@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 
 use Closure;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 use function sprintf;
 use Throwable;
 
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
-    use LogsMessagesTrait;
+    use LogsToLoggerTrait;
+
     private ContextInterface $exportContext;
 
     private bool $running = false;
@@ -28,8 +31,10 @@ class SimpleSpanProcessor implements SpanProcessorInterface
 
     private bool $closed = false;
 
-    public function __construct(private readonly SpanExporterInterface $exporter)
-    {
+    public function __construct(
+        private readonly SpanExporterInterface $exporter,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
+    ) {
         $this->exportContext = Context::getCurrent();
         $this->queue = new SplQueue();
     }
@@ -101,7 +106,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
                     if ($propagateResult) {
                         $exception = $e;
                     } else {
-                        self::logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
+                        $this->logError(sprintf('Unhandled %s error', $taskName), ['exception' => $e]);
                     }
                 } finally {
                     $scope->detach();
@@ -116,5 +121,11 @@ class SimpleSpanProcessor implements SpanProcessorInterface
         }
 
         return $success;
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }

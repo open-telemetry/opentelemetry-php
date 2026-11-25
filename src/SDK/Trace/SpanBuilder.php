@@ -211,6 +211,7 @@ final class SpanBuilder implements API\SpanBuilderInterface
             $this->startEpochNanos,
             $spanSuppression,
             $this->tracerSharedState->getSpanLiveCounter(),
+            $this->tracerSharedState->getLogger(),
         );
     }
 }

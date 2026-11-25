@@ -7,7 +7,7 @@ namespace OpenTelemetry\SDK\Trace\SpanProcessor;
 use function assert;
 use function count;
 use InvalidArgumentException;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
@@ -16,6 +16,7 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Util\LogsToLoggerTrait;
 use OpenTelemetry\SDK\Trace\ReadableSpanInterface;
 use OpenTelemetry\SDK\Trace\ReadWriteSpanInterface;
 use OpenTelemetry\SDK\Trace\SpanDataInterface;
@@ -24,13 +25,14 @@ use OpenTelemetry\SDK\Trace\SpanProcessorInterface;
 use OpenTelemetry\SemConv\Incubating\Attributes\OtelIncubatingAttributes;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use OpenTelemetry\SemConv\Version;
+use Psr\Log\LoggerInterface;
 use SplQueue;
 use function sprintf;
 use Throwable;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
-    use LogsMessagesTrait;
+    use LogsToLoggerTrait;
 
     public const DEFAULT_SCHEDULE_DELAY = 5000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
@@ -73,6 +75,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
         int $maxExportBatchSize = self::DEFAULT_MAX_EXPORT_BATCH_SIZE,
         private readonly bool $autoFlush = true,
         ?MeterProviderInterface $meterProvider = null,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
         if ($maxQueueSize <= 0) {
             throw new InvalidArgumentException(sprintf('Maximum queue size (%d) must be greater than zero', $maxQueueSize));
@@ -87,7 +90,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
             throw new InvalidArgumentException(sprintf('Maximum export batch size (%d) must be greater than zero', $maxExportBatchSize));
         }
         if ($maxExportBatchSize > $maxQueueSize) {
-            self::logWarning(sprintf('Maximum export batch size (%d) exceeds maximum queue size (%d), using %2$d', $maxExportBatchSize, $maxQueueSize));
+            $this->logWarning(sprintf('Maximum export batch size (%d) exceeds maximum queue size (%d), using %2$d', $maxExportBatchSize, $maxQueueSize));
             $maxExportBatchSize = $maxQueueSize;
         }
         $this->maxQueueSize = $maxQueueSize;
@@ -240,7 +243,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                         if ($propagateResult) {
                             $exception = $e;
                         } else {
-                            self::logError(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
+                            $this->logError(sprintf('Unhandled %s error', $flushMethod), ['exception' => $e]);
                         }
                     } finally {
                         $scope->detach();
@@ -267,7 +270,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
                     $errorAttrs = ['error.type' => $e::class];
                     $this->spanExportedCounter?->add($batchSize, $this->exporterAttributes + $errorAttrs);
                     $this->spanProcessedCounter?->add($batchSize, $this->processorAttributes + $errorAttrs);
-                    self::logError('Unhandled export error', ['exception' => $e]);
+                    $this->logError('Unhandled export error', ['exception' => $e]);
                 } finally {
                     $this->queueSize -= $batchSize;
                     $this->spanInflightCounter?->add(-$batchSize, $this->exporterAttributes);
@@ -299,5 +302,11 @@ class BatchSpanProcessor implements SpanProcessorInterface
         $this->queue->enqueue($this->batch);
         $this->batch = [];
         $this->nextScheduledRun = null;
+    }
+
+    #[\Override]
+    protected function logger(): LoggerInterface
+    {
+        return $this->logger;
     }
 }
