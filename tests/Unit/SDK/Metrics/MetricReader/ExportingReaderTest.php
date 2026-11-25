@@ -213,7 +213,7 @@ final class ExportingReaderTest extends TestCase
             'test',
             null,
             null,
-            $this->createStub(DataInterface::class),
+            $this->createConfiguredStub(DataInterface::class, ['dataPointCount' => 1]),
         );
 
         $source = $this->createMock(MetricSourceInterface::class);
@@ -258,7 +258,7 @@ final class ExportingReaderTest extends TestCase
             'test',
             null,
             null,
-            $this->createStub(DataInterface::class),
+            $this->createConfiguredStub(DataInterface::class, ['dataPointCount' => 1]),
         ));
         $provider->method('create')->willReturn($source);
         $exporter->method('temporality')->willReturn('foo');
