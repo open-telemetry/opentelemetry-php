@@ -12,9 +12,6 @@ use OpenTelemetry\API\Metrics\UpDownCounterInterface;
 use OpenTelemetry\SDK\Metrics\AggregationInterface;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
-use OpenTelemetry\SDK\Metrics\Data\Gauge;
-use OpenTelemetry\SDK\Metrics\Data\Histogram;
-use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderTrait;
 use OpenTelemetry\SDK\Metrics\MetricExporterInterface;
@@ -170,8 +167,7 @@ final class ExportingReader implements MetricReaderInterface, MetricSourceRegist
         $metrics = [];
         foreach ($this->sources as $source) {
             $metric = $source->collect();
-            if (($metric->data instanceof Sum || $metric->data instanceof Gauge || $metric->data instanceof Histogram)
-                && $metric->data->dataPoints === []) {
+            if (!$metric->data->dataPointCount()) {
                 continue;
             }
             $metrics[] = $metric;
