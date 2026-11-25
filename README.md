@@ -7,6 +7,7 @@
 [![PHP 8.3](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
 [![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
 [![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
+[![PHP 8.6](https://img.shields.io/badge/PHP-8.6-777BB4?logo=php&logoColor=white)](docs/versioning.md#php-version-support)
 <!-- php-support-badges:end -->
 [![Slack](https://img.shields.io/badge/slack-@cncf/otel--php-brightgreen.svg?logo=slack)](https://cloud-native.slack.com/archives/D03FAB6GN0K)
 

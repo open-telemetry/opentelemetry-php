@@ -11,5 +11,5 @@ Checklist:
 - [ ] If {{ version }} becomes the newest, update the default `PHP_VERSION` in `docker/Dockerfile` and `.devcontainer`
 - [ ] Update the supported versions listed in `AGENTS.md` and `CONTRIBUTING.md`
 - [ ] Update the PHP version badges and the summary in `README.md`, and the table in `docs/versioning.md`: run `make php-support` and commit the result
-- [ ] Add an `Added` entry (PHP {{ version }} support) to the changelogs of the affected packages
+- [ ] If supporting {{ version }} changed a package's code or `composer.json`, add an `Added` entry (PHP {{ version }} support) to its changelog
 - [ ] Update the requirements on opentelemetry.io

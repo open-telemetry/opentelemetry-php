@@ -16,11 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-version: ['8.2', '8.3', '8.4', '8.5']
+        php-version: ['8.2', '8.3', '8.4', '8.5', '8.6']
         composer_args: ['']
-        include:
-          - php-version: '8.6'
-            experimental: true
     env:
       extensions: ast, grpc, opentelemetry, protobuf, yaml
       # ext-grpc threads outlive grpc_shutdown(), so PHP 8.5 on ubuntu-26.04

@@ -41,7 +41,6 @@ make install        # Install dependencies
 ```
 
 Set `PHP_VERSION` (8.2, 8.3, 8.4, 8.5, 8.6) to test against specific PHP versions: `PHP_VERSION=8.2 make all`.
-PHP 8.6 is experimental in CI, so its job doesn't block.
 
 PHP 8.2 is the minimum supported version and the Makefile default, so code must not use newer syntax or functions.
 Polyfills for 8.3 and 8.4 are available.
@@ -174,7 +173,7 @@ on pull requests, unless the PR has the `skip-changelog` label.
 
 ## CI Requirements
 
-The blocking checks in `.github/workflows/php.yml` run on PHP 8.2 to 8.5:
+The blocking checks in `.github/workflows/php.yml` run on PHP 8.2 to 8.6:
 1. `composer validate` and `make packages-composer`
 2. `make style`: CI runs it with `--dry-run`, so run it locally to apply fixes
 3. `make deptrac`: no architectural layer violations
