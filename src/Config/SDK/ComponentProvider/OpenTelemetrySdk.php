@@ -442,6 +442,7 @@ final class OpenTelemetrySdk implements ComponentProvider
                 configurator: $configurator,
                 spanSuppressionStrategy: $distributionConfiguration->spanSuppressionStrategy,
                 meterProvider: $selfObservabilityMeterProvider,
+                logger: $context->logger,
             );
 
             // </editor-fold>
