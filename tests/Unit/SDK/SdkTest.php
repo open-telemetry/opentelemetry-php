@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK;
 
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
 use OpenTelemetry\Context\Propagation\TextMapPropagatorInterface;
@@ -112,9 +114,17 @@ class SdkTest extends TestCase
         $this->assertInstanceOf(SdkBuilder::class, Sdk::builder());
     }
 
-    public function test_getters(): void
+    public function test_config_provider_defaults_to_noop(): void
     {
         $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator, $this->responsePropagator);
+        $this->assertInstanceOf(NoopConfigProvider::class, $sdk->getConfigProvider());
+    }
+
+    public function test_getters(): void
+    {
+        $configProvider = $this->createStub(ConfigProviderInterface::class);
+        $sdk = new Sdk($this->tracerProvider, $this->meterProvider, $this->loggerProvider, $this->eventLoggerProvider, $this->propagator, $this->responsePropagator, $configProvider);
+        $this->assertSame($configProvider, $sdk->getConfigProvider());
         $this->assertSame($this->propagator, $sdk->getPropagator());
         $this->assertSame($this->meterProvider, $sdk->getMeterProvider());
         $this->assertSame($this->tracerProvider, $sdk->getTracerProvider());

@@ -6,6 +6,14 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- `ConfigProvider`, `SdkBuilder::setConfigProvider()` and `Sdk::getConfigProvider()`, experimental.
+  `buildAndRegisterGlobal()` registers the provider, so `Globals::configProvider()` returns it ([#2152]).
+- The SDK autoloader registers a `ConfigProvider` holding the same instrumentation configuration it passes to
+  `Instrumentation::register()`, whether configured from `OTEL_CONFIG_FILE` or from environment variables, and also
+  when `OTEL_SDK_DISABLED` is set ([#2152]).
+
 ## 1.18.0 - 2026-11-26
 
 ### Added
@@ -222,4 +230,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
 [#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
+[#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

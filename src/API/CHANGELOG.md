@@ -6,6 +6,18 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- `Globals::configProvider()` and `Configurator::withConfigProvider()`, experimental. An instrumentation that registers
+  from its own autoload file, not through the `Instrumentation` SPI, can read its configuration with
+  `Globals::configProvider()->getInstrumentationConfig()`. Read it inside a hook, not from the autoload file: any
+  `Globals` call made before the SDK autoloader has run leaves every global noop ([#2152]).
+
+### Changed
+
+- `ConfigProviderInterface::getInstrumentationConfig()` no longer takes a `Context`. The interface is experimental
+  ([#2152]).
+
 ## 1.13.0 - 2026-11-26
 
 ### Breaking changes
@@ -84,3 +96,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/api/releases).
 [#2125]: https://github.com/open-telemetry/opentelemetry-php/pull/2125
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151
+[#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152

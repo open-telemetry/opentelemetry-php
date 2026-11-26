@@ -6,6 +6,8 @@ namespace OpenTelemetry\Tests\Unit\API\Instrumentation;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\CachedInstrumentation;
 use OpenTelemetry\API\Instrumentation\Configurator;
@@ -62,6 +64,7 @@ final class InstrumentationTest extends TestCase
         $this->assertInstanceOf(NoopLoggerProvider::class, Globals::loggerProvider());
         $this->assertInstanceOf(NoopEventLoggerProvider::class, Globals::eventLoggerProvider());
         $this->assertInstanceOf(NoopResponsePropagator::class, Globals::responsePropagator());
+        $this->assertInstanceOf(NoopConfigProvider::class, Globals::configProvider());
     }
 
     public function test_globals_returns_configured_instances(): void
@@ -72,6 +75,7 @@ final class InstrumentationTest extends TestCase
         $loggerProvider = $this->createStub(LoggerProviderInterface::class);
         $eventLoggerProvider = $this->createStub(EventLoggerProviderInterface::class);
         $responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
+        $configProvider = $this->createStub(ConfigProviderInterface::class);
 
         $scope = Configurator::create()
             ->withTracerProvider($tracerProvider)
@@ -80,6 +84,7 @@ final class InstrumentationTest extends TestCase
             ->withLoggerProvider($loggerProvider)
             ->withEventLoggerProvider($eventLoggerProvider)
             ->withResponsePropagator($responsePropagator)
+            ->withConfigProvider($configProvider)
             ->activate();
 
         try {
@@ -89,6 +94,7 @@ final class InstrumentationTest extends TestCase
             $this->assertSame($loggerProvider, Globals::loggerProvider());
             $this->assertSame($eventLoggerProvider, Globals::eventLoggerProvider());
             $this->assertSame($responsePropagator, Globals::responsePropagator());
+            $this->assertSame($configProvider, Globals::configProvider());
         } finally {
             $scope->detach();
         }
@@ -166,5 +172,16 @@ final class InstrumentationTest extends TestCase
             $this->anything(),
         );
         Globals::propagator();
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider
+     */
+    public function test_initializer_sets_config_provider(): void
+    {
+        $configProvider = $this->createStub(ConfigProviderInterface::class);
+        Globals::registerInitializer(fn (Configurator $configurator) => $configurator->withConfigProvider($configProvider));
+
+        $this->assertSame($configProvider, Globals::configProvider());
     }
 }

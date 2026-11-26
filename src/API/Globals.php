@@ -7,6 +7,8 @@ namespace OpenTelemetry\API;
 use function assert;
 use Closure;
 use OpenTelemetry\API\Behavior\LogsMessagesTrait;
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\Instrumentation\ContextKeys;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
@@ -21,6 +23,13 @@ use Throwable;
 
 /**
  * Provides access to the globally configured instrumentation instances.
+ *
+ * The first call to any of these methods runs the registered initializers, which builds the SDK,
+ * and the result is kept for the request. An initializer registered after that is ignored. Don't
+ * call them from a Composer autoload file: one that runs before the SDK autoloader's leaves every
+ * global noop. Register through the
+ * {@see \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation} SPI instead, or
+ * call them inside a hook.
  */
 final class Globals
 {
@@ -37,6 +46,7 @@ final class Globals
         private readonly EventLoggerProviderInterface $eventLoggerProvider,
         private readonly TextMapPropagatorInterface $propagator,
         private readonly ResponsePropagatorInterface $responsePropagator,
+        private readonly ConfigProviderInterface $configProvider = new NoopConfigProvider(),
     ) {
     }
 
@@ -75,6 +85,17 @@ final class Globals
     public static function eventLoggerProvider(): EventLoggerProviderInterface
     {
         return Context::getCurrent()->get(ContextKeys::eventLoggerProvider()) ?? self::globals()->eventLoggerProvider;
+    }
+
+    /**
+     * Noop unless an SDK registered one, as the SDK autoloader does.
+     *
+     * @experimental
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider
+     */
+    public static function configProvider(): ConfigProviderInterface
+    {
+        return Context::getCurrent()->get(ContextKeys::configProvider()) ?? self::globals()->configProvider;
     }
 
     /**
@@ -120,10 +141,11 @@ final class Globals
         $responsePropagator = $context->get(ContextKeys::responsePropagator());
         $loggerProvider = $context->get(ContextKeys::loggerProvider());
         $eventLoggerProvider = $context->get(ContextKeys::eventLoggerProvider());
+        $configProvider = $context->get(ContextKeys::configProvider());
 
-        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator));
+        assert(isset($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator, $configProvider));
 
-        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator);
+        return self::$globals = new self($tracerProvider, $meterProvider, $loggerProvider, $eventLoggerProvider, $propagator, $responsePropagator, $configProvider);
     }
 
     /**

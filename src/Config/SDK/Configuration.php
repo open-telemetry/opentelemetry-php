@@ -63,22 +63,6 @@ final class Configuration
             ->create($context);
     }
 
-    /**
-     * Instrumentation configuration from the file, without processing the SDK root, so an invalid
-     * SDK root costs nothing here.
-     *
-     * @internal
-     */
-    public static function parseInstrumentationConfig(
-        string $file,
-        Context $context = new Context(),
-        ?EnvReader $envReader = null,
-    ): ConfigProperties {
-        return self::instrumentationFactory($envReader)
-            ->process(ConfigurationFileLoader::load($file))
-            ->create($context);
-    }
-
     public static function parseFile(
         string $file,
         ?string $cacheFile = null,

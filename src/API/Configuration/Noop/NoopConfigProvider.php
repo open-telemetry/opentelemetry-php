@@ -6,7 +6,6 @@ namespace OpenTelemetry\API\Configuration\Noop;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Configuration\ConfigProviderInterface;
-use OpenTelemetry\API\Configuration\Context;
 
 /**
  * @experimental
@@ -14,7 +13,7 @@ use OpenTelemetry\API\Configuration\Context;
 class NoopConfigProvider implements ConfigProviderInterface
 {
     #[\Override]
-    public function getInstrumentationConfig(Context $context = new Context()): ConfigProperties
+    public function getInstrumentationConfig(): ConfigProperties
     {
         return new NoopConfigProperties();
     }

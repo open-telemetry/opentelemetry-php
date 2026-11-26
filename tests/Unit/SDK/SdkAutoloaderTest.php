@@ -12,6 +12,7 @@ use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
+use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
 use OpenTelemetry\API\Instrumentation\Configurator;
 use OpenTelemetry\API\LoggerHolder;
 use OpenTelemetry\API\Logs\NoopEventLoggerProvider;
@@ -216,6 +217,39 @@ class SdkAutoloaderTest extends TestCase
 
         $this->assertTrue(SdkAutoloader::autoload());
         $this->assertNotInstanceOf(NoopTracerProvider::class, Globals::tracerProvider());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/sdk.md#create
+     */
+    public function test_autoload_from_config_file_sets_global_config_provider(): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_CONFIG_FILE, __DIR__ . '/fixtures/otel-sdk.yaml');
+
+        $this->assertTrue(SdkAutoloader::autoload());
+        $http = Globals::configProvider()->getInstrumentationConfig()->get(HttpConfig::class);
+        $this->assertInstanceOf(HttpConfig::class, $http);
+        $this->assertSame(['GET', 'POST'], $http->config['server']['known_methods']);
+    }
+
+    #[DataProvider('sdkDisabledProvider')]
+    public function test_autoload_from_environment_sets_global_config_provider(string $sdkDisabled): void
+    {
+        $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $sdkDisabled);
+        $this->setEnvironmentVariable('OTEL_PHP_INSTRUMENTATION_HTTP_REQUEST_HEADERS', 'Accept');
+
+        $this->assertTrue(SdkAutoloader::autoload());
+        $http = Globals::configProvider()->getInstrumentationConfig()->get(HttpConfig::class);
+        $this->assertInstanceOf(HttpConfig::class, $http);
+        $this->assertSame(['Accept'], $http->config['server']['request_captured_headers']);
+    }
+
+    public static function sdkDisabledProvider(): iterable
+    {
+        yield 'sdk enabled' => ['false'];
+        yield 'sdk disabled' => ['true'];
     }
 
     /**

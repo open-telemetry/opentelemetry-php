@@ -202,9 +202,6 @@
 
                 "OpenTelemetry\\Example\\ExampleConfigLoader"
             ],
-            "OpenTelemetry\\API\\Configuration\\ConfigProviderInterface": [
-                "OpenTelemetry\\Config\\SDK\\ConfigProvider"
-            ],
             "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\HookManagerInterface": [
               "OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\ExtensionHookManager"
             ],

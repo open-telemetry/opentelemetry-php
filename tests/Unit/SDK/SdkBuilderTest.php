@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Configuration\ConfigProviderInterface;
+use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Logs\EventLoggerProviderInterface;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -50,6 +52,10 @@ class SdkBuilderTest extends TestCase
      * @var Stub&ResponsePropagatorInterface
      */
     private Stub $responsePropagator;
+    /**
+     * @var Stub&ConfigProviderInterface
+     */
+    private Stub $configProvider;
     private SdkBuilder $builder;
 
     #[\Override]
@@ -61,6 +67,7 @@ class SdkBuilderTest extends TestCase
         $this->loggerProvider = $this->createStub(LoggerProviderInterface::class);
         $this->eventLoggerProvider = $this->createStub(EventLoggerProviderInterface::class);
         $this->responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
+        $this->configProvider = $this->createStub(ConfigProviderInterface::class);
         $this->builder = (new SdkBuilder())
             ->setMeterProvider($this->meterProvider)
             ->setLoggerProvider($this->loggerProvider)
@@ -68,6 +75,7 @@ class SdkBuilderTest extends TestCase
             ->setPropagator($this->propagator)
             ->setResponsePropagator($this->responsePropagator)
             ->setTracerProvider($this->tracerProvider)
+            ->setConfigProvider($this->configProvider)
             ->setAutoShutdown(true);
     }
 
@@ -80,6 +88,12 @@ class SdkBuilderTest extends TestCase
         $this->assertSame($this->loggerProvider, $sdk->getLoggerProvider());
         $this->assertSame($this->eventLoggerProvider, $sdk->getEventLoggerProvider());
         $this->assertSame($this->responsePropagator, $sdk->getResponsePropagator());
+        $this->assertSame($this->configProvider, $sdk->getConfigProvider());
+    }
+
+    public function test_build_without_config_provider_uses_noop(): void
+    {
+        $this->assertInstanceOf(NoopConfigProvider::class, (new SdkBuilder())->build()->getConfigProvider());
     }
 
     public function test_build_and_register_global(): void
@@ -91,6 +105,7 @@ class SdkBuilderTest extends TestCase
         $this->assertSame($this->loggerProvider, Globals::loggerProvider());
         $this->assertSame($this->eventLoggerProvider, Globals::eventLoggerProvider());
         $this->assertSame($this->responsePropagator, Globals::responsePropagator());
+        $this->assertSame($this->configProvider, Globals::configProvider());
         $scope->detach();
     }
 

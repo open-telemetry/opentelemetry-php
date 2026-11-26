@@ -167,6 +167,16 @@ and sequences. Here it is a registry of instrumentation configuration objects ke
 $http = $configuration->getInstrumentationConfig()->get(HttpConfig::class);
 ```
 
+The SDK autoloader registers the same configuration with `Globals`, for instrumentations that don't
+register through the `Instrumentation` SPI:
+
+```php
+$http = Globals::configProvider()->getInstrumentationConfig()->get(HttpConfig::class);
+```
+
+Read it inside a hook, not from the instrumentation's autoload file. Calling any `Globals` method
+builds the SDK, and a call made before the SDK autoloader has run leaves every global noop.
+
 `ConfigProperties` is marked experimental. The spec's accessors will be added alongside `get()`,
 which stays.
 

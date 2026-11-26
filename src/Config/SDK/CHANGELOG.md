@@ -9,6 +9,11 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+### Breaking changes
+
+- `ConfigProvider` is removed, and nothing is registered through SPI under `ConfigProviderInterface`. Use
+  `Globals::configProvider()` to read the configuration the SDK was built from ([#2152]).
+
 ## 0.11.0 - 2026-11-26
 
 ### Breaking changes
@@ -210,3 +215,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
 [#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151
+[#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152
