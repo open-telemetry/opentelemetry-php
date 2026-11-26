@@ -166,6 +166,22 @@ interface OtelIncubatingAttributes
     public const OTEL_EVENT_NAME = 'otel.event.name';
 
     /**
+     * Deprecated. Use the `otel.scope.name` attribute
+     *
+     * @experimental
+     * @deprecated Replaced by `otel.scope.name`.
+     */
+    public const OTEL_LIBRARY_NAME = 'otel.library.name';
+
+    /**
+     * Deprecated. Use the `otel.scope.version` attribute.
+     *
+     * @experimental
+     * @deprecated Replaced by `otel.scope.version`.
+     */
+    public const OTEL_LIBRARY_VERSION = 'otel.library.version';
+
+    /**
      * The name of the instrumentation scope - (`InstrumentationScope.Name` in OTLP).
      *
      * @stable

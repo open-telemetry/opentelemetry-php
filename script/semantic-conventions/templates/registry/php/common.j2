@@ -38,3 +38,15 @@
         {{ "@experimental" }}
     {%- endif -%}
 {%- endmacro -%}
+
+{%- macro deprecation(item) -%}
+    {%- if item is deprecated -%}
+        {%- if item.deprecated.renamed_to -%}
+            {{ "@deprecated Replaced by `" ~ item.deprecated.renamed_to ~ "`." }}
+        {%- elif item.deprecated.note -%}
+            {{ "@deprecated " ~ item.deprecated.note | trim }}
+        {%- else -%}
+            {{ "@deprecated" }}
+        {%- endif -%}
+    {%- endif -%}
+{%- endmacro -%}

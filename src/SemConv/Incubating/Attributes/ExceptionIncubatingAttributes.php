@@ -14,6 +14,14 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface ExceptionIncubatingAttributes
 {
     /**
+     * Indicates that the exception is escaping the scope of the span.
+     *
+     * @stable
+     * @deprecated It's no longer recommended to record exceptions that are handled and do not escape the scope of a span.
+     */
+    public const EXCEPTION_ESCAPED = 'exception.escaped';
+
+    /**
      * The exception message.
      *
      * > [!WARNING]> This attribute may contain sensitive information.

@@ -10,6 +10,13 @@ conventions themselves are in the
 
 ## Unreleased
 
+### Fixed
+
+- Restore the constants for deprecated conventions, which 1.45.0 removed. They are back, marked `@deprecated`, with
+  their replacement where upstream names one ([#2139]).
+
+[#2139]: https://github.com/open-telemetry/opentelemetry-php/issues/2139
+
 ## 1.45.0 - 2026-11-04
 
 ### Changed

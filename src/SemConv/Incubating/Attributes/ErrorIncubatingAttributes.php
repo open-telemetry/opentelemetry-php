@@ -14,6 +14,19 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface ErrorIncubatingAttributes
 {
     /**
+     * A message providing more detail about an error in human-readable form.
+     * `error.message` should provide additional context and detail about an error.
+     * It is NOT RECOMMENDED to duplicate the value of `error.type` in `error.message`.
+     * It is also NOT RECOMMENDED to duplicate the value of `exception.message` in `error.message`.
+     *
+     * `error.message` is NOT RECOMMENDED for metrics or spans due to its unbounded cardinality and overlap with span status.
+     *
+     * @experimental
+     * @deprecated Use domain-specific error message attribute. For example, use `feature_flag.error.message` for feature flag errors.
+     */
+    public const ERROR_MESSAGE = 'error.message';
+
+    /**
      * Describes a class of error the operation ended with.
      *
      * The `error.type` SHOULD be predictable, and SHOULD have low cardinality.
@@ -53,11 +66,4 @@ interface ErrorIncubatingAttributes
      */
     public const ERROR_TYPE_VALUE_OTHER = '_OTHER';
 
-    /**
-     * Deprecated. Use a domain-specific error message attribute instead.
-     * For feature flag errors use {@see \OpenTelemetry\SemConv\Incubating\Attributes\FeatureFlagIncubatingAttributes::FEATURE_FLAG_ERROR_MESSAGE}.
-     *
-     * @deprecated
-     */
-    public const ERROR_MESSAGE = 'error.message';
 }

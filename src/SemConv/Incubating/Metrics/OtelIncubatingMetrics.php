@@ -100,6 +100,7 @@ interface OtelIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {span}
      * @experimental
+     * @deprecated Replaced by `otel.sdk.exporter.span.exported`.
      */
     public const OTEL_SDK_EXPORTER_SPAN_EXPORTED_COUNT = 'otel.sdk.exporter.span.exported.count';
 
@@ -120,6 +121,7 @@ interface OtelIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {span}
      * @experimental
+     * @deprecated Replaced by `otel.sdk.exporter.span.inflight`.
      */
     public const OTEL_SDK_EXPORTER_SPAN_INFLIGHT_COUNT = 'otel.sdk.exporter.span.inflight.count';
 
@@ -212,6 +214,7 @@ interface OtelIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {span}
      * @experimental
+     * @deprecated Replaced by `otel.sdk.processor.span.processed`.
      */
     public const OTEL_SDK_PROCESSOR_SPAN_PROCESSED_COUNT = 'otel.sdk.processor.span.processed.count';
 
@@ -241,6 +244,7 @@ interface OtelIncubatingMetrics
      * Instrument: counter
      * Unit: {span}
      * @experimental
+     * @deprecated Obsoleted.
      */
     public const OTEL_SDK_SPAN_ENDED = 'otel.sdk.span.ended';
 
@@ -250,6 +254,7 @@ interface OtelIncubatingMetrics
      * Instrument: counter
      * Unit: {span}
      * @experimental
+     * @deprecated Obsoleted.
      */
     public const OTEL_SDK_SPAN_ENDED_COUNT = 'otel.sdk.span.ended.count';
 
@@ -269,6 +274,7 @@ interface OtelIncubatingMetrics
      * Instrument: updowncounter
      * Unit: {span}
      * @experimental
+     * @deprecated Replaced by `otel.sdk.span.live`.
      */
     public const OTEL_SDK_SPAN_LIVE_COUNT = 'otel.sdk.span.live.count';
 
