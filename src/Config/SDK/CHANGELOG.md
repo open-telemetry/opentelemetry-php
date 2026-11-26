@@ -9,6 +9,15 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.19, for the tracer provider's logger ([#2155]).
+
+### Changed
+
+- The tracer provider's and the `simple` and `batch` span processors' internal messages honour the
+  configured `log_level`. They used to follow the global log level ([#2155]).
+
 ## 0.11.0 - 2026-11-26
 
 ### Breaking changes
@@ -210,3 +219,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
 [#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151
+[#2155]: https://github.com/open-telemetry/opentelemetry-php/pull/2155

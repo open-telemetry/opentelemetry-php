@@ -9,7 +9,7 @@ use Psr\Log\LogLevel;
 
 trait LogsToLoggerTrait
 {
-    abstract protected function logger(): LoggerInterface;
+    abstract private function logger(): LoggerInterface;
 
     /**
      * Logging is best effort: a failing logger must not break the code that is being observed.

@@ -30,6 +30,7 @@ final class SpanProcessorSimple implements ComponentProvider
     {
         return new SimpleSpanProcessor(
             exporter: $properties['exporter']->create($context),
+            logger: $context->logger,
         );
     }
 

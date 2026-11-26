@@ -42,6 +42,7 @@ final class SpanProcessorBatch implements ComponentProvider
             exportTimeoutMillis: $properties['export_timeout'],
             maxExportBatchSize: BatchSize::clamp($properties['max_export_batch_size'], $properties['max_queue_size'], $context),
             meterProvider: $context->meterProvider,
+            logger: $context->logger,
         );
     }
 

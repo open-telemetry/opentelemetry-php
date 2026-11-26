@@ -24,6 +24,7 @@ use OpenTelemetry\Config\SDK\ComponentProvider\Metrics\MetricReaderPeriodic;
 use OpenTelemetry\Config\SDK\ComponentProvider\OpenTelemetrySdk;
 use OpenTelemetry\Config\SDK\ComponentProvider\OutputStreamParser;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanExporterConsole;
+use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorBatch;
 use OpenTelemetry\Config\SDK\ComponentProvider\Trace\SpanProcessorSimple;
 use OpenTelemetry\Config\SDK\Configuration;
 use OpenTelemetry\Config\SDK\Configuration\ConfigurationFactory;
@@ -66,6 +67,7 @@ use OpenTelemetry\SDK\Trace\SpanSuppression\NoopSuppressionStrategy\NoopSuppress
 use OpenTelemetry\SDK\Trace\SpanSuppression\SemanticConventionSuppressionStrategy\SemanticConventionSuppressionStrategy;
 use OpenTelemetry\SDK\Trace\TracerProvider;
 use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Detector\ServiceName;
+use OpenTelemetry\Tests\Integration\Config\ComponentProvider\Trace\SpanExporterFailing;
 use OpenTelemetry\Tests\TestState;
 use org\bovigo\vfs\vfsStream;
 use Override;
@@ -515,6 +517,57 @@ final class ConfigurationTest extends TestCase
         } finally {
             Logging::reset();
         }
+    }
+
+    #[DataProvider('spanProcessorProvider')]
+    public function test_tracer_provider_honours_log_level(string $processor): void
+    {
+        $messages = [];
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->exactly(2))->method('write')->willReturnCallback(
+            static function (mixed $level, string $message) use (&$messages): void {
+                $messages[] = [$level, $message];
+            },
+        );
+
+        try {
+            $factory = new ConfigurationFactory([new SpanProcessorSimple(), new SpanProcessorBatch(), new SpanExporterFailing()], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $sdk = $factory->process([Yaml::parse(<<<YAML
+                file_format: "1.0"
+                log_level: warn
+                tracer_provider:
+                  limits:
+                    attribute_count_limit: 1
+                  processors:
+                  - $processor:
+                      exporter:
+                        failing:
+                YAML)])->create(new Context())->build();
+
+            Logging::setLogWriter($logWriter);
+            Logging::setLogLevel(LogLevel::EMERGENCY);
+            $tracerProvider = $sdk->getTracerProvider();
+            $this->assertInstanceOf(TracerProvider::class, $tracerProvider);
+            $tracerProvider->getTracer('test')->spanBuilder('span')
+                ->setAttribute('a', 1)
+                ->setAttribute('b', 2)
+                ->startSpan()
+                ->end();
+            $tracerProvider->forceFlush();
+        } finally {
+            Logging::reset();
+        }
+
+        $this->assertEqualsCanonicalizing([
+            [LogLevel::WARNING, 'Dropped span attributes, links or events'],
+            [LogLevel::ERROR, 'Unhandled export error'],
+        ], $messages);
+    }
+
+    public static function spanProcessorProvider(): iterable
+    {
+        yield 'simple' => ['simple'];
+        yield 'batch' => ['batch'];
     }
 
     private static function instrumentationFactory(): ConfigurationFactory
