@@ -9,6 +9,15 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.19, for the tracer provider's logger ([#2155]).
+
+### Changed
+
+- The tracer provider's and the `simple` and `batch` span processors' internal messages honour the
+  configured `log_level`. They used to follow the global log level ([#2155]).
+
 ## 0.11.0 - 2026-11-26
 
 ### Breaking changes
@@ -23,14 +32,12 @@ error straight away, with no deprecation step.
   `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
 - `OpenTelemetry\Config\SDK\Instrumentation` is removed. Use `Configuration::parseFile()` and
   `getInstrumentationConfig()` ([#2151]).
-- Requires `open-telemetry/sdk` 1.18, for the meter and tracer providers' loggers ([#2145], [#2155]).
+- Requires `open-telemetry/sdk` 1.18, for the meter provider's logger ([#2145]).
 
 ### Changed
 
 - The meter provider's internal messages honour the configured `log_level`. They used to follow
   the global log level ([#2145]).
-- The tracer provider and the `simple` and `batch` span processors honour the configured `log_level`
-  in the same way ([#2155]).
 
 ## 0.10.0 - 2026-11-06
 

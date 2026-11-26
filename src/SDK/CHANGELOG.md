@@ -6,15 +6,19 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- `TracerProvider`, `TracerProviderBuilder::setLogger()`, `BatchSpanProcessor`,
+  `BatchSpanProcessorBuilder::setLogger()` and `SimpleSpanProcessor` accept a PSR-3 logger for the SDK's internal
+  messages. Spans log through their provider's logger. Without one, messages still go to the global internal logger
+  and its level ([#2155]).
+
 ## 1.18.0 - 2026-11-26
 
 ### Added
 
 - `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
   messages. Without one, messages still go to the global internal logger and its level ([#2145]).
-- `TracerProvider`, `TracerProviderBuilder::setLogger()`, `BatchSpanProcessor`,
-  `BatchSpanProcessorBuilder::setLogger()` and `SimpleSpanProcessor` accept a PSR-3 logger in the same way. Spans log
-  through their provider's logger ([#2155]).
 
 ## 1.17.0 - 2026-11-19
 
