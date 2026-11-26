@@ -519,10 +519,6 @@ final class ConfigurationTest extends TestCase
         }
     }
 
-    /**
-     * The tracer provider and its span processors log through the configuration context's logger, so
-     * messages they emit after creation honour the file's `log_level` rather than the global level.
-     */
     #[DataProvider('spanProcessorProvider')]
     public function test_tracer_provider_honours_log_level(string $processor): void
     {

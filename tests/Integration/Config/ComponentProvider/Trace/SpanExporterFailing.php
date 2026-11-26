@@ -16,8 +16,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * A span exporter whose export always throws, so a test can check where the processor's error is logged.
- *
  * @implements ComponentProvider<SpanExporterInterface>
  */
 final class SpanExporterFailing implements ComponentProvider
