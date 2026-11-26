@@ -32,7 +32,13 @@ use Throwable;
 
 class BatchSpanProcessor implements SpanProcessorInterface
 {
-    use LogsToLoggerTrait;
+    use LogsToLoggerTrait {
+        logDebug as private;
+        logInfo as private;
+        logNotice as private;
+        logWarning as private;
+        logError as private;
+    }
 
     public const DEFAULT_SCHEDULE_DELAY = 5000;
     public const DEFAULT_EXPORT_TIMEOUT = 30000;
@@ -305,7 +311,7 @@ class BatchSpanProcessor implements SpanProcessorInterface
     }
 
     #[\Override]
-    protected function logger(): LoggerInterface
+    private function logger(): LoggerInterface
     {
         return $this->logger;
     }

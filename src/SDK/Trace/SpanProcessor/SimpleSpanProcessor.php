@@ -21,7 +21,13 @@ use Throwable;
 
 class SimpleSpanProcessor implements SpanProcessorInterface
 {
-    use LogsToLoggerTrait;
+    use LogsToLoggerTrait {
+        logDebug as private;
+        logInfo as private;
+        logNotice as private;
+        logWarning as private;
+        logError as private;
+    }
 
     private ContextInterface $exportContext;
 
@@ -124,7 +130,7 @@ class SimpleSpanProcessor implements SpanProcessorInterface
     }
 
     #[\Override]
-    protected function logger(): LoggerInterface
+    private function logger(): LoggerInterface
     {
         return $this->logger;
     }
