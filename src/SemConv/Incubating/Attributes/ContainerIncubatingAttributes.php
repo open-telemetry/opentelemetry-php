@@ -37,6 +37,35 @@ interface ContainerIncubatingAttributes
     public const CONTAINER_COMMAND_LINE = 'container.command_line';
 
     /**
+     * Deprecated, use `cpu.mode` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const CONTAINER_CPU_STATE = 'container.cpu.state';
+
+    /**
+     * When tasks of the cgroup are in user mode (Linux). When all container processes are in user mode (Windows).
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const CONTAINER_CPU_STATE_VALUE_USER = 'user';
+
+    /**
+     * When CPU is used by the system (host OS)
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const CONTAINER_CPU_STATE_VALUE_SYSTEM = 'system';
+
+    /**
+     * When tasks of the cgroup are in kernel mode (Linux). When all container processes are in kernel mode (Windows).
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const CONTAINER_CPU_STATE_VALUE_KERNEL = 'kernel';
+
+    /**
      * The name of the CSI ([Container Storage Interface](https://github.com/container-storage-interface/spec)) plugin used by the volume.
      *
      * This can sometimes be referred to as a "driver" in CSI implementations. This should represent the `name` field of the GetPluginInfo RPC.
@@ -105,11 +134,27 @@ interface ContainerIncubatingAttributes
     public const CONTAINER_LABEL = 'container.label';
 
     /**
+     * Deprecated, use `container.label` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `container.label`.
+     */
+    public const CONTAINER_LABELS = 'container.labels';
+
+    /**
      * Container name used by container runtime.
      *
      * @experimental
      */
     public const CONTAINER_NAME = 'container.name';
+
+    /**
+     * The container runtime managing this container.
+     *
+     * @experimental
+     * @deprecated Replaced by `container.runtime.name`.
+     */
+    public const CONTAINER_RUNTIME = 'container.runtime';
 
     /**
      * A description about the runtime which could include, for example details about the CRI/API version being used or other customizations.

@@ -1,3 +1,4 @@
+{% import 'common.j2' as c %}
 {%- set my_class_name = ctx.root_namespace | pascal_case ~ ("Incubating" if ctx.incubating ) ~ "Metrics" -%}
 <?php
 
@@ -25,7 +26,7 @@ interface {{ my_class_name }}
     {%- else -%}
         {%- set stability_phpdoc = "@experimental" -%}
     {%- endif -%}
-    {{ [metric.brief, concat_if(metric.note), instrument_phpdoc, unit_phpdoc, stability_phpdoc] | comment(indent=4)  | replace(' \n', '\n') }}
+    {{ [metric.brief, concat_if(metric.note), instrument_phpdoc, unit_phpdoc, stability_phpdoc, c.deprecation(metric)] | comment(indent=4)  | replace(' \n', '\n') }}
     public const {{ const_name }} = '{{ metric.metric_name }}';
 
 {% endfor %}

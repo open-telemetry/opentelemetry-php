@@ -14,6 +14,21 @@ error straight away, with no deprecation step.
 - `ConfigProvider` takes the instrumentation configuration in its constructor and returns it, instead of parsing
   `OTEL_CONFIG_FILE` on each call. It is no longer registered through SPI under `ConfigProviderInterface`. Use
   `Globals::configProvider()` to read the configuration the SDK was built from ([#2152]).
+
+## 0.11.0 - 2026-11-26
+
+### Breaking changes
+
+- The top-level `response_propagator/development` key is ignored, with a warning. Move it under
+  `distribution.opentelemetry_php/development` ([#2151]).
+- Providers registered under the `OpenTelemetry\Config\SDK\Configuration\ComponentProvider` SPI
+  key are not loaded, and a file naming one fails with `unknown provider`. Register them under
+  `OpenTelemetry\API\Configuration\Config\ComponentProvider` ([#2151]).
+- `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,
+  `ComponentProviderRegistry` and `Context` are removed. Use their equivalents in
+  `OpenTelemetry\API\Configuration\Config` and `OpenTelemetry\API\Configuration\Context` ([#2151]).
+- `OpenTelemetry\Config\SDK\Instrumentation` is removed. Use `Configuration::parseFile()` and
+  `getInstrumentationConfig()` ([#2151]).
 - Requires `open-telemetry/sdk` 1.18, for the meter provider's logger ([#2145]).
 
 ### Changed
@@ -200,4 +215,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/config-sdk/releas
 [#2107]: https://github.com/open-telemetry/opentelemetry-php/pull/2107
 [#2116]: https://github.com/open-telemetry/opentelemetry-php/pull/2116
 [#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
+[#2151]: https://github.com/open-telemetry/opentelemetry-php/pull/2151
 [#2152]: https://github.com/open-telemetry/opentelemetry-php/pull/2152

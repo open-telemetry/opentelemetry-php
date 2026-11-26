@@ -31,8 +31,6 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\ArrayEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\EnvSourceReader;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ComponentPlugin;
 use OpenTelemetry\Config\SDK\Configuration\Internal\SkippedComponentPlugin;
-use OpenTelemetry\Config\SDK\Instrumentation;
-use OpenTelemetry\Context\Propagation\MultiResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopResponsePropagator;
 use OpenTelemetry\Context\Propagation\NoopTextMapPropagator;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -161,43 +159,42 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * @phan-suppress PhanDeprecatedClass
+     * @param class-string $replacement loaded first, so that an alias it declares for $removed would exist
      */
-    public function test_deprecated_instrumentation_entry_point(): void
+    #[DataProvider('removedTypeProvider')]
+    public function test_removed_type_does_not_resolve(string $removed, string $replacement): void
     {
-        $registry = Instrumentation::parseFile(__DIR__ . '/../../Unit/SDK/fixtures/otel-sdk.yaml')->create();
+        $this->assertTrue(class_exists($replacement) || interface_exists($replacement));
 
-        $this->assertInstanceOf(HttpConfig::class, $registry->get(HttpConfig::class));
+        $this->assertFalse(class_exists($removed) || interface_exists($removed));
+    }
+
+    public static function removedTypeProvider(): iterable
+    {
+        yield 'Instrumentation' => ['OpenTelemetry\Config\SDK\Instrumentation', Configuration::class];
+        yield 'ComponentPlugin' => ['OpenTelemetry\Config\SDK\Configuration\ComponentPlugin', \OpenTelemetry\API\Configuration\Config\ComponentPlugin::class];
+        yield 'ComponentProvider' => ['OpenTelemetry\Config\SDK\Configuration\ComponentProvider', ComponentProvider::class];
+        yield 'ComponentProviderRegistry' => ['OpenTelemetry\Config\SDK\Configuration\ComponentProviderRegistry', ComponentProviderRegistry::class];
+        yield 'Context' => ['OpenTelemetry\Config\SDK\Configuration\Context', Context::class];
     }
 
     /**
-     * Isolated because SPI registration is global, and {@see Configuration} caches its factories.
+     * Isolated because SPI registration and the alias are global, and {@see Configuration} caches
+     * its factories. The alias stands in for an old package that still declares the name, without
+     * which the SPI key cannot be registered at all.
      */
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
-    public function test_legacy_spi_key_logs_deprecation(): void
+    public function test_legacy_spi_key_is_not_loaded(): void
     {
-        /** @phpstan-ignore-next-line */
-        ServiceLoader::register(Configuration\ComponentProvider::class, LegacySpiKeyProvider::class);
+        $legacyKey = 'OpenTelemetry\Config\SDK\Configuration\ComponentProvider';
+        class_alias(ComponentProvider::class, $legacyKey);
+        /** @psalm-suppress ArgumentTypeCoercion @phpstan-ignore argument.type */
+        $this->assertTrue(ServiceLoader::register($legacyKey, LegacySpiKeyProvider::class));
 
-        $logWriter = $this->createMock(LogWriterInterface::class);
-        $logWriter->expects($this->once())
-            ->method('write')
-            ->with(
-                LogLevel::WARNING,
-                $this->logicalAnd(
-                    $this->stringContains(LegacySpiKeyProvider::class),
-                    $this->stringContains(ComponentProvider::class),
-                ),
-                $this->anything(),
-            );
-        Logging::setLogWriter($logWriter);
-
-        try {
-            Configuration::parseFile(__DIR__ . '/configurations/minimal.yaml');
-        } finally {
-            Logging::reset();
-        }
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessageMatches('/unknown provider "legacy_spi_key"/');
+        Configuration::parseFile(__DIR__ . '/configurations/legacy-spi-key.yaml');
     }
 
     /**
@@ -1750,12 +1747,12 @@ final class ConfigurationTest extends TestCase
         $this->assertInstanceOf(ResponsePropagatorInterface::class, $responsePropagators[0]);
     }
 
-    public function test_top_level_response_propagator_is_deprecated_but_applied(): void
+    public function test_top_level_response_propagator_is_ignored_with_warning(): void
     {
         $logWriter = $this->createMock(LogWriterInterface::class);
         $logWriter->expects($this->once())
             ->method('write')
-            ->with(LogLevel::WARNING, $this->stringContains('"response_propagator/development" is deprecated'), $this->anything());
+            ->with(LogLevel::WARNING, $this->stringContains('distribution.opentelemetry_php/development'), $this->anything());
         Logging::setLogWriter($logWriter);
 
         try {
@@ -1770,7 +1767,26 @@ final class ConfigurationTest extends TestCase
                   composite_list: servertiming
                 YAML)])->create(new Context())->build()->getResponsePropagator();
 
-            $this->assertInstanceOf(MultiResponsePropagator::class, $responsePropagator);
+            $this->assertInstanceOf(NoopResponsePropagator::class, $responsePropagator);
+        } finally {
+            Logging::reset();
+        }
+    }
+
+    public function test_top_level_response_propagator_warning_respects_log_level(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->never())->method('write');
+        Logging::setLogWriter($logWriter);
+
+        try {
+            $factory = new ConfigurationFactory([], new OpenTelemetrySdk(), new EnvSourceReader([]));
+            $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
+                file_format: "1.0"
+                log_level: error
+                response_propagator/development:
+                  composite_list: servertiming
+                YAML)])->create(new Context());
         } finally {
             Logging::reset();
         }
@@ -1803,36 +1819,6 @@ final class ConfigurationTest extends TestCase
                   composite:
                     - composite: [servertiming]
             YAML)]);
-    }
-
-    public function test_distribution_response_propagator_takes_precedence_over_top_level(): void
-    {
-        Logging::setLogWriter($this->createStub(LogWriterInterface::class));
-
-        try {
-            $factory = new ConfigurationFactory(
-                self::spiComponentProviders(),
-                new OpenTelemetrySdk(),
-                new EnvSourceReader([]),
-            );
-            $responsePropagator = $factory->process([Yaml::parse(/** @lang yaml */<<<'YAML'
-                file_format: "1.0"
-                response_propagator/development:
-                  composite_list: servertiming,traceresponse
-                distribution:
-                  opentelemetry_php/development:
-                    response_propagator/development:
-                      composite_list: servertiming
-                YAML)])->create(new Context())->build()->getResponsePropagator();
-
-            $responsePropagators = (new \ReflectionClass($responsePropagator))
-                ->getProperty('responsePropagators')
-                ->getValue($responsePropagator);
-            $this->assertIsArray($responsePropagators);
-            $this->assertCount(1, $responsePropagators);
-        } finally {
-            Logging::reset();
-        }
     }
 
     #[DataProvider('unsupportedFileFormatProvider')]
@@ -2588,7 +2574,6 @@ final class ConfigurationTest extends TestCase
         yield 'propagator composite_list bool' => ["propagator:\n  composite_list: true", $notString('propagator.composite_list')];
         yield 'propagator composite_list list' => ["propagator:\n  composite_list: [tracecontext]", '/path "[^"]*propagator\.composite_list"\. Expected "scalar", but got "array"/'];
         yield 'response propagator composite_list' => ["{$responsePropagator}      composite_list: 1", $notString('response_propagator/development.composite_list')];
-        yield 'deprecated response propagator composite_list' => ["response_propagator/development:\n  composite_list: 1", $notString('response_propagator/development.composite_list')];
         yield 'propagator composite' => ["propagator:\n  composite: 5", $notArray('propagator.composite')];
         yield 'propagator composite item' => ["propagator:\n  composite: [5]", $notArray('propagator.composite.0')];
         yield 'response propagator composite item' => ["{$responsePropagator}      composite: [5]", $notArray('response_propagator/development.composite.0')];

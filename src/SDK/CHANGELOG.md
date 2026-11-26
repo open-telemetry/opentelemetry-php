@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.18.0 - 2026-11-26
+
 ### Added
 
 - `SdkBuilder::setConfigProvider()` and `Sdk::getConfigProvider()`, experimental. `buildAndRegisterGlobal()`

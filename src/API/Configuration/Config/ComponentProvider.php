@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\API\Configuration\Config;
 
-use function class_alias;
 use OpenTelemetry\API\Configuration\Context;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -43,6 +42,3 @@ interface ComponentProvider
      */
     public function getConfig(ComponentProviderRegistry $registry, NodeBuilder $builder): ArrayNodeDefinition;
 }
-
-/** @phpstan-ignore-next-line @phan-suppress-next-line PhanUndeclaredClassReference */
-class_alias(ComponentProvider::class, \OpenTelemetry\Config\SDK\Configuration\ComponentProvider::class);

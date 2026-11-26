@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OpenTelemetry\Config\SDK;
 
 use Nevay\SPI\ServiceLoader;
-use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Configuration\Config\ComponentPlugin;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\ConfigProperties;
@@ -24,13 +23,10 @@ use OpenTelemetry\Config\SDK\Configuration\Environment\PhpIniEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Environment\ServerEnvSource;
 use OpenTelemetry\Config\SDK\Configuration\Internal\ConfigurationFileLoader;
 use OpenTelemetry\SDK\SdkBuilder;
-use function sprintf;
 use WeakMap;
 
 final class Configuration
 {
-    use LogsMessagesTrait;
-
     /**
      * @param ComponentPlugin<SdkBuilder> $sdkPlugin
      * @param array|null $configs loaded configurations, null until the file is read
@@ -145,20 +141,6 @@ final class Configuration
 
     private static function loadComponentProviders(): iterable
     {
-        yield from ServiceLoader::load(ComponentProvider::class);
-
-        // TODO remove the deprecated SPI key before 1.0
-        /** @phpstan-ignore-next-line */
-        $legacyKey = Configuration\ComponentProvider::class;
-        foreach (ServiceLoader::load($legacyKey) as $class => $provider) {
-            self::logWarning(sprintf(
-                'Component provider "%s" is registered under the deprecated SPI key "%s", register it under "%s"',
-                $class,
-                $legacyKey,
-                ComponentProvider::class,
-            ));
-
-            yield $class => $provider;
-        }
+        return ServiceLoader::load(ComponentProvider::class);
     }
 }
