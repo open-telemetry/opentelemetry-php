@@ -6,10 +6,11 @@ namespace OpenTelemetry\SDK\Logs\Processor;
 
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
-use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Logs\ExtendedLogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
-class NoopLogRecordProcessor implements LogRecordProcessorInterface
+class NoopLogRecordProcessor implements ExtendedLogRecordProcessorInterface
 {
     public static function getInstance(): self
     {
@@ -36,5 +37,15 @@ class NoopLogRecordProcessor implements LogRecordProcessorInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return true;
+    }
+
+    #[\Override]
+    public function isEnabled(
+        ContextInterface $context,
+        InstrumentationScopeInterface $scope,
+        ?int $severityNumber,
+        ?string $eventName,
+    ): bool {
+        return false;
     }
 }

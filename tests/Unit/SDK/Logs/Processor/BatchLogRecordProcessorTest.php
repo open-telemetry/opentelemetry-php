@@ -15,6 +15,7 @@ use OpenTelemetry\API\Common\Time\ClockInterface;
 use OpenTelemetry\API\Common\Time\TestClock;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\SDK\Common\Future\CompletedFuture;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Processor\BatchLogRecordProcessor;
@@ -428,6 +429,18 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
             ],
             array_column($metrics->collect(), 'name'),
         );
+    }
+
+    public function test_is_enabled(): void
+    {
+        $processor = new BatchLogRecordProcessor($this->createStub(LogRecordExporterInterface::class), $this->testClock);
+
+        $this->assertTrue($processor->isEnabled(
+            Context::getCurrent(),
+            $this->createStub(InstrumentationScopeInterface::class),
+            null,
+            null,
+        ));
     }
 
     public function test_logs_processor_throws_on_invalid_max_queue_size(): void

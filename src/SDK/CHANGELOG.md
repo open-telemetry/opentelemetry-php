@@ -12,6 +12,19 @@ upgraders can check them in one place.
 
 - `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
   messages. Without one, messages still go to the global internal logger and its level ([#2145]).
+- `ReadWriteLogRecord::setAttribute()` and `removeAttribute()`. A processor can add, change and remove attributes
+  of a record in `onEmit()`, and processors registered after it see the change. Added attributes are subject to the
+  attribute limits ([#2131]).
+- `ExtendedLogRecordProcessorInterface`, with `isEnabled()`. `Logger::isEnabled()` returns false when the processor
+  reports that it would drop the record. The batch, simple, multi and noop processors implement it. The interface is
+  experimental ([#2131]).
+
+### Fixed
+
+- `Logger::isEnabled()` returns false when the provider has no processors. It used to return true ([#2131]).
+- The console log exporter writes the event name of a record, as `event_name`. Every record has the key, and it is
+  null when the record has no event name ([#2131]).
+- The deprecated `EventLogger` sets the event name of the record, as well as the `event.name` attribute ([#2131]).
 
 ## 1.17.0 - 2026-11-19
 
@@ -217,6 +230,7 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2113]: https://github.com/open-telemetry/opentelemetry-php/pull/2113
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
+[#2131]: https://github.com/open-telemetry/opentelemetry-php/pull/2131
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140

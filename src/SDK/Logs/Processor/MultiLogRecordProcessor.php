@@ -6,10 +6,12 @@ namespace OpenTelemetry\SDK\Logs\Processor;
 
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Logs\ExtendedLogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
-class MultiLogRecordProcessor implements LogRecordProcessorInterface
+class MultiLogRecordProcessor implements ExtendedLogRecordProcessorInterface
 {
     /** @var list<LogRecordProcessorInterface> */
     private array $processors = [];
@@ -61,5 +63,26 @@ class MultiLogRecordProcessor implements LogRecordProcessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns `true` if any processor is enabled. A processor that doesn't implement `isEnabled()`
+     * counts as enabled.
+     */
+    #[\Override]
+    public function isEnabled(
+        ContextInterface $context,
+        InstrumentationScopeInterface $scope,
+        ?int $severityNumber,
+        ?string $eventName,
+    ): bool {
+        foreach ($this->processors as $processor) {
+            if (!$processor instanceof ExtendedLogRecordProcessorInterface
+                || $processor->isEnabled($context, $scope, $severityNumber, $eventName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

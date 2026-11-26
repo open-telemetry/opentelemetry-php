@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Logs\Processor;
 
+use OpenTelemetry\Context\Context;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
 use OpenTelemetry\SDK\Logs\Processor\SimpleLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
@@ -54,5 +56,15 @@ class SimpleLogRecordProcessorTest extends TestCase
         $this->exporter->expects($this->once())->method('forceFlush');
 
         $this->processor->forceFlush();
+    }
+
+    public function test_is_enabled(): void
+    {
+        $this->assertTrue($this->processor->isEnabled(
+            Context::getCurrent(),
+            $this->createStub(InstrumentationScopeInterface::class),
+            null,
+            null,
+        ));
     }
 }

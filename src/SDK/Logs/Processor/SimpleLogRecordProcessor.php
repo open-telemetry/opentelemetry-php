@@ -6,11 +6,12 @@ namespace OpenTelemetry\SDK\Logs\Processor;
 
 use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Future\CancellationInterface;
+use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
+use OpenTelemetry\SDK\Logs\ExtendedLogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\LogRecordExporterInterface;
-use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 
-class SimpleLogRecordProcessor implements LogRecordProcessorInterface
+class SimpleLogRecordProcessor implements ExtendedLogRecordProcessorInterface
 {
     public function __construct(private readonly LogRecordExporterInterface $exporter)
     {
@@ -35,5 +36,15 @@ class SimpleLogRecordProcessor implements LogRecordProcessorInterface
     public function forceFlush(?CancellationInterface $cancellation = null): bool
     {
         return $this->exporter->forceFlush($cancellation);
+    }
+
+    #[\Override]
+    public function isEnabled(
+        ContextInterface $context,
+        InstrumentationScopeInterface $scope,
+        ?int $severityNumber,
+        ?string $eventName,
+    ): bool {
+        return true;
     }
 }

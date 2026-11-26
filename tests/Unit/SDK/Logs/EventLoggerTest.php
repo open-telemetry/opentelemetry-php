@@ -45,6 +45,7 @@ class EventLoggerTest extends TestCase
     {
         $this->logger->expects($this->once())->method('emit')->with($this->callback(function (LogRecord $logRecord) {
             $expected = (new LogRecord('some.payload'))
+                ->setEventName('my.event')
                 ->setSeverityNumber(Severity::ERROR)
                 ->setTimestamp(123456)
                 ->setContext(Context::getCurrent())
@@ -65,6 +66,7 @@ class EventLoggerTest extends TestCase
     {
         $this->logger->expects($this->once())->method('emit')->with($this->callback(function (LogRecord $logRecord) {
             $expected = (new LogRecord())
+                ->setEventName('my.event')
                 ->setSeverityNumber(Severity::INFO)
                 ->setTimestamp($this->clock->now())
                 ->setContext(Context::getCurrent())
@@ -81,6 +83,24 @@ class EventLoggerTest extends TestCase
     }
 
     /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/data-model.md#field-eventname
+     */
+    public function test_sets_event_name_field(): void
+    {
+        $eventLoggerProvider = new EventLoggerProvider((new LoggerProviderBuilder())
+            ->addLogRecordProcessor(new SimpleLogRecordProcessor($exporter = new InMemoryExporter()))
+            ->build());
+
+        $eventLoggerProvider->getEventLogger('test')->emit('my.event');
+
+        /** @var list<ReadableLogRecord> $logs */
+        $logs = $exporter->getStorage()->getArrayCopy();
+        $this->assertCount(1, $logs);
+        $this->assertSame('my.event', $logs[0]->getEventName());
+        $this->assertSame('my.event', $logs[0]->getAttributes()->get('event.name'));
+    }
+
+    /**
      * "The user provided Attributes MUST not take over the event.name attribute"
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.32.0/specification/logs/event-sdk.md#emit-event
      */
@@ -88,6 +108,7 @@ class EventLoggerTest extends TestCase
     {
         $this->logger->expects($this->once())->method('emit')->with($this->callback(function (LogRecord $logRecord) {
             $expected = (new LogRecord())
+                ->setEventName('my.event')
                 ->setSeverityNumber(Severity::INFO)
                 ->setTimestamp($this->clock->now())
                 ->setContext(Context::getCurrent())

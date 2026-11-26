@@ -14,14 +14,17 @@ use OpenTelemetry\Context\ContextInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScope;
 use OpenTelemetry\SDK\Common\InstrumentationScope\Configurator;
+use OpenTelemetry\SDK\Logs\ExtendedLogRecordProcessorInterface;
 use OpenTelemetry\SDK\Logs\Logger;
 use OpenTelemetry\SDK\Logs\LoggerConfig;
 use OpenTelemetry\SDK\Logs\LoggerSharedState;
 use OpenTelemetry\SDK\Logs\LogRecordBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordLimitsBuilder;
 use OpenTelemetry\SDK\Logs\LogRecordProcessorInterface;
+use OpenTelemetry\SDK\Logs\Processor\NoopLogRecordProcessor;
 use OpenTelemetry\SDK\Logs\ReadWriteLogRecord;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -189,6 +192,57 @@ class LoggerTest extends TestCase
         $this->processor->expects($this->once())->method('onEmit');
 
         $logger->emit(new LogRecord());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/sdk.md#enabled
+     */
+    #[Group('logs-compliance')]
+    public function test_not_enabled_when_processor_is_not_enabled(): void
+    {
+        $processor = $this->createStub(ExtendedLogRecordProcessorInterface::class);
+        $processor->method('isEnabled')->willReturn(false);
+        $sharedState = $this->createStub(LoggerSharedState::class);
+        $sharedState->method('getProcessor')->willReturn($processor);
+
+        $this->assertFalse((new Logger($sharedState, $this->scope))->isEnabled());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/logs/sdk.md#enabled
+     */
+    #[Group('logs-compliance')]
+    public function test_not_enabled_without_processors(): void
+    {
+        $sharedState = $this->createStub(LoggerSharedState::class);
+        $sharedState->method('getProcessor')->willReturn(NoopLogRecordProcessor::getInstance());
+
+        $this->assertFalse((new Logger($sharedState, $this->scope))->isEnabled());
+    }
+
+    public function test_is_enabled_passes_parameters_to_processor(): void
+    {
+        $context = Context::getCurrent()->with(Context::createKey('foo'), 'bar');
+        $processor = $this->createMock(ExtendedLogRecordProcessorInterface::class);
+        $processor->expects($this->once())->method('isEnabled')
+            ->with($context, $this->scope, 9, 'event')
+            ->willReturn(true);
+        $sharedState = $this->createStub(LoggerSharedState::class);
+        $sharedState->method('getProcessor')->willReturn($processor);
+
+        $this->assertTrue((new Logger($sharedState, $this->scope))->isEnabled($context, 9, 'event'));
+    }
+
+    public function test_is_enabled_defaults_to_current_context(): void
+    {
+        $processor = $this->createMock(ExtendedLogRecordProcessorInterface::class);
+        $processor->expects($this->once())->method('isEnabled')
+            ->with(Context::getCurrent(), $this->scope, null, null)
+            ->willReturn(true);
+        $sharedState = $this->createStub(LoggerSharedState::class);
+        $sharedState->method('getProcessor')->willReturn($processor);
+
+        $this->assertTrue((new Logger($sharedState, $this->scope))->isEnabled());
     }
 
     public function test_builder_enabled(): void
