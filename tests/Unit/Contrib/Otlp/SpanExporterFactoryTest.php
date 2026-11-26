@@ -200,6 +200,9 @@ class SpanExporterFactoryTest extends TestCase
         ];
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     #[DataProvider('timeoutProvider')]
     public function test_timeout(array $env, float $timeout): void
     {

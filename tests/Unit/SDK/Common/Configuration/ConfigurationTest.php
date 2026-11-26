@@ -137,6 +137,9 @@ class ConfigurationTest extends TestCase
         $this->assertSame(Defaults::OTEL_ATTRIBUTE_COUNT_LIMIT, Configuration::getInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     public function test_invalid_integer_without_default_throws_exception(): void
     {
         $this->expectWarning('Invalid integer value "foo" for OTEL_FOO');
@@ -164,6 +167,9 @@ class ConfigurationTest extends TestCase
         $this->assertSame(9.9, Configuration::getFloat('OTEL_FOO', 9.9));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     public function test_invalid_non_scalar_integer_uses_default(): void
     {
         $this->expectWarning('Invalid integer value "array" for OTEL_FOO');
@@ -188,6 +194,9 @@ class ConfigurationTest extends TestCase
         $this->assertNull(Configuration::getNullableInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     public function test_invalid_nullable_int_returns_null(): void
     {
         $this->expectWarning('Invalid integer value "abc" for OTEL_ATTRIBUTE_COUNT_LIMIT');
@@ -203,6 +212,9 @@ class ConfigurationTest extends TestCase
         $this->assertSame(1.5, Configuration::getNullableFloat('OTEL_FOO'));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     public function test_invalid_nullable_float_returns_null(): void
     {
         $this->expectWarning('Invalid float value "foo" for OTEL_FOO');

@@ -36,6 +36,9 @@ class EnvResolverTest extends TestCase
         $this->assertNull((new EnvResolver())->int('OTEL_FOO'));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     public function test_invalid_int_with_library_default_is_treated_as_unset(): void
     {
         $this->expectWarning('Invalid integer value "abc" for OTEL_BSP_MAX_QUEUE_SIZE');

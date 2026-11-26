@@ -41,7 +41,7 @@ class LogRecordLimitsBuilder
     {
         return Configuration::getNullableInt($specific)
             ?? Configuration::getNullableInt($general)
-            ?? Configuration::getInt($specific);
+            ?? (int) Configuration::getDefault($specific);
     }
 
     /**

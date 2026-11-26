@@ -193,7 +193,7 @@ class Configuration
         $number = filter_var($value, $filterType);
         if ($number === false) {
             self::logWarning(sprintf(
-                'Invalid %s value "%s" for %s, using the default value instead',
+                'Invalid %s value "%s" for %s, ignoring it',
                 $type,
                 is_string($value) ? $value : get_debug_type($value),
                 $key,
