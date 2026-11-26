@@ -34,7 +34,6 @@ use OpenTelemetry\SDK\SdkAutoloader;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 #[CoversClass(LateBindingLoggerProvider::class)]
 #[CoversClass(LateBindingLogger::class)]
@@ -50,7 +49,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 class LateBindingProviderTest extends TestCase
 {
     use TestState;
-    use ProphecyTrait;
 
     #[\Override]
     public function setUp(): void
@@ -121,8 +119,14 @@ class LateBindingProviderTest extends TestCase
 
             return $this->createMock(LoggerInterface::class);
         });
-        $propagator = $this->prophesize(TextMapPropagatorInterface::class);
-        $responsePropagator = $this->prophesize(ResponsePropagatorInterface::class);
+        $propagator_fields_calls = 0;
+        $propagator = $this->createMock(TextMapPropagatorInterface::class);
+        $propagator->method('fields')->willReturnCallback(function () use (&$propagator_fields_calls): array {
+            $propagator_fields_calls++;
+
+            return [];
+        });
+        $responsePropagator = $this->createStub(ResponsePropagatorInterface::class);
 
         ServiceLoader::register(Instrumentation::class, $instrumentation::class);
         $this->assertTrue(SdkAutoloader::autoload());
@@ -132,8 +136,8 @@ class LateBindingProviderTest extends TestCase
                 ->withTracerProvider($tracerProvider)
                 ->withMeterProvider($meterProvider)
                 ->withLoggerProvider($loggerProvider)
-                ->withPropagator($propagator->reveal())
-                ->withResponsePropagator($responsePropagator->reveal())
+                ->withPropagator($propagator)
+                ->withResponsePropagator($responsePropagator)
             ;
         });
 
@@ -155,11 +159,10 @@ class LateBindingProviderTest extends TestCase
         $logger->emit(new LogRecord()); /** @phpstan-ignore-next-line */
         $this->assertTrue($logger_accessed);
 
-        /** @phpstan-ignore-next-line */
-        $propagator->fields()->shouldNotHaveBeenCalled();
+        $this->assertSame(0, $propagator_fields_calls);
         $instrumentation->getPropagator()->fields();
         /** @phpstan-ignore-next-line */
-        $propagator->fields()->shouldHaveBeenCalledOnce();
+        $this->assertSame(1, $propagator_fields_calls);
     }
 
     public function test_late_binding_meter_observable_instruments(): void

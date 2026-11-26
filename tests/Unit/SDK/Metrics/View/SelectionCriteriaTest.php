@@ -19,7 +19,6 @@ use OpenTelemetry\SDK\Metrics\View\SelectionCriteriaInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 #[CoversClass(InstrumentationScopeNameCriteria::class)]
 #[CoversClass(InstrumentationScopeVersionCriteria::class)]
@@ -30,8 +29,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 #[CoversClass(AllCriteria::class)]
 final class SelectionCriteriaTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function test_instrument_scope_name_criteria(): void
     {
         $this->assertTrue((new InstrumentationScopeNameCriteria('scopeName'))->accepts(
@@ -136,15 +133,13 @@ final class SelectionCriteriaTest extends TestCase
 
         $criterias = [];
         for ($i = 0; $i < 3; $i++) {
-            $criteria = $this->prophesize(SelectionCriteriaInterface::class);
-            /** @noinspection PhpUndefinedMethodInspection */
-            /** @phpstan-ignore-next-line */
+            $criteria = $this->createMock(SelectionCriteriaInterface::class);
             $criteria
-                ->accepts()
-                ->shouldBeCalledOnce()
-                ->withArguments([$instrument, $instrumentScope])
+                ->expects($this->once())
+                ->method('accepts')
+                ->with($instrument, $instrumentScope)
                 ->willReturn(true);
-            $criterias[] = $criteria->reveal();
+            $criterias[] = $criteria;
         }
 
         $this->assertTrue((new AllCriteria($criterias))->accepts($instrument, $instrumentScope));
@@ -157,14 +152,12 @@ final class SelectionCriteriaTest extends TestCase
 
         $criterias = [];
         for ($i = 0; $i < 3; $i++) {
-            $criteria = $this->prophesize(SelectionCriteriaInterface::class);
-            /** @noinspection PhpUndefinedMethodInspection */
-            /** @phpstan-ignore-next-line */
+            $criteria = $this->createMock(SelectionCriteriaInterface::class);
             $criteria
-                ->accepts()
-                ->withArguments([$instrument, $instrumentScope])
+                ->method('accepts')
+                ->with($instrument, $instrumentScope)
                 ->willReturn(($i & 1) !== 0);
-            $criterias[] = $criteria->reveal();
+            $criterias[] = $criteria;
         }
 
         $this->assertFalse((new AllCriteria($criterias))->accepts($instrument, $instrumentScope));

@@ -130,7 +130,7 @@ parameters:
 			path: tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest.php
 
 		-
-			message: '#^Static property OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation@anonymous/tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest\.php\:63\:\:\$context \(OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Context\|null\) is never assigned null so it can be removed from the property type\.$#'
+			message: '#^Static property OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Instrumentation@anonymous/tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest\.php\:61\:\:\$context \(OpenTelemetry\\API\\Instrumentation\\AutoInstrumentation\\Context\|null\) is never assigned null so it can be removed from the property type\.$#'
 			identifier: property.unusedType
 			count: 1
 			path: tests/Unit/API/Instrumentation/AutoInstrumentation/LateBindingProviderTest.php
@@ -368,12 +368,6 @@ parameters:
 			identifier: method.alreadyNarrowedType
 			count: 1
 			path: tests/Unit/SDK/Metrics/StalenessHandler/NoopStalenessHandlerTest.php
-
-		-
-			message: '#^Call to an undefined method Prophecy\\Prophecy\\ObjectProphecy\<OpenTelemetry\\SDK\\Metrics\\View\\SelectionCriteriaInterface\>\:\:accepts\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: tests/Unit/SDK/Metrics/View/SelectionCriteriaTest.php
 
 		-
 			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''OpenTelemetry\\\\SDK\\\\Resource\\\\ResourceInfo'' and OpenTelemetry\\SDK\\Resource\\ResourceInfo will always evaluate to true\.$#'

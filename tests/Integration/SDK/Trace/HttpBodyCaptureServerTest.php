@@ -161,7 +161,6 @@ class HttpBodyCaptureServerTest extends TestCase
         ]);
         $result = curl_exec($curl);
         $this->assertNotFalse($result, curl_error($curl));
-        curl_close($curl);
 
         return json_decode((string) $result, true, flags: JSON_THROW_ON_ERROR);
     }

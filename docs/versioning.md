@@ -17,6 +17,7 @@ release after its general availability.
 | 8.3 | 2027-12-31 | 2028-12-31 |
 | 8.4 | 2028-12-31 | 2029-12-31 |
 | 8.5 | 2029-12-31 | 2030-12-31 |
+| 8.6 | 2030-12-31 | 2031-12-31 |
 <!-- php-support-table:end -->
 
 The dates come from [php.net](https://www.php.net/releases/states.php), and the badges and the summary in the README

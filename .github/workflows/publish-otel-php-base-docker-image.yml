@@ -28,6 +28,7 @@ jobs:
           - "8.3"
           - "8.4"
           - "8.5"
+          - "8.6"
         runner:
           - ubuntu-latest
           - ubuntu-24.04-arm
@@ -60,6 +61,7 @@ jobs:
           - "8.3"
           - "8.4"
           - "8.5"
+          - "8.6"
     runs-on: ubuntu-latest
     permissions:
       packages: write

@@ -7,9 +7,8 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Export\Http;
 
 use ArrayObject;
-use function date;
-use const DATE_RFC7231;
 use ErrorException;
+use function gmdate;
 use GuzzleHttp\Psr7\FnStream;
 use function gzdecode;
 use function gzencode;
@@ -68,7 +67,7 @@ final class PsrUtilsTest extends TestCase
 
     public function test_retry_delay_respects_response_retry_after_date(): void
     {
-        $delay = PsrUtils::retryDelay(2, 1000, (new Response())->withHeader('Retry-After', date(DATE_RFC7231, time() + 6)));
+        $delay = PsrUtils::retryDelay(2, 1000, (new Response())->withHeader('Retry-After', gmdate('D, d M Y H:i:s \G\M\T', time() + 6)));
         $this->assertGreaterThan(4, $delay);
     }
 

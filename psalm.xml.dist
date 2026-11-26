@@ -90,12 +90,6 @@
                 <directory name="src/Config/SDK/Configuration/Internal/NodeDefinition"/>
             </errorLevel>
         </TooManyTemplateParams>
-        <UndefinedMagicMethod>
-            <errorLevel type="suppress">
-                <referencedMethod name="Prophecy\Prophecy\ObjectProphecy::accepts"/>
-                <referencedMethod name="Prophecy\Prophecy\ObjectProphecy::fields"/>
-            </errorLevel>
-        </UndefinedMagicMethod>
         <PossiblyFalseArgument>
             <errorLevel type="suppress">
                 <directory name="tests"/>

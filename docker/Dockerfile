@@ -1,7 +1,7 @@
 FROM composer:2.10@sha256:5946476338742b200bb9ff88f8be56275ddae4b3949c72305cb0dbf10cfcb760 AS composer
 FROM debian:13@sha256:fac46bff2e02f51425b6e33b0e1169f55dfb053d83511ca28aa50c09fd5ed7a4
 
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.6
 
 WORKDIR /usr/src/myapp
 
