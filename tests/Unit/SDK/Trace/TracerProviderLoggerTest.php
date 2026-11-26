@@ -7,6 +7,7 @@ namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
+use OpenTelemetry\API\Behavior\LogsMessagesTrait;
 use OpenTelemetry\API\Common\Time\Clock;
 use OpenTelemetry\SDK\Trace\Span;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use RuntimeException;
 
 #[CoversClass(TracerProvider::class)]
@@ -77,11 +79,11 @@ class TracerProviderLoggerTest extends TestCase
             $this->callback(static fn (array $context): bool => $context['source'] === Span::class),
         );
 
+        $this->setEnvironmentVariable('OTEL_SPAN_EVENT_COUNT_LIMIT', 1);
+
         $span = (new TracerProviderBuilder())->setLogger($logger)->build()->getTracer('test')->spanBuilder('span')->startSpan();
-        // the default event count limit is 128
-        for ($i = 0; $i <= 128; $i++) {
-            $span->addEvent('event');
-        }
+        $span->addEvent('a');
+        $span->addEvent('b');
         $span->end();
     }
 
@@ -132,9 +134,41 @@ class TracerProviderLoggerTest extends TestCase
         $this->endSpan(new SimpleSpanProcessor($this->failingExporter(), $logger));
     }
 
-    /**
-     * A provider built with its own level logs at that level, whatever the global level is.
-     */
+    public function test_batch_span_processor_subclass_can_declare_its_own_logging(): void
+    {
+        $this->globalWriter->expects($this->never())->method('write');
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(
+            LogLevel::WARNING,
+            $this->stringContains('exceeds maximum queue size'),
+        );
+
+        new class($this->createStub(SpanExporterInterface::class), Clock::getDefault(), maxQueueSize: 1, maxExportBatchSize: 2, logger: $logger) extends BatchSpanProcessor {
+            use LogsMessagesTrait;
+
+            protected function logger(): LoggerInterface
+            {
+                return new NullLogger();
+            }
+        };
+    }
+
+    public function test_simple_span_processor_subclass_can_declare_its_own_logging(): void
+    {
+        $this->globalWriter->expects($this->never())->method('write');
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('log')->with(LogLevel::ERROR, 'Unhandled export error');
+
+        $this->endSpan(new class($this->failingExporter(), $logger) extends SimpleSpanProcessor {
+            use LogsMessagesTrait;
+
+            protected function logger(): LoggerInterface
+            {
+                return new NullLogger();
+            }
+        });
+    }
+
     public function test_injected_level_applies_instead_of_global_level(): void
     {
         Logging::setLogLevel('error');
