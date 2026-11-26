@@ -6,6 +6,8 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+## 1.13.0 - 2026-11-26
+
 ### Breaking changes
 
 - The `OpenTelemetry\Config\SDK\Configuration\ComponentPlugin`, `ComponentProvider`,

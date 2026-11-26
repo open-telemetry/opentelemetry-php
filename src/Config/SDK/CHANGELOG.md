@@ -9,6 +9,8 @@ error straight away, with no deprecation step.
 
 ## Unreleased
 
+## 0.11.0 - 2026-11-26
+
 ### Breaking changes
 
 - The top-level `response_propagator/development` key is ignored, with a warning. Move it under
