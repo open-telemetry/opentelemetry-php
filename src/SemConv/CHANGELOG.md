@@ -10,6 +10,8 @@ conventions themselves are in the
 
 ## Unreleased
 
+## 1.45.1 - 2026-11-26
+
 ### Fixed
 
 - Restore the constants for deprecated conventions, which 1.45.0 removed. They are back, marked `@deprecated`, with
