@@ -1,4 +1,4 @@
-ARG PHP_VERSION=8.5
+ARG PHP_VERSION=8.5@sha256:f83ae72fdab33a546ec338dc7994e3a01b21971f1c19f4ab5f8c3b841abb0e42
 FROM ghcr.io/open-telemetry/opentelemetry-php/opentelemetry-php-base:${PHP_VERSION}
 
 ENV LANG=C.UTF-8
