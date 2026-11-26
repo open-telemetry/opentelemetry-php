@@ -26,7 +26,6 @@ use OpenTelemetry\API\Metrics\LateBindingMeterProvider;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Trace\LateBindingTracerProvider;
 use OpenTelemetry\API\Trace\TracerProviderInterface;
-use OpenTelemetry\Config\SDK\ConfigProvider;
 use OpenTelemetry\Config\SDK\Configuration as SdkConfiguration;
 use OpenTelemetry\Context\Context;
 use OpenTelemetry\Context\Propagation\ResponsePropagatorInterface;
@@ -84,8 +83,8 @@ class SdkAutoloader
                 }
             }
         } else {
-            Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator));
             $configuration = self::loadConfigPropertiesFromEnv();
+            Globals::registerInitializer(fn ($configurator) => self::environmentBasedInitializer($configurator, $configuration));
         }
         self::registerInstrumentations($configuration ?? new NoopConfigProperties());
 
@@ -97,10 +96,11 @@ class SdkAutoloader
     /**
      * @phan-suppress PhanDeprecatedClass,PhanDeprecatedFunction
      */
-    private static function environmentBasedInitializer(Configurator $configurator): Configurator
+    private static function environmentBasedInitializer(Configurator $configurator, ConfigProperties $configuration): Configurator
     {
         $propagator = (new PropagatorFactory())->create();
         $responsePropagator = (new ResponsePropagatorFactory())->create();
+        $configurator = $configurator->withConfigProvider(new ConfigProvider($configuration));
         if (Sdk::isDisabled()) {
             //@see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md#general-sdk-configuration
             return $configurator->withPropagator($propagator)->withResponsePropagator($responsePropagator);

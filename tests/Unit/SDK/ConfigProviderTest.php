@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Tests\Unit\Config\SDK;
+namespace OpenTelemetry\Tests\Unit\SDK;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
-use OpenTelemetry\Config\SDK\ConfigProvider;
+use OpenTelemetry\SDK\ConfigProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

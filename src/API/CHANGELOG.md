@@ -10,8 +10,8 @@ upgraders can check them in one place.
 
 - `Globals::configProvider()` and `Configurator::withConfigProvider()`, experimental. An instrumentation that registers
   from its own autoload file, not through the `Instrumentation` SPI, can read its configuration with
-  `Globals::configProvider()->getInstrumentationConfig()`. It is noop unless the SDK was configured from
-  `OTEL_CONFIG_FILE`, and until the SDK is built, so read it inside a hook, not when registering ([#2152]).
+  `Globals::configProvider()->getInstrumentationConfig()`. Read it inside a hook, not from the autoload file: any
+  `Globals` call made before the SDK autoloader has run leaves every global noop ([#2152]).
 
 ### Changed
 

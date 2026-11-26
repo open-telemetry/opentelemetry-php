@@ -10,7 +10,6 @@ use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\API\Configuration\Config\ComponentProvider;
 use OpenTelemetry\API\Configuration\Config\ComponentProviderRegistry;
 use OpenTelemetry\API\Configuration\Context;
-use OpenTelemetry\API\Configuration\Noop\NoopConfigProvider;
 use OpenTelemetry\API\Globals;
 use OpenTelemetry\API\Instrumentation\AutoInstrumentation\InstrumentationConfiguration;
 use OpenTelemetry\API\Instrumentation\Configuration\General\HttpConfig;
@@ -234,13 +233,23 @@ class SdkAutoloaderTest extends TestCase
         $this->assertSame(['GET', 'POST'], $http->config['server']['known_methods']);
     }
 
-    public function test_autoload_from_environment_leaves_global_config_provider_noop(): void
+    #[DataProvider('sdkDisabledProvider')]
+    public function test_autoload_from_environment_sets_global_config_provider(string $sdkDisabled): void
     {
         $this->setEnvironmentVariable(Variables::OTEL_PHP_AUTOLOAD_ENABLED, 'true');
+        $this->setEnvironmentVariable(Variables::OTEL_SDK_DISABLED, $sdkDisabled);
         $this->setEnvironmentVariable('OTEL_PHP_INSTRUMENTATION_HTTP_REQUEST_HEADERS', 'Accept');
 
         $this->assertTrue(SdkAutoloader::autoload());
-        $this->assertInstanceOf(NoopConfigProvider::class, Globals::configProvider());
+        $http = Globals::configProvider()->getInstrumentationConfig()->get(HttpConfig::class);
+        $this->assertInstanceOf(HttpConfig::class, $http);
+        $this->assertSame(['Accept'], $http->config['server']['request_captured_headers']);
+    }
+
+    public static function sdkDisabledProvider(): iterable
+    {
+        yield 'sdk enabled' => ['false'];
+        yield 'sdk disabled' => ['true'];
     }
 
     /**

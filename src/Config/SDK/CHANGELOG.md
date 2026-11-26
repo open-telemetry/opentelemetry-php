@@ -11,8 +11,7 @@ error straight away, with no deprecation step.
 
 ### Breaking changes
 
-- `ConfigProvider` takes the instrumentation configuration in its constructor and returns it, instead of parsing
-  `OTEL_CONFIG_FILE` on each call. It is no longer registered through SPI under `ConfigProviderInterface`. Use
+- `ConfigProvider` is removed, and nothing is registered through SPI under `ConfigProviderInterface`. Use
   `Globals::configProvider()` to read the configuration the SDK was built from ([#2152]).
 
 ## 0.11.0 - 2026-11-26

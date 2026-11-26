@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OpenTelemetry\Config\SDK;
+namespace OpenTelemetry\SDK;
 
 use OpenTelemetry\API\Configuration\ConfigProperties;
 use OpenTelemetry\API\Configuration\ConfigProviderInterface;

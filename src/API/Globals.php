@@ -23,6 +23,13 @@ use Throwable;
 
 /**
  * Provides access to the globally configured instrumentation instances.
+ *
+ * The first call to any of these methods runs the registered initializers, which builds the SDK,
+ * and the result is kept for the request. An initializer registered after that is ignored. Don't
+ * call them from a Composer autoload file: one that runs before the SDK autoloader's leaves every
+ * global noop. Register through the
+ * {@see \OpenTelemetry\API\Instrumentation\AutoInstrumentation\Instrumentation} SPI instead, or
+ * call them inside a hook.
  */
 final class Globals
 {
@@ -81,8 +88,7 @@ final class Globals
     }
 
     /**
-     * Noop unless an SDK registered one. The SDK autoloader does so only for a declarative
-     * configuration file.
+     * Noop unless an SDK registered one, as the SDK autoloader does.
      *
      * @experimental
      * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/configuration/api.md#configprovider

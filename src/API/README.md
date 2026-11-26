@@ -8,6 +8,12 @@
 
 Documentation: https://opentelemetry.io/docs/instrumentation/php
 
+## Read Globals inside a hook, not an autoload file
+
+`Globals` builds the SDK on first use and keeps the result for the request. A Composer autoload
+file can run before the SDK autoloader's, and a `Globals` call made there leaves every global noop.
+Register instrumentation through the `Instrumentation` SPI, or call `Globals` inside a hook.
+
 ## Contributing
 
 This repository is a read-only git subtree split.

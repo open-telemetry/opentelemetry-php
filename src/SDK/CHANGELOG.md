@@ -6,15 +6,18 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Added
+
+- `ConfigProvider`, `SdkBuilder::setConfigProvider()` and `Sdk::getConfigProvider()`, experimental.
+  `buildAndRegisterGlobal()` registers the provider, so `Globals::configProvider()` returns it ([#2152]).
+- The SDK autoloader registers a `ConfigProvider` holding the same instrumentation configuration it passes to
+  `Instrumentation::register()`, whether configured from `OTEL_CONFIG_FILE` or from environment variables, and also
+  when `OTEL_SDK_DISABLED` is set ([#2152]).
+
 ## 1.18.0 - 2026-11-26
 
 ### Added
 
-- `SdkBuilder::setConfigProvider()` and `Sdk::getConfigProvider()`, experimental. `buildAndRegisterGlobal()`
-  registers the provider, so `Globals::configProvider()` returns it ([#2152]).
-- When configured from `OTEL_CONFIG_FILE`, the SDK autoloader registers a `ConfigProvider` holding the same
-  instrumentation configuration it passes to `Instrumentation::register()`. Configured from environment variables,
-  `Globals::configProvider()` stays noop ([#2152]).
 - `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
   messages. Without one, messages still go to the global internal logger and its level ([#2145]).
 
