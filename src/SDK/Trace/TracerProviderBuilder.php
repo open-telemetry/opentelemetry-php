@@ -67,7 +67,8 @@ class TracerProviderBuilder
 
     /**
      * Set the logger for the provider's internal messages. Without one, they go to the global internal
-     * logger, filtered by its global level.
+     * logger, filtered by its global level. Span processors are built before they are added, so give them
+     * their logger when you build them, for example with {@see BatchSpanProcessorBuilder::setLogger()}.
      */
     public function setLogger(LoggerInterface $logger): self
     {
