@@ -86,7 +86,7 @@ class SdkAutoloader
         }
         self::registerInstrumentations($config);
 
-        AutoRootSpan::start();
+        //AutoRootSpan::start();
 
         return true;
     }
