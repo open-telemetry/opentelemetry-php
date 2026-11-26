@@ -147,7 +147,7 @@ class HostTest extends TestCase
             ));
             chmod($script, 0755);
         }
-        $this->setEnvironmentVariable('PATH', $this->plantedDir . PATH_SEPARATOR . getenv('PATH'));
+        $this->setEnvironmentVariable('PATH', $this->plantedDir . PATH_SEPARATOR . (string) getenv('PATH'));
 
         $root = vfsStream::setup('/');
         $resource = (new Host($root->url(), $os))->getResource();

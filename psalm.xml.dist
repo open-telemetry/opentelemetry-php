@@ -23,6 +23,10 @@
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
         <pluginClass class="Psalm\MockeryPlugin\Plugin"/>
     </plugins>
+    <!-- With ext-protobuf loaded, psalm reflects the internal class and loses its @template. -->
+    <stubs>
+        <file name="vendor/google/protobuf/src/Google/Protobuf/RepeatedField.php"/>
+    </stubs>
     <issueHandlers>
         <UndefinedClass>
             <errorLevel type="suppress">
