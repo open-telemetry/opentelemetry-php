@@ -47,11 +47,33 @@ class EnvResolverTest extends TestCase
         $this->assertNull((new EnvResolver())->int(Variables::OTEL_BSP_MAX_QUEUE_SIZE));
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/common.md#numeric
+     */
     public function test_int_out_of_range_is_treated_as_unset(): void
     {
+        $this->expectWarning('Out of range value "-1" for OTEL_FOO');
         $this->setEnvironmentVariable('OTEL_FOO', '-1');
 
         $this->assertNull((new EnvResolver())->int('OTEL_FOO'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/common.md#numeric
+     */
+    public function test_numeric_out_of_range_is_treated_as_unset(): void
+    {
+        $this->expectWarning('Out of range value "1.5" for OTEL_FOO');
+        $this->setEnvironmentVariable('OTEL_FOO', '1.5');
+
+        $this->assertNull((new EnvResolver())->numeric('OTEL_FOO', 0, 1));
+    }
+
+    public function test_int_without_bounds(): void
+    {
+        $this->setEnvironmentVariable('OTEL_FOO', '-5');
+
+        $this->assertSame(-5, (new EnvResolver())->int('OTEL_FOO', null, null));
     }
 
     public function test_numeric(): void

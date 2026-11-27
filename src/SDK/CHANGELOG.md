@@ -12,6 +12,15 @@ upgraders can check them in one place.
   `BatchSpanProcessorBuilder::setLogger()` and `SimpleSpanProcessor` accept a PSR-3 logger for the SDK's internal
   messages. Spans log through their provider's logger. Without one, messages still go to the global internal logger
   and its level ([#2155]).
+- `Configuration::getNullableInt()` and `getNullableFloat()`, which return `null` for a variable that is not set or
+  is invalid, instead of the library default ([#2144]).
+
+### Fixed
+
+- An invalid numeric `OTEL_*` value, such as `OTEL_ATTRIBUTE_COUNT_LIMIT=abc`, logs a warning and is ignored, so the
+  default is used. It used to abort SDK initialization with `Value has invalid type "string"` ([#2144]).
+- `EnvResolver::int()` and `numeric()` return `null` for an invalid value, as documented, instead of the library
+  default. An out-of-range value logs a warning ([#2144]).
 
 ## 1.18.0 - 2026-11-26
 
@@ -43,8 +52,6 @@ upgraders can check them in one place.
   temporality, like the console and OTLP metric exporters ([#2129]).
 - An asynchronous instrument callback that returns a value logs a warning, once per callback. The value is ignored,
   as it always was. Report measurements through the observer instead ([#2129]).
-- `Configuration::getNullableInt()` and `getNullableFloat()`, which return `null` for a variable that is not set or
-  is invalid, instead of the library default ([#2144]).
 
 ### Changed
 
@@ -77,10 +84,6 @@ upgraders can check them in one place.
   specification. Sampling thresholds computed from ratios that aren't a sum of 56-bit fractions used to differ from the
   spec test vectors: `1/3` was `th:aaaaaaaaaaaaac` instead of `th:aaab`, `0.1` was `th:e6666666666666` instead of
   `th:e666` ([#2140]).
-- An invalid numeric `OTEL_*` value, such as `OTEL_ATTRIBUTE_COUNT_LIMIT=abc`, logs a warning and is ignored, so the
-  default is used. It used to abort SDK initialization with `Value has invalid type "string"` ([#2144]).
-- `EnvResolver::int()` and `numeric()` return `null` for an invalid value, as documented, instead of the library
-  default ([#2144]).
 
 ## 1.16.1 - 2026-11-06
 
@@ -231,10 +234,10 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2115]: https://github.com/open-telemetry/opentelemetry-php/pull/2115
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
-[#2144]: https://github.com/open-telemetry/opentelemetry-php/pull/2144
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
 [#2140]: https://github.com/open-telemetry/opentelemetry-php/pull/2140
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
+[#2144]: https://github.com/open-telemetry/opentelemetry-php/pull/2144
 [#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [#2155]: https://github.com/open-telemetry/opentelemetry-php/pull/2155
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

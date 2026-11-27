@@ -6,13 +6,22 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.19 ([#2144]).
+
+### Fixed
+
+- An invalid signal-specific timeout, such as `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=abc`, falls back to
+  `OTEL_EXPORTER_OTLP_TIMEOUT`, as an unset one does. It threw an exception ([#2144]).
+
 ## 1.6.0 - 2026-11-19
 
 ### Breaking changes
 
-- Requires `open-telemetry/sdk` 1.19 ([#2144]) and `tbachert/spi`. The exporter and transport factories are
-  registered through SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are
-  registered when the package's autoload file loads, as before ([#2120]).
+- Requires `open-telemetry/sdk` 1.17 and `tbachert/spi`. The exporter and transport factories are registered through
+  SPI. Allow the `tbachert/spi` Composer plugin for the early registration, without it they are registered when the
+  package's autoload file loads, as before ([#2120]).
 
 ### Deprecated
 
@@ -28,8 +37,6 @@ upgraders can check them in one place.
   autoloads, whatever the order in which Composer includes the packages ([#2120]).
 - The `otlp/stdout` metrics exporter reads `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE`, as the `otlp`
   exporter does. It used each stream's temporality, so synchronous instruments were exported as delta ([#2129]).
-- An invalid signal-specific timeout, such as `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=abc`, falls back to
-  `OTEL_EXPORTER_OTLP_TIMEOUT`, as an unset one does. It threw an exception ([#2144]).
 
 ## 1.5.0 - 2026-11-06
 
