@@ -6,6 +6,15 @@ upgraders can check them in one place.
 
 ## Unreleased
 
+### Breaking changes
+
+- Requires `open-telemetry/sdk` 1.19 ([#2144]).
+
+### Fixed
+
+- An invalid signal-specific timeout, such as `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT=abc`, falls back to
+  `OTEL_EXPORTER_OTLP_TIMEOUT`, as an unset one does. It threw an exception ([#2144]).
+
 ## 1.6.0 - 2026-11-19
 
 ### Breaking changes
@@ -85,3 +94,4 @@ See the [GitHub releases](https://github.com/opentelemetry-php/exporter-otlp/rel
 [#2110]: https://github.com/open-telemetry/opentelemetry-php/pull/2110
 [#2120]: https://github.com/open-telemetry/opentelemetry-php/pull/2120
 [#2129]: https://github.com/open-telemetry/opentelemetry-php/pull/2129
+[#2144]: https://github.com/open-telemetry/opentelemetry-php/pull/2144

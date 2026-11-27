@@ -89,16 +89,9 @@ class SpanLimitsBuilder
         return $this;
     }
 
-    private static function resolveAttributeLimit(string $specific, string $general, int $default): int
+    private static function resolveAttributeLimit(string $specific, ?int $general, int $default): int
     {
-        if (Configuration::has($specific)) {
-            return Configuration::getInt($specific);
-        }
-        if (Configuration::has($general)) {
-            return Configuration::getInt($general);
-        }
-
-        return $default;
+        return Configuration::getNullableInt($specific) ?? $general ?? $default;
     }
 
     /**
@@ -107,18 +100,19 @@ class SpanLimitsBuilder
      */
     public function build(): SpanLimits
     {
+        $generalAttributeCountLimit = Configuration::getNullableInt(Env::OTEL_ATTRIBUTE_COUNT_LIMIT);
         $attributeCountLimit = $this->attributeCountLimit
-            ?: self::resolveAttributeLimit(Env::OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, Env::OTEL_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT);
+            ?: self::resolveAttributeLimit(Env::OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, $generalAttributeCountLimit, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT);
         $attributeValueLengthLimit = $this->attributeValueLengthLimit
-            ?: self::resolveAttributeLimit(Env::OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT, Env::OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT, SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT);
+            ?: self::resolveAttributeLimit(Env::OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT, Configuration::getNullableInt(Env::OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT), SpanLimits::DEFAULT_SPAN_ATTRIBUTE_LENGTH_LIMIT);
         $eventCountLimit = $this->eventCountLimit
             ?: Configuration::getInt(Env::OTEL_SPAN_EVENT_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_EVENT_COUNT_LIMIT);
         $linkCountLimit = $this->linkCountLimit
             ?: Configuration::getInt(Env::OTEL_SPAN_LINK_COUNT_LIMIT, SpanLimits::DEFAULT_SPAN_LINK_COUNT_LIMIT);
         $attributePerEventCountLimit = $this->attributePerEventCountLimit
-            ?: self::resolveAttributeLimit(Env::OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT, Env::OTEL_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT);
+            ?: self::resolveAttributeLimit(Env::OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT, $generalAttributeCountLimit, SpanLimits::DEFAULT_EVENT_ATTRIBUTE_COUNT_LIMIT);
         $attributePerLinkCountLimit = $this->attributePerLinkCountLimit
-            ?: self::resolveAttributeLimit(Env::OTEL_LINK_ATTRIBUTE_COUNT_LIMIT, Env::OTEL_ATTRIBUTE_COUNT_LIMIT, SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT);
+            ?: self::resolveAttributeLimit(Env::OTEL_LINK_ATTRIBUTE_COUNT_LIMIT, $generalAttributeCountLimit, SpanLimits::DEFAULT_LINK_ATTRIBUTE_COUNT_LIMIT);
 
         if ($attributeValueLengthLimit === PHP_INT_MAX) {
             $attributeValueLengthLimit = null;

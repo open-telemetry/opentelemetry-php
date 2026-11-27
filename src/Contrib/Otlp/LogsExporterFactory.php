@@ -102,9 +102,8 @@ class LogsExporterFactory implements LogRecordExporterFactoryInterface
 
     private function getTimeout(): float
     {
-        $value = Configuration::has(Variables::OTEL_EXPORTER_OTLP_LOGS_TIMEOUT) ?
-            Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_LOGS_TIMEOUT) :
-            Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_TIMEOUT);
+        $value = Configuration::getNullableInt(Variables::OTEL_EXPORTER_OTLP_LOGS_TIMEOUT)
+            ?? Configuration::getInt(Variables::OTEL_EXPORTER_OTLP_TIMEOUT);
 
         return $value/1000;
     }

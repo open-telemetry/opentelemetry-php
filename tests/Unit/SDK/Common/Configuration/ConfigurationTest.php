@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Common\Configuration;
 
-use Exception;
 use Generator;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Configuration\Configuration;
 use OpenTelemetry\SDK\Common\Configuration\Defaults;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
@@ -15,6 +16,7 @@ use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LogLevel;
 use UnexpectedValueException;
 
 #[CoversClass(Configuration::class)]
@@ -113,11 +115,121 @@ class ConfigurationTest extends TestCase
         $this->assertSame(100, $value);
     }
 
-    public function test_integer_failure(): void
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_integer_uses_default(): void
     {
+        $this->expectWarning('Invalid integer value "foo" for OTEL_FOO');
         $this->setEnvironmentVariable('OTEL_FOO', 'foo');
-        $this->expectException(Exception::class);
-        Configuration::getInt('OTEL_FOO', 99);
+
+        $this->assertSame(99, Configuration::getInt('OTEL_FOO', 99));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_integer_uses_library_default(): void
+    {
+        $this->expectWarning('Invalid integer value "abc" for OTEL_ATTRIBUTE_COUNT_LIMIT');
+        $this->setEnvironmentVariable(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT, 'abc');
+
+        $this->assertSame(Defaults::OTEL_ATTRIBUTE_COUNT_LIMIT, Configuration::getInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_integer_without_default_throws_exception(): void
+    {
+        $this->expectWarning('Invalid integer value "foo" for OTEL_FOO');
+        $this->setEnvironmentVariable('OTEL_FOO', 'foo');
+
+        $this->expectException(UnexpectedValueException::class);
+        Configuration::getInt('OTEL_FOO');
+    }
+
+    public function test_float_get(): void
+    {
+        $this->setEnvironmentVariable('OTEL_FOO', '1.5');
+
+        $this->assertSame(1.5, Configuration::getFloat('OTEL_FOO', 9.9));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_float_uses_default(): void
+    {
+        $this->expectWarning('Invalid float value "foo" for OTEL_FOO');
+        $this->setEnvironmentVariable('OTEL_FOO', 'foo');
+
+        $this->assertSame(9.9, Configuration::getFloat('OTEL_FOO', 9.9));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_non_scalar_integer_uses_default(): void
+    {
+        $this->expectWarning('Invalid integer value "array" for OTEL_FOO');
+        $_SERVER['OTEL_FOO'] = ['foo'];
+
+        try {
+            $this->assertSame(99, Configuration::getInt('OTEL_FOO', 99));
+        } finally {
+            unset($_SERVER['OTEL_FOO']);
+        }
+    }
+
+    public function test_nullable_int(): void
+    {
+        $this->setEnvironmentVariable('OTEL_FOO', '42');
+
+        $this->assertSame(42, Configuration::getNullableInt('OTEL_FOO'));
+    }
+
+    public function test_nullable_int_ignores_library_default(): void
+    {
+        $this->assertNull(Configuration::getNullableInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_nullable_int_returns_null(): void
+    {
+        $this->expectWarning('Invalid integer value "abc" for OTEL_ATTRIBUTE_COUNT_LIMIT');
+        $this->setEnvironmentVariable(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT, 'abc');
+
+        $this->assertNull(Configuration::getNullableInt(Variables::OTEL_ATTRIBUTE_COUNT_LIMIT));
+    }
+
+    public function test_nullable_float(): void
+    {
+        $this->setEnvironmentVariable('OTEL_FOO', '1.5');
+
+        $this->assertSame(1.5, Configuration::getNullableFloat('OTEL_FOO'));
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_invalid_nullable_float_returns_null(): void
+    {
+        $this->expectWarning('Invalid float value "foo" for OTEL_FOO');
+        $this->setEnvironmentVariable('OTEL_FOO', 'foo');
+
+        $this->assertNull(Configuration::getNullableFloat('OTEL_FOO'));
+    }
+
+    private function expectWarning(string $message): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())
+            ->method('write')
+            ->with(LogLevel::WARNING, $this->stringContains($message), $this->anything());
+        Logging::setLogWriter($logWriter);
     }
 
     public function environment_variables_integer_uses_default_if_env_var_not_defined(): void

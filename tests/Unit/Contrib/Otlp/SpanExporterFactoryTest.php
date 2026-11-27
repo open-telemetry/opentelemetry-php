@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\Contrib\Otlp;
 
+use OpenTelemetry\API\Behavior\Internal\Logging;
 use OpenTelemetry\Contrib\Otlp\SpanExporterFactory;
 use OpenTelemetry\SDK\Common\Configuration\KnownValues;
 use OpenTelemetry\SDK\Common\Configuration\Variables;
@@ -196,6 +197,38 @@ class SpanExporterFactoryTest extends TestCase
                     'Authorization' => 'Basic AAA',
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    #[DataProvider('timeoutProvider')]
+    public function test_timeout(array $env, float $timeout): void
+    {
+        Logging::disable();
+        foreach ($env as $k => $v) {
+            $this->setEnvironmentVariable($k, $v);
+        }
+        // @phpstan-ignore-next-line
+        $this->transportFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($this->anything(), $this->anything(), $this->anything(), $this->anything(), $this->identicalTo($timeout))
+            ->willReturn($this->transport);
+        // @phpstan-ignore-next-line
+        $this->transport->method('contentType')->willReturn('application/x-protobuf');
+
+        (new SpanExporterFactory($this->transportFactory))->create();
+    }
+
+    public static function timeoutProvider(): array
+    {
+        return [
+            'default' => [[], 10.0],
+            'general' => [[Variables::OTEL_EXPORTER_OTLP_TIMEOUT => '2000'], 2.0],
+            'signal-specific' => [[Variables::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT => '3000', Variables::OTEL_EXPORTER_OTLP_TIMEOUT => '2000'], 3.0],
+            'invalid signal-specific falls back to general' => [[Variables::OTEL_EXPORTER_OTLP_TRACES_TIMEOUT => 'abc', Variables::OTEL_EXPORTER_OTLP_TIMEOUT => '2000'], 2.0],
         ];
     }
 }

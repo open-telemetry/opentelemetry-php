@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\Tests\Unit\SDK\Trace;
 
-use Exception;
+use OpenTelemetry\API\Behavior\Internal\Logging;
+use OpenTelemetry\API\Behavior\Internal\LogWriter\LogWriterInterface;
 use OpenTelemetry\SDK\Common\Attribute\Attributes;
+use OpenTelemetry\SDK\Trace\SpanLimits;
 use OpenTelemetry\SDK\Trace\SpanLimitsBuilder;
 use OpenTelemetry\Tests\TestState;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -75,12 +77,42 @@ class SpanLimitsBuilderTest extends TestCase
         $this->assertEquals(Attributes::factory(222), $spanLimits->getAttributesFactory());
     }
 
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
     #[Group('trace-compliance')]
-    public function test_span_limits_builder_throws_exception_on_invalid_value_from_environment(): void
+    public function test_span_limits_builder_ignores_invalid_value_from_environment(): void
     {
         $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 'fruit');
-        $builder = new SpanLimitsBuilder();
-        $this->expectException(Exception::class);
-        $builder->build();
+        $spanLimits = (new SpanLimitsBuilder())->build();
+
+        $this->assertEquals(Attributes::factory(SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT), $spanLimits->getAttributesFactory());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    #[Group('trace-compliance')]
+    public function test_span_limits_builder_uses_global_attribute_limit_when_span_limit_is_invalid(): void
+    {
+        $this->setEnvironmentVariable('OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT', 'fruit');
+        $this->setEnvironmentVariable('OTEL_ATTRIBUTE_COUNT_LIMIT', 111);
+        $spanLimits = (new SpanLimitsBuilder())->build();
+
+        $this->assertEquals(Attributes::factory(111), $spanLimits->getAttributesFactory());
+    }
+
+    /**
+     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.62.0/specification/configuration/sdk-environment-variables.md#numeric
+     */
+    public function test_span_limits_builder_warns_once_for_invalid_global_attribute_limit(): void
+    {
+        $logWriter = $this->createMock(LogWriterInterface::class);
+        $logWriter->expects($this->once())->method('write');
+        Logging::setLogWriter($logWriter);
+        $this->setEnvironmentVariable('OTEL_ATTRIBUTE_COUNT_LIMIT', 'fruit');
+        $spanLimits = (new SpanLimitsBuilder())->build();
+
+        $this->assertEquals(Attributes::factory(SpanLimits::DEFAULT_SPAN_ATTRIBUTE_COUNT_LIMIT), $spanLimits->getAttributesFactory());
     }
 }
