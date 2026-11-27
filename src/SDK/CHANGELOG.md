@@ -13,8 +13,9 @@ upgraders can check them in one place.
 
 ### Fixed
 
-- A metric with no data points in a collection, such as an asynchronous instrument whose callback observed nothing,
-  is no longer exported. Receivers like Prometheus rejected the whole batch because of it ([#2154]).
+- Sum, Gauge and Histogram metrics with an empty data-point array, such as an asynchronous instrument whose callback
+  observed nothing, are no longer exported. Receivers like Prometheus rejected the whole batch because of them.
+  Metrics with other data-point iterables are still exported ([#2154]).
 
 ## 1.17.0 - 2026-11-19
 

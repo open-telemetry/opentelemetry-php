@@ -47,9 +47,6 @@ final class ExportingReaderTest extends TestCase
         $this->assertSame([], $exporter->collect());
     }
 
-    /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#exportbatch
-     */
     public function test_collect_exports_only_metrics_with_data_points(): void
     {
         $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
@@ -79,9 +76,6 @@ final class ExportingReaderTest extends TestCase
         $this->assertSame([$metric], $exporter->collect());
     }
 
-    /**
-     * @see https://github.com/open-telemetry/opentelemetry-specification/blob/v1.61.0/specification/metrics/sdk.md#exportbatch
-     */
     public function test_collect_does_not_export_metrics_without_data_points(): void
     {
         $exporter = $this->createMock(MetricExporterWithTemporalityInterface::class);
@@ -107,6 +101,37 @@ final class ExportingReaderTest extends TestCase
         );
 
         $this->assertTrue($reader->collect());
+    }
+
+    public function test_collect_exports_metrics_with_generator_data_points(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+        $dataPoint = new NumberDataPoint(1, Attributes::create([]), 0, 1);
+        $dataPoints = (static function () use ($dataPoint): \Generator {
+            yield $dataPoint;
+        })();
+        $metric = new Metric(
+            $this->createStub(InstrumentationScopeInterface::class),
+            ResourceInfoFactory::emptyResource(),
+            'counter',
+            null,
+            null,
+            new Sum($dataPoints, Temporality::CUMULATIVE, true),
+        );
+        $source = $this->createStub(MetricSourceInterface::class);
+        $source->method('collect')->willReturn($metric);
+        $provider = $this->createStub(MetricSourceProviderInterface::class);
+        $provider->method('create')->willReturn($source);
+        $reader->add(
+            $provider,
+            $this->createStub(MetricMetadataInterface::class),
+            $this->createStub(StalenessHandlerInterface::class),
+        );
+
+        $this->assertTrue($reader->collect());
+        $this->assertSame([$metric], $exporter->collect());
+        $this->assertSame([$dataPoint], iterator_to_array($dataPoints));
     }
 
     public function test_default_aggregation_returns_default_aggregation(): void
