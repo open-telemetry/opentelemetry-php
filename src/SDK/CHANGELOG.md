@@ -8,14 +8,23 @@ upgraders can check them in one place.
 
 ### Added
 
-- `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
-  messages. Without one, messages still go to the global internal logger and its level ([#2145]).
+- `TracerProvider`, `TracerProviderBuilder::setLogger()`, `BatchSpanProcessor`,
+  `BatchSpanProcessorBuilder::setLogger()` and `SimpleSpanProcessor` accept a PSR-3 logger for the SDK's internal
+  messages. Spans log through their provider's logger. Without one, messages still go to the global internal logger
+  and its level ([#2155]).
 
 ### Fixed
 
 - Sum, Gauge and Histogram metrics with an empty data-point array, such as an asynchronous instrument whose callback
   observed nothing, are no longer exported. Receivers like Prometheus rejected the whole batch because of them.
   Metrics with other data-point iterables are still exported ([#2154]).
+
+## 1.18.0 - 2026-11-26
+
+### Added
+
+- `MeterProvider`, `Meter` and `MeterProviderBuilder::setLogger()` accept a PSR-3 logger for the SDK's internal
+  messages. Without one, messages still go to the global internal logger and its level ([#2145]).
 
 ## 1.17.0 - 2026-11-19
 
@@ -227,4 +236,5 @@ See the [GitHub releases](https://github.com/opentelemetry-php/sdk/releases).
 [#2142]: https://github.com/open-telemetry/opentelemetry-php/pull/2142
 [#2145]: https://github.com/open-telemetry/opentelemetry-php/pull/2145
 [#2154]: https://github.com/open-telemetry/opentelemetry-php/pull/2154
+[#2155]: https://github.com/open-telemetry/opentelemetry-php/pull/2155
 [GHSA-fc6f-cp96-6g5w]: https://github.com/open-telemetry/opentelemetry-php/security/advisories/GHSA-fc6f-cp96-6g5w

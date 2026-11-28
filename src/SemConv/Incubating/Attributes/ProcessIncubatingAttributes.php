@@ -61,6 +61,32 @@ interface ProcessIncubatingAttributes
     public const PROCESS_CONTEXT_SWITCH_TYPE_VALUE_INVOLUNTARY = 'involuntary';
 
     /**
+     * Deprecated, use `cpu.mode` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const PROCESS_CPU_STATE = 'process.cpu.state';
+
+    /**
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const PROCESS_CPU_STATE_VALUE_SYSTEM = 'system';
+
+    /**
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const PROCESS_CPU_STATE_VALUE_USER = 'user';
+
+    /**
+     * @experimental
+     * @deprecated Replaced by `cpu.mode`.
+     */
+    public const PROCESS_CPU_STATE_VALUE_WAIT = 'wait';
+
+    /**
      * The date and time the process was created, in ISO 8601 format.
      *
      * @experimental
@@ -115,6 +141,14 @@ interface ProcessIncubatingAttributes
      * @experimental
      */
     public const PROCESS_EXECUTABLE_BUILD_ID_HTLHASH = 'process.executable.build_id.htlhash';
+
+    /**
+     * "Deprecated, use `process.executable.build_id.htlhash` instead."
+     *
+     * @experimental
+     * @deprecated Replaced by `process.executable.build_id.htlhash`.
+     */
+    public const PROCESS_EXECUTABLE_BUILD_ID_PROFILING = 'process.executable.build_id.profiling';
 
     /**
      * The name of the process executable. On Linux based systems, this SHOULD be set to the base name of the target of `/proc/[pid]/exe`. On Windows, this SHOULD be set to the base name of `GetProcessImageFileNameW`.
@@ -172,6 +206,26 @@ interface ProcessIncubatingAttributes
      * @experimental
      */
     public const PROCESS_OWNER = 'process.owner';
+
+    /**
+     * Deprecated, use `system.paging.fault.type` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `system.paging.fault.type`.
+     */
+    public const PROCESS_PAGING_FAULT_TYPE = 'process.paging.fault_type';
+
+    /**
+     * @experimental
+     * @deprecated Replaced by `system.paging.fault.type`.
+     */
+    public const PROCESS_PAGING_FAULT_TYPE_VALUE_MAJOR = 'major';
+
+    /**
+     * @experimental
+     * @deprecated Replaced by `system.paging.fault.type`.
+     */
+    public const PROCESS_PAGING_FAULT_TYPE_VALUE_MINOR = 'minor';
 
     /**
      * Parent Process identifier (PPID).

@@ -14,6 +14,14 @@ namespace OpenTelemetry\SemConv\Incubating\Attributes;
 interface HttpIncubatingAttributes
 {
     /**
+     * Deprecated, use `client.address` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `client.address`.
+     */
+    public const HTTP_CLIENT_IP = 'http.client_ip';
+
+    /**
      * State of the HTTP connection in the HTTP connection pool.
      *
      * @experimental
@@ -31,6 +39,72 @@ interface HttpIncubatingAttributes
      * @experimental
      */
     public const HTTP_CONNECTION_STATE_VALUE_IDLE = 'idle';
+
+    /**
+     * Deprecated, use `network.protocol.name` and `network.protocol.version` instead.
+     *
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR = 'http.flavor';
+
+    /**
+     * HTTP/1.0
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR_VALUE_HTTP_1_0 = '1.0';
+
+    /**
+     * HTTP/1.1
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR_VALUE_HTTP_1_1 = '1.1';
+
+    /**
+     * HTTP/2
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR_VALUE_HTTP_2_0 = '2.0';
+
+    /**
+     * HTTP/3
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR_VALUE_HTTP_3_0 = '3.0';
+
+    /**
+     * SPDY protocol.
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR_VALUE_SPDY = 'SPDY';
+
+    /**
+     * QUIC protocol.
+     * @experimental
+     * @deprecated Split into `network.protocol.name` and `network.protocol.version`
+     */
+    public const HTTP_FLAVOR_VALUE_QUIC = 'QUIC';
+
+    /**
+     * Deprecated, use one of `server.address`, `client.address` or `http.request.header.host` instead, depending on the usage.
+     *
+     * @experimental
+     * @deprecated Replaced by one of `server.address`, `client.address` or `http.request.header.host`, depending on the usage.
+     */
+    public const HTTP_HOST = 'http.host';
+
+    /**
+     * Deprecated, use `http.request.method` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `http.request.method`.
+     */
+    public const HTTP_METHOD = 'http.method';
 
     /**
      * The content of the HTTP request body, with any content coding indicated by [Content-Encoding](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding) removed, captured as a string when the request content is textual or as byte array otherwise.
@@ -212,6 +286,22 @@ interface HttpIncubatingAttributes
     public const HTTP_REQUEST_SIZE = 'http.request.size';
 
     /**
+     * Deprecated, use `http.request.header.content-length` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `http.request.header.content-length`.
+     */
+    public const HTTP_REQUEST_CONTENT_LENGTH = 'http.request_content_length';
+
+    /**
+     * Deprecated, use `http.request.body.size` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `http.request.body.size`.
+     */
+    public const HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED = 'http.request_content_length_uncompressed';
+
+    /**
      * The content of the HTTP response body, with any content coding indicated by [Content-Encoding](https://www.rfc-editor.org/rfc/rfc9110.html#field.content-encoding) removed, captured as a string when the response content is textual or as byte array otherwise.
      *
      * Captured value MAY be limited in size and thus value is expected to be truncated in many cases.
@@ -289,6 +379,22 @@ interface HttpIncubatingAttributes
     public const HTTP_RESPONSE_STATUS_CODE = 'http.response.status_code';
 
     /**
+     * Deprecated, use `http.response.header.content-length` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `http.response.header.content-length`.
+     */
+    public const HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length';
+
+    /**
+     * Deprecated, use `http.response.body.size` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `http.response.body.size`.
+     */
+    public const HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED = 'http.response_content_length_uncompressed';
+
+    /**
      * The matched route template for the request. This MUST be low-cardinality and include all static path segments, with dynamic path segments represented with placeholders.
      *
      * MUST NOT be populated when this is not supported by the HTTP server framework as the route attribute should have low-cardinality and the URI path can NOT substitute it.
@@ -305,5 +411,53 @@ interface HttpIncubatingAttributes
      * @stable
      */
     public const HTTP_ROUTE = 'http.route';
+
+    /**
+     * Deprecated, use `url.scheme` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `url.scheme`.
+     */
+    public const HTTP_SCHEME = 'http.scheme';
+
+    /**
+     * Deprecated, use `server.address` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `server.address`.
+     */
+    public const HTTP_SERVER_NAME = 'http.server_name';
+
+    /**
+     * Deprecated, use `http.response.status_code` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `http.response.status_code`.
+     */
+    public const HTTP_STATUS_CODE = 'http.status_code';
+
+    /**
+     * Deprecated, use `url.path` and `url.query` instead.
+     *
+     * @experimental
+     * @deprecated Split to `url.path` and `url.query`.
+     */
+    public const HTTP_TARGET = 'http.target';
+
+    /**
+     * Deprecated, use `url.full` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `url.full`.
+     */
+    public const HTTP_URL = 'http.url';
+
+    /**
+     * Deprecated, use `user_agent.original` instead.
+     *
+     * @experimental
+     * @deprecated Replaced by `user_agent.original`.
+     */
+    public const HTTP_USER_AGENT = 'http.user_agent';
 
 }

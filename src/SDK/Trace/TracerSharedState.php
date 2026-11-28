@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OpenTelemetry\SDK\Trace;
 
+use OpenTelemetry\API\Behavior\Internal\ConfiguredLogger;
 use OpenTelemetry\API\Metrics\CounterInterface;
 use OpenTelemetry\API\Metrics\MeterProviderInterface;
 use OpenTelemetry\API\Metrics\UpDownCounterInterface;
@@ -14,6 +15,7 @@ use OpenTelemetry\SDK\Trace\SpanProcessor\MultiSpanProcessor;
 use OpenTelemetry\SDK\Trace\SpanProcessor\NoopSpanProcessor;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use OpenTelemetry\SemConv\Version;
+use Psr\Log\LoggerInterface;
 
 /**
  * Stores shared state/config between all {@see API\TracerInterface} created via the same {@see API\TracerProviderInterface}.
@@ -33,6 +35,7 @@ final class TracerSharedState
         private readonly SamplerInterface $sampler,
         array $spanProcessors,
         ?MeterProviderInterface $meterProvider = null,
+        private readonly LoggerInterface $logger = new ConfiguredLogger(),
     ) {
         $this->spanProcessor = match (count($spanProcessors)) {
             0 => NoopSpanProcessor::getInstance(),
@@ -86,6 +89,11 @@ final class TracerSharedState
     public function getSpanProcessor(): SpanProcessorInterface
     {
         return $this->spanProcessor;
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 
     public function getSpanStartedCounter(): ?CounterInterface
