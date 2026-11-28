@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace OpenTelemetry\Tests\Unit\SDK\Metrics\MetricReader;
 
 use OpenTelemetry\API\Common\Time\TestClock;
+use OpenTelemetry\SDK\Common\Attribute\Attributes;
 use OpenTelemetry\SDK\Common\Instrumentation\InstrumentationScopeInterface;
 use OpenTelemetry\SDK\Metrics\Aggregation\ExplicitBucketHistogramAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\LastValueAggregation;
 use OpenTelemetry\SDK\Metrics\Aggregation\SumAggregation;
 use OpenTelemetry\SDK\Metrics\AggregationTemporalitySelectorInterface;
 use OpenTelemetry\SDK\Metrics\Data\DataInterface;
+use OpenTelemetry\SDK\Metrics\Data\Gauge;
 use OpenTelemetry\SDK\Metrics\Data\Metric;
+use OpenTelemetry\SDK\Metrics\Data\NumberDataPoint;
 use OpenTelemetry\SDK\Metrics\Data\Sum;
 use OpenTelemetry\SDK\Metrics\Data\Temporality;
 use OpenTelemetry\SDK\Metrics\DefaultAggregationProviderInterface;
@@ -26,6 +29,7 @@ use OpenTelemetry\SDK\Metrics\PushMetricExporterInterface;
 use OpenTelemetry\SDK\Metrics\StalenessHandler\ImmediateStalenessHandler;
 use OpenTelemetry\SDK\Metrics\StalenessHandlerInterface;
 use OpenTelemetry\SDK\Resource\ResourceInfo;
+use OpenTelemetry\SDK\Resource\ResourceInfoFactory;
 use OpenTelemetry\SemConv\Incubating\Metrics\OtelIncubatingMetrics;
 use OpenTelemetry\Tests\Unit\SDK\Util\MeterProviderFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -41,6 +45,93 @@ final class ExportingReaderTest extends TestCase
 
         $reader->collect();
         $this->assertSame([], $exporter->collect());
+    }
+
+    public function test_collect_exports_only_metrics_with_data_points(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+        $scope = $this->createStub(InstrumentationScopeInterface::class);
+        $resource = ResourceInfoFactory::emptyResource();
+        $emptyMetric = new Metric($scope, $resource, 'empty', null, null, new Gauge([]));
+        $metric = new Metric($scope, $resource, 'counter', null, null, new Sum(
+            [new NumberDataPoint(1, Attributes::create([]), 0, 1)],
+            Temporality::CUMULATIVE,
+            true,
+        ));
+
+        foreach ([$emptyMetric, $metric] as $sourceMetric) {
+            $source = $this->createStub(MetricSourceInterface::class);
+            $source->method('collect')->willReturn($sourceMetric);
+            $provider = $this->createStub(MetricSourceProviderInterface::class);
+            $provider->method('create')->willReturn($source);
+            $reader->add(
+                $provider,
+                $this->createStub(MetricMetadataInterface::class),
+                $this->createStub(StalenessHandlerInterface::class),
+            );
+        }
+
+        $this->assertTrue($reader->collect());
+        $this->assertSame([$metric], $exporter->collect());
+    }
+
+    public function test_collect_does_not_export_metrics_without_data_points(): void
+    {
+        $exporter = $this->createMock(MetricExporterWithTemporalityInterface::class);
+        $exporter->method('temporality')->willReturn(Temporality::CUMULATIVE);
+        $exporter->expects($this->never())->method('export');
+        $reader = new ExportingReader($exporter);
+        $metric = new Metric(
+            $this->createStub(InstrumentationScopeInterface::class),
+            ResourceInfoFactory::emptyResource(),
+            'empty',
+            null,
+            null,
+            new Gauge([]),
+        );
+        $source = $this->createStub(MetricSourceInterface::class);
+        $source->method('collect')->willReturn($metric);
+        $provider = $this->createStub(MetricSourceProviderInterface::class);
+        $provider->method('create')->willReturn($source);
+        $reader->add(
+            $provider,
+            $this->createStub(MetricMetadataInterface::class),
+            $this->createStub(StalenessHandlerInterface::class),
+        );
+
+        $this->assertTrue($reader->collect());
+    }
+
+    public function test_collect_exports_metrics_with_generator_data_points(): void
+    {
+        $exporter = new InMemoryExporter(temporality: Temporality::CUMULATIVE);
+        $reader = new ExportingReader($exporter);
+        $dataPoint = new NumberDataPoint(1, Attributes::create([]), 0, 1);
+        $dataPoints = (static function () use ($dataPoint): \Generator {
+            yield $dataPoint;
+        })();
+        $metric = new Metric(
+            $this->createStub(InstrumentationScopeInterface::class),
+            ResourceInfoFactory::emptyResource(),
+            'counter',
+            null,
+            null,
+            new Sum($dataPoints, Temporality::CUMULATIVE, true),
+        );
+        $source = $this->createStub(MetricSourceInterface::class);
+        $source->method('collect')->willReturn($metric);
+        $provider = $this->createStub(MetricSourceProviderInterface::class);
+        $provider->method('create')->willReturn($source);
+        $reader->add(
+            $provider,
+            $this->createStub(MetricMetadataInterface::class),
+            $this->createStub(StalenessHandlerInterface::class),
+        );
+
+        $this->assertTrue($reader->collect());
+        $this->assertSame([$metric], $exporter->collect());
+        $this->assertSame([$dataPoint], iterator_to_array($dataPoints));
     }
 
     public function test_default_aggregation_returns_default_aggregation(): void
@@ -147,7 +238,7 @@ final class ExportingReaderTest extends TestCase
             'test',
             null,
             null,
-            $this->createStub(DataInterface::class),
+            $this->createConfiguredStub(DataInterface::class, ['dataPointCount' => 1]),
         );
 
         $source = $this->createMock(MetricSourceInterface::class);
@@ -186,7 +277,14 @@ final class ExportingReaderTest extends TestCase
         $exporter = $this->createMock(MetricExporterWithTemporalityInterface::class);
         $provider = $this->createMock(MetricSourceProviderInterface::class);
         $source = $this->createMock(MetricSourceInterface::class);
-        $source->method('collect')->willReturn($this->createStub(Metric::class));
+        $source->method('collect')->willReturn(new Metric(
+            $this->createStub(InstrumentationScopeInterface::class),
+            ResourceInfoFactory::emptyResource(),
+            'test',
+            null,
+            null,
+            $this->createConfiguredStub(DataInterface::class, ['dataPointCount' => 1]),
+        ));
         $provider->method('create')->willReturn($source);
         $exporter->method('temporality')->willReturn('foo');
         $exporter->expects($this->once())->method('export')->willReturn(true);

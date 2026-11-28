@@ -417,6 +417,9 @@ class BatchLogRecordProcessorTest extends MockeryTestCase
             $meterProvider,
         );
 
+        $processor->onEmit($this->createMock(ReadWriteLogRecord::class));
+        $processor->forceFlush();
+
         $reader->collect();
         $this->assertEquals(
             [

@@ -472,6 +472,9 @@ class BatchSpanProcessorTest extends MockeryTestCase
             $meterProvider,
         );
 
+        $processor->onEnd($this->createSampledSpanMock());
+        $processor->forceFlush();
+
         $reader->collect();
         $this->assertEquals(
             [
